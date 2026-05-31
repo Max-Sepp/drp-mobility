@@ -1,8 +1,9 @@
-import { Ionicons } from '@expo/vector-icons'
 import { useEffect, useState } from 'react'
 import { FlatList, Keyboard } from 'react-native'
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Input, Separator, Text, XStack, YStack } from 'tamagui'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { Input, Separator, YStack } from 'tamagui'
+import ScreenHeader from '../components/ScreenHeader'
+import StationListItem from '../components/StationListItem'
 import { STATIONS } from '../constants/stations'
 import { stationPicker } from '../navigation/stationPicker'
 import type { SelectStationScreenProps, Station } from '../navigation/types'
@@ -33,15 +34,7 @@ export default function SelectStationScreen({ navigation, route }: SelectStation
 
   return (
     <YStack flex={1} style={{ backgroundColor: 'white' }}>
-      <SafeAreaView edges={['top']} style={{ backgroundColor: '#dbeafe' }}>
-        <YStack style={{ height: 72, justifyContent: 'center' }} px="$5" gap="$1">
-          <XStack items="center" gap="$1" mb="$2" style={{ alignSelf: 'flex-start' }} pressStyle={{ opacity: 0.6 }} onPress={() => navigation.goBack()}>
-            <Ionicons name="chevron-back" size={18} color="#2563eb" />
-            <Text fontSize={14} fontWeight="500" color="#2563eb">Back</Text>
-          </XStack>
-          <Text fontSize={22} fontWeight="700" color="#1a1a1a">Select station</Text>
-        </YStack>
-      </SafeAreaView>
+      <ScreenHeader title="Select station" height={72} onBack={() => navigation.goBack()} />
 
       <FlatList
         data={filtered}
@@ -49,35 +42,14 @@ export default function SelectStationScreen({ navigation, route }: SelectStation
         ItemSeparatorComponent={() => (
           <Separator style={{ marginLeft: 58 }} borderColor="$borderColor" />
         )}
-        renderItem={({ item }) => {
-          const selected = item.name === currentStation
-          return (
-            <XStack
-              items="center"
-              py="$4"
-              px="$5"
-              gap="$3.5"
-              pressStyle={{ opacity: 0.7 }}
-              onPress={() => select(item.name as Station)}
-              style={{ backgroundColor: selected ? '#f0fdf4' : 'white' }}
-            >
-              <YStack
-                style={{
-                  width: 24, height: 24, borderRadius: 12, borderWidth: 2,
-                  borderColor: selected ? '#2d6a4f' : '#9ca3af',
-                  backgroundColor: selected ? '#2d6a4f' : 'transparent',
-                  alignItems: 'center', justifyContent: 'center',
-                }}
-              >
-                {selected && <Text color="white" fontSize={13} fontWeight="700">✓</Text>}
-              </YStack>
-              <YStack>
-                <Text fontSize={16} fontWeight="600" color="#111827">{item.name}</Text>
-                <Text fontSize={13} color="#6b7280" mt="$1">{item.lines.join(', ')}</Text>
-              </YStack>
-            </XStack>
-          )
-        }}
+        renderItem={({ item }) => (
+          <StationListItem
+            name={item.name}
+            lines={item.lines}
+            selected={item.name === currentStation}
+            onPress={() => select(item.name as Station)}
+          />
+        )}
       />
 
       <YStack px="$4" pt="$2.5" style={{ borderTopWidth: 1, borderTopColor: '#e5e7eb', paddingBottom: keyboardHeight > 0 ? 10 : (insets.bottom || 10), marginBottom: keyboardHeight > 0 ? keyboardHeight + insets.bottom : 0 }}>
