@@ -46,7 +46,7 @@ export interface paths {
         post?: never;
         /**
          * Delete Outage Report
-         * @description Delete an outage report and its associated image.
+         * @description Soft-delete an outage report (creates a deletion record, row is kept).
          */
         delete: operations["delete_outage_report_outage_reports__report_id__delete"];
         options?: never;
@@ -80,6 +80,126 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/failures": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Failures
+         * @description Return all failures with computed first_reported and active report count.
+         */
+        get: operations["list_failures_failures_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/failures/{failure_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Failure
+         * @description Return a single failure with its equipment details and active reports.
+         */
+        get: operations["get_failure_failures__failure_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/failures/{failure_id}/resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Resolve Failure
+         * @description Mark a failure as resolved. New reports for the same equipment will start a fresh failure.
+         */
+        patch: operations["resolve_failure_failures__failure_id__resolve_patch"];
+        trace?: never;
+    };
+    "/stations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Stations
+         * @description Return all available stations.
+         */
+        get: operations["list_stations_stations_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/equipment-types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Equipment Types
+         * @description Return all available equipment types.
+         */
+        get: operations["list_equipment_types_equipment_types_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/equipment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Equipment
+         * @description Return all equipment, optionally filtered by station_id.
+         */
+        get: operations["list_equipment_equipment_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -90,11 +210,70 @@ export interface components {
             file: string;
         };
         /**
-         * EquipmentType
-         * @description Types of accessibility equipment that can be reported as broken down.
-         * @enum {string}
+         * EquipmentSummary
+         * @description Equipment row with its Station and EquipmentType inlined for client convenience.
          */
-        EquipmentType: "lift" | "escalator";
+        EquipmentSummary: {
+            /** Id */
+            id: number;
+            station: components["schemas"]["StationSchema"];
+            equipment_type: components["schemas"]["EquipmentTypeSchema"];
+            /** Connection */
+            connection: string;
+        };
+        /**
+         * EquipmentTypeSchema
+         * @description Public representation of an EquipmentType row (e.g. "lift", "escalator").
+         */
+        EquipmentTypeSchema: {
+            /** Id */
+            id: number;
+            /** Name */
+            name: string;
+        };
+        /**
+         * FailureDetail
+         * @description Failure as returned by GET /failures/{id} (with active reports).
+         */
+        FailureDetail: {
+            /** Id */
+            id: number;
+            equipment: components["schemas"]["EquipmentSummary"];
+            /** Resolved */
+            resolved: boolean;
+            /** First Reported */
+            first_reported: string | null;
+            /** Reports */
+            reports: components["schemas"]["OutageReportSummary"][];
+        };
+        /**
+         * FailureInline
+         * @description Minimal failure info embedded inside an OutageReportSummary.
+         */
+        FailureInline: {
+            /** Id */
+            id: number;
+            equipment: components["schemas"]["EquipmentSummary"];
+            /** Resolved */
+            resolved: boolean;
+        };
+        /**
+         * FailureSummary
+         * @description Failure as returned by GET /failures (with computed aggregates).
+         */
+        FailureSummary: {
+            /** Id */
+            id: number;
+            equipment: components["schemas"]["EquipmentSummary"];
+            /** Resolved */
+            resolved: boolean;
+            /** First Reported */
+            first_reported: string | null;
+            /** Last Reported */
+            last_reported: string | null;
+            /** Report Count */
+            report_count: number;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -102,16 +281,11 @@ export interface components {
         };
         /**
          * OutageReportCreate
-         * @description Payload accepted when submitting a new outage report.
-         *
-         *     `image` and `image_content_type` are handled separately via a multipart
-         *     upload endpoint rather than JSON, so they are absent here.
+         * @description Request body for POST /outage-reports — the image is uploaded separately.
          */
         OutageReportCreate: {
-            equipment_type: components["schemas"]["EquipmentType"];
-            station: components["schemas"]["Station"];
-            /** Connection */
-            connection: string;
+            /** Equipment Id */
+            equipment_id: number;
             /**
              * Breakdown Time
              * Format: date-time
@@ -122,17 +296,15 @@ export interface components {
         };
         /**
          * OutageReportSummary
-         * @description Outage report returned by list and single-item endpoints.
-         *
-         *     Image bytes are intentionally absent — use GET /outage-reports/{id}/image
-         *     to retrieve them.  `image_content_type` is kept so callers can tell whether
-         *     an image exists without downloading it.
+         * @description Outage report as returned to clients; `image_content_type` indicates an image is available
+         *     via GET /outage-reports/{id}/image — the bytes themselves are never embedded in JSON.
          */
         OutageReportSummary: {
-            equipment_type: components["schemas"]["EquipmentType"];
-            station: components["schemas"]["Station"];
-            /** Connection */
-            connection: string;
+            /** Id */
+            id: number;
+            /** Failure Id */
+            failure_id: number;
+            failure: components["schemas"]["FailureInline"];
             /**
              * Breakdown Time
              * Format: date-time
@@ -140,17 +312,19 @@ export interface components {
             breakdown_time: string;
             /** Description */
             description?: string | null;
-            /** Id */
-            id: number;
             /** Image Content Type */
             image_content_type?: string | null;
         };
         /**
-         * Station
-         * @description Stations where an outage can be reported.
-         * @enum {string}
+         * StationSchema
+         * @description Public representation of a Station row.
          */
-        Station: "Victoria" | "Waterloo" | "Paddington" | "King's Cross" | "London Bridge";
+        StationSchema: {
+            /** Id */
+            id: number;
+            /** Name */
+            name: string;
+        };
         /** ValidationError */
         ValidationError: {
             /** Location */
@@ -259,7 +433,9 @@ export interface operations {
     };
     delete_outage_report_outage_reports__report_id__delete: {
         parameters: {
-            query?: never;
+            query?: {
+                reason?: string | null;
+            };
             header?: never;
             path: {
                 report_id: number;
@@ -339,6 +515,159 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["OutageReportSummary"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_failures_failures_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FailureSummary"][];
+                };
+            };
+        };
+    };
+    get_failure_failures__failure_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                failure_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FailureDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    resolve_failure_failures__failure_id__resolve_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                failure_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FailureSummary"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_stations_stations_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StationSchema"][];
+                };
+            };
+        };
+    };
+    list_equipment_types_equipment_types_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EquipmentTypeSchema"][];
+                };
+            };
+        };
+    };
+    list_equipment_equipment_get: {
+        parameters: {
+            query?: {
+                station_id?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EquipmentSummary"][];
                 };
             };
             /** @description Validation Error */

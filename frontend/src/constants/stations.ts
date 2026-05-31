@@ -8,19 +8,4 @@ export const STATIONS: { name: Station; lines: string[] }[] = [
   { name: 'Waterloo', lines: ['Bakerloo', 'Jubilee', 'Northern', 'Waterloo & City'] },
 ]
 
-export const LIFT_CONNECTIONS = [
-  'street entrance',
-  'platform 1',
-  'platform 2',
-  'platform 3',
-  'car park',
-]
-
-export const ESCALATOR_CONNECTIONS = [
-  'street entrance',
-  'platform 1',
-  'platform 2',
-  'concourse',
-]
-
 export const DEFAULT_STATION: Station = 'Victoria'

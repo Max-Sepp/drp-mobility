@@ -30,8 +30,9 @@ function isToday(iso: string) {
 }
 
 function alertLabel(report: OutageReport) {
-  const conn = report.connection.toUpperCase()
-  const type = report.equipment_type === 'lift' ? 'LIFT' : 'ESCALATOR'
+  const equipment = report.failure.equipment
+  const conn = equipment.connection.toUpperCase()
+  const type = equipment.equipment_type.name === 'lift' ? 'LIFT' : 'ESCALATOR'
   return `${type} BROKEN – ${conn}`
 }
 
@@ -50,7 +51,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
   const fetchReports = useCallback(async () => {
     setLoading(true)
     const { data } = await apiClient.GET('/outage-reports')
-    if (data) setReports(data.filter(r => r.station === station))
+    if (data) setReports(data.filter(r => r.failure.equipment.station.name === station))
     setLoading(false)
   }, [station])
 

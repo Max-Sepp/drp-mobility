@@ -1,24 +1,46 @@
 import { Ionicons } from '@expo/vector-icons'
 import * as ImagePicker from 'expo-image-picker'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Alert, Image, KeyboardAvoidingView, Platform } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ScrollView, Spinner, TextArea, Text, XStack, YStack } from 'tamagui'
 import { apiClient } from '../api/client'
-import { ESCALATOR_CONNECTIONS, LIFT_CONNECTIONS } from '../constants/stations'
+import type { components } from '../api/schema.d'
 import type { ReportFormScreenProps, Station } from '../navigation/types'
+
+type Equipment = components['schemas']['EquipmentSummary']
 
 export default function ReportFormScreen({ navigation, route }: ReportFormScreenProps) {
   const [equipmentType] = useState(route.params.equipmentType)
   const [station] = useState<Station>(route.params.station)
-  const [connection, setConnection] = useState<string | null>(null)
+  // Connections are no longer hardcoded — they come from the equipment rows the backend has for
+  // this station and equipment type. Each option carries the equipment_id we submit the report against.
+  const [equipment, setEquipment] = useState<Equipment[]>([])
+  const [equipmentId, setEquipmentId] = useState<number | null>(null)
+  const [loadingEquipment, setLoadingEquipment] = useState(true)
   const [description, setDescription] = useState('')
   const [photo, setPhoto] = useState<ImagePicker.ImagePickerAsset | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
-  const connections = equipmentType === 'lift' ? LIFT_CONNECTIONS : ESCALATOR_CONNECTIONS
   const title = equipmentType === 'lift' ? 'Report a broken lift' : 'Report a broken escalator'
   const which = equipmentType === 'lift' ? 'Which lift?' : 'Which escalator?'
+
+  useEffect(() => {
+    let active = true
+    ;(async () => {
+      const { data } = await apiClient.GET('/equipment')
+      if (!active) return
+      if (data) {
+        setEquipment(
+          data.filter(e => e.station.name === station && e.equipment_type.name === equipmentType),
+        )
+      }
+      setLoadingEquipment(false)
+    })()
+    return () => {
+      active = false
+    }
+  }, [station, equipmentType])
 
   async function pickPhoto() {
     Alert.alert('Attach photo', undefined, [
@@ -48,7 +70,7 @@ export default function ReportFormScreen({ navigation, route }: ReportFormScreen
   const ALLOWED_MIME = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
 
   async function submit() {
-    if (!connection) {
+    if (!equipmentId) {
       Alert.alert('Required', `Please select which ${equipmentType} is broken.`)
       return
     }
@@ -66,9 +88,7 @@ export default function ReportFormScreen({ navigation, route }: ReportFormScreen
     try {
       const { data, error } = await apiClient.POST('/outage-reports', {
         body: {
-          equipment_type: equipmentType,
-          station,
-          connection,
+          equipment_id: equipmentId,
           breakdown_time: new Date().toISOString(),
           description: description.trim() || null,
         },
@@ -117,36 +137,42 @@ export default function ReportFormScreen({ navigation, route }: ReportFormScreen
       {/* Connection picker */}
       <YStack px="$5" mt="$5">
         <Text fontSize={14} fontWeight="600" color="#6b7280" mb="$2">{which}</Text>
-        {connections.map(c => {
-          const selected = connection === c
-          return (
-            <XStack
-              key={c}
-              items="center"
-              gap="$3"
-              pressStyle={{ opacity: 0.7 }}
-              onPress={() => setConnection(c)}
-              mb="$2"
-              style={{
-                paddingVertical: 12, paddingHorizontal: 14,
-                borderWidth: 1, borderColor: selected ? '#2d6a4f' : '#e5e7eb',
-                borderRadius: 8, backgroundColor: selected ? '#f0fdf4' : 'white',
-              }}
-            >
-              <YStack
+        {loadingEquipment ? (
+          <Spinner color="#9ca3af" />
+        ) : equipment.length === 0 ? (
+          <Text fontSize={15} color="#9ca3af">No {equipmentType}s registered at {station}.</Text>
+        ) : (
+          equipment.map(e => {
+            const selected = equipmentId === e.id
+            return (
+              <XStack
+                key={e.id}
+                items="center"
+                gap="$3"
+                pressStyle={{ opacity: 0.7 }}
+                onPress={() => setEquipmentId(e.id)}
+                mb="$2"
                 style={{
-                  width: 22, height: 22, borderRadius: 4, borderWidth: 2,
-                  borderColor: selected ? '#2d6a4f' : '#9ca3af',
-                  backgroundColor: selected ? '#2d6a4f' : 'transparent',
-                  alignItems: 'center', justifyContent: 'center',
+                  paddingVertical: 12, paddingHorizontal: 14,
+                  borderWidth: 1, borderColor: selected ? '#2d6a4f' : '#e5e7eb',
+                  borderRadius: 8, backgroundColor: selected ? '#f0fdf4' : 'white',
                 }}
               >
-                {selected && <Text color="white" fontSize={12} fontWeight="700">✕</Text>}
-              </YStack>
-              <Text fontSize={15} color="#111827">{c}</Text>
-            </XStack>
-          )
-        })}
+                <YStack
+                  style={{
+                    width: 22, height: 22, borderRadius: 4, borderWidth: 2,
+                    borderColor: selected ? '#2d6a4f' : '#9ca3af',
+                    backgroundColor: selected ? '#2d6a4f' : 'transparent',
+                    alignItems: 'center', justifyContent: 'center',
+                  }}
+                >
+                  {selected && <Text color="white" fontSize={12} fontWeight="700">✕</Text>}
+                </YStack>
+                <Text fontSize={15} color="#111827">{e.connection}</Text>
+              </XStack>
+            )
+          })
+        )}
       </YStack>
 
       {/* Photo */}
