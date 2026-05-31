@@ -13,8 +13,8 @@ type Equipment = components['schemas']['EquipmentSummary']
 export default function ReportFormScreen({ navigation, route }: ReportFormScreenProps) {
   const [equipmentType] = useState(route.params.equipmentType)
   const [station] = useState<Station>(route.params.station)
-  // Connections are no longer hardcoded — they come from the equipment rows the backend has for
-  // this station and equipment type. Each option carries the equipment_id we submit the report against.
+  // Connections come from the equipment rows the backend has for this station and equipment type.
+  // Each option carries the equipment_id the report is submitted against.
   const [equipment, setEquipment] = useState<Equipment[]>([])
   const [equipmentId, setEquipmentId] = useState<number | null>(null)
   const [loadingEquipment, setLoadingEquipment] = useState(true)
