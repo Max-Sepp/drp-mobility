@@ -1,14 +1,13 @@
 import { useState } from 'react'
 import { Alert } from 'react-native'
-import { Input, Text, XStack, YStack } from 'tamagui'
+import { Text, XStack, YStack } from 'tamagui'
 import { ScreenHeader } from '@/components/ScreenHeader'
 import { FormScreenLayout } from '@/features/reporting/components/FormScreenLayout'
 import type { JourneyPlannerScreenProps } from '@/navigation/types'
 import { type ResolvedLocation, resolveToPostcode } from '../api/geocode'
 import { type Journey, planJourney } from '../api/tfl'
 import { JourneyResultCard } from '../components/JourneyResultCard'
-
-const fieldStyle = { borderColor: '#d1d5db', backgroundColor: '#f9fafb', color: '#111827', fontSize: 15 }
+import { LocationInput } from '../components/LocationInput'
 
 type Resolved = { from: ResolvedLocation; to: ResolvedLocation }
 
@@ -57,29 +56,8 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
       footer={null}
     >
       <YStack px="$5" mt="$5" gap="$3">
-        <YStack gap="$1.5">
-          <Text fontSize={14} fontWeight="600" color="#6b7280">From</Text>
-          <Input
-            value={from}
-            onChangeText={setFrom}
-            placeholder="Address, postcode, or lat,long"
-            placeholderTextColor="$gray9"
-            autoCapitalize="none"
-            style={fieldStyle}
-          />
-        </YStack>
-
-        <YStack gap="$1.5">
-          <Text fontSize={14} fontWeight="600" color="#6b7280">To</Text>
-          <Input
-            value={to}
-            onChangeText={setTo}
-            placeholder="Address, postcode, or lat,long"
-            placeholderTextColor="$gray9"
-            autoCapitalize="none"
-            style={fieldStyle}
-          />
-        </YStack>
+        <LocationInput label="From" value={from} onChangeText={setFrom} />
+        <LocationInput label="To" value={to} onChangeText={setTo} />
 
         <YStack
           mt="$2"

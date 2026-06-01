@@ -19,6 +19,9 @@ const COORD_RE = /^(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)$/
 export type ResolvedLocation = { postcode: string; label: string }
 export type ResolveResult = ResolvedLocation | { error: string }
 
+/** A candidate place for the address autocomplete dropdown. */
+export type LocationSuggestion = { label: string; lat: number; lon: number; postcode?: string }
+
 /** Normalise a postcode to upper-case with a single space before the final three chars. */
 function normalisePostcode(raw: string): string {
   const compact = raw.replace(/\s+/g, '').toUpperCase()
@@ -47,6 +50,38 @@ async function coordsFromAddress(query: string): Promise<{ lat: number; lon: num
   const first = Array.isArray(body) ? body[0] : null
   if (!first) return null
   return { lat: Number(first.lat), lon: Number(first.lon) }
+}
+
+/**
+ * Address autocomplete: up to five candidate places (Great Britain only) for a free-text
+ * query, to populate a selection dropdown. Returns nothing for very short queries or for
+ * input that is already a postcode/coordinate (those need no lookup).
+ */
+export async function searchLocations(query: string): Promise<LocationSuggestion[]> {
+  const q = query.trim()
+  if (q.length < 3 || POSTCODE_RE.test(q) || COORD_RE.test(q)) return []
+  const url = `${NOMINATIM_BASE}/search?q=${encodeURIComponent(q)}&format=json&addressdetails=1&countrycodes=gb&limit=5`
+  const res = await fetch(url, { headers: { 'User-Agent': 'drp-mobility-app/1.0' } })
+  if (!res.ok) return []
+  const body = await res.json().catch(() => null)
+  if (!Array.isArray(body)) return []
+  return body.map(r => ({
+    label: String(r.display_name),
+    lat: Number(r.lat),
+    lon: Number(r.lon),
+    postcode: r.address?.postcode,
+  }))
+}
+
+/**
+ * The postcode for a chosen suggestion: use Nominatim's own postcode when it gave one,
+ * otherwise reverse-geocode its coordinates.
+ */
+export async function postcodeForSuggestion(suggestion: LocationSuggestion): Promise<string | null> {
+  if (suggestion.postcode && POSTCODE_RE.test(suggestion.postcode)) {
+    return normalisePostcode(suggestion.postcode)
+  }
+  return postcodeFromCoords(suggestion.lat, suggestion.lon)
 }
 
 /**
