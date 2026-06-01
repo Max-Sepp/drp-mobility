@@ -1,4 +1,4 @@
-import type { Station } from './types'
+import type { Station } from '@/navigation/types'
 
 let _callback: ((station: Station) => void) | null = null
 

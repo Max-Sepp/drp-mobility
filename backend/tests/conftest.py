@@ -8,6 +8,7 @@ from sqlalchemy.pool import StaticPool
 
 from app.database import Base, get_db
 from app.main import app
+from app.seed import seed_defaults
 
 
 @pytest.fixture
@@ -20,6 +21,7 @@ def db_session() -> Iterator[Session]:
     Base.metadata.create_all(bind=engine)
     TestingSessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
     session = TestingSessionLocal()
+    seed_defaults(session)
     try:
         yield session
     finally:
