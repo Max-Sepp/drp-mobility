@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import { Input, Spinner, Text, XStack, YStack } from 'tamagui'
+import { Input, Spinner, Text, YStack } from 'tamagui'
 import { type LocationSuggestion, postcodeForSuggestion, searchLocations } from '../api/geocode'
 
-const boxStyle = { borderWidth: 1.5, borderColor: '#d1d5db', borderRadius: 10, backgroundColor: '#f9fafb' }
+const fieldStyle = { borderColor: '#d1d5db', backgroundColor: '#f9fafb', color: '#111827', fontSize: 15 }
 
 type LocationInputProps = {
   label: string
@@ -73,22 +73,25 @@ export const LocationInput = ({ label, value, onChangeText, onResolved }: Locati
     <YStack gap="$1.5">
       <Text fontSize={14} fontWeight="600" color="#6b7280">{label}</Text>
 
-      <XStack items="center" gap="$2" pr="$3" style={boxStyle}>
+      <YStack position="relative" justify="center">
         <Input
-          flex={1}
           value={value}
           onChangeText={handleType}
           placeholder="Address, postcode, or lat,long"
           placeholderTextColor="$gray9"
           autoCapitalize="none"
-          style={{ borderWidth: 0, backgroundColor: 'transparent', color: '#111827', fontSize: 15 }}
+          style={{ ...fieldStyle, paddingRight: 38 }}
         />
-        {searching ? (
-          <Spinner size="small" color="#6b7280" />
-        ) : resolved ? (
-          <Text fontSize={18} fontWeight="700" color="#16a34a">✓</Text>
-        ) : null}
-      </XStack>
+        {(searching || resolved) && (
+          <YStack position="absolute" r={12} t={0} b={0} justify="center">
+            {searching ? (
+              <Spinner size="small" color="#6b7280" />
+            ) : (
+              <Text fontSize={18} fontWeight="700" color="#16a34a">✓</Text>
+            )}
+          </YStack>
+        )}
+      </YStack>
 
       {suggestions.length > 0 && (
         <YStack style={{ borderWidth: 1.5, borderColor: '#d1d5db', borderRadius: 10, backgroundColor: 'white', overflow: 'hidden' }}>
