@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Spinner, Text, YStack } from 'tamagui'
-import type { components } from '../api/schema.d'
-import OutageReportCard from './OutageReportCard'
+import type { components } from '@/api/schema.d'
+import { Heading } from '@/components/Heading'
+import { OutageReportCard } from './OutageReportCard'
 
 type OutageReport = components['schemas']['OutageReportSummary']
 
@@ -11,7 +12,7 @@ type ReportsStatusProps = {
 }
 
 /** Station status block: a spinner while loading, an "all clear" card when empty, or the list of outages. */
-export default function ReportsStatus({ loading, reports }: ReportsStatusProps) {
+export const ReportsStatus = ({ loading, reports }: ReportsStatusProps) => {
   const [expandedId, setExpandedId] = useState<number | null>(null)
 
   if (loading) {
@@ -28,7 +29,7 @@ export default function ReportsStatus({ loading, reports }: ReportsStatusProps) 
         <YStack style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: '#2d6a4f', alignItems: 'center', justifyContent: 'center' }}>
           <Text color="white" fontSize={24} fontWeight="700">✓</Text>
         </YStack>
-        <Text fontSize={18} fontWeight="700" color="#1a3c2a">No known issues</Text>
+        <Heading fontSize={18} color="#1a3c2a">No known issues</Heading>
       </YStack>
     )
   }

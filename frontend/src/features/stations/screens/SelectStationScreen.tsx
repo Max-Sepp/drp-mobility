@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react'
 import { FlatList, Keyboard } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Input, Separator, YStack } from 'tamagui'
-import ScreenHeader from '../components/ScreenHeader'
-import StationListItem from '../components/StationListItem'
-import { STATIONS } from '../constants/stations'
-import { stationPicker } from '../navigation/stationPicker'
-import type { SelectStationScreenProps, Station } from '../navigation/types'
+import { ScreenHeader } from '@/components/ScreenHeader'
+import type { SelectStationScreenProps, Station } from '@/navigation/types'
+import { StationListItem } from '../components/StationListItem'
+import { STATIONS } from '../constants'
+import { stationPicker } from '../stationPicker'
 
-export default function SelectStationScreen({ navigation, route }: SelectStationScreenProps) {
+export const SelectStationScreen = ({ navigation, route }: SelectStationScreenProps) => {
   const { currentStation } = route.params
   const [query, setQuery] = useState('')
   const [keyboardHeight, setKeyboardHeight] = useState(0)

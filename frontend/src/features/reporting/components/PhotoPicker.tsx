@@ -1,7 +1,7 @@
 import * as ImagePicker from 'expo-image-picker'
 import { Alert, Image } from 'react-native'
 import { Text, YStack } from 'tamagui'
-import FormSection from './FormSection'
+import { FormSection } from './FormSection'
 
 type PhotoPickerProps = {
   photo: ImagePicker.ImagePickerAsset | null
@@ -10,7 +10,7 @@ type PhotoPickerProps = {
 }
 
 /** Labelled image upload box that prompts for camera or library and reports the chosen asset. */
-export default function PhotoPicker({ photo, onPicked, label = 'Attach photo (optional)' }: PhotoPickerProps) {
+export const PhotoPicker = ({ photo, onPicked, label = 'Attach photo (optional)' }: PhotoPickerProps) => {
   function pick() {
     Alert.alert('Attach photo', undefined, [
       {

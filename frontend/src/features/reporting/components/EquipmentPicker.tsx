@@ -1,6 +1,6 @@
 import { Spinner, Text, XStack, YStack } from 'tamagui'
-import type { components } from '../api/schema.d'
-import FormSection from './FormSection'
+import type { components } from '@/api/schema.d'
+import { FormSection } from './FormSection'
 
 type Equipment = components['schemas']['EquipmentSummary']
 
@@ -14,7 +14,7 @@ type EquipmentPickerProps = {
 }
 
 /** Single-select list of equipment connections; shows a spinner while loading and a message when empty. */
-export default function EquipmentPicker({ label, loading, equipment, selectedId, onSelect, emptyText }: EquipmentPickerProps) {
+export const EquipmentPicker = ({ label, loading, equipment, selectedId, onSelect, emptyText }: EquipmentPickerProps) => {
   return (
     <FormSection label={label}>
       {loading ? (

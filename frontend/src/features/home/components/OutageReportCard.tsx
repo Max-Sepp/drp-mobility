@@ -1,8 +1,9 @@
 import { Image, Pressable } from 'react-native'
 import { Text, XStack, YStack } from 'tamagui'
-import { BASE_URL } from '../api/client'
-import type { components } from '../api/schema.d'
-import { formatTime, isToday } from '../lib/datetime'
+import { BASE_URL } from '@/api/client'
+import type { components } from '@/api/schema.d'
+import { Heading } from '@/components/Heading'
+import { formatTime, isToday } from '@/lib/datetime'
 
 type OutageReport = components['schemas']['OutageReportSummary']
 
@@ -20,7 +21,7 @@ function alertLabel(report: OutageReport): string {
 }
 
 /** A single outage alert. When it has a photo it becomes tappable to expand the description + image. */
-export default function OutageReportCard({ report, expanded, onToggle }: OutageReportCardProps) {
+export const OutageReportCard = ({ report, expanded, onToggle }: OutageReportCardProps) => {
   const hasPhoto = !!report.image_content_type
 
   const header = (
@@ -29,7 +30,7 @@ export default function OutageReportCard({ report, expanded, onToggle }: OutageR
         <Text color="white" fontWeight="700" fontSize={18}>!</Text>
       </YStack>
       <YStack flex={1}>
-        <Text fontSize={14} fontWeight="700" color="#7f1d1d">{alertLabel(report)}</Text>
+        <Heading fontSize={14} color="#7f1d1d">{alertLabel(report)}</Heading>
         <Text fontSize={12} color="#991b1b" mt="$1">
           reported at {formatTime(report.breakdown_time)}{isToday(report.breakdown_time) ? ' today' : ''}
         </Text>

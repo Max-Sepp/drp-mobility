@@ -9,7 +9,7 @@ type FormScreenLayoutProps = {
 }
 
 /** Keyboard-aware scaffold for the report forms: a pinned header, a scrolling body, and a pinned footer. */
-export default function FormScreenLayout({ header, footer, children }: FormScreenLayoutProps) {
+export const FormScreenLayout = ({ header, footer, children }: FormScreenLayoutProps) => {
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: 'white' }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <ScrollView flex={1} style={{ backgroundColor: 'white' }} contentContainerStyle={{ paddingBottom: 16 } as any} keyboardShouldPersistTaps="handled">

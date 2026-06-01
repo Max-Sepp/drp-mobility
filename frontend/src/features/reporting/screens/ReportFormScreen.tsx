@@ -2,21 +2,21 @@ import * as ImagePicker from 'expo-image-picker'
 import { useEffect, useState } from 'react'
 import { Alert } from 'react-native'
 import { TextArea } from 'tamagui'
-import { apiClient } from '../api/client'
-import type { components } from '../api/schema.d'
-import EquipmentPicker from '../components/EquipmentPicker'
-import FormScreenLayout from '../components/FormScreenLayout'
-import FormSection from '../components/FormSection'
-import PhotoPicker from '../components/PhotoPicker'
-import ScreenHeader from '../components/ScreenHeader'
-import SubmitBar from '../components/SubmitBar'
-import type { ReportFormScreenProps, Station } from '../navigation/types'
+import { apiClient } from '@/api/client'
+import type { components } from '@/api/schema.d'
+import { ScreenHeader } from '@/components/ScreenHeader'
+import type { ReportFormScreenProps, Station } from '@/navigation/types'
+import { EquipmentPicker } from '../components/EquipmentPicker'
+import { FormScreenLayout } from '../components/FormScreenLayout'
+import { FormSection } from '../components/FormSection'
+import { PhotoPicker } from '../components/PhotoPicker'
+import { SubmitBar } from '../components/SubmitBar'
 
 type Equipment = components['schemas']['EquipmentSummary']
 
 const ALLOWED_MIME = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
 
-export default function ReportFormScreen({ navigation, route }: ReportFormScreenProps) {
+export const ReportFormScreen = ({ navigation, route }: ReportFormScreenProps) => {
   const [equipmentType] = useState(route.params.equipmentType)
   const [station] = useState<Station>(route.params.station)
   // Connections come from the equipment rows the backend has for this station and equipment type.

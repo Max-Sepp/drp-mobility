@@ -2,14 +2,14 @@ import * as ImagePicker from 'expo-image-picker'
 import { useState } from 'react'
 import { Alert } from 'react-native'
 import { Input, TextArea } from 'tamagui'
-import FormScreenLayout from '../components/FormScreenLayout'
-import FormSection from '../components/FormSection'
-import PhotoPicker from '../components/PhotoPicker'
-import ScreenHeader from '../components/ScreenHeader'
-import SubmitBar from '../components/SubmitBar'
-import type { ReportCustomScreenProps } from '../navigation/types'
+import { ScreenHeader } from '@/components/ScreenHeader'
+import type { ReportCustomScreenProps } from '@/navigation/types'
+import { FormScreenLayout } from '../components/FormScreenLayout'
+import { FormSection } from '../components/FormSection'
+import { PhotoPicker } from '../components/PhotoPicker'
+import { SubmitBar } from '../components/SubmitBar'
 
-export default function ReportCustomScreen({ navigation, route }: ReportCustomScreenProps) {
+export const ReportCustomScreen = ({ navigation, route }: ReportCustomScreenProps) => {
   const { station } = route.params
   const [description, setDescription] = useState('')
   const [area, setArea] = useState('')

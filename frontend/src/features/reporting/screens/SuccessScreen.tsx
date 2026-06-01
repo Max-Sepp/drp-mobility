@@ -1,8 +1,9 @@
 import { useEffect } from 'react'
 import { Text, YStack } from 'tamagui'
-import type { SuccessScreenProps } from '../navigation/types'
+import { Heading } from '@/components/Heading'
+import type { SuccessScreenProps } from '@/navigation/types'
 
-export default function SuccessScreen({ navigation }: SuccessScreenProps) {
+export const SuccessScreen = ({ navigation }: SuccessScreenProps) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       navigation.reset({ index: 0, routes: [{ name: 'Home' }] })
@@ -19,7 +20,7 @@ export default function SuccessScreen({ navigation }: SuccessScreenProps) {
       >
         <Text fontSize={52} color="#2d6a4f">✓</Text>
       </YStack>
-      <Text fontSize={22} fontWeight="700" color="#1a1a1a">Submitted</Text>
+      <Heading>Submitted</Heading>
     </YStack>
   )
 }

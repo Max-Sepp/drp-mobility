@@ -8,7 +8,7 @@ type StationListItemProps = {
 }
 
 /** One selectable station row: a radio indicator, the station name, and its lines. */
-export default function StationListItem({ name, lines, selected, onPress }: StationListItemProps) {
+export const StationListItem = ({ name, lines, selected, onPress }: StationListItemProps) => {
   return (
     <XStack
       items="center"

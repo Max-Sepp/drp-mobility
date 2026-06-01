@@ -1,17 +1,16 @@
 import { useCallback, useEffect, useState } from 'react'
 import { ScrollView } from 'tamagui'
-import { apiClient } from '../api/client'
-import type { components } from '../api/schema.d'
-import QuickReportGrid, { type QuickReportAction } from '../components/QuickReportGrid'
-import ReportsStatus from '../components/ReportsStatus'
-import StationHeader from '../components/StationHeader'
-import { DEFAULT_STATION } from '../constants/stations'
-import { stationPicker } from '../navigation/stationPicker'
-import type { HomeScreenProps, Station } from '../navigation/types'
+import { apiClient } from '@/api/client'
+import type { components } from '@/api/schema.d'
+import { DEFAULT_STATION, stationPicker } from '@/features/stations'
+import type { HomeScreenProps, Station } from '@/navigation/types'
+import { QuickReportGrid, type QuickReportAction } from '../components/QuickReportGrid'
+import { ReportsStatus } from '../components/ReportsStatus'
+import { StationHeader } from '../components/StationHeader'
 
 type OutageReport = components['schemas']['OutageReportSummary']
 
-export default function HomeScreen({ navigation }: HomeScreenProps) {
+export const HomeScreen = ({ navigation }: HomeScreenProps) => {
   const [station, setStation] = useState<Station>(DEFAULT_STATION)
   const [reports, setReports] = useState<OutageReport[]>([])
   const [loading, setLoading] = useState(false)

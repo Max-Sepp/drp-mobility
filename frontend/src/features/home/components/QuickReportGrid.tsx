@@ -1,5 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import { Text, XStack, YStack } from 'tamagui'
+import { Heading } from '@/components/Heading'
 
 export type QuickReportAction =
   | { route: 'ReportForm'; equipmentType: 'lift' | 'escalator' }
@@ -23,10 +24,10 @@ type QuickReportGridProps = {
 }
 
 /** The two-column grid of quick-report tiles; tiles without an action are shown disabled. */
-export default function QuickReportGrid({ onSelect }: QuickReportGridProps) {
+export const QuickReportGrid = ({ onSelect }: QuickReportGridProps) => {
   return (
     <>
-      <Text fontSize={13} fontWeight="600" color="#374151" mt="$4" mb="$2" mx="$4">Quick report</Text>
+      <Heading fontSize={13} fontWeight="600" color="#374151" mt="$4" mb="$2" mx="$4">Quick report</Heading>
       <XStack flexWrap="wrap" mx="$4" gap="$2.5" justify="center">
         {GRID_ITEMS.map(item => {
           const disabled = !item.action

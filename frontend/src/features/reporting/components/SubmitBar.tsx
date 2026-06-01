@@ -8,7 +8,7 @@ type SubmitBarProps = {
 }
 
 /** Fixed bottom bar holding the primary submit button; shows a spinner while submitting. */
-export default function SubmitBar({ onPress, submitting = false, label = 'Submit' }: SubmitBarProps) {
+export const SubmitBar = ({ onPress, submitting = false, label = 'Submit' }: SubmitBarProps) => {
   return (
     <SafeAreaView edges={['bottom']} style={{ backgroundColor: 'white', borderTopWidth: 1, borderTopColor: '#e5e7eb' }}>
       <YStack

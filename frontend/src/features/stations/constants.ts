@@ -1,4 +1,4 @@
-import type { Station } from '../navigation/types'
+import type { Station } from '@/navigation/types'
 
 export const STATIONS: { name: Station; lines: string[] }[] = [
   { name: "King's Cross", lines: ['Circle', 'Hammersmith & City', 'Metropolitan', 'Northern', 'Piccadilly', 'Victoria'] },
