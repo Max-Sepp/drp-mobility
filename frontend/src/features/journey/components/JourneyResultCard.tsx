@@ -1,8 +1,18 @@
 import { Text, XStack, YStack } from 'tamagui'
+import type { StationOutage } from '../api/accessibility'
 import type { Journey } from '../api/tfl'
 
 type JourneyResultCardProps = {
   journey: Journey
+  /** Stations on this journey we know to have broken step-free equipment, if any. */
+  outages?: StationOutage[]
+}
+
+/** "Victoria: lift, escalator reported out of service" for each affected station. */
+function outageWarning(outages: StationOutage[]): string {
+  return outages
+    .map(o => `${o.stationName}: ${o.equipmentTypes.join(', ')} reported out of service`)
+    .join(' · ')
 }
 
 /** A human-readable label for a TfL mode name, e.g. `national-rail` -> `National rail`. */
@@ -40,7 +50,7 @@ function fareLabel(journey: Journey): string | null {
  * One journey option: total duration, depart/arrive times, and the ordered legs.
  * Mode is shown as text (no colour-only signals, per the project UI rules).
  */
-export const JourneyResultCard = ({ journey }: JourneyResultCardProps) => {
+export const JourneyResultCard = ({ journey, outages = [] }: JourneyResultCardProps) => {
   const fare = fareLabel(journey)
   return (
     <YStack
@@ -50,6 +60,18 @@ export const JourneyResultCard = ({ journey }: JourneyResultCardProps) => {
       gap="$3"
       style={{ borderWidth: 1.5, borderColor: '#d1d5db', borderRadius: 10, backgroundColor: 'white' }}
     >
+      {outages.length > 0 && (
+        <XStack
+          gap="$2"
+          p="$2.5"
+          items="flex-start"
+          style={{ backgroundColor: '#fffbeb', borderWidth: 1, borderColor: '#fcd34d', borderRadius: 8 }}
+        >
+          <Text fontSize={15}>⚠️</Text>
+          <Text fontSize={13} color="#92400e" flex={1}>{outageWarning(outages)}</Text>
+        </XStack>
+      )}
+
       <XStack items="center" justify="space-between">
         <XStack items="baseline" gap="$2">
           <Text fontSize={18} fontWeight="700" color="#111827">{journey.duration} min</Text>
