@@ -14,6 +14,10 @@ type Resolved = { from: ResolvedLocation; to: ResolvedLocation }
 export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) => {
   const [from, setFrom] = useState('')
   const [to, setTo] = useState('')
+  // Postcode resolved from a chosen suggestion, used behind the scenes so the box can keep
+  // showing the readable address. Null when the user typed a value we resolve at submit.
+  const [fromPostcode, setFromPostcode] = useState<string | null>(null)
+  const [toPostcode, setToPostcode] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState<Journey[]>([])
   const [resolved, setResolved] = useState<Resolved | null>(null)
@@ -27,8 +31,11 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
     setResults([])
     setResolved(null)
 
-    // Convert each input to a UK postcode first, then query TfL postcode-to-postcode.
-    const [fromLoc, toLoc] = await Promise.all([resolveToPostcode(from), resolveToPostcode(to)])
+    // Use the postcode already resolved from a dropdown selection; otherwise convert the
+    // typed text (a postcode or coordinates) now. Either way we query postcode-to-postcode.
+    const resolveField = (text: string, postcode: string | null) =>
+      postcode ? Promise.resolve({ postcode, label: text } as ResolvedLocation) : resolveToPostcode(text)
+    const [fromLoc, toLoc] = await Promise.all([resolveField(from, fromPostcode), resolveField(to, toPostcode)])
     if ('error' in fromLoc) {
       setLoading(false)
       Alert.alert('Start location', fromLoc.error)
@@ -56,8 +63,8 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
       footer={null}
     >
       <YStack px="$5" mt="$5" gap="$3">
-        <LocationInput label="From" value={from} onChangeText={setFrom} />
-        <LocationInput label="To" value={to} onChangeText={setTo} />
+        <LocationInput label="From" value={from} onChangeText={setFrom} onResolved={setFromPostcode} />
+        <LocationInput label="To" value={to} onChangeText={setTo} onResolved={setToPostcode} />
 
         <YStack
           mt="$2"

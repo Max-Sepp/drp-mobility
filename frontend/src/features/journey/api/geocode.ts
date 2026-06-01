@@ -53,9 +53,24 @@ async function coordsFromAddress(query: string): Promise<{ lat: number; lon: num
 }
 
 /**
+ * Shorten Nominatim's verbose `display_name` to its most useful leading parts (e.g.
+ * "14, Leinster Gardens, Westbourne Green") — Nominatim orders parts specific-to-general,
+ * so the front is the building/street/area and the tail is county/region/country/postcode.
+ */
+function conciseAddress(displayName: string): string {
+  return displayName
+    .split(',')
+    .map(part => part.trim())
+    .filter(Boolean)
+    .slice(0, 3)
+    .join(', ')
+}
+
+/**
  * Address autocomplete: up to five candidate places (Great Britain only) for a free-text
- * query, to populate a selection dropdown. Returns nothing for very short queries or for
- * input that is already a postcode/coordinate (those need no lookup).
+ * query, to populate a selection dropdown. Labels are shortened for display. Returns
+ * nothing for very short queries or for input that is already a postcode/coordinate
+ * (those need no lookup).
  */
 export async function searchLocations(query: string): Promise<LocationSuggestion[]> {
   const q = query.trim()
@@ -66,7 +81,7 @@ export async function searchLocations(query: string): Promise<LocationSuggestion
   const body = await res.json().catch(() => null)
   if (!Array.isArray(body)) return []
   return body.map(r => ({
-    label: String(r.display_name),
+    label: conciseAddress(String(r.display_name)),
     lat: Number(r.lat),
     lon: Number(r.lon),
     postcode: r.address?.postcode,

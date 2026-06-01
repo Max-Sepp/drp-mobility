@@ -22,10 +22,18 @@ function clockTime(local: string): string {
   return match ? match[1] : local
 }
 
-/** Format a TfL fare: `totalCost` is in pence. Walking-only journeys (no fare) read "Free". */
-function fareLabel(fare?: { totalCost: number }): string {
-  if (!fare || fare.totalCost === 0) return 'Free'
-  return `£${(fare.totalCost / 100).toFixed(2)}`
+/**
+ * The fare to display, or null to show nothing. TfL's fare data is unreliable — it's often
+ * omitted even for ticketed journeys — so we only say "Free" when the journey is genuinely
+ * walking-only. A paid journey with missing fare data returns null (we show nothing) rather
+ * than a misleading "Free".
+ */
+function fareLabel(journey: Journey): string | null {
+  const { fare, legs } = journey
+  if (fare && fare.totalCost > 0) return `£${(fare.totalCost / 100).toFixed(2)}`
+  const walkingOnly = legs.length > 0 && legs.every(leg => leg.mode.name === 'walking')
+  if (walkingOnly) return 'Free'
+  return null
 }
 
 /**
@@ -33,6 +41,7 @@ function fareLabel(fare?: { totalCost: number }): string {
  * Mode is shown as text (no colour-only signals, per the project UI rules).
  */
 export const JourneyResultCard = ({ journey }: JourneyResultCardProps) => {
+  const fare = fareLabel(journey)
   return (
     <YStack
       mx="$5"
@@ -44,7 +53,7 @@ export const JourneyResultCard = ({ journey }: JourneyResultCardProps) => {
       <XStack items="center" justify="space-between">
         <XStack items="baseline" gap="$2">
           <Text fontSize={18} fontWeight="700" color="#111827">{journey.duration} min</Text>
-          <Text fontSize={15} fontWeight="600" color="#16a34a">{fareLabel(journey.fare)}</Text>
+          {fare && <Text fontSize={15} fontWeight="600" color="#16a34a">{fare}</Text>}
         </XStack>
         <Text fontSize={15} color="#374151">
           {clockTime(journey.startDateTime)} → {clockTime(journey.arrivalDateTime)}

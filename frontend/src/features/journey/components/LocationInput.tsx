@@ -1,25 +1,28 @@
 import { useEffect, useRef, useState } from 'react'
-import { Input, Text, XStack, YStack } from 'tamagui'
+import { Input, Spinner, Text, XStack, YStack } from 'tamagui'
 import { type LocationSuggestion, postcodeForSuggestion, searchLocations } from '../api/geocode'
 
-const fieldStyle = { borderColor: '#d1d5db', backgroundColor: '#f9fafb', color: '#111827', fontSize: 15 }
+const boxStyle = { borderWidth: 1.5, borderColor: '#d1d5db', borderRadius: 10, backgroundColor: '#f9fafb' }
 
 type LocationInputProps = {
   label: string
   value: string
   onChangeText: (text: string) => void
+  /** Called with the postcode resolved from a chosen suggestion, or null when invalidated. */
+  onResolved: (postcode: string | null) => void
 }
 
 /**
- * Address field with a postcode-picker dropdown: as the user types a free-text address we
- * fetch matching places and list them; tapping one fills the field with that place's
- * postcode (and confirms the place name below). Typing a postcode or coordinates directly
- * skips the dropdown — those are used as-is.
+ * Address field with a postcode-picker dropdown. As the user types a free-text address we
+ * fetch matching places (shown with short labels); tapping one keeps the readable address
+ * in the box and reports its postcode to the parent via `onResolved` to use behind the
+ * scenes. A tick on the right of the box confirms a resolved selection. Typing a postcode
+ * or coordinates directly skips the dropdown — those are resolved at submit time.
  */
-export const LocationInput = ({ label, value, onChangeText }: LocationInputProps) => {
+export const LocationInput = ({ label, value, onChangeText, onResolved }: LocationInputProps) => {
   const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([])
   const [searching, setSearching] = useState(false)
-  const [selectedLabel, setSelectedLabel] = useState<string | null>(null)
+  const [resolved, setResolved] = useState(false)
   // Skip the search that the value change from a selection would otherwise trigger.
   const skipNextSearch = useRef(false)
 
@@ -49,43 +52,43 @@ export const LocationInput = ({ label, value, onChangeText }: LocationInputProps
 
   // User typing invalidates any prior selection.
   function handleType(text: string) {
-    setSelectedLabel(null)
+    setResolved(false)
+    onResolved(null)
     onChangeText(text)
   }
 
   async function choose(suggestion: LocationSuggestion) {
     setSuggestions([])
+    setSearching(true)
     const postcode = await postcodeForSuggestion(suggestion)
+    setSearching(false)
+    if (!postcode) return // keep the typed text; let the user try a postcode directly
     skipNextSearch.current = true
-    if (postcode) {
-      setSelectedLabel(suggestion.label)
-      onChangeText(postcode)
-    } else {
-      // No postcode found — keep the typed text and let the user try a postcode directly.
-      skipNextSearch.current = false
-    }
+    setResolved(true)
+    onResolved(postcode)
+    onChangeText(suggestion.label)
   }
 
   return (
     <YStack gap="$1.5">
       <Text fontSize={14} fontWeight="600" color="#6b7280">{label}</Text>
-      <Input
-        value={value}
-        onChangeText={handleType}
-        placeholder="Address, postcode, or lat,long"
-        placeholderTextColor="$gray9"
-        autoCapitalize="none"
-        style={fieldStyle}
-      />
 
-      {searching && <Text fontSize={13} color="#6b7280">Searching…</Text>}
-
-      {selectedLabel && (
-        <XStack gap="$1.5" items="center">
-          <Text fontSize={13} color="#16a34a">✓</Text>
-          <Text fontSize={13} color="#374151" flex={1} numberOfLines={2}>{selectedLabel}</Text>
-        </XStack>
-      )}
+      <XStack items="center" gap="$2" pr="$3" style={boxStyle}>
+        <Input
+          flex={1}
+          value={value}
+          onChangeText={handleType}
+          placeholder="Address, postcode, or lat,long"
+          placeholderTextColor="$gray9"
+          autoCapitalize="none"
+          style={{ borderWidth: 0, backgroundColor: 'transparent', color: '#111827', fontSize: 15 }}
+        />
+        {searching ? (
+          <Spinner size="small" color="#6b7280" />
+        ) : resolved ? (
+          <Text fontSize={18} fontWeight="700" color="#16a34a">✓</Text>
+        ) : null}
+      </XStack>
 
       {suggestions.length > 0 && (
         <YStack style={{ borderWidth: 1.5, borderColor: '#d1d5db', borderRadius: 10, backgroundColor: 'white', overflow: 'hidden' }}>
@@ -102,7 +105,7 @@ export const LocationInput = ({ label, value, onChangeText }: LocationInputProps
                 borderTopColor: '#e5e7eb',
               }}
             >
-              <Text fontSize={15} color="#111827" numberOfLines={2}>{suggestion.label}</Text>
+              <Text fontSize={15} color="#111827" numberOfLines={1}>{suggestion.label}</Text>
               {suggestion.postcode && (
                 <Text fontSize={13} color="#6b7280">{suggestion.postcode}</Text>
               )}
