@@ -22,6 +22,12 @@ function clockTime(local: string): string {
   return match ? match[1] : local
 }
 
+/** Format a TfL fare: `totalCost` is in pence. Walking-only journeys (no fare) read "Free". */
+function fareLabel(fare?: { totalCost: number }): string {
+  if (!fare || fare.totalCost === 0) return 'Free'
+  return `£${(fare.totalCost / 100).toFixed(2)}`
+}
+
 /**
  * One journey option: total duration, depart/arrive times, and the ordered legs.
  * Mode is shown as text (no colour-only signals, per the project UI rules).
@@ -36,7 +42,10 @@ export const JourneyResultCard = ({ journey }: JourneyResultCardProps) => {
       style={{ borderWidth: 1.5, borderColor: '#d1d5db', borderRadius: 10, backgroundColor: 'white' }}
     >
       <XStack items="center" justify="space-between">
-        <Text fontSize={18} fontWeight="700" color="#111827">{journey.duration} min</Text>
+        <XStack items="baseline" gap="$2">
+          <Text fontSize={18} fontWeight="700" color="#111827">{journey.duration} min</Text>
+          <Text fontSize={15} fontWeight="600" color="#16a34a">{fareLabel(journey.fare)}</Text>
+        </XStack>
         <Text fontSize={15} color="#374151">
           {clockTime(journey.startDateTime)} → {clockTime(journey.arrivalDateTime)}
         </Text>

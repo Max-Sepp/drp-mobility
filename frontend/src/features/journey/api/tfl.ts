@@ -21,6 +21,9 @@ export type Journey = {
   arrivalDateTime: string
   duration: number
   legs: Leg[]
+  // Present only for journeys with a ticketed leg; `totalCost` is in pence. Walking-only
+  // journeys have no fare.
+  fare?: { totalCost: number }
 }
 
 /** Result of a journey plan request. */
