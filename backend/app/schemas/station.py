@@ -1,5 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 
+from app.models.station import StepFree
+
 
 class StationSchema(BaseModel):
     """Public representation of a Station row."""
@@ -8,3 +10,4 @@ class StationSchema(BaseModel):
 
     id: int
     name: str
+    step_free: StepFree

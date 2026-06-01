@@ -324,7 +324,17 @@ export interface components {
             id: number;
             /** Name */
             name: string;
+            step_free: components["schemas"]["StepFree"];
         };
+        /**
+         * StepFree
+         * @description A station's step-free accessibility, as published by TfL.
+         *
+         *     Ordered weakest-to-strongest: no step-free access, step-free from street to platform
+         *     only, and step-free all the way from street onto the train.
+         * @enum {string}
+         */
+        StepFree: "none" | "to_platform" | "to_vehicle";
         /** ValidationError */
         ValidationError: {
             /** Location */

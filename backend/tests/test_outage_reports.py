@@ -78,7 +78,10 @@ def test_create_outage_report_returns_201(client: TestClient, db_session: Sessio
     assert body["failure_id"] is not None
     assert body["failure"]["equipment"]["station"]["name"] == "Victoria"
     assert body["failure"]["equipment"]["equipment_type"]["name"] == "lift"
-    assert body["failure"]["equipment"]["connection"] == "street to platform 1"
+    # Real feed lifts are named "Lift X: <from> → <to>" (e.g. "Lift A1B2: D-VIC → Booking hall").
+    connection = body["failure"]["equipment"]["connection"]
+    assert connection.startswith("Lift ")
+    assert " → " in connection
     assert body["description"] == "Doors not closing"
     assert body["image_content_type"] is None
 

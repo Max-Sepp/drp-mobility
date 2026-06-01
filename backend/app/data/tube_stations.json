@@ -1,0 +1,4552 @@
+[
+  {
+    "name": "Acton Town",
+    "step_free": "to_platform",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District line — Platform 1",
+        "lines": "District"
+      },
+      {
+        "name": "District line — Platform 2",
+        "lines": "District"
+      },
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Piccadilly line — Platform 2",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Aldgate",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Metropolitan line — Platform 1",
+        "lines": "Metropolitan"
+      },
+      {
+        "name": "Circle line — Platform 1",
+        "lines": "Circle"
+      },
+      {
+        "name": "Circle line — Platform 2",
+        "lines": "Circle"
+      },
+      {
+        "name": "Metropolitan line — Platform 2",
+        "lines": "Metropolitan"
+      }
+    ]
+  },
+  {
+    "name": "Aldgate East",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District/Hammersmith & City line — Platform 1",
+        "lines": "District, Hammersmith & City"
+      },
+      {
+        "name": "District/Hammersmith & City line — Platform 2",
+        "lines": "District, Hammersmith & City"
+      }
+    ]
+  },
+  {
+    "name": "Alperton",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Piccadilly line — Platform 2",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Amersham",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Metropolitan line — Platform 1",
+        "lines": "Metropolitan"
+      },
+      {
+        "name": "Metropolitan line — Platform 2",
+        "lines": "Metropolitan"
+      }
+    ]
+  },
+  {
+    "name": "Angel",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 6,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Archway",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 2,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Arnos Grove",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Piccadilly line — Platform 2",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Piccadilly line — Platform 3",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Arsenal",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Piccadilly line — Platform 2",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Baker Street",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 6,
+    "platforms": [
+      {
+        "name": "Bakerloo line — Platform 1",
+        "lines": "Bakerloo"
+      },
+      {
+        "name": "Bakerloo line — Platform 2",
+        "lines": "Bakerloo"
+      },
+      {
+        "name": "Circle/Hammersmith & City line — Platform 1",
+        "lines": "Circle, Hammersmith & City"
+      },
+      {
+        "name": "Circle/Hammersmith & City line — Platform 2",
+        "lines": "Circle, Hammersmith & City"
+      },
+      {
+        "name": "Jubilee line — Platform 1",
+        "lines": "Jubilee"
+      },
+      {
+        "name": "Jubilee line — Platform 2",
+        "lines": "Jubilee"
+      },
+      {
+        "name": "Metropolitan line — Platform 1",
+        "lines": "Metropolitan"
+      },
+      {
+        "name": "Metropolitan line — Platform 2",
+        "lines": "Metropolitan"
+      }
+    ]
+  },
+  {
+    "name": "Balham",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 2,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Bank",
+    "step_free": "to_platform",
+    "lifts": 5,
+    "escalators": 15,
+    "platforms": [
+      {
+        "name": "DLR line — Platform 1",
+        "lines": "DLR"
+      },
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Central line — Platform 2",
+        "lines": "Central"
+      },
+      {
+        "name": "Waterloo & City line — Platform 1",
+        "lines": "Waterloo & City"
+      },
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      },
+      {
+        "name": "Northern line — Platform 2",
+        "lines": "Northern"
+      },
+      {
+        "name": "Waterloo & City line — Platform 2",
+        "lines": "Waterloo & City"
+      }
+    ]
+  },
+  {
+    "name": "Barbican",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Circle/Hammersmith & City/Metropolitan line — Platform 1",
+        "lines": "Circle, Hammersmith & City, Metropolitan"
+      },
+      {
+        "name": "Circle/Hammersmith & City/Metropolitan line — Platform 2",
+        "lines": "Circle, Hammersmith & City, Metropolitan"
+      }
+    ]
+  },
+  {
+    "name": "Barking",
+    "step_free": "none",
+    "lifts": 1,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District/Hammersmith & City line — Platform 1",
+        "lines": "District, Hammersmith & City"
+      },
+      {
+        "name": "Hammersmith & City line — Platform 1",
+        "lines": "Hammersmith & City"
+      },
+      {
+        "name": "District line — Platform 1",
+        "lines": "District"
+      }
+    ]
+  },
+  {
+    "name": "Barkingside",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Central line — Platform 2",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Barons Court",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District line — Platform 1",
+        "lines": "District"
+      },
+      {
+        "name": "District line — Platform 2",
+        "lines": "District"
+      },
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Piccadilly line — Platform 2",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Battersea Power Station",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": []
+  },
+  {
+    "name": "Bayswater",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Circle/District line — Platform 1",
+        "lines": "Circle, District"
+      },
+      {
+        "name": "Circle/District line — Platform 2",
+        "lines": "Circle, District"
+      }
+    ]
+  },
+  {
+    "name": "Becontree",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District line — Platform 1",
+        "lines": "District"
+      },
+      {
+        "name": "District line — Platform 2",
+        "lines": "District"
+      }
+    ]
+  },
+  {
+    "name": "Belsize Park",
+    "step_free": "none",
+    "lifts": 3,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      },
+      {
+        "name": "Northern line — Platform 2",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Bermondsey",
+    "step_free": "to_platform",
+    "lifts": 1,
+    "escalators": 3,
+    "platforms": [
+      {
+        "name": "Jubilee line — Platform 1",
+        "lines": "Jubilee"
+      },
+      {
+        "name": "Jubilee line — Platform 2",
+        "lines": "Jubilee"
+      }
+    ]
+  },
+  {
+    "name": "Bethnal Green",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 3,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Blackfriars",
+    "step_free": "to_vehicle",
+    "lifts": 2,
+    "escalators": 4,
+    "platforms": [
+      {
+        "name": "Circle/District line — Platform 1",
+        "lines": "Circle, District"
+      },
+      {
+        "name": "Circle/District line — Platform 2",
+        "lines": "Circle, District"
+      }
+    ]
+  },
+  {
+    "name": "Blackhorse Road",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 2,
+    "platforms": [
+      {
+        "name": "Victoria line — Platform 1",
+        "lines": "Victoria"
+      }
+    ]
+  },
+  {
+    "name": "Bond Street",
+    "step_free": "none",
+    "lifts": 1,
+    "escalators": 8,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Jubilee line — Platform 1",
+        "lines": "Jubilee"
+      },
+      {
+        "name": "Jubilee line — Platform 2",
+        "lines": "Jubilee"
+      }
+    ]
+  },
+  {
+    "name": "Borough",
+    "step_free": "to_platform",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      },
+      {
+        "name": "Northern line — Platform 2",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Boston Manor",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Piccadilly line — Platform 2",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Bounds Green",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 2,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Bow Road",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District/Hammersmith & City line — Platform 1",
+        "lines": "District, Hammersmith & City"
+      },
+      {
+        "name": "District/Hammersmith & City line — Platform 2",
+        "lines": "District, Hammersmith & City"
+      }
+    ]
+  },
+  {
+    "name": "Brent Cross",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Brixton",
+    "step_free": "to_vehicle",
+    "lifts": 2,
+    "escalators": 2,
+    "platforms": [
+      {
+        "name": "Victoria line — Platform 1",
+        "lines": "Victoria"
+      }
+    ]
+  },
+  {
+    "name": "Bromley-by-Bow",
+    "step_free": "none",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District/Hammersmith & City line — Platform 1",
+        "lines": "District, Hammersmith & City"
+      },
+      {
+        "name": "District/Hammersmith & City line — Platform 2",
+        "lines": "District, Hammersmith & City"
+      }
+    ]
+  },
+  {
+    "name": "Buckhurst Hill",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Central line — Platform 2",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Burnt Oak",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Caledonian Road",
+    "step_free": "to_platform",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Camden Town",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 2,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      },
+      {
+        "name": "Northern line — Platform 2",
+        "lines": "Northern"
+      },
+      {
+        "name": "Northern line — Platform 3",
+        "lines": "Northern"
+      },
+      {
+        "name": "Northern line — Platform 4",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Canada Water",
+    "step_free": "none",
+    "lifts": 4,
+    "escalators": 8,
+    "platforms": [
+      {
+        "name": "Jubilee line — Platform 1",
+        "lines": "Jubilee"
+      },
+      {
+        "name": "Jubilee line — Platform 2",
+        "lines": "Jubilee"
+      }
+    ]
+  },
+  {
+    "name": "Canary Wharf",
+    "step_free": "to_platform",
+    "lifts": 3,
+    "escalators": 4,
+    "platforms": [
+      {
+        "name": "DLR line — Platform 1",
+        "lines": "DLR"
+      },
+      {
+        "name": "DLR line — Platform 2",
+        "lines": "DLR"
+      },
+      {
+        "name": "Jubilee line — Platform 1",
+        "lines": "Jubilee"
+      }
+    ]
+  },
+  {
+    "name": "Canning Town",
+    "step_free": "to_platform",
+    "lifts": 3,
+    "escalators": 10,
+    "platforms": [
+      {
+        "name": "DLR line — Platform 1",
+        "lines": "DLR"
+      },
+      {
+        "name": "DLR line — Platform 2",
+        "lines": "DLR"
+      },
+      {
+        "name": "DLR line — Platform 3",
+        "lines": "DLR"
+      },
+      {
+        "name": "DLR line — Platform 4",
+        "lines": "DLR"
+      },
+      {
+        "name": "Jubilee line — Platform 1",
+        "lines": "Jubilee"
+      },
+      {
+        "name": "Jubilee line — Platform 2",
+        "lines": "Jubilee"
+      }
+    ]
+  },
+  {
+    "name": "Cannon Street",
+    "step_free": "to_vehicle",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Circle/District line — Platform 1",
+        "lines": "Circle, District"
+      },
+      {
+        "name": "Circle/District line — Platform 2",
+        "lines": "Circle, District"
+      }
+    ]
+  },
+  {
+    "name": "Canons Park",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Jubilee line — Platform 1",
+        "lines": "Jubilee"
+      },
+      {
+        "name": "Jubilee line — Platform 2",
+        "lines": "Jubilee"
+      }
+    ]
+  },
+  {
+    "name": "Chalfont & Latimer",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Metropolitan line — Platform 1",
+        "lines": "Metropolitan"
+      },
+      {
+        "name": "Metropolitan line — Platform 2",
+        "lines": "Metropolitan"
+      }
+    ]
+  },
+  {
+    "name": "Chalk Farm",
+    "step_free": "none",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Chancery Lane",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 5,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Central line — Platform 2",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Charing Cross",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 10,
+    "platforms": [
+      {
+        "name": "Bakerloo line — Platform 1",
+        "lines": "Bakerloo"
+      },
+      {
+        "name": "Bakerloo line — Platform 2",
+        "lines": "Bakerloo"
+      },
+      {
+        "name": "Underground line — Platform 1",
+        "lines": ""
+      },
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      },
+      {
+        "name": "Northern line — Platform 2",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Chesham",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Metropolitan line — Platform 1",
+        "lines": "Metropolitan"
+      }
+    ]
+  },
+  {
+    "name": "Chigwell",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Central line — Platform 2",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Chiswick Park",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District line — Platform 1",
+        "lines": "District"
+      },
+      {
+        "name": "District line — Platform 2",
+        "lines": "District"
+      }
+    ]
+  },
+  {
+    "name": "Chorleywood",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Metropolitan line — Platform 1",
+        "lines": "Metropolitan"
+      },
+      {
+        "name": "Metropolitan line — Platform 2",
+        "lines": "Metropolitan"
+      }
+    ]
+  },
+  {
+    "name": "Clapham Common",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 2,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Clapham North",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 2,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Clapham South",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 2,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Cockfosters",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Colindale",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Colliers Wood",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 2,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Covent Garden",
+    "step_free": "none",
+    "lifts": 4,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Piccadilly line — Platform 2",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Croxley",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Metropolitan line — Platform 1",
+        "lines": "Metropolitan"
+      },
+      {
+        "name": "Metropolitan line — Platform 2",
+        "lines": "Metropolitan"
+      }
+    ]
+  },
+  {
+    "name": "Dagenham East",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District line — Platform 1",
+        "lines": "District"
+      },
+      {
+        "name": "District line — Platform 2",
+        "lines": "District"
+      }
+    ]
+  },
+  {
+    "name": "Dagenham Heathway",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District line — Platform 1",
+        "lines": "District"
+      },
+      {
+        "name": "District line — Platform 2",
+        "lines": "District"
+      }
+    ]
+  },
+  {
+    "name": "Debden",
+    "step_free": "none",
+    "lifts": 1,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Central line — Platform 2",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Dollis Hill",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Jubilee line — Platform 1",
+        "lines": "Jubilee"
+      }
+    ]
+  },
+  {
+    "name": "Ealing Broadway",
+    "step_free": "none",
+    "lifts": 4,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Underground line — Platform 1",
+        "lines": ""
+      },
+      {
+        "name": "District line — Platform 1",
+        "lines": "District"
+      },
+      {
+        "name": "District line — Platform 2",
+        "lines": "District"
+      }
+    ]
+  },
+  {
+    "name": "Ealing Common",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District/Piccadilly line — Platform 1",
+        "lines": "District, Piccadilly"
+      },
+      {
+        "name": "District/Piccadilly line — Platform 2",
+        "lines": "District, Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Earl's Court",
+    "step_free": "to_vehicle",
+    "lifts": 4,
+    "escalators": 4,
+    "platforms": [
+      {
+        "name": "District line — Platform 1",
+        "lines": "District"
+      },
+      {
+        "name": "District line — Platform 2",
+        "lines": "District"
+      },
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Piccadilly line — Platform 2",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "East Acton",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Central line — Platform 2",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "East Finchley",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      },
+      {
+        "name": "Northern line — Platform 2",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "East Ham",
+    "step_free": "to_vehicle",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District/Hammersmith & City line — Platform 1",
+        "lines": "District, Hammersmith & City"
+      },
+      {
+        "name": "District/Hammersmith & City line — Platform 2",
+        "lines": "District, Hammersmith & City"
+      }
+    ]
+  },
+  {
+    "name": "East Putney",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District line — Platform 1",
+        "lines": "District"
+      },
+      {
+        "name": "District line — Platform 2",
+        "lines": "District"
+      }
+    ]
+  },
+  {
+    "name": "Eastcote",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Metropolitan/Piccadilly line — Platform 1",
+        "lines": "Metropolitan, Piccadilly"
+      },
+      {
+        "name": "Metropolitan/Piccadilly line — Platform 2",
+        "lines": "Metropolitan, Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Edgware",
+    "step_free": "to_platform",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Edgware Road (Bakerloo)",
+    "step_free": "none",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Bakerloo line — Platform 1",
+        "lines": "Bakerloo"
+      },
+      {
+        "name": "Bakerloo line — Platform 2",
+        "lines": "Bakerloo"
+      }
+    ]
+  },
+  {
+    "name": "Edgware Road (Circle Line)",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Circle/Hammersmith & City line — Platform 1",
+        "lines": "Circle, Hammersmith & City"
+      },
+      {
+        "name": "Circle line — Platform 1",
+        "lines": "Circle"
+      },
+      {
+        "name": "Circle/District line — Platform 1",
+        "lines": "Circle, District"
+      },
+      {
+        "name": "Circle/Hammersmith & City line — Platform 2",
+        "lines": "Circle, Hammersmith & City"
+      }
+    ]
+  },
+  {
+    "name": "Elephant & Castle",
+    "step_free": "to_platform",
+    "lifts": 5,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Bakerloo line — Platform 1",
+        "lines": "Bakerloo"
+      },
+      {
+        "name": "Bakerloo line — Platform 2",
+        "lines": "Bakerloo"
+      },
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      },
+      {
+        "name": "Northern line — Platform 2",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Elm Park",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District line — Platform 1",
+        "lines": "District"
+      }
+    ]
+  },
+  {
+    "name": "Embankment",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 10,
+    "platforms": [
+      {
+        "name": "Bakerloo line — Platform 1",
+        "lines": "Bakerloo"
+      },
+      {
+        "name": "Bakerloo line — Platform 2",
+        "lines": "Bakerloo"
+      },
+      {
+        "name": "Circle/District line — Platform 1",
+        "lines": "Circle, District"
+      },
+      {
+        "name": "Circle/District line — Platform 2",
+        "lines": "Circle, District"
+      },
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      },
+      {
+        "name": "Northern line — Platform 2",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Epping",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Underground line — Platform 1",
+        "lines": ""
+      }
+    ]
+  },
+  {
+    "name": "Euston",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 10,
+    "platforms": [
+      {
+        "name": "Victoria line — Platform 1",
+        "lines": "Victoria"
+      },
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      },
+      {
+        "name": "Northern line — Platform 2",
+        "lines": "Northern"
+      },
+      {
+        "name": "Northern line — Platform 3",
+        "lines": "Northern"
+      },
+      {
+        "name": "Northern line — Platform 4",
+        "lines": "Northern"
+      },
+      {
+        "name": "Victoria line — Platform 2",
+        "lines": "Victoria"
+      }
+    ]
+  },
+  {
+    "name": "Euston Square",
+    "step_free": "to_platform",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Circle/Hammersmith & City/Metropolitan line — Platform 1",
+        "lines": "Circle, Hammersmith & City, Metropolitan"
+      },
+      {
+        "name": "Circle/Hammersmith & City/Metropolitan line — Platform 2",
+        "lines": "Circle, Hammersmith & City, Metropolitan"
+      }
+    ]
+  },
+  {
+    "name": "Fairlop",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Central line — Platform 2",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Farringdon",
+    "step_free": "to_vehicle",
+    "lifts": 4,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Circle/Hammersmith & City/Metropolitan line — Platform 1",
+        "lines": "Circle, Hammersmith & City, Metropolitan"
+      },
+      {
+        "name": "Circle/Hammersmith & City/Metropolitan line — Platform 2",
+        "lines": "Circle, Hammersmith & City, Metropolitan"
+      },
+      {
+        "name": "Underground line — Platform 1",
+        "lines": ""
+      },
+      {
+        "name": "Underground line — Platform 2",
+        "lines": ""
+      }
+    ]
+  },
+  {
+    "name": "Finchley Central",
+    "step_free": "to_platform",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      },
+      {
+        "name": "Northern line — Platform 2",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Finchley Road",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Jubilee line — Platform 1",
+        "lines": "Jubilee"
+      },
+      {
+        "name": "Jubilee line — Platform 2",
+        "lines": "Jubilee"
+      },
+      {
+        "name": "Metropolitan line — Platform 1",
+        "lines": "Metropolitan"
+      },
+      {
+        "name": "Metropolitan line — Platform 2",
+        "lines": "Metropolitan"
+      }
+    ]
+  },
+  {
+    "name": "Finsbury Park",
+    "step_free": "none",
+    "lifts": 1,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Piccadilly line — Platform 2",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Victoria line — Platform 1",
+        "lines": "Victoria"
+      },
+      {
+        "name": "Victoria line — Platform 2",
+        "lines": "Victoria"
+      }
+    ]
+  },
+  {
+    "name": "Fulham Broadway",
+    "step_free": "to_vehicle",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District line — Platform 1",
+        "lines": "District"
+      },
+      {
+        "name": "District line — Platform 2",
+        "lines": "District"
+      }
+    ]
+  },
+  {
+    "name": "Gants Hill",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 3,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Gloucester Road",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Circle line — Platform 1",
+        "lines": "Circle"
+      },
+      {
+        "name": "Circle/District line — Platform 1",
+        "lines": "Circle, District"
+      },
+      {
+        "name": "District line — Platform 1",
+        "lines": "District"
+      },
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Piccadilly line — Platform 2",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Golders Green",
+    "step_free": "to_platform",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      },
+      {
+        "name": "Northern line — Platform 2",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Goldhawk Road",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Circle/Hammersmith & City line — Platform 1",
+        "lines": "Circle, Hammersmith & City"
+      },
+      {
+        "name": "Circle/Hammersmith & City line — Platform 2",
+        "lines": "Circle, Hammersmith & City"
+      }
+    ]
+  },
+  {
+    "name": "Goodge Street",
+    "step_free": "none",
+    "lifts": 4,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Grange Hill",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Central line — Platform 2",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Great Portland Street",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Circle/Hammersmith & City/Metropolitan line — Platform 1",
+        "lines": "Circle, Hammersmith & City, Metropolitan"
+      },
+      {
+        "name": "Circle/Hammersmith & City/Metropolitan line — Platform 2",
+        "lines": "Circle, Hammersmith & City, Metropolitan"
+      }
+    ]
+  },
+  {
+    "name": "Green Park",
+    "step_free": "to_platform",
+    "lifts": 5,
+    "escalators": 11,
+    "platforms": [
+      {
+        "name": "Victoria line — Platform 1",
+        "lines": "Victoria"
+      },
+      {
+        "name": "Jubilee line — Platform 1",
+        "lines": "Jubilee"
+      },
+      {
+        "name": "Jubilee line — Platform 2",
+        "lines": "Jubilee"
+      },
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Victoria line — Platform 2",
+        "lines": "Victoria"
+      }
+    ]
+  },
+  {
+    "name": "Greenford",
+    "step_free": "none",
+    "lifts": 1,
+    "escalators": 1,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Central line — Platform 2",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Gunnersbury",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District line — Platform 1",
+        "lines": "District"
+      }
+    ]
+  },
+  {
+    "name": "Hainault",
+    "step_free": "to_vehicle",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Central line — Platform 2",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Hammersmith",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Circle/Hammersmith & City line — Platform 1",
+        "lines": "Circle, Hammersmith & City"
+      },
+      {
+        "name": "District line — Platform 1",
+        "lines": "District"
+      },
+      {
+        "name": "District line — Platform 2",
+        "lines": "District"
+      },
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Piccadilly line — Platform 2",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Hammersmith",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Circle/Hammersmith & City line — Platform 1",
+        "lines": "Circle, Hammersmith & City"
+      },
+      {
+        "name": "District line — Platform 1",
+        "lines": "District"
+      },
+      {
+        "name": "District line — Platform 2",
+        "lines": "District"
+      },
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Piccadilly line — Platform 2",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Hampstead",
+    "step_free": "none",
+    "lifts": 4,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      },
+      {
+        "name": "Northern line — Platform 2",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Hanger Lane",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Harlesden",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Bakerloo line — Platform 1",
+        "lines": "Bakerloo"
+      },
+      {
+        "name": "Bakerloo line — Platform 2",
+        "lines": "Bakerloo"
+      }
+    ]
+  },
+  {
+    "name": "Harrow & Wealdstone",
+    "step_free": "none",
+    "lifts": 4,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Bakerloo line — Platform 1",
+        "lines": "Bakerloo"
+      },
+      {
+        "name": "Bakerloo line — Platform 2",
+        "lines": "Bakerloo"
+      }
+    ]
+  },
+  {
+    "name": "Harrow-on-the-Hill",
+    "step_free": "none",
+    "lifts": 5,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Metropolitan line — Platform 1",
+        "lines": "Metropolitan"
+      },
+      {
+        "name": "Metropolitan line — Platform 2",
+        "lines": "Metropolitan"
+      }
+    ]
+  },
+  {
+    "name": "Hatton Cross",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Heathrow Airport Terminal 4",
+    "step_free": "none",
+    "lifts": 1,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Heathrow Airport Terminal 5",
+    "step_free": "none",
+    "lifts": 2,
+    "escalators": 2,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Heathrow Terminals 2 & 3",
+    "step_free": "to_platform",
+    "lifts": 1,
+    "escalators": 6,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Piccadilly line — Platform 2",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Hendon Central",
+    "step_free": "to_platform",
+    "lifts": 1,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "High Barnet",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "High Street Kensington",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Circle/District line — Platform 1",
+        "lines": "Circle, District"
+      },
+      {
+        "name": "Circle/District line — Platform 2",
+        "lines": "Circle, District"
+      }
+    ]
+  },
+  {
+    "name": "Highbury & Islington",
+    "step_free": "none",
+    "lifts": 3,
+    "escalators": 2,
+    "platforms": [
+      {
+        "name": "Victoria line — Platform 1",
+        "lines": "Victoria"
+      },
+      {
+        "name": "Victoria line — Platform 2",
+        "lines": "Victoria"
+      }
+    ]
+  },
+  {
+    "name": "Highgate",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 3,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Hillingdon",
+    "step_free": "to_vehicle",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Metropolitan/Piccadilly line — Platform 1",
+        "lines": "Metropolitan, Piccadilly"
+      },
+      {
+        "name": "Metropolitan/Piccadilly line — Platform 2",
+        "lines": "Metropolitan, Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Holborn",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 7,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Central line — Platform 2",
+        "lines": "Central"
+      },
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Piccadilly line — Platform 2",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Holland Park",
+    "step_free": "none",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Central line — Platform 2",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Holloway Road",
+    "step_free": "none",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Hornchurch",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District line — Platform 1",
+        "lines": "District"
+      },
+      {
+        "name": "District line — Platform 2",
+        "lines": "District"
+      }
+    ]
+  },
+  {
+    "name": "Hounslow Central",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Hounslow East",
+    "step_free": "to_vehicle",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Piccadilly line — Platform 2",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Hounslow West",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Hyde Park Corner",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 2,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Ickenham",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Metropolitan/Piccadilly line — Platform 1",
+        "lines": "Metropolitan, Piccadilly"
+      },
+      {
+        "name": "Metropolitan/Piccadilly line — Platform 2",
+        "lines": "Metropolitan, Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Kennington",
+    "step_free": "none",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      },
+      {
+        "name": "Northern line — Platform 2",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Kensal Green",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Bakerloo line — Platform 1",
+        "lines": "Bakerloo"
+      },
+      {
+        "name": "Bakerloo line — Platform 2",
+        "lines": "Bakerloo"
+      }
+    ]
+  },
+  {
+    "name": "Kensington (Olympia)",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District line — Platform 1",
+        "lines": "District"
+      }
+    ]
+  },
+  {
+    "name": "Kentish Town",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 2,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      },
+      {
+        "name": "Northern line — Platform 2",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Kenton",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Bakerloo line — Platform 1",
+        "lines": "Bakerloo"
+      },
+      {
+        "name": "Bakerloo line — Platform 2",
+        "lines": "Bakerloo"
+      }
+    ]
+  },
+  {
+    "name": "Kew Gardens",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District line — Platform 1",
+        "lines": "District"
+      },
+      {
+        "name": "District line — Platform 2",
+        "lines": "District"
+      }
+    ]
+  },
+  {
+    "name": "Kilburn",
+    "step_free": "to_platform",
+    "lifts": 1,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Jubilee line — Platform 1",
+        "lines": "Jubilee"
+      },
+      {
+        "name": "Jubilee line — Platform 2",
+        "lines": "Jubilee"
+      }
+    ]
+  },
+  {
+    "name": "Kilburn Park",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 2,
+    "platforms": [
+      {
+        "name": "Bakerloo line — Platform 1",
+        "lines": "Bakerloo"
+      }
+    ]
+  },
+  {
+    "name": "King's Cross & St Pancras International",
+    "step_free": "to_vehicle",
+    "lifts": 10,
+    "escalators": 19,
+    "platforms": [
+      {
+        "name": "Victoria line — Platform 1",
+        "lines": "Victoria"
+      },
+      {
+        "name": "Victoria line — Platform 2",
+        "lines": "Victoria"
+      },
+      {
+        "name": "Circle/Hammersmith & City/Metropolitan line — Platform 1",
+        "lines": "Circle, Hammersmith & City, Metropolitan"
+      },
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      },
+      {
+        "name": "Northern line — Platform 2",
+        "lines": "Northern"
+      },
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Piccadilly line — Platform 2",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Kingsbury",
+    "step_free": "to_platform",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Jubilee line — Platform 1",
+        "lines": "Jubilee"
+      },
+      {
+        "name": "Jubilee line — Platform 2",
+        "lines": "Jubilee"
+      }
+    ]
+  },
+  {
+    "name": "Knightsbridge",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 5,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Piccadilly line — Platform 2",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Ladbroke Grove",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Circle/Hammersmith & City line — Platform 1",
+        "lines": "Circle, Hammersmith & City"
+      },
+      {
+        "name": "Circle/Hammersmith & City line — Platform 2",
+        "lines": "Circle, Hammersmith & City"
+      }
+    ]
+  },
+  {
+    "name": "Lambeth North",
+    "step_free": "none",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Bakerloo line — Platform 1",
+        "lines": "Bakerloo"
+      }
+    ]
+  },
+  {
+    "name": "Lancaster Gate",
+    "step_free": "none",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Latimer Road",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Circle/Hammersmith & City line — Platform 1",
+        "lines": "Circle, Hammersmith & City"
+      },
+      {
+        "name": "Circle/Hammersmith & City line — Platform 2",
+        "lines": "Circle, Hammersmith & City"
+      }
+    ]
+  },
+  {
+    "name": "Leicester Square",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 6,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      },
+      {
+        "name": "Northern line — Platform 2",
+        "lines": "Northern"
+      },
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Piccadilly line — Platform 2",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Leyton",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Central line — Platform 2",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Leytonstone",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Central line — Platform 2",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Liverpool Street",
+    "step_free": "to_vehicle",
+    "lifts": 1,
+    "escalators": 9,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Central line — Platform 2",
+        "lines": "Central"
+      },
+      {
+        "name": "Circle/Hammersmith & City/Metropolitan line — Platform 1",
+        "lines": "Circle, Hammersmith & City, Metropolitan"
+      },
+      {
+        "name": "Circle/Hammersmith & City/Metropolitan line — Platform 2",
+        "lines": "Circle, Hammersmith & City, Metropolitan"
+      }
+    ]
+  },
+  {
+    "name": "London Bridge",
+    "step_free": "to_vehicle",
+    "lifts": 3,
+    "escalators": 17,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      },
+      {
+        "name": "Jubilee line — Platform 1",
+        "lines": "Jubilee"
+      }
+    ]
+  },
+  {
+    "name": "Loughton",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Central line — Platform 2",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Maida Vale",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 2,
+    "platforms": [
+      {
+        "name": "Bakerloo line — Platform 1",
+        "lines": "Bakerloo"
+      }
+    ]
+  },
+  {
+    "name": "Manor House",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 3,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Mansion House",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Circle/District line — Platform 1",
+        "lines": "Circle, District"
+      },
+      {
+        "name": "Circle/District line — Platform 2",
+        "lines": "Circle, District"
+      },
+      {
+        "name": "Underground line — Platform 1",
+        "lines": ""
+      }
+    ]
+  },
+  {
+    "name": "Marble Arch",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 2,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Marylebone",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 2,
+    "platforms": [
+      {
+        "name": "Bakerloo line — Platform 1",
+        "lines": "Bakerloo"
+      },
+      {
+        "name": "Bakerloo line — Platform 2",
+        "lines": "Bakerloo"
+      }
+    ]
+  },
+  {
+    "name": "Mile End",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Central line — Platform 2",
+        "lines": "Central"
+      },
+      {
+        "name": "District/Hammersmith & City line — Platform 1",
+        "lines": "District, Hammersmith & City"
+      },
+      {
+        "name": "District/Hammersmith & City line — Platform 2",
+        "lines": "District, Hammersmith & City"
+      }
+    ]
+  },
+  {
+    "name": "Mill Hill East",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Monument",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Circle/District line — Platform 1",
+        "lines": "Circle, District"
+      },
+      {
+        "name": "Circle/District line — Platform 2",
+        "lines": "Circle, District"
+      }
+    ]
+  },
+  {
+    "name": "Moor Park",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Metropolitan line — Platform 1",
+        "lines": "Metropolitan"
+      },
+      {
+        "name": "Metropolitan line — Platform 2",
+        "lines": "Metropolitan"
+      },
+      {
+        "name": "Metropolitan line — Platform 3",
+        "lines": "Metropolitan"
+      }
+    ]
+  },
+  {
+    "name": "Moorgate",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 6,
+    "platforms": [
+      {
+        "name": "Circle/Hammersmith & City/Metropolitan line — Platform 1",
+        "lines": "Circle, Hammersmith & City, Metropolitan"
+      },
+      {
+        "name": "Circle/Hammersmith & City/Metropolitan line — Platform 2",
+        "lines": "Circle, Hammersmith & City, Metropolitan"
+      },
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      },
+      {
+        "name": "Northern line — Platform 2",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Morden",
+    "step_free": "to_platform",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Underground line — Platform 1",
+        "lines": ""
+      },
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Mornington Crescent",
+    "step_free": "none",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Neasden",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Jubilee line — Platform 1",
+        "lines": "Jubilee"
+      }
+    ]
+  },
+  {
+    "name": "Newbury Park",
+    "step_free": "none",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Central line — Platform 2",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Nine Elms",
+    "step_free": "none",
+    "lifts": 2,
+    "escalators": 2,
+    "platforms": []
+  },
+  {
+    "name": "North Acton",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Central line — Platform 2",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "North Ealing",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Piccadilly line — Platform 2",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "North Greenwich",
+    "step_free": "to_platform",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "London Cable Car line — Platform 1",
+        "lines": "London Cable Car"
+      },
+      {
+        "name": "Jubilee line — Platform 1",
+        "lines": "Jubilee"
+      },
+      {
+        "name": "Jubilee line — Platform 2",
+        "lines": "Jubilee"
+      }
+    ]
+  },
+  {
+    "name": "North Harrow",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Metropolitan line — Platform 1",
+        "lines": "Metropolitan"
+      },
+      {
+        "name": "Metropolitan line — Platform 2",
+        "lines": "Metropolitan"
+      }
+    ]
+  },
+  {
+    "name": "North Wembley",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Bakerloo line — Platform 1",
+        "lines": "Bakerloo"
+      },
+      {
+        "name": "Bakerloo line — Platform 2",
+        "lines": "Bakerloo"
+      }
+    ]
+  },
+  {
+    "name": "Northfields",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Piccadilly line — Platform 2",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Northolt",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Northwick Park",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Metropolitan line — Platform 1",
+        "lines": "Metropolitan"
+      }
+    ]
+  },
+  {
+    "name": "Northwood",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Metropolitan line — Platform 1",
+        "lines": "Metropolitan"
+      },
+      {
+        "name": "Metropolitan line — Platform 2",
+        "lines": "Metropolitan"
+      }
+    ]
+  },
+  {
+    "name": "Northwood Hills",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Metropolitan line — Platform 1",
+        "lines": "Metropolitan"
+      },
+      {
+        "name": "Metropolitan line — Platform 2",
+        "lines": "Metropolitan"
+      }
+    ]
+  },
+  {
+    "name": "Notting Hill Gate",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 6,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Central line — Platform 2",
+        "lines": "Central"
+      },
+      {
+        "name": "Circle/District line — Platform 1",
+        "lines": "Circle, District"
+      },
+      {
+        "name": "Circle/District line — Platform 2",
+        "lines": "Circle, District"
+      }
+    ]
+  },
+  {
+    "name": "Oakwood",
+    "step_free": "to_platform",
+    "lifts": 1,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Old Street",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 3,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Osterley",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Piccadilly line — Platform 2",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Oval",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 2,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      },
+      {
+        "name": "Northern line — Platform 2",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Oxford Circus",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 14,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Victoria line — Platform 1",
+        "lines": "Victoria"
+      },
+      {
+        "name": "Bakerloo line — Platform 1",
+        "lines": "Bakerloo"
+      },
+      {
+        "name": "Bakerloo line — Platform 2",
+        "lines": "Bakerloo"
+      },
+      {
+        "name": "Central line — Platform 2",
+        "lines": "Central"
+      },
+      {
+        "name": "Victoria line — Platform 2",
+        "lines": "Victoria"
+      }
+    ]
+  },
+  {
+    "name": "Paddington",
+    "step_free": "none",
+    "lifts": 2,
+    "escalators": 4,
+    "platforms": [
+      {
+        "name": "Bakerloo line — Platform 1",
+        "lines": "Bakerloo"
+      },
+      {
+        "name": "Bakerloo line — Platform 2",
+        "lines": "Bakerloo"
+      },
+      {
+        "name": "Circle/District line — Platform 1",
+        "lines": "Circle, District"
+      },
+      {
+        "name": "Circle/District line — Platform 2",
+        "lines": "Circle, District"
+      },
+      {
+        "name": "Circle/Hammersmith & City line — Platform 1",
+        "lines": "Circle, Hammersmith & City"
+      },
+      {
+        "name": "Hammersmith & City line — Platform 1",
+        "lines": "Hammersmith & City"
+      }
+    ]
+  },
+  {
+    "name": "Paddington",
+    "step_free": "none",
+    "lifts": 2,
+    "escalators": 4,
+    "platforms": [
+      {
+        "name": "Bakerloo line — Platform 1",
+        "lines": "Bakerloo"
+      },
+      {
+        "name": "Bakerloo line — Platform 2",
+        "lines": "Bakerloo"
+      },
+      {
+        "name": "Circle/District line — Platform 1",
+        "lines": "Circle, District"
+      },
+      {
+        "name": "Circle/District line — Platform 2",
+        "lines": "Circle, District"
+      },
+      {
+        "name": "Circle/Hammersmith & City line — Platform 1",
+        "lines": "Circle, Hammersmith & City"
+      },
+      {
+        "name": "Hammersmith & City line — Platform 1",
+        "lines": "Hammersmith & City"
+      }
+    ]
+  },
+  {
+    "name": "Park Royal",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Piccadilly line — Platform 2",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Parsons Green",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District line — Platform 1",
+        "lines": "District"
+      },
+      {
+        "name": "District line — Platform 2",
+        "lines": "District"
+      }
+    ]
+  },
+  {
+    "name": "Perivale",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Piccadilly Circus",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 11,
+    "platforms": [
+      {
+        "name": "Bakerloo line — Platform 1",
+        "lines": "Bakerloo"
+      },
+      {
+        "name": "Bakerloo line — Platform 2",
+        "lines": "Bakerloo"
+      },
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Piccadilly line — Platform 2",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Pimlico",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 2,
+    "platforms": [
+      {
+        "name": "Victoria line — Platform 1",
+        "lines": "Victoria"
+      }
+    ]
+  },
+  {
+    "name": "Pinner",
+    "step_free": "to_platform",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Metropolitan line — Platform 1",
+        "lines": "Metropolitan"
+      },
+      {
+        "name": "Metropolitan line — Platform 2",
+        "lines": "Metropolitan"
+      }
+    ]
+  },
+  {
+    "name": "Plaistow",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District/Hammersmith & City line — Platform 1",
+        "lines": "District, Hammersmith & City"
+      },
+      {
+        "name": "District/Hammersmith & City line — Platform 2",
+        "lines": "District, Hammersmith & City"
+      }
+    ]
+  },
+  {
+    "name": "Preston Road",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Metropolitan line — Platform 1",
+        "lines": "Metropolitan"
+      }
+    ]
+  },
+  {
+    "name": "Putney Bridge",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District line — Platform 1",
+        "lines": "District"
+      },
+      {
+        "name": "District line — Platform 2",
+        "lines": "District"
+      }
+    ]
+  },
+  {
+    "name": "Queen's Park",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Bakerloo line — Platform 1",
+        "lines": "Bakerloo"
+      },
+      {
+        "name": "Bakerloo line — Platform 2",
+        "lines": "Bakerloo"
+      }
+    ]
+  },
+  {
+    "name": "Queensbury",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Jubilee line — Platform 1",
+        "lines": "Jubilee"
+      },
+      {
+        "name": "Jubilee line — Platform 2",
+        "lines": "Jubilee"
+      }
+    ]
+  },
+  {
+    "name": "Queensway",
+    "step_free": "none",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Ravenscourt Park",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District line — Platform 1",
+        "lines": "District"
+      },
+      {
+        "name": "District line — Platform 2",
+        "lines": "District"
+      }
+    ]
+  },
+  {
+    "name": "Rayners Lane",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Metropolitan/Piccadilly line — Platform 1",
+        "lines": "Metropolitan, Piccadilly"
+      },
+      {
+        "name": "Metropolitan/Piccadilly line — Platform 2",
+        "lines": "Metropolitan, Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Redbridge",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Regent's Park",
+    "step_free": "none",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Bakerloo line — Platform 1",
+        "lines": "Bakerloo"
+      },
+      {
+        "name": "Bakerloo line — Platform 2",
+        "lines": "Bakerloo"
+      }
+    ]
+  },
+  {
+    "name": "Richmond",
+    "step_free": "none",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District line — Platform 1",
+        "lines": "District"
+      }
+    ]
+  },
+  {
+    "name": "Rickmansworth",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Metropolitan line — Platform 1",
+        "lines": "Metropolitan"
+      },
+      {
+        "name": "Metropolitan line — Platform 2",
+        "lines": "Metropolitan"
+      }
+    ]
+  },
+  {
+    "name": "Roding Valley",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Central line — Platform 2",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Royal Oak",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Circle/Hammersmith & City line — Platform 1",
+        "lines": "Circle, Hammersmith & City"
+      }
+    ]
+  },
+  {
+    "name": "Ruislip",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Piccadilly line — Platform 2",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Metropolitan line — Platform 1",
+        "lines": "Metropolitan"
+      },
+      {
+        "name": "Metropolitan line — Platform 2",
+        "lines": "Metropolitan"
+      }
+    ]
+  },
+  {
+    "name": "Ruislip Gardens",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Ruislip Manor",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Metropolitan/Piccadilly line — Platform 1",
+        "lines": "Metropolitan, Piccadilly"
+      },
+      {
+        "name": "Metropolitan/Piccadilly line — Platform 2",
+        "lines": "Metropolitan, Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Russell Square",
+    "step_free": "none",
+    "lifts": 3,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Piccadilly line — Platform 2",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Seven Sisters",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 4,
+    "platforms": [
+      {
+        "name": "Victoria line — Platform 1",
+        "lines": "Victoria"
+      },
+      {
+        "name": "Victoria line — Platform 2",
+        "lines": "Victoria"
+      }
+    ]
+  },
+  {
+    "name": "Shepherd's Bush",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 2,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Shepherd's Bush Market",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Circle/Hammersmith & City line — Platform 1",
+        "lines": "Circle, Hammersmith & City"
+      },
+      {
+        "name": "Circle/Hammersmith & City line — Platform 2",
+        "lines": "Circle, Hammersmith & City"
+      }
+    ]
+  },
+  {
+    "name": "Sloane Square",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 2,
+    "platforms": [
+      {
+        "name": "Circle/District line — Platform 1",
+        "lines": "Circle, District"
+      },
+      {
+        "name": "Circle/District line — Platform 2",
+        "lines": "Circle, District"
+      }
+    ]
+  },
+  {
+    "name": "Snaresbrook",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Central line — Platform 2",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "South Ealing",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Piccadilly line — Platform 2",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "South Harrow",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Piccadilly line — Platform 2",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "South Kensington",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 5,
+    "platforms": [
+      {
+        "name": "Circle/District line — Platform 1",
+        "lines": "Circle, District"
+      },
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Piccadilly line — Platform 2",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Circle/District line — Platform 2",
+        "lines": "Circle, District"
+      }
+    ]
+  },
+  {
+    "name": "South Kenton",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Bakerloo line — Platform 1",
+        "lines": "Bakerloo"
+      }
+    ]
+  },
+  {
+    "name": "South Ruislip",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "South Wimbledon",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 2,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "South Woodford",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Central line — Platform 2",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Southfields",
+    "step_free": "to_vehicle",
+    "lifts": 1,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District line — Platform 1",
+        "lines": "District"
+      }
+    ]
+  },
+  {
+    "name": "Southgate",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 2,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Southwark",
+    "step_free": "to_platform",
+    "lifts": 2,
+    "escalators": 8,
+    "platforms": [
+      {
+        "name": "Jubilee line — Platform 1",
+        "lines": "Jubilee"
+      },
+      {
+        "name": "Jubilee line — Platform 2",
+        "lines": "Jubilee"
+      }
+    ]
+  },
+  {
+    "name": "St. James's Park",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Circle/District line — Platform 1",
+        "lines": "Circle, District"
+      },
+      {
+        "name": "Circle/District line — Platform 2",
+        "lines": "Circle, District"
+      }
+    ]
+  },
+  {
+    "name": "St. John's Wood",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 2,
+    "platforms": [
+      {
+        "name": "Jubilee line — Platform 1",
+        "lines": "Jubilee"
+      }
+    ]
+  },
+  {
+    "name": "St. Paul's",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 4,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Central line — Platform 2",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Stamford Brook",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District line — Platform 1",
+        "lines": "District"
+      },
+      {
+        "name": "District line — Platform 2",
+        "lines": "District"
+      }
+    ]
+  },
+  {
+    "name": "Stanmore",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Jubilee line — Platform 1",
+        "lines": "Jubilee"
+      }
+    ]
+  },
+  {
+    "name": "Stepney Green",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District/Hammersmith & City line — Platform 1",
+        "lines": "District, Hammersmith & City"
+      },
+      {
+        "name": "District/Hammersmith & City line — Platform 2",
+        "lines": "District, Hammersmith & City"
+      }
+    ]
+  },
+  {
+    "name": "Stockwell",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 3,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      },
+      {
+        "name": "Northern line — Platform 2",
+        "lines": "Northern"
+      },
+      {
+        "name": "Victoria line — Platform 1",
+        "lines": "Victoria"
+      },
+      {
+        "name": "Victoria line — Platform 2",
+        "lines": "Victoria"
+      }
+    ]
+  },
+  {
+    "name": "Stonebridge Park",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Bakerloo line — Platform 1",
+        "lines": "Bakerloo"
+      },
+      {
+        "name": "Bakerloo line — Platform 2",
+        "lines": "Bakerloo"
+      }
+    ]
+  },
+  {
+    "name": "Stratford",
+    "step_free": "to_vehicle",
+    "lifts": 5,
+    "escalators": 2,
+    "platforms": [
+      {
+        "name": "DLR line — Platform 1",
+        "lines": "DLR"
+      },
+      {
+        "name": "Underground line — Platform 1",
+        "lines": ""
+      },
+      {
+        "name": "DLR line — Platform 2",
+        "lines": "DLR"
+      },
+      {
+        "name": "DLR line — Platform 3",
+        "lines": "DLR"
+      },
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Central line — Platform 2",
+        "lines": "Central"
+      },
+      {
+        "name": "Jubilee line — Platform 1",
+        "lines": "Jubilee"
+      },
+      {
+        "name": "Underground line — Platform 2",
+        "lines": ""
+      },
+      {
+        "name": "Underground line — Platform 3",
+        "lines": ""
+      },
+      {
+        "name": "Underground line — Platform 4",
+        "lines": ""
+      }
+    ]
+  },
+  {
+    "name": "Sudbury Hill",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Piccadilly line — Platform 2",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Sudbury Town",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Piccadilly line — Platform 2",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Swiss Cottage",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 2,
+    "platforms": [
+      {
+        "name": "Jubilee line — Platform 1",
+        "lines": "Jubilee"
+      }
+    ]
+  },
+  {
+    "name": "Temple",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Circle/District line — Platform 1",
+        "lines": "Circle, District"
+      },
+      {
+        "name": "Circle/District line — Platform 2",
+        "lines": "Circle, District"
+      }
+    ]
+  },
+  {
+    "name": "Theydon Bois",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Central line — Platform 2",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Tooting Bec",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 2,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Tooting Broadway",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 3,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Tottenham Court Road",
+    "step_free": "none",
+    "lifts": 1,
+    "escalators": 6,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      },
+      {
+        "name": "Northern line — Platform 2",
+        "lines": "Northern"
+      },
+      {
+        "name": "Central line — Platform 2",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Tottenham Hale",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 2,
+    "platforms": [
+      {
+        "name": "Victoria line — Platform 1",
+        "lines": "Victoria"
+      }
+    ]
+  },
+  {
+    "name": "Totteridge & Whetstone",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      },
+      {
+        "name": "Northern line — Platform 2",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Tower Hill",
+    "step_free": "none",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Circle/District line — Platform 1",
+        "lines": "Circle, District"
+      },
+      {
+        "name": "Circle/District line — Platform 2",
+        "lines": "Circle, District"
+      },
+      {
+        "name": "Underground line — Platform 1",
+        "lines": ""
+      }
+    ]
+  },
+  {
+    "name": "Tufnell Park",
+    "step_free": "none",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      },
+      {
+        "name": "Northern line — Platform 2",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "Turnham Green",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "Piccadilly line — Platform 2",
+        "lines": "Piccadilly"
+      },
+      {
+        "name": "District line — Platform 1",
+        "lines": "District"
+      },
+      {
+        "name": "District line — Platform 2",
+        "lines": "District"
+      }
+    ]
+  },
+  {
+    "name": "Turnpike Lane",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 3,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Upminster",
+    "step_free": "none",
+    "lifts": 1,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District line — Platform 1",
+        "lines": "District"
+      },
+      {
+        "name": "Underground line — Platform 1",
+        "lines": ""
+      }
+    ]
+  },
+  {
+    "name": "Upminster Bridge",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District line — Platform 1",
+        "lines": "District"
+      }
+    ]
+  },
+  {
+    "name": "Upney",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District line — Platform 1",
+        "lines": "District"
+      }
+    ]
+  },
+  {
+    "name": "Upton Park",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District/Hammersmith & City line — Platform 1",
+        "lines": "District, Hammersmith & City"
+      },
+      {
+        "name": "District/Hammersmith & City line — Platform 2",
+        "lines": "District, Hammersmith & City"
+      }
+    ]
+  },
+  {
+    "name": "Uxbridge",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Metropolitan/Piccadilly line — Platform 1",
+        "lines": "Metropolitan, Piccadilly"
+      },
+      {
+        "name": "Underground line — Platform 1",
+        "lines": ""
+      }
+    ]
+  },
+  {
+    "name": "Vauxhall",
+    "step_free": "none",
+    "lifts": 2,
+    "escalators": 2,
+    "platforms": [
+      {
+        "name": "Victoria line — Platform 1",
+        "lines": "Victoria"
+      }
+    ]
+  },
+  {
+    "name": "Victoria",
+    "step_free": "none",
+    "lifts": 1,
+    "escalators": 6,
+    "platforms": [
+      {
+        "name": "Circle/District line — Platform 1",
+        "lines": "Circle, District"
+      },
+      {
+        "name": "Victoria line — Platform 1",
+        "lines": "Victoria"
+      },
+      {
+        "name": "Victoria line — Platform 2",
+        "lines": "Victoria"
+      },
+      {
+        "name": "Circle/District line — Platform 2",
+        "lines": "Circle, District"
+      }
+    ]
+  },
+  {
+    "name": "Walthamstow Central",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 2,
+    "platforms": [
+      {
+        "name": "Victoria line — Platform 1",
+        "lines": "Victoria"
+      }
+    ]
+  },
+  {
+    "name": "Wanstead",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 2,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Warren Street",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 7,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      },
+      {
+        "name": "Northern line — Platform 2",
+        "lines": "Northern"
+      },
+      {
+        "name": "Victoria line — Platform 1",
+        "lines": "Victoria"
+      },
+      {
+        "name": "Victoria line — Platform 2",
+        "lines": "Victoria"
+      }
+    ]
+  },
+  {
+    "name": "Warwick Avenue",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 2,
+    "platforms": [
+      {
+        "name": "Bakerloo line — Platform 1",
+        "lines": "Bakerloo"
+      }
+    ]
+  },
+  {
+    "name": "Waterloo",
+    "step_free": "to_vehicle",
+    "lifts": 1,
+    "escalators": 23,
+    "platforms": [
+      {
+        "name": "Bakerloo line — Platform 1",
+        "lines": "Bakerloo"
+      },
+      {
+        "name": "Bakerloo line — Platform 2",
+        "lines": "Bakerloo"
+      },
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      },
+      {
+        "name": "Jubilee line — Platform 1",
+        "lines": "Jubilee"
+      },
+      {
+        "name": "Waterloo & City line — Platform 1",
+        "lines": "Waterloo & City"
+      },
+      {
+        "name": "Waterloo & City line — Platform 2",
+        "lines": "Waterloo & City"
+      }
+    ]
+  },
+  {
+    "name": "Watford",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Metropolitan line — Platform 1",
+        "lines": "Metropolitan"
+      }
+    ]
+  },
+  {
+    "name": "Wembley Central",
+    "step_free": "none",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Bakerloo line — Platform 1",
+        "lines": "Bakerloo"
+      },
+      {
+        "name": "Bakerloo line — Platform 2",
+        "lines": "Bakerloo"
+      }
+    ]
+  },
+  {
+    "name": "Wembley Park",
+    "step_free": "to_vehicle",
+    "lifts": 5,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Jubilee line — Platform 1",
+        "lines": "Jubilee"
+      },
+      {
+        "name": "Jubilee line — Platform 2",
+        "lines": "Jubilee"
+      },
+      {
+        "name": "Metropolitan line — Platform 1",
+        "lines": "Metropolitan"
+      },
+      {
+        "name": "Metropolitan line — Platform 2",
+        "lines": "Metropolitan"
+      },
+      {
+        "name": "Metropolitan line — Platform 3",
+        "lines": "Metropolitan"
+      }
+    ]
+  },
+  {
+    "name": "West Acton",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Central line — Platform 2",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "West Brompton",
+    "step_free": "none",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District line — Platform 1",
+        "lines": "District"
+      },
+      {
+        "name": "District line — Platform 2",
+        "lines": "District"
+      }
+    ]
+  },
+  {
+    "name": "West Finchley",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      },
+      {
+        "name": "Northern line — Platform 2",
+        "lines": "Northern"
+      }
+    ]
+  },
+  {
+    "name": "West Ham",
+    "step_free": "none",
+    "lifts": 5,
+    "escalators": 6,
+    "platforms": [
+      {
+        "name": "DLR line — Platform 1",
+        "lines": "DLR"
+      },
+      {
+        "name": "DLR line — Platform 2",
+        "lines": "DLR"
+      },
+      {
+        "name": "District/Hammersmith & City line — Platform 1",
+        "lines": "District, Hammersmith & City"
+      },
+      {
+        "name": "Jubilee line — Platform 1",
+        "lines": "Jubilee"
+      },
+      {
+        "name": "District/Hammersmith & City line — Platform 2",
+        "lines": "District, Hammersmith & City"
+      },
+      {
+        "name": "Jubilee line — Platform 2",
+        "lines": "Jubilee"
+      }
+    ]
+  },
+  {
+    "name": "West Hampstead",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Jubilee line — Platform 1",
+        "lines": "Jubilee"
+      }
+    ]
+  },
+  {
+    "name": "West Harrow",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Metropolitan line — Platform 1",
+        "lines": "Metropolitan"
+      },
+      {
+        "name": "Metropolitan line — Platform 2",
+        "lines": "Metropolitan"
+      }
+    ]
+  },
+  {
+    "name": "West Kensington",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District line — Platform 1",
+        "lines": "District"
+      },
+      {
+        "name": "District line — Platform 2",
+        "lines": "District"
+      }
+    ]
+  },
+  {
+    "name": "West Ruislip",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Westbourne Park",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Circle/Hammersmith & City line — Platform 1",
+        "lines": "Circle, Hammersmith & City"
+      },
+      {
+        "name": "Circle/Hammersmith & City line — Platform 2",
+        "lines": "Circle, Hammersmith & City"
+      }
+    ]
+  },
+  {
+    "name": "Westminster",
+    "step_free": "to_vehicle",
+    "lifts": 5,
+    "escalators": 17,
+    "platforms": [
+      {
+        "name": "Circle/District line — Platform 1",
+        "lines": "Circle, District"
+      },
+      {
+        "name": "Circle/District line — Platform 2",
+        "lines": "Circle, District"
+      },
+      {
+        "name": "Jubilee line — Platform 1",
+        "lines": "Jubilee"
+      },
+      {
+        "name": "Jubilee line — Platform 2",
+        "lines": "Jubilee"
+      }
+    ]
+  },
+  {
+    "name": "White City",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Central line — Platform 2",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Whitechapel",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District/Hammersmith & City line — Platform 1",
+        "lines": "District, Hammersmith & City"
+      },
+      {
+        "name": "District/Hammersmith & City line — Platform 2",
+        "lines": "District, Hammersmith & City"
+      }
+    ]
+  },
+  {
+    "name": "Willesden Green",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Jubilee line — Platform 1",
+        "lines": "Jubilee"
+      }
+    ]
+  },
+  {
+    "name": "Willesden Junction",
+    "step_free": "none",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Bakerloo line — Platform 1",
+        "lines": "Bakerloo"
+      },
+      {
+        "name": "Bakerloo line — Platform 2",
+        "lines": "Bakerloo"
+      },
+      {
+        "name": "Underground line — Platform 1",
+        "lines": ""
+      }
+    ]
+  },
+  {
+    "name": "Wimbledon",
+    "step_free": "none",
+    "lifts": 1,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Tram line — Platform 1",
+        "lines": "Tram"
+      },
+      {
+        "name": "Underground line — Platform 1",
+        "lines": ""
+      },
+      {
+        "name": "District line — Platform 1",
+        "lines": "District"
+      }
+    ]
+  },
+  {
+    "name": "Wimbledon Park",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "District line — Platform 1",
+        "lines": "District"
+      }
+    ]
+  },
+  {
+    "name": "Wood Green",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 3,
+    "platforms": [
+      {
+        "name": "Piccadilly line — Platform 1",
+        "lines": "Piccadilly"
+      }
+    ]
+  },
+  {
+    "name": "Wood Lane",
+    "step_free": "to_vehicle",
+    "lifts": 2,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Circle/Hammersmith & City line — Platform 1",
+        "lines": "Circle, Hammersmith & City"
+      },
+      {
+        "name": "Circle/Hammersmith & City line — Platform 2",
+        "lines": "Circle, Hammersmith & City"
+      }
+    ]
+  },
+  {
+    "name": "Woodford",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Central line — Platform 1",
+        "lines": "Central"
+      },
+      {
+        "name": "Central line — Platform 2",
+        "lines": "Central"
+      }
+    ]
+  },
+  {
+    "name": "Woodside Park",
+    "step_free": "none",
+    "lifts": 0,
+    "escalators": 0,
+    "platforms": [
+      {
+        "name": "Northern line — Platform 1",
+        "lines": "Northern"
+      },
+      {
+        "name": "Northern line — Platform 2",
+        "lines": "Northern"
+      }
+    ]
+  }
+]

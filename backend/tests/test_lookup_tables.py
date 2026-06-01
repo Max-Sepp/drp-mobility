@@ -14,7 +14,9 @@ def test_list_stations_returns_seeded_stations(client: TestClient) -> None:
 
     assert response.status_code == 200
     names = {s["name"] for s in response.json()}
-    assert names == {"Victoria", "Waterloo", "Paddington", "King's Cross", "London Bridge"}
+    # The seed is the full London Underground network; assert a few well-known members are present.
+    assert {"Victoria", "Waterloo", "Paddington", "London Bridge"} <= names
+    assert len(names) > 100
 
 
 def test_list_stations_have_ids(client: TestClient) -> None:
@@ -51,7 +53,8 @@ def test_list_equipment_returns_all_seeded_equipment(client: TestClient) -> None
     response = client.get("/equipment")
 
     assert response.status_code == 200
-    assert len(response.json()) == 10  # 5 stations × 2 equipment types
+    # One row per lift / escalator across the seeded network (counts come from TfL facility data).
+    assert len(response.json()) > 100
 
 
 def test_list_equipment_items_have_nested_station_and_type(client: TestClient) -> None:
@@ -71,7 +74,7 @@ def test_list_equipment_filter_by_station(client: TestClient, db_session: Sessio
 
     assert response.status_code == 200
     items = response.json()
-    assert len(items) == 2
+    assert len(items) >= 2  # Victoria has at least one lift and one escalator
     assert all(e["station"]["name"] == "Victoria" for e in items)
 
 
