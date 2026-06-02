@@ -1,5 +1,6 @@
 import { Text, XStack, YStack } from 'tamagui'
 import type { StationStepFree } from '../stepFree'
+import { LineChips } from './LineChips'
 import { StepFreeBadge } from './StepFreeBadge'
 
 type StationListItemProps = {
@@ -34,7 +35,7 @@ export const StationListItem = ({ name, lines, stepFree, selected, onPress }: St
       </YStack>
       <YStack flex={1} gap="$1.5">
         <Text fontSize={16} fontWeight="600" color="#111827">{name}</Text>
-        {lines.length > 0 && <Text fontSize={13} color="#6b7280">{lines.join(', ')}</Text>}
+        <LineChips lines={lines} />
         <StepFreeBadge value={stepFree} compact />
       </YStack>
     </XStack>

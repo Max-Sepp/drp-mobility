@@ -48,7 +48,7 @@ export const HomeScreen = ({ navigation }: HomeScreenProps) => {
   return (
     <ScrollView flex={1} style={{ backgroundColor: '#f9fafb' }} contentContainerStyle={{ paddingBottom: 40 } as any}>
       <StationHeader station={station} stepFree={stationDetail?.step_free} onPress={changeStation} />
-      {stationDetail && <PlatformAccessCard platforms={stationDetail.platforms} />}
+      {stationDetail && <PlatformAccessCard key={station} platforms={stationDetail.platforms} />}
       <ReportsStatus loading={loading} reports={reports} />
       <XStack
         mx="$4"

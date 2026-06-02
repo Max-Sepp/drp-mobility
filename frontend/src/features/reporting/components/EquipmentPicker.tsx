@@ -48,7 +48,7 @@ export const EquipmentPicker = ({ label, loading, equipment, selectedId, onSelec
               >
                 {selected && <Text color="white" fontSize={12} fontWeight="700">✕</Text>}
               </YStack>
-              <Text fontSize={15} color="#111827">{e.connection}</Text>
+              <Text flex={1} fontSize={15} color="#111827">{e.connection}</Text>
             </XStack>
           )
         })
