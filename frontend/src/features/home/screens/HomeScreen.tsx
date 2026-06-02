@@ -1,5 +1,6 @@
+import { MaterialIcons } from '@expo/vector-icons'
 import { useCallback, useEffect, useState } from 'react'
-import { ScrollView } from 'tamagui'
+import { ScrollView, Text, XStack } from 'tamagui'
 import { apiClient } from '@/api/client'
 import type { components } from '@/api/schema.d'
 import { DEFAULT_STATION, stationPicker } from '@/features/stations'
@@ -45,6 +46,18 @@ export const HomeScreen = ({ navigation }: HomeScreenProps) => {
     <ScrollView flex={1} style={{ backgroundColor: '#f9fafb' }} contentContainerStyle={{ paddingBottom: 40 } as any}>
       <StationHeader station={station} onPress={changeStation} />
       <ReportsStatus loading={loading} reports={reports} />
+      <XStack
+        mx="$4"
+        mt="$4"
+        items="center"
+        gap="$2.5"
+        pressStyle={{ opacity: 0.8 }}
+        onPress={() => navigation.navigate('JourneyPlanner')}
+        style={{ backgroundColor: '#111827', borderRadius: 10, height: 56, paddingHorizontal: 16 }}
+      >
+        <MaterialIcons name="directions" size={26} color="white" />
+        <Text color="white" fontSize={16} fontWeight="700">Plan a journey</Text>
+      </XStack>
       <QuickReportGrid onSelect={quickReport} />
     </ScrollView>
   )
