@@ -1,3 +1,4 @@
+import { MaterialIcons } from '@expo/vector-icons'
 import { useState } from 'react'
 import { Alert } from 'react-native'
 import { Text, XStack, YStack } from 'tamagui'
@@ -21,6 +22,10 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState<Journey[]>([])
   const [resolved, setResolved] = useState<Resolved | null>(null)
+  // Once a journey is shown the bulky inputs collapse to a compact summary; "Edit" reopens
+  // them. Editing stays true until the next successful plan so the user can change and re-run.
+  const [editing, setEditing] = useState(false)
+  const showInputs = results.length === 0 || editing
 
   async function run() {
     if (!from.trim() || !to.trim()) {
@@ -52,6 +57,7 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
     setLoading(false)
     if (result.kind === 'journeys') {
       setResults(result.journeys)
+      setEditing(false)
     } else {
       Alert.alert('No journey', result.message)
     }
@@ -62,40 +68,57 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
       header={<ScreenHeader title="Plan a journey" onBack={() => navigation.goBack()} />}
       footer={null}
     >
-      <YStack px="$5" mt="$5" gap="$3">
-        <LocationInput label="From" value={from} onChangeText={setFrom} onResolved={setFromPostcode} />
-        <LocationInput label="To" value={to} onChangeText={setTo} onResolved={setToPostcode} />
+      {showInputs ? (
+        <YStack px="$5" mt="$5" gap="$3">
+          <LocationInput label="From" value={from} onChangeText={setFrom} onResolved={setFromPostcode} />
+          <LocationInput label="To" value={to} onChangeText={setTo} onResolved={setToPostcode} />
 
-        <YStack
-          mt="$2"
-          items="center"
-          justify="center"
-          pressStyle={{ opacity: 0.8 }}
-          onPress={loading ? undefined : run}
-          opacity={loading ? 0.6 : 1}
-          style={{ backgroundColor: '#111827', borderRadius: 10, height: 52 }}
-        >
-          <Text color="white" fontSize={16} fontWeight="700">
-            {loading ? 'Planning…' : 'Plan journey'}
-          </Text>
+          <YStack
+            mt="$2"
+            items="center"
+            justify="center"
+            pressStyle={{ opacity: 0.8 }}
+            onPress={loading ? undefined : run}
+            opacity={loading ? 0.6 : 1}
+            style={{ backgroundColor: '#111827', borderRadius: 10, height: 52 }}
+          >
+            <Text color="white" fontSize={16} fontWeight="700">
+              {loading ? 'Planning…' : 'Plan journey'}
+            </Text>
+          </YStack>
         </YStack>
-      </YStack>
-
-      {resolved && (
-        <YStack px="$5" mt="$4" gap="$1">
-          <XStack gap="$2">
-            <Text fontSize={13} color="#6b7280" style={{ width: 36 }}>From</Text>
-            <Text fontSize={13} color="#111827" flex={1}>{resolved.from.label}</Text>
+      ) : (
+        resolved && (
+          <XStack
+            mx="$5"
+            mt="$4"
+            p="$3"
+            items="center"
+            gap="$3"
+            pressStyle={{ opacity: 0.7 }}
+            onPress={() => setEditing(true)}
+            style={{ borderWidth: 1.5, borderColor: '#d1d5db', borderRadius: 10, backgroundColor: '#f9fafb' }}
+          >
+            <YStack flex={1} gap="$1">
+              <XStack gap="$2" items="center">
+                <MaterialIcons name="trip-origin" size={14} color="#6b7280" style={{ width: 18 }} />
+                <Text fontSize={14} color="#111827" flex={1} numberOfLines={1}>{resolved.from.label}</Text>
+              </XStack>
+              <XStack gap="$2" items="center">
+                <MaterialIcons name="place" size={16} color="#6b7280" style={{ width: 18 }} />
+                <Text fontSize={14} color="#111827" flex={1} numberOfLines={1}>{resolved.to.label}</Text>
+              </XStack>
+            </YStack>
+            <XStack items="center" gap="$1">
+              <MaterialIcons name="edit" size={16} color="#2563eb" />
+              <Text fontSize={14} fontWeight="600" color="#2563eb">Edit</Text>
+            </XStack>
           </XStack>
-          <XStack gap="$2">
-            <Text fontSize={13} color="#6b7280" style={{ width: 36 }}>To</Text>
-            <Text fontSize={13} color="#111827" flex={1}>{resolved.to.label}</Text>
-          </XStack>
-        </YStack>
+        )
       )}
 
       {results.map((journey, i) => (
-        <JourneyResultCard key={i} journey={journey} />
+        <JourneyResultCard key={i} journey={journey} from={resolved?.from} to={resolved?.to} />
       ))}
     </FormScreenLayout>
   )

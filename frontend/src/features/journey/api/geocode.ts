@@ -133,6 +133,7 @@ export async function resolveToPostcode(input: string): Promise<ResolveResult> {
   if (!postcode) {
     return { error: `Couldn’t find a UK postcode near “${trimmed}”. Try a postcode directly.` }
   }
-  // Show the original text alongside the postcode we resolved it to.
-  return { postcode, label: coordMatch ? postcode : `${trimmed} → ${postcode}` }
+  // Keep the readable place the user typed as the label (the postcode is used only to query
+  // TfL); coordinates have no readable form, so fall back to the postcode there.
+  return { postcode, label: coordMatch ? postcode : trimmed }
 }

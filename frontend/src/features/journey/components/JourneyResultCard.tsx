@@ -1,14 +1,49 @@
+import { MaterialIcons } from '@expo/vector-icons'
 import { Text, XStack, YStack } from 'tamagui'
+import type { ResolvedLocation } from '../api/geocode'
 import type { Journey } from '../api/tfl'
 
 type JourneyResultCardProps = {
   journey: Journey
+  // The resolved start/end the journey was planned between. Used to swap the bare postcodes
+  // TfL echoes in its leg instructions back to the readable places the user chose.
+  from?: ResolvedLocation
+  to?: ResolvedLocation
 }
 
 /** A human-readable label for a TfL mode name, e.g. `national-rail` -> `National rail`. */
 function modeLabel(name: string): string {
   const cleaned = name.replace(/-/g, ' ')
   return cleaned.charAt(0).toUpperCase() + cleaned.slice(1)
+}
+
+/** A MaterialIcons glyph for a TfL mode name, falling back to a generic transit icon. */
+function modeIcon(name: string): keyof typeof MaterialIcons.glyphMap {
+  switch (name) {
+    case 'walking':
+      return 'directions-walk'
+    case 'bus':
+    case 'coach':
+      return 'directions-bus'
+    case 'tube':
+      return 'directions-subway'
+    case 'dlr':
+    case 'overground':
+    case 'national-rail':
+    case 'elizabeth-line':
+    case 'tflrail':
+      return 'directions-railway'
+    case 'tram':
+      return 'tram'
+    case 'river-bus':
+    case 'river-tour':
+      return 'directions-boat'
+    case 'cycle':
+    case 'cycle-hire':
+      return 'directions-bike'
+    default:
+      return 'directions-transit'
+  }
 }
 
 /**
@@ -37,11 +72,32 @@ function fareLabel(journey: Journey): string | null {
 }
 
 /**
- * One journey option: total duration, depart/arrive times, and the ordered legs.
- * Mode is shown as text (no colour-only signals, per the project UI rules).
+ * Replace the postcodes we sent to TfL with the readable places the user chose. We query
+ * postcode-to-postcode (to avoid TfL's "did you mean?" disambiguation), so TfL's instructions
+ * say e.g. "Walk to SW1A 1AA" — we rewrite that to "Walk to Buckingham Palace". The match is
+ * space-insensitive because TfL may format the postcode differently from how we sent it.
  */
-export const JourneyResultCard = ({ journey }: JourneyResultCardProps) => {
+function humanizeSummary(summary: string, locations: (ResolvedLocation | undefined)[]): string {
+  let out = summary
+  for (const loc of locations) {
+    if (!loc || loc.label === loc.postcode) continue
+    const compact = loc.postcode.replace(/\s+/g, '')
+    const pattern = `${compact.slice(0, -3)}\\s*${compact.slice(-3)}`
+    out = out.replace(new RegExp(pattern, 'ig'), loc.label)
+  }
+  return out
+}
+
+/**
+ * One journey option: total duration, depart/arrive times, and the ordered legs, each shown
+ * with a mode icon. Per-leg durations cover only time in motion, so any remaining time (the
+ * total minus the legs) is interchange and waiting — shown as its own line so the breakdown
+ * visibly adds up to the headline duration.
+ */
+export const JourneyResultCard = ({ journey, from, to }: JourneyResultCardProps) => {
   const fare = fareLabel(journey)
+  const legTotal = journey.legs.reduce((sum, leg) => sum + leg.duration, 0)
+  const waiting = journey.duration - legTotal
   return (
     <YStack
       mx="$5"
@@ -62,16 +118,36 @@ export const JourneyResultCard = ({ journey }: JourneyResultCardProps) => {
 
       <YStack gap="$2.5">
         {journey.legs.map((leg, i) => (
-          <XStack key={i} gap="$2.5" items="flex-start">
-            <Text fontSize={13} fontWeight="700" color="#2563eb" style={{ width: 88 }}>
-              {modeLabel(leg.mode.name)}
-            </Text>
+          <XStack key={i} gap="$3" items="flex-start">
+            <MaterialIcons
+              name={modeIcon(leg.mode.name)}
+              size={22}
+              color="#2563eb"
+              accessibilityLabel={modeLabel(leg.mode.name)}
+              style={{ width: 24, marginTop: 1 }}
+            />
             <YStack flex={1} gap="$0.5">
-              <Text fontSize={14} color="#111827">{leg.instruction.summary}</Text>
+              <Text fontSize={14} color="#111827">{humanizeSummary(leg.instruction.summary, [from, to])}</Text>
               <Text fontSize={12} color="#6b7280">{leg.duration} min</Text>
             </YStack>
           </XStack>
         ))}
+
+        {waiting >= 1 && (
+          <XStack gap="$3" items="flex-start">
+            <MaterialIcons
+              name="schedule"
+              size={22}
+              color="#6b7280"
+              accessibilityLabel="Waiting and connections"
+              style={{ width: 24, marginTop: 1 }}
+            />
+            <YStack flex={1} gap="$0.5">
+              <Text fontSize={14} color="#6b7280">Waiting & connections</Text>
+              <Text fontSize={12} color="#6b7280">{waiting} min</Text>
+            </YStack>
+          </XStack>
+        )}
       </YStack>
     </YStack>
   )
