@@ -23,14 +23,14 @@ def _lift_connections(items: list[dict]) -> list[str]:
 
 
 def test_real_lift_carries_name_and_decoded_connection(client: TestClient, db_session: Session) -> None:
-    # Acton Town's two lifts run from the booking hall to the District line platforms.
+    # Acton Town's two lifts run from the booking hall to the platforms.
     connections = _lift_connections(_equipment_for(client, db_session, "Acton Town"))
 
     assert len(connections) == 2
     # Each connection names the lift and describes a decoded, directional route.
     assert all(c.startswith("Lift ") for c in connections)
     assert all(" → " in c for c in connections)
-    assert any("Booking hall" in c and "District line platform" in c for c in connections)
+    assert any("Booking Hall" in c and "Platform" in c for c in connections)
 
 
 def test_lift_connections_are_not_synthetic_placeholders(client: TestClient, db_session: Session) -> None:
@@ -65,10 +65,10 @@ def test_named_lifts_merge_onto_a_single_station(client: TestClient, db_session:
 
 
 def test_each_lift_seeded_as_its_own_equipment_row(client: TestClient, db_session: Session) -> None:
-    # The feed lists 569 individual lifts; each becomes its own Equipment row. (A handful
-    # of tube stations the feed doesn't itemise still get count-based "street → " fallbacks.)
+    # Named lifts from the feed each become their own Equipment row.
+    # Synthesised fallbacks (street → platform) are excluded from this count.
     all_equipment = client.get("/equipment").json()
     lifts = [e for e in all_equipment if e["equipment_type"]["name"] == "lift"]
-    feed_lifts = [e for e in lifts if "street → " not in e["connection"]]
-    assert len(feed_lifts) == 569
-    assert len(lifts) >= 569
+    feed_lifts = [e for e in lifts if "street → " not in e["connection"].lower()]
+    assert len(feed_lifts) == 573
+    assert len(lifts) >= 573

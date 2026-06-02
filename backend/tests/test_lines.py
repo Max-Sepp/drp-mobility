@@ -30,22 +30,22 @@ def test_line_names_are_unique(db_session: Session) -> None:
 
 
 def test_platform_references_lines_as_a_list(db_session: Session) -> None:
-    platform = _platform(db_session, "Acton Town", "District line — Platform 1")
+    platform = _platform(db_session, "Acton Town", "Westbound Platform 2")
 
-    assert [line.name for line in platform.lines] == ["District"]
+    assert [line.name for line in platform.lines] == ["Piccadilly"]
     assert all(isinstance(line, Line) for line in platform.lines)
 
 
 def test_platform_with_multiple_lines(db_session: Session) -> None:
-    platform = _platform(db_session, "Baker Street", "Circle/Hammersmith & City line — Platform 1")
+    platform = _platform(db_session, "Baker Street", "Eastbound Platform 5")
 
     assert {line.name for line in platform.lines} == {"Circle", "Hammersmith & City"}
 
 
 def test_same_line_shared_across_platforms(db_session: Session) -> None:
-    # Two District platforms must point at the *same* Line row, not duplicates.
-    p1 = _platform(db_session, "Acton Town", "District line — Platform 1")
-    p2 = _platform(db_session, "Acton Town", "District line — Platform 2")
+    # Two shared District/Piccadilly platforms must reference the same District Line row.
+    p1 = _platform(db_session, "Acton Town", "Westbound Platform 1")
+    p2 = _platform(db_session, "Acton Town", "Eastbound Platform 4")
 
     district1 = next(line for line in p1.lines if line.name == "District")
     district2 = next(line for line in p2.lines if line.name == "District")
