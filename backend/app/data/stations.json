@@ -1,7 +1,6 @@
 [
   {
     "name": "Abbey Road",
-    "step_free": "to_platform",
     "escalators": 0,
     "platforms": [
       {
@@ -64,7 +63,6 @@
   },
   {
     "name": "Abbey Wood",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -211,7 +209,6 @@
   },
   {
     "name": "Acton Main Line",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -286,7 +283,6 @@
   },
   {
     "name": "Acton Town",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -411,7 +407,6 @@
   },
   {
     "name": "Aldgate",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -479,7 +474,6 @@
   },
   {
     "name": "Aldgate East",
-    "step_free": "to_platform",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -529,7 +523,6 @@
   },
   {
     "name": "All Saints",
-    "step_free": "to_platform",
     "escalators": 0,
     "platforms": [
       {
@@ -591,7 +584,6 @@
   },
   {
     "name": "Alperton",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -661,7 +653,6 @@
   },
   {
     "name": "Amersham",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -764,7 +755,6 @@
   },
   {
     "name": "Angel",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 6,
     "platforms": [
@@ -806,11 +796,54 @@
     "coordinates": {
       "lat": 51.53176,
       "lng": -0.105386
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUAGL-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Southbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUAGL-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Northbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUAGL-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Southbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUAGL-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Northbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUAGL-Escalator-5",
+        "name": "Escalator 5",
+        "from": "Street",
+        "to": "Southbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUAGL-Escalator-6",
+        "name": "Escalator 6",
+        "from": "Street",
+        "to": "Northbound Platform 2",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Archway",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 2,
     "platforms": [
@@ -853,11 +886,26 @@
     "coordinates": {
       "lat": 51.565477,
       "lng": -0.134819
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUACY-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUACY-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Arnos Grove",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -925,7 +973,6 @@
   },
   {
     "name": "Arsenal",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -971,7 +1018,6 @@
   },
   {
     "name": "Baker Street",
-    "step_free": "to_platform",
     "lifts": 0,
     "escalators": 6,
     "platforms": [
@@ -1131,11 +1177,54 @@
         "managedByTfL": true,
         "location": "Located in Metropolitan line ticket hall"
       }
+    ],
+    "escalator_units": [
+      {
+        "id": "940GZZLUBST-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUBST-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Northbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUBST-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Southbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUBST-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Northbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUBST-Escalator-5",
+        "name": "Escalator 5",
+        "from": "Street",
+        "to": "Eastbound Platform 5",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUBST-Escalator-6",
+        "name": "Escalator 6",
+        "from": "Street",
+        "to": "Westbound Platform 6",
+        "mocked": true
+      }
     ]
   },
   {
     "name": "Balham",
-    "step_free": "to_vehicle",
     "lifts": 1,
     "escalators": 2,
     "platforms": [
@@ -1208,11 +1297,26 @@
     "coordinates": {
       "lat": 51.443286,
       "lng": -0.152998
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "HUBBAL-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBBAL-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Bank",
-    "step_free": "to_vehicle",
     "lifts": 10,
     "escalators": 15,
     "platforms": [
@@ -1407,11 +1511,117 @@
         "managedByTfL": true,
         "location": "Located at Cannon Street ticket hall"
       }
+    ],
+    "escalator_units": [
+      {
+        "id": "HUBBAN-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Southbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "HUBBAN-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Northbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "HUBBAN-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Westbound Platform 5",
+        "mocked": true
+      },
+      {
+        "id": "HUBBAN-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Eastbound Platform 6",
+        "mocked": true
+      },
+      {
+        "id": "HUBBAN-Escalator-5",
+        "name": "Escalator 5",
+        "from": "Street",
+        "to": "Westbound Platform 7",
+        "mocked": true
+      },
+      {
+        "id": "HUBBAN-Escalator-6",
+        "name": "Escalator 6",
+        "from": "Street",
+        "to": "Westbound Platform 8",
+        "mocked": true
+      },
+      {
+        "id": "HUBBAN-Escalator-7",
+        "name": "Escalator 7",
+        "from": "Street",
+        "to": "Eastbound Platform 9",
+        "mocked": true
+      },
+      {
+        "id": "HUBBAN-Escalator-8",
+        "name": "Escalator 8",
+        "from": "Street",
+        "to": "Westbound Platform 10",
+        "mocked": true
+      },
+      {
+        "id": "HUBBAN-Escalator-9",
+        "name": "Escalator 9",
+        "from": "Street",
+        "to": "Southbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "HUBBAN-Escalator-10",
+        "name": "Escalator 10",
+        "from": "Street",
+        "to": "Northbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "HUBBAN-Escalator-11",
+        "name": "Escalator 11",
+        "from": "Street",
+        "to": "Westbound Platform 5",
+        "mocked": true
+      },
+      {
+        "id": "HUBBAN-Escalator-12",
+        "name": "Escalator 12",
+        "from": "Street",
+        "to": "Eastbound Platform 6",
+        "mocked": true
+      },
+      {
+        "id": "HUBBAN-Escalator-13",
+        "name": "Escalator 13",
+        "from": "Street",
+        "to": "Westbound Platform 7",
+        "mocked": true
+      },
+      {
+        "id": "HUBBAN-Escalator-14",
+        "name": "Escalator 14",
+        "from": "Street",
+        "to": "Westbound Platform 8",
+        "mocked": true
+      },
+      {
+        "id": "HUBBAN-Escalator-15",
+        "name": "Escalator 15",
+        "from": "Street",
+        "to": "Eastbound Platform 9",
+        "mocked": true
+      }
     ]
   },
   {
     "name": "Barbican",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -1478,7 +1688,6 @@
   },
   {
     "name": "Barking",
-    "step_free": "to_vehicle",
     "lifts": 1,
     "escalators": 0,
     "platforms": [
@@ -1639,7 +1848,6 @@
   },
   {
     "name": "Barking Riverside",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -1713,7 +1921,6 @@
   },
   {
     "name": "Barkingside",
-    "step_free": "to_vehicle",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -1785,7 +1992,6 @@
   },
   {
     "name": "Barons Court",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -1885,7 +2091,6 @@
   },
   {
     "name": "Battersea Power Station",
-    "step_free": "to_platform",
     "lifts": 4,
     "escalators": 0,
     "platforms": [
@@ -1975,7 +2180,6 @@
   },
   {
     "name": "Bayswater",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -2023,7 +2227,6 @@
   },
   {
     "name": "Becontree",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -2093,7 +2296,6 @@
   },
   {
     "name": "Belsize Park",
-    "step_free": "none",
     "lifts": 3,
     "escalators": 0,
     "platforms": [
@@ -2162,7 +2364,6 @@
   },
   {
     "name": "Bermondsey",
-    "step_free": "to_platform",
     "lifts": 1,
     "escalators": 3,
     "platforms": [
@@ -2214,11 +2415,33 @@
     "coordinates": {
       "lat": 51.497951,
       "lng": -0.063769
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUBMY-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUBMY-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUBMY-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Bethnal Green",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 3,
     "platforms": [
@@ -2260,11 +2483,33 @@
     "coordinates": {
       "lat": 51.527221,
       "lng": -0.055506
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUBLG-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUBLG-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUBLG-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Blackfriars",
-    "step_free": "to_vehicle",
     "lifts": 6,
     "escalators": 4,
     "platforms": [
@@ -2431,11 +2676,40 @@
         "managedByTfL": false,
         "location": "Located in National Rail station"
       }
+    ],
+    "escalator_units": [
+      {
+        "id": "HUBBFR-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Southbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBBFR-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBBFR-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBBFR-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Northbound Platform 2",
+        "mocked": true
+      }
     ]
   },
   {
     "name": "Blackhorse Road",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 2,
     "platforms": [
@@ -2515,11 +2789,26 @@
     "coordinates": {
       "lat": 51.586917,
       "lng": -0.04115
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "HUBBHO-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBBHO-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Blackwall",
-    "step_free": "to_platform",
     "escalators": 0,
     "platforms": [
       {
@@ -2581,7 +2870,6 @@
   },
   {
     "name": "Bond Street",
-    "step_free": "to_vehicle",
     "lifts": 6,
     "escalators": 8,
     "platforms": [
@@ -2713,11 +3001,68 @@
     "coordinates": {
       "lat": 51.514303,
       "lng": -0.149723
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "HUBBDS-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBBDS-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBBDS-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Northbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "HUBBDS-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Southbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "HUBBDS-Escalator-5",
+        "name": "Escalator 5",
+        "from": "Street",
+        "to": "Eastbound Platform A",
+        "mocked": true
+      },
+      {
+        "id": "HUBBDS-Escalator-6",
+        "name": "Escalator 6",
+        "from": "Street",
+        "to": "Westbound Platform B",
+        "mocked": true
+      },
+      {
+        "id": "HUBBDS-Escalator-7",
+        "name": "Escalator 7",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBBDS-Escalator-8",
+        "name": "Escalator 8",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Borough",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -2779,7 +3124,6 @@
   },
   {
     "name": "Boston Manor",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -2849,7 +3193,6 @@
   },
   {
     "name": "Bounds Green",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 2,
     "platforms": [
@@ -2892,11 +3235,26 @@
     "coordinates": {
       "lat": 51.607033,
       "lng": -0.124235
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUBDS-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Eastbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUBDS-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Westbound Platform 2",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Bow Church",
-    "step_free": "to_platform",
     "escalators": 0,
     "platforms": [
       {
@@ -2958,7 +3316,6 @@
   },
   {
     "name": "Bow Road",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -3006,7 +3363,6 @@
   },
   {
     "name": "Brent Cross",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -3052,7 +3408,6 @@
   },
   {
     "name": "Brent Cross West Station",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -3157,7 +3512,6 @@
   },
   {
     "name": "Brentwood",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -3276,7 +3630,6 @@
   },
   {
     "name": "Brixton",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 2,
     "platforms": [
@@ -3356,11 +3709,26 @@
     "coordinates": {
       "lat": 51.462616,
       "lng": -0.114888
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "HUBBRX-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBBRX-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Northbound Platform 2",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Brockley",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -3431,7 +3799,6 @@
   },
   {
     "name": "Bromley South",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -3519,7 +3886,6 @@
   },
   {
     "name": "Bromley-by-Bow",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -3584,7 +3950,6 @@
   },
   {
     "name": "Buckhurst Hill",
-    "step_free": "to_vehicle",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -3654,7 +4019,6 @@
   },
   {
     "name": "Burnham",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -3744,7 +4108,6 @@
   },
   {
     "name": "Burnt Oak",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -3790,7 +4153,6 @@
   },
   {
     "name": "Caledonian Road",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -3852,7 +4214,6 @@
   },
   {
     "name": "Caledonian Road & Barnsbury",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -3907,7 +4268,6 @@
   },
   {
     "name": "Camden Road",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -3969,7 +4329,6 @@
   },
   {
     "name": "Camden Town",
-    "step_free": "to_platform",
     "lifts": 0,
     "escalators": 2,
     "platforms": [
@@ -4033,11 +4392,26 @@
     "coordinates": {
       "lat": 51.53929,
       "lng": -0.14274
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUCTN-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUCTN-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Canada Water",
-    "step_free": "to_platform",
     "lifts": 3,
     "escalators": 8,
     "platforms": [
@@ -4126,11 +4500,68 @@
     "coordinates": {
       "lat": 51.497943,
       "lng": -0.049722
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "HUBZCW-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBZCW-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBZCW-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Southbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "HUBZCW-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Northbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "HUBZCW-Escalator-5",
+        "name": "Escalator 5",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBZCW-Escalator-6",
+        "name": "Escalator 6",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBZCW-Escalator-7",
+        "name": "Escalator 7",
+        "from": "Street",
+        "to": "Southbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "HUBZCW-Escalator-8",
+        "name": "Escalator 8",
+        "from": "Street",
+        "to": "Northbound Platform 4",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Canary Wharf",
-    "step_free": "to_vehicle",
     "lifts": 10,
     "escalators": 4,
     "platforms": [
@@ -4363,11 +4794,40 @@
         "managedByTfL": true,
         "location": "Located in ticket hall"
       }
+    ],
+    "escalator_units": [
+      {
+        "id": "HUBCAW-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Southbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBCAW-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBCAW-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBCAW-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      }
     ]
   },
   {
     "name": "Canning Town",
-    "step_free": "to_platform",
     "lifts": 4,
     "escalators": 10,
     "platforms": [
@@ -4486,11 +4946,82 @@
     "coordinates": {
       "lat": 51.514126,
       "lng": 0.008101
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "HUBCAN-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Southbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBCAN-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Northbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBCAN-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Eastbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "HUBCAN-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Westbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "HUBCAN-Escalator-5",
+        "name": "Escalator 5",
+        "from": "Street",
+        "to": "Westbound Platform 5",
+        "mocked": true
+      },
+      {
+        "id": "HUBCAN-Escalator-6",
+        "name": "Escalator 6",
+        "from": "Street",
+        "to": "Eastbound Platform 6",
+        "mocked": true
+      },
+      {
+        "id": "HUBCAN-Escalator-7",
+        "name": "Escalator 7",
+        "from": "Street",
+        "to": "Southbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBCAN-Escalator-8",
+        "name": "Escalator 8",
+        "from": "Street",
+        "to": "Northbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBCAN-Escalator-9",
+        "name": "Escalator 9",
+        "from": "Street",
+        "to": "Eastbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "HUBCAN-Escalator-10",
+        "name": "Escalator 10",
+        "from": "Street",
+        "to": "Westbound Platform 4",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Cannon Street",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -4666,7 +5197,6 @@
   },
   {
     "name": "Canonbury",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -4757,7 +5287,6 @@
   },
   {
     "name": "Canons Park",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -4838,7 +5367,6 @@
   },
   {
     "name": "Carshalton",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -4902,7 +5430,6 @@
   },
   {
     "name": "Catford",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -4966,7 +5493,6 @@
   },
   {
     "name": "Chadwell Heath",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -5070,7 +5596,6 @@
   },
   {
     "name": "Chalfont & Latimer",
-    "step_free": "to_vehicle",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -5148,7 +5673,6 @@
   },
   {
     "name": "Chalk Farm",
-    "step_free": "none",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -5210,7 +5734,6 @@
   },
   {
     "name": "Chancery Lane",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 5,
     "platforms": [
@@ -5252,11 +5775,47 @@
     "coordinates": {
       "lat": 51.518245,
       "lng": -0.111583
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUCHL-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUCHL-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUCHL-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUCHL-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUCHL-Escalator-5",
+        "name": "Escalator 5",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Charing Cross",
-    "step_free": "to_vehicle",
     "lifts": 0,
     "escalators": 10,
     "platforms": [
@@ -5421,11 +5980,82 @@
         "managedByTfL": false,
         "location": "Located in National Rail station"
       }
+    ],
+    "escalator_units": [
+      {
+        "id": "HUBCHX-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBCHX-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBCHX-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Northbound Platform 5",
+        "mocked": true
+      },
+      {
+        "id": "HUBCHX-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Southbound Platform 6",
+        "mocked": true
+      },
+      {
+        "id": "HUBCHX-Escalator-5",
+        "name": "Escalator 5",
+        "from": "Street",
+        "to": "Southbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBCHX-Escalator-6",
+        "name": "Escalator 6",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBCHX-Escalator-7",
+        "name": "Escalator 7",
+        "from": "Street",
+        "to": "Southbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "HUBCHX-Escalator-8",
+        "name": "Escalator 8",
+        "from": "Street",
+        "to": "Southbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "HUBCHX-Escalator-9",
+        "name": "Escalator 9",
+        "from": "Street",
+        "to": "Southbound Platform 5",
+        "mocked": true
+      },
+      {
+        "id": "HUBCHX-Escalator-10",
+        "name": "Escalator 10",
+        "from": "Street",
+        "to": "Southbound Platform 6",
+        "mocked": true
+      }
     ]
   },
   {
     "name": "Charlton",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -5482,7 +6112,6 @@
   },
   {
     "name": "Chesham",
-    "step_free": "to_vehicle",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -5541,7 +6170,6 @@
   },
   {
     "name": "Chigwell",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -5611,7 +6239,6 @@
   },
   {
     "name": "Chiswick Park",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -5657,7 +6284,6 @@
   },
   {
     "name": "Chorleywood",
-    "step_free": "to_vehicle",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -5731,7 +6357,6 @@
   },
   {
     "name": "City Thameslink",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -5797,7 +6422,6 @@
   },
   {
     "name": "Clapham Common",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 2,
     "platforms": [
@@ -5839,11 +6463,26 @@
     "coordinates": {
       "lat": 51.461741,
       "lng": -0.138317
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUCPC-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUCPC-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Clapham Junction",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -5966,7 +6605,6 @@
   },
   {
     "name": "Clapham North",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 2,
     "platforms": [
@@ -6008,11 +6646,26 @@
     "coordinates": {
       "lat": 51.465134,
       "lng": -0.130016
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUCPN-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUCPN-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Clapham South",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 2,
     "platforms": [
@@ -6055,11 +6708,26 @@
     "coordinates": {
       "lat": 51.452652,
       "lng": -0.147582
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUCPS-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUCPS-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Cockfosters",
-    "step_free": "to_vehicle",
     "lifts": 1,
     "escalators": 0,
     "platforms": [
@@ -6160,7 +6828,6 @@
   },
   {
     "name": "Colindale",
-    "step_free": "to_vehicle",
     "lifts": 1,
     "escalators": 0,
     "platforms": [
@@ -6215,7 +6882,6 @@
   },
   {
     "name": "Colliers Wood",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 2,
     "platforms": [
@@ -6257,11 +6923,26 @@
     "coordinates": {
       "lat": 51.418158,
       "lng": -0.178086
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUCSD-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUCSD-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Coulsdon South",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -6327,7 +7008,6 @@
   },
   {
     "name": "Covent Garden",
-    "step_free": "none",
     "lifts": 4,
     "escalators": 0,
     "platforms": [
@@ -6403,7 +7083,6 @@
   },
   {
     "name": "Crossharbour",
-    "step_free": "to_platform",
     "escalators": 0,
     "platforms": [
       {
@@ -6465,7 +7144,6 @@
   },
   {
     "name": "Croxley",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -6535,7 +7213,6 @@
   },
   {
     "name": "Crystal Palace",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -6681,7 +7358,6 @@
   },
   {
     "name": "Custom House for ExCel",
-    "step_free": "to_platform",
     "escalators": 0,
     "platforms": [
       {
@@ -6791,7 +7467,6 @@
   },
   {
     "name": "Cutty Sark for Maritime Greenwich",
-    "step_free": "to_platform",
     "escalators": 0,
     "platforms": [
       {
@@ -6848,7 +7523,6 @@
   },
   {
     "name": "Dagenham East",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -6929,7 +7603,6 @@
   },
   {
     "name": "Dagenham Heathway",
-    "step_free": "to_platform",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -7010,7 +7683,6 @@
   },
   {
     "name": "Dalston Junction",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -7099,7 +7771,6 @@
   },
   {
     "name": "Dartford",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -7190,7 +7861,6 @@
   },
   {
     "name": "Debden",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -7276,7 +7946,6 @@
   },
   {
     "name": "Denmark Hill",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -7382,7 +8051,6 @@
   },
   {
     "name": "Deptford",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -7446,7 +8114,6 @@
   },
   {
     "name": "Deptford Bridge",
-    "step_free": "to_platform",
     "escalators": 0,
     "platforms": [
       {
@@ -7509,7 +8176,6 @@
   },
   {
     "name": "Devons Road",
-    "step_free": "to_platform",
     "escalators": 0,
     "platforms": [
       {
@@ -7571,7 +8237,6 @@
   },
   {
     "name": "Dollis Hill",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -7652,7 +8317,6 @@
   },
   {
     "name": "Ealing Broadway",
-    "step_free": "to_vehicle",
     "lifts": 4,
     "escalators": 0,
     "platforms": [
@@ -7842,7 +8506,6 @@
   },
   {
     "name": "Ealing Common",
-    "step_free": "to_platform",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -7914,7 +8577,6 @@
   },
   {
     "name": "Earl's Court",
-    "step_free": "to_vehicle",
     "lifts": 4,
     "escalators": 4,
     "platforms": [
@@ -8031,11 +8693,40 @@
     "coordinates": {
       "lat": 51.492061,
       "lng": -0.193378
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUECT-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Eastbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUECT-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUECT-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Westbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUECT-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Westbound Platform 4",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "East Acton",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -8081,7 +8772,6 @@
   },
   {
     "name": "East Croydon",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -8223,7 +8913,6 @@
   },
   {
     "name": "East Finchley",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -8291,7 +8980,6 @@
   },
   {
     "name": "East Ham",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -8356,7 +9044,6 @@
   },
   {
     "name": "East India",
-    "step_free": "to_platform",
     "escalators": 0,
     "platforms": [
       {
@@ -8428,7 +9115,6 @@
   },
   {
     "name": "East Putney",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -8475,7 +9161,6 @@
   },
   {
     "name": "Eastcote",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -8523,7 +9208,6 @@
   },
   {
     "name": "Edgware",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -8599,7 +9283,6 @@
   },
   {
     "name": "Edgware Road (Bakerloo)",
-    "step_free": "none",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -8661,7 +9344,6 @@
   },
   {
     "name": "Edgware Road (Circle Line)",
-    "step_free": "to_platform",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -8741,7 +9423,6 @@
   },
   {
     "name": "Edmonton Green",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -8803,7 +9484,6 @@
   },
   {
     "name": "Elephant & Castle",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -8936,7 +9616,6 @@
   },
   {
     "name": "Elm Park",
-    "step_free": "to_vehicle",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -9017,7 +9696,6 @@
   },
   {
     "name": "Elstree & Borehamwood",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -9112,7 +9790,6 @@
   },
   {
     "name": "Embankment",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 10,
     "platforms": [
@@ -9200,11 +9877,82 @@
     "coordinates": {
       "lat": 51.507056,
       "lng": -0.122666
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUEMB-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUEMB-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUEMB-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Northbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUEMB-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Southbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUEMB-Escalator-5",
+        "name": "Escalator 5",
+        "from": "Street",
+        "to": "Northbound Platform 5",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUEMB-Escalator-6",
+        "name": "Escalator 6",
+        "from": "Street",
+        "to": "Southbound Platform 6",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUEMB-Escalator-7",
+        "name": "Escalator 7",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUEMB-Escalator-8",
+        "name": "Escalator 8",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUEMB-Escalator-9",
+        "name": "Escalator 9",
+        "from": "Street",
+        "to": "Northbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUEMB-Escalator-10",
+        "name": "Escalator 10",
+        "from": "Street",
+        "to": "Southbound Platform 4",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Epping",
-    "step_free": "to_vehicle",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -9301,7 +10049,6 @@
   },
   {
     "name": "Euston",
-    "step_free": "to_vehicle",
     "lifts": 0,
     "escalators": 10,
     "platforms": [
@@ -9450,11 +10197,82 @@
         "managedByTfL": false,
         "location": "Located in National Rail station"
       }
+    ],
+    "escalator_units": [
+      {
+        "id": "HUBEUS-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBEUS-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBEUS-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Northbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "HUBEUS-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Northbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "HUBEUS-Escalator-5",
+        "name": "Escalator 5",
+        "from": "Street",
+        "to": "Southbound Platform 5",
+        "mocked": true
+      },
+      {
+        "id": "HUBEUS-Escalator-6",
+        "name": "Escalator 6",
+        "from": "Street",
+        "to": "Southbound Platform 6",
+        "mocked": true
+      },
+      {
+        "id": "HUBEUS-Escalator-7",
+        "name": "Escalator 7",
+        "from": "Street",
+        "to": "Northbound Platform 9",
+        "mocked": true
+      },
+      {
+        "id": "HUBEUS-Escalator-8",
+        "name": "Escalator 8",
+        "from": "Street",
+        "to": "Northbound Platform 10",
+        "mocked": true
+      },
+      {
+        "id": "HUBEUS-Escalator-9",
+        "name": "Escalator 9",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBEUS-Escalator-10",
+        "name": "Escalator 10",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      }
     ]
   },
   {
     "name": "Euston Square",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -9520,7 +10338,6 @@
   },
   {
     "name": "Fairlop",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -9590,7 +10407,6 @@
   },
   {
     "name": "Farringdon",
-    "step_free": "to_vehicle",
     "lifts": 8,
     "escalators": 0,
     "platforms": [
@@ -9795,7 +10611,6 @@
   },
   {
     "name": "Finchley Central",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -9881,7 +10696,6 @@
   },
   {
     "name": "Finchley Road",
-    "step_free": "to_platform",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -9975,7 +10789,6 @@
   },
   {
     "name": "Finsbury Park",
-    "step_free": "to_vehicle",
     "lifts": 5,
     "escalators": 0,
     "platforms": [
@@ -10108,7 +10921,6 @@
   },
   {
     "name": "Forest Gate",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -10212,7 +11024,6 @@
   },
   {
     "name": "Forest Hill",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -10280,7 +11091,6 @@
   },
   {
     "name": "Fulham Broadway",
-    "step_free": "to_platform",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -10342,7 +11152,6 @@
   },
   {
     "name": "Gallions Reach",
-    "step_free": "to_platform",
     "escalators": 0,
     "platforms": [
       {
@@ -10404,7 +11213,6 @@
   },
   {
     "name": "Gants Hill",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 3,
     "platforms": [
@@ -10446,11 +11254,33 @@
     "coordinates": {
       "lat": 51.576542,
       "lng": 0.066185
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUGTH-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUGTH-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUGTH-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Gidea Park",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -10582,7 +11412,6 @@
   },
   {
     "name": "Gloucester Road",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -10662,7 +11491,6 @@
   },
   {
     "name": "Golders Green",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -10746,7 +11574,6 @@
   },
   {
     "name": "Goldhawk Road",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -10794,7 +11621,6 @@
   },
   {
     "name": "Goodge Street",
-    "step_free": "none",
     "lifts": 4,
     "escalators": 0,
     "platforms": [
@@ -10870,7 +11696,6 @@
   },
   {
     "name": "Goodmayes",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -10967,7 +11792,6 @@
   },
   {
     "name": "Gospel Oak",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -11072,7 +11896,6 @@
   },
   {
     "name": "Grange Hill",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -11142,7 +11965,6 @@
   },
   {
     "name": "Great Portland Street",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -11192,7 +12014,6 @@
   },
   {
     "name": "Green Park",
-    "step_free": "to_vehicle",
     "lifts": 5,
     "escalators": 11,
     "platforms": [
@@ -11447,11 +12268,89 @@
         "opensWithStation": false,
         "managedByTfL": false
       }
+    ],
+    "escalator_units": [
+      {
+        "id": "940GZZLUGPK-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUGPK-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUGPK-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Northbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUGPK-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Southbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUGPK-Escalator-5",
+        "name": "Escalator 5",
+        "from": "Street",
+        "to": "Northbound Platform 5",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUGPK-Escalator-6",
+        "name": "Escalator 6",
+        "from": "Street",
+        "to": "Southbound Platform 6",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUGPK-Escalator-7",
+        "name": "Escalator 7",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUGPK-Escalator-8",
+        "name": "Escalator 8",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUGPK-Escalator-9",
+        "name": "Escalator 9",
+        "from": "Street",
+        "to": "Northbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUGPK-Escalator-10",
+        "name": "Escalator 10",
+        "from": "Street",
+        "to": "Southbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUGPK-Escalator-11",
+        "name": "Escalator 11",
+        "from": "Street",
+        "to": "Northbound Platform 5",
+        "mocked": true
+      }
     ]
   },
   {
     "name": "Greenford",
-    "step_free": "to_vehicle",
     "lifts": 1,
     "escalators": 1,
     "platforms": [
@@ -11513,11 +12412,19 @@
     "coordinates": {
       "lat": 51.542423,
       "lng": -0.34605
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "HUBGFD-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Greenwich",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -11604,7 +12511,6 @@
   },
   {
     "name": "Gunnersbury",
-    "step_free": "to_platform",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -11652,7 +12558,6 @@
   },
   {
     "name": "Hackney Central",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -11714,7 +12619,6 @@
   },
   {
     "name": "Hackney Downs",
-    "step_free": "to_platform",
     "escalators": 0,
     "platforms": [
       {
@@ -11796,7 +12700,6 @@
   },
   {
     "name": "Hackney Wick",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -11860,7 +12763,6 @@
   },
   {
     "name": "Haggerston",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -11934,7 +12836,6 @@
   },
   {
     "name": "Hainault",
-    "step_free": "to_vehicle",
     "lifts": 3,
     "escalators": 0,
     "platforms": [
@@ -12027,7 +12928,6 @@
   },
   {
     "name": "Hammersmith",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -12257,7 +13157,6 @@
   },
   {
     "name": "Hammersmith",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -12487,7 +13386,6 @@
   },
   {
     "name": "Hampstead",
-    "step_free": "none",
     "lifts": 4,
     "escalators": 0,
     "platforms": [
@@ -12564,7 +13462,6 @@
   },
   {
     "name": "Hampstead Heath",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -12626,7 +13523,6 @@
   },
   {
     "name": "Hanger Lane",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -12696,7 +13592,6 @@
   },
   {
     "name": "Hanwell",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -12773,7 +13668,6 @@
   },
   {
     "name": "Harlesden",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -12821,7 +13715,6 @@
   },
   {
     "name": "Harold Wood",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -12947,7 +13840,6 @@
   },
   {
     "name": "Harrow & Wealdstone",
-    "step_free": "to_vehicle",
     "lifts": 4,
     "escalators": 0,
     "platforms": [
@@ -13065,7 +13957,6 @@
   },
   {
     "name": "Harrow-on-the-Hill",
-    "step_free": "to_vehicle",
     "lifts": 4,
     "escalators": 0,
     "platforms": [
@@ -13210,7 +14101,6 @@
   },
   {
     "name": "Hatton Cross",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -13257,7 +14147,6 @@
   },
   {
     "name": "Hayes & Harlington",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -13406,7 +14295,6 @@
   },
   {
     "name": "Heathrow Airport Terminal 4",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -13514,7 +14402,6 @@
   },
   {
     "name": "Heathrow Airport Terminal 5",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 2,
     "platforms": [
@@ -13637,11 +14524,26 @@
         "managedByTfL": false,
         "location": "Located on lower concourse"
       }
+    ],
+    "escalator_units": [
+      {
+        "id": "HUBHX5-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Eastbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "HUBHX5-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Eastbound Platform 4",
+        "mocked": true
+      }
     ]
   },
   {
     "name": "Heathrow Terminal 4",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -13749,7 +14651,6 @@
   },
   {
     "name": "Heathrow Terminal 5",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -13876,7 +14777,6 @@
   },
   {
     "name": "Heathrow Terminals 2 & 3",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 6,
     "platforms": [
@@ -13995,11 +14895,54 @@
         "managedByTfL": false,
         "location": "Located at street level"
       }
+    ],
+    "escalator_units": [
+      {
+        "id": "HUBH13-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBH13-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBH13-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBH13-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBH13-Escalator-5",
+        "name": "Escalator 5",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBH13-Escalator-6",
+        "name": "Escalator 6",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      }
     ]
   },
   {
     "name": "Hendon Central",
-    "step_free": "to_vehicle",
     "lifts": 1,
     "escalators": 0,
     "platforms": [
@@ -14070,7 +15013,6 @@
   },
   {
     "name": "Herne Hill",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -14155,7 +15097,6 @@
   },
   {
     "name": "Heron Quays",
-    "step_free": "to_platform",
     "escalators": 0,
     "platforms": [
       {
@@ -14217,7 +15158,6 @@
   },
   {
     "name": "High Barnet",
-    "step_free": "to_platform",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -14309,7 +15249,6 @@
   },
   {
     "name": "High Street Kensington",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -14381,7 +15320,6 @@
   },
   {
     "name": "Highbury & Islington",
-    "step_free": "to_vehicle",
     "lifts": 3,
     "escalators": 2,
     "platforms": [
@@ -14514,11 +15452,26 @@
     "coordinates": {
       "lat": 51.546348,
       "lng": -0.103324
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "HUBHHY-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Southbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBHHY-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Highgate",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 3,
     "platforms": [
@@ -14560,11 +15513,33 @@
     "coordinates": {
       "lat": 51.57753,
       "lng": -0.145857
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUHGT-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUHGT-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUHGT-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Hillingdon",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -14663,7 +15638,6 @@
   },
   {
     "name": "Holborn",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 7,
     "platforms": [
@@ -14727,11 +15701,61 @@
     "coordinates": {
       "lat": 51.517578,
       "lng": -0.120475
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUHBN-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUHBN-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUHBN-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Westbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUHBN-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Eastbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUHBN-Escalator-5",
+        "name": "Escalator 5",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUHBN-Escalator-6",
+        "name": "Escalator 6",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUHBN-Escalator-7",
+        "name": "Escalator 7",
+        "from": "Street",
+        "to": "Westbound Platform 3",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Holland Park",
-    "step_free": "none",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -14793,7 +15817,6 @@
   },
   {
     "name": "Holloway Road",
-    "step_free": "none",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -14855,7 +15878,6 @@
   },
   {
     "name": "Honor Oak Park",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -14919,7 +15941,6 @@
   },
   {
     "name": "Hornchurch",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -14989,7 +16010,6 @@
   },
   {
     "name": "Hounslow Central",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -15059,7 +16079,6 @@
   },
   {
     "name": "Hounslow East",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -15134,7 +16153,6 @@
   },
   {
     "name": "Hounslow West",
-    "step_free": "to_vehicle",
     "lifts": 1,
     "escalators": 0,
     "platforms": [
@@ -15194,7 +16212,6 @@
   },
   {
     "name": "Hoxton",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -15269,7 +16286,6 @@
   },
   {
     "name": "Hyde Park Corner",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 2,
     "platforms": [
@@ -15311,11 +16327,26 @@
     "coordinates": {
       "lat": 51.503033,
       "lng": -0.152442
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUHPC-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Eastbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUHPC-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Westbound Platform 2",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Ickenham",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -15379,7 +16410,6 @@
   },
   {
     "name": "Ilford",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -15505,7 +16535,6 @@
   },
   {
     "name": "Imperial Wharf",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -15569,7 +16598,6 @@
   },
   {
     "name": "Island Gardens",
-    "step_free": "to_platform",
     "escalators": 0,
     "platforms": [
       {
@@ -15624,7 +16652,6 @@
   },
   {
     "name": "Iver",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -15730,7 +16757,6 @@
   },
   {
     "name": "Kennington",
-    "step_free": "to_platform",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -15815,7 +16841,6 @@
   },
   {
     "name": "Kensal Green",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -15863,7 +16888,6 @@
   },
   {
     "name": "Kensal Rise",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -15934,7 +16958,6 @@
   },
   {
     "name": "Kensington (Olympia)",
-    "step_free": "to_vehicle",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -16053,7 +17076,6 @@
   },
   {
     "name": "Kentish Town",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 2,
     "platforms": [
@@ -16143,11 +17165,26 @@
     "coordinates": {
       "lat": 51.55031,
       "lng": -0.140733
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "HUBKTN-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBKTN-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Southbound Platform 1",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Kenton",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -16195,7 +17232,6 @@
   },
   {
     "name": "Kew Gardens",
-    "step_free": "to_vehicle",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -16282,7 +17318,6 @@
   },
   {
     "name": "Kilburn",
-    "step_free": "to_vehicle",
     "lifts": 1,
     "escalators": 0,
     "platforms": [
@@ -16372,7 +17407,6 @@
   },
   {
     "name": "Kilburn Park",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 2,
     "platforms": [
@@ -16414,11 +17448,26 @@
     "coordinates": {
       "lat": 51.534977,
       "lng": -0.194232
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUKPK-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUKPK-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "King George V",
-    "step_free": "to_platform",
     "escalators": 0,
     "platforms": [
       {
@@ -16480,7 +17529,6 @@
   },
   {
     "name": "King's Cross & St Pancras International",
-    "step_free": "to_vehicle",
     "lifts": 13,
     "escalators": 19,
     "platforms": [
@@ -16967,11 +18015,145 @@
         "managedByTfL": false,
         "location": "Located in King's Cross National Rail station. Changing Places and standalone baby changing area available."
       }
+    ],
+    "escalator_units": [
+      {
+        "id": "HUBKGX-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound Platform B",
+        "mocked": true
+      },
+      {
+        "id": "HUBKGX-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Southbound Platform A",
+        "mocked": true
+      },
+      {
+        "id": "HUBKGX-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBKGX-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Northbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBKGX-Escalator-5",
+        "name": "Escalator 5",
+        "from": "Street",
+        "to": "Northbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "HUBKGX-Escalator-6",
+        "name": "Escalator 6",
+        "from": "Street",
+        "to": "Northbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "HUBKGX-Escalator-7",
+        "name": "Escalator 7",
+        "from": "Street",
+        "to": "Eastbound Platform 11",
+        "mocked": true
+      },
+      {
+        "id": "HUBKGX-Escalator-8",
+        "name": "Escalator 8",
+        "from": "Street",
+        "to": "Eastbound Platform 12",
+        "mocked": true
+      },
+      {
+        "id": "HUBKGX-Escalator-9",
+        "name": "Escalator 9",
+        "from": "Street",
+        "to": "Eastbound Platform 13",
+        "mocked": true
+      },
+      {
+        "id": "HUBKGX-Escalator-10",
+        "name": "Escalator 10",
+        "from": "Street",
+        "to": "Northbound Platform 0",
+        "mocked": true
+      },
+      {
+        "id": "HUBKGX-Escalator-11",
+        "name": "Escalator 11",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBKGX-Escalator-12",
+        "name": "Escalator 12",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBKGX-Escalator-13",
+        "name": "Escalator 13",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBKGX-Escalator-14",
+        "name": "Escalator 14",
+        "from": "Street",
+        "to": "Northbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBKGX-Escalator-15",
+        "name": "Escalator 15",
+        "from": "Street",
+        "to": "Northbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "HUBKGX-Escalator-16",
+        "name": "Escalator 16",
+        "from": "Street",
+        "to": "Northbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "HUBKGX-Escalator-17",
+        "name": "Escalator 17",
+        "from": "Street",
+        "to": "Northbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "HUBKGX-Escalator-18",
+        "name": "Escalator 18",
+        "from": "Street",
+        "to": "Southbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "HUBKGX-Escalator-19",
+        "name": "Escalator 19",
+        "from": "Street",
+        "to": "Northbound Platform 5",
+        "mocked": true
+      }
     ]
   },
   {
     "name": "Kingsbury",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -17070,7 +18252,6 @@
   },
   {
     "name": "Knightsbridge",
-    "step_free": "to_vehicle",
     "lifts": 3,
     "escalators": 5,
     "platforms": [
@@ -17135,11 +18316,47 @@
     "coordinates": {
       "lat": 51.501667,
       "lng": -0.160508
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUKNB-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Eastbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUKNB-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Westbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUKNB-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Eastbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUKNB-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Westbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUKNB-Escalator-5",
+        "name": "Escalator 5",
+        "from": "Street",
+        "to": "Eastbound Platform 1",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Ladbroke Grove",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -17187,7 +18404,6 @@
   },
   {
     "name": "Lambeth North",
-    "step_free": "none",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -17249,7 +18465,6 @@
   },
   {
     "name": "Lancaster Gate",
-    "step_free": "none",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -17311,7 +18526,6 @@
   },
   {
     "name": "Langdon Park",
-    "step_free": "to_platform",
     "escalators": 0,
     "platforms": [
       {
@@ -17373,7 +18587,6 @@
   },
   {
     "name": "Langley",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -17501,7 +18714,6 @@
   },
   {
     "name": "Latimer Road",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -17549,7 +18761,6 @@
   },
   {
     "name": "Leicester Square",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 6,
     "platforms": [
@@ -17613,11 +18824,54 @@
     "coordinates": {
       "lat": 51.511384,
       "lng": -0.128426
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLULSQ-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLULSQ-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLULSQ-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Southbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLULSQ-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Northbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLULSQ-Escalator-5",
+        "name": "Escalator 5",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLULSQ-Escalator-6",
+        "name": "Escalator 6",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Leyton",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -17687,7 +18941,6 @@
   },
   {
     "name": "Leytonstone",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -17769,7 +19022,6 @@
   },
   {
     "name": "Limehouse",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -17874,7 +19126,6 @@
   },
   {
     "name": "Liverpool Street",
-    "step_free": "to_vehicle",
     "lifts": 4,
     "escalators": 9,
     "platforms": [
@@ -18227,11 +19478,75 @@
         "managedByTfL": false,
         "location": "Located in National Rail station"
       }
+    ],
+    "escalator_units": [
+      {
+        "id": "HUBLST-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Eastbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBLST-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Eastbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBLST-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBLST-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Westbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBLST-Escalator-5",
+        "name": "Escalator 5",
+        "from": "Street",
+        "to": "Eastbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "HUBLST-Escalator-6",
+        "name": "Escalator 6",
+        "from": "Street",
+        "to": "Eastbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "HUBLST-Escalator-7",
+        "name": "Escalator 7",
+        "from": "Street",
+        "to": "Eastbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "HUBLST-Escalator-8",
+        "name": "Escalator 8",
+        "from": "Street",
+        "to": "Eastbound Platform 5",
+        "mocked": true
+      },
+      {
+        "id": "HUBLST-Escalator-9",
+        "name": "Escalator 9",
+        "from": "Street",
+        "to": "Westbound Platform 5",
+        "mocked": true
+      }
     ]
   },
   {
     "name": "London Bridge",
-    "step_free": "to_vehicle",
     "lifts": 5,
     "escalators": 17,
     "platforms": [
@@ -18436,11 +19751,131 @@
         "managedByTfL": false,
         "location": "Located in National Rail station"
       }
+    ],
+    "escalator_units": [
+      {
+        "id": "HUBLBG-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBLBG-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBLBG-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Westbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "HUBLBG-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Eastbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "HUBLBG-Escalator-5",
+        "name": "Escalator 5",
+        "from": "Street",
+        "to": "Northbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "HUBLBG-Escalator-6",
+        "name": "Escalator 6",
+        "from": "Street",
+        "to": "Southbound Platform 5",
+        "mocked": true
+      },
+      {
+        "id": "HUBLBG-Escalator-7",
+        "name": "Escalator 7",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBLBG-Escalator-8",
+        "name": "Escalator 8",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBLBG-Escalator-9",
+        "name": "Escalator 9",
+        "from": "Street",
+        "to": "Westbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "HUBLBG-Escalator-10",
+        "name": "Escalator 10",
+        "from": "Street",
+        "to": "Eastbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "HUBLBG-Escalator-11",
+        "name": "Escalator 11",
+        "from": "Street",
+        "to": "Northbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "HUBLBG-Escalator-12",
+        "name": "Escalator 12",
+        "from": "Street",
+        "to": "Southbound Platform 5",
+        "mocked": true
+      },
+      {
+        "id": "HUBLBG-Escalator-13",
+        "name": "Escalator 13",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBLBG-Escalator-14",
+        "name": "Escalator 14",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBLBG-Escalator-15",
+        "name": "Escalator 15",
+        "from": "Street",
+        "to": "Westbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "HUBLBG-Escalator-16",
+        "name": "Escalator 16",
+        "from": "Street",
+        "to": "Eastbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "HUBLBG-Escalator-17",
+        "name": "Escalator 17",
+        "from": "Street",
+        "to": "Northbound Platform 4",
+        "mocked": true
+      }
     ]
   },
   {
     "name": "London City Airport",
-    "step_free": "to_platform",
     "escalators": 0,
     "platforms": [
       {
@@ -18502,7 +19937,6 @@
   },
   {
     "name": "Loughton",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -18594,7 +20028,6 @@
   },
   {
     "name": "Maida Vale",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 2,
     "platforms": [
@@ -18636,11 +20069,26 @@
     "coordinates": {
       "lat": 51.529775,
       "lng": -0.185759
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUMVL-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUMVL-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Maidenhead",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -18773,7 +20221,6 @@
   },
   {
     "name": "Manor House",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 3,
     "platforms": [
@@ -18816,11 +20263,33 @@
     "coordinates": {
       "lat": 51.570736,
       "lng": -0.096118
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUMRH-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Eastbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUMRH-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Westbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUMRH-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Eastbound Platform 1",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Manor Park",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -18925,7 +20394,6 @@
   },
   {
     "name": "Mansion House",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -18973,7 +20441,6 @@
   },
   {
     "name": "Marble Arch",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 2,
     "platforms": [
@@ -19015,11 +20482,26 @@
     "coordinates": {
       "lat": 51.513423,
       "lng": -0.158953
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUMBA-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUMBA-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Maryland",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -19124,7 +20606,6 @@
   },
   {
     "name": "Marylebone",
-    "step_free": "to_vehicle",
     "lifts": 0,
     "escalators": 2,
     "platforms": [
@@ -19267,11 +20748,26 @@
         "managedByTfL": false,
         "location": "Located in National Rail station. Baby changing is standalone area"
       }
+    ],
+    "escalator_units": [
+      {
+        "id": "HUBMYB-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBMYB-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      }
     ]
   },
   {
     "name": "Mile End",
-    "step_free": "to_platform",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -19341,7 +20837,6 @@
   },
   {
     "name": "Mill Hill East",
-    "step_free": "to_vehicle",
     "lifts": 1,
     "escalators": 0,
     "platforms": [
@@ -19385,7 +20880,6 @@
   },
   {
     "name": "Mitcham Eastfields",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -19449,7 +20943,6 @@
   },
   {
     "name": "Monument",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -19497,7 +20990,6 @@
   },
   {
     "name": "Moor Park",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -19590,7 +21082,6 @@
   },
   {
     "name": "Moorgate",
-    "step_free": "to_vehicle",
     "lifts": 4,
     "escalators": 6,
     "platforms": [
@@ -19740,11 +21231,54 @@
     "coordinates": {
       "lat": 51.518174,
       "lng": -0.088322
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "HUBZMG-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Eastbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBZMG-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Westbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBZMG-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Westbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "HUBZMG-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Westbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "HUBZMG-Escalator-5",
+        "name": "Escalator 5",
+        "from": "Street",
+        "to": "Northbound Platform 7",
+        "mocked": true
+      },
+      {
+        "id": "HUBZMG-Escalator-6",
+        "name": "Escalator 6",
+        "from": "Street",
+        "to": "Southbound Platform 8",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Morden",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -19854,7 +21388,6 @@
   },
   {
     "name": "Mornington Crescent",
-    "step_free": "none",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -19916,7 +21449,6 @@
   },
   {
     "name": "Neasden",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -19962,7 +21494,6 @@
   },
   {
     "name": "New Cross",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -20081,7 +21612,6 @@
   },
   {
     "name": "New Cross Gate",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -20184,7 +21714,6 @@
   },
   {
     "name": "Newbury Park",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -20270,7 +21799,6 @@
   },
   {
     "name": "Nine Elms",
-    "step_free": "to_platform",
     "lifts": 1,
     "escalators": 2,
     "platforms": [
@@ -20334,11 +21862,26 @@
         "managedByTfL": true,
         "location": "Located in ticket hall"
       }
+    ],
+    "escalator_units": [
+      {
+        "id": "940GZZNEUGST-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound",
+        "mocked": true
+      },
+      {
+        "id": "940GZZNEUGST-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Southbound",
+        "mocked": true
+      }
     ]
   },
   {
     "name": "North Acton",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -20396,7 +21939,6 @@
   },
   {
     "name": "North Ealing",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -20466,7 +22008,6 @@
   },
   {
     "name": "North Greenwich",
-    "step_free": "to_platform",
     "lifts": 3,
     "escalators": 0,
     "platforms": [
@@ -20549,7 +22090,6 @@
   },
   {
     "name": "North Harrow",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -20619,7 +22159,6 @@
   },
   {
     "name": "North Wembley",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -20667,7 +22206,6 @@
   },
   {
     "name": "Northfields",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -20759,7 +22297,6 @@
   },
   {
     "name": "Northolt",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -20829,7 +22366,6 @@
   },
   {
     "name": "Northwick Park",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -20904,7 +22440,6 @@
   },
   {
     "name": "Northwood",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -20974,7 +22509,6 @@
   },
   {
     "name": "Northwood Hills",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -21044,7 +22578,6 @@
   },
   {
     "name": "Notting Hill Gate",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 6,
     "platforms": [
@@ -21111,11 +22644,54 @@
     "coordinates": {
       "lat": 51.509126,
       "lng": -0.196104
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUNHG-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUNHG-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUNHG-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Eastbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUNHG-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Westbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUNHG-Escalator-5",
+        "name": "Escalator 5",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUNHG-Escalator-6",
+        "name": "Escalator 6",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Oakwood",
-    "step_free": "to_vehicle",
     "lifts": 1,
     "escalators": 0,
     "platforms": [
@@ -21196,7 +22772,6 @@
   },
   {
     "name": "Old Street",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 3,
     "platforms": [
@@ -21260,11 +22835,33 @@
     "coordinates": {
       "lat": 51.525862,
       "lng": -0.08777
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "HUBOLD-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBOLD-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBOLD-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Northbound Platform 3",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Orpington",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -21399,7 +22996,6 @@
   },
   {
     "name": "Osterley",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -21485,7 +23081,6 @@
   },
   {
     "name": "Oval",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 2,
     "platforms": [
@@ -21527,11 +23122,26 @@
     "coordinates": {
       "lat": 51.481848,
       "lng": -0.112439
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUOVL-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUOVL-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Oxford Circus",
-    "step_free": "to_platform",
     "lifts": 0,
     "escalators": 14,
     "platforms": [
@@ -21619,404 +23229,110 @@
     "coordinates": {
       "lat": 51.515222,
       "lng": -0.141903
-    }
-  },
-  {
-    "name": "Paddington",
-    "step_free": "to_vehicle",
-    "lifts": 10,
-    "escalators": 4,
-    "platforms": [
-      {
-        "id": "HUBPAD-Plat01-WB-circle|district",
-        "name": "Westbound Platform 1",
-        "direction": "Westbound",
-        "lines": [
-          "Circle",
-          "District"
-        ],
-        "stepFreeAccess": "none",
-        "boardingRamp": false,
-        "levelAccess": false
-      },
-      {
-        "id": "HUBPAD-Plat02-EB-circle|district",
-        "name": "Eastbound Platform 2",
-        "direction": "Eastbound",
-        "lines": [
-          "Circle",
-          "District"
-        ],
-        "stepFreeAccess": "to_platform",
-        "gapMm": 0,
-        "stepMm": 133,
-        "boardingRamp": false,
-        "levelAccess": false,
-        "accessibilityNote": "If travelling towards Liverpool Street, take the District Line towards Edgware Road and change there for the Circle line."
-      },
-      {
-        "id": "HUBPAD-Plat03-NB-bakerloo",
-        "name": "Northbound Platform 3",
-        "direction": "Northbound",
-        "lines": [
-          "Bakerloo"
-        ],
-        "stepFreeAccess": "Full",
-        "boardingRamp": true,
-        "levelAccess": false
-      },
-      {
-        "id": "HUBPAD-Plat04-SB-bakerloo",
-        "name": "Southbound Platform 4",
-        "direction": "Southbound",
-        "lines": [
-          "Bakerloo"
-        ],
-        "stepFreeAccess": "Full",
-        "boardingRamp": true,
-        "levelAccess": false
-      },
-      {
-        "id": "HUBPAD-Plat01-WB-elizabeth|national-rail",
-        "name": "Westbound Platform 1",
-        "direction": "Westbound",
-        "lines": [
-          "Elizabeth",
-          "National Rail"
-        ],
-        "stepFreeAccess": "Full",
-        "boardingRamp": true,
-        "levelAccess": false
-      },
-      {
-        "id": "HUBPAD-Plat02-WB-elizabeth|national-rail",
-        "name": "Westbound Platform 2",
-        "direction": "Westbound",
-        "lines": [
-          "Elizabeth",
-          "National Rail"
-        ],
-        "stepFreeAccess": "Full",
-        "boardingRamp": true,
-        "levelAccess": false
-      },
-      {
-        "id": "HUBPAD-Plat03-WB-elizabeth|national-rail",
-        "name": "Westbound Platform 3",
-        "direction": "Westbound",
-        "lines": [
-          "Elizabeth",
-          "National Rail"
-        ],
-        "stepFreeAccess": "Full",
-        "boardingRamp": true,
-        "levelAccess": false
-      },
-      {
-        "id": "HUBPAD-Plat04-WB-elizabeth|national-rail",
-        "name": "Westbound Platform 4",
-        "direction": "Westbound",
-        "lines": [
-          "Elizabeth",
-          "National Rail"
-        ],
-        "stepFreeAccess": "Full",
-        "boardingRamp": true,
-        "levelAccess": false
-      },
-      {
-        "id": "HUBPAD-Plat05-WB-elizabeth|national-rail",
-        "name": "Westbound Platform 5",
-        "direction": "Westbound",
-        "lines": [
-          "Elizabeth",
-          "National Rail"
-        ],
-        "stepFreeAccess": "Full",
-        "boardingRamp": true,
-        "levelAccess": false
-      },
-      {
-        "id": "HUBPAD-Plat06-WB-national-rail",
-        "name": "Westbound Platform 6",
-        "direction": "Westbound",
-        "lines": [
-          "National Rail"
-        ],
-        "stepFreeAccess": "Full",
-        "boardingRamp": true,
-        "levelAccess": false
-      },
-      {
-        "id": "HUBPAD-Plat07-WB-national-rail",
-        "name": "Westbound Platform 7",
-        "direction": "Westbound",
-        "lines": [
-          "National Rail"
-        ],
-        "stepFreeAccess": "Full",
-        "boardingRamp": true,
-        "levelAccess": false
-      },
-      {
-        "id": "HUBPAD-Plat08-WB-elizabeth|national-rail",
-        "name": "Westbound Platform 8",
-        "direction": "Westbound",
-        "lines": [
-          "Elizabeth",
-          "National Rail"
-        ],
-        "stepFreeAccess": "Full",
-        "boardingRamp": true,
-        "levelAccess": false
-      },
-      {
-        "id": "HUBPAD-Plat09-WB-elizabeth|national-rail",
-        "name": "Westbound Platform 9",
-        "direction": "Westbound",
-        "lines": [
-          "Elizabeth",
-          "National Rail"
-        ],
-        "stepFreeAccess": "Full",
-        "boardingRamp": true,
-        "levelAccess": false
-      },
-      {
-        "id": "HUBPAD-Plat10-WB-elizabeth|national-rail",
-        "name": "Westbound Platform 10",
-        "direction": "Westbound",
-        "lines": [
-          "Elizabeth",
-          "National Rail"
-        ],
-        "stepFreeAccess": "Full",
-        "boardingRamp": true,
-        "levelAccess": false
-      },
-      {
-        "id": "HUBPAD-Plat11-WB-elizabeth|national-rail",
-        "name": "Westbound Platform 11",
-        "direction": "Westbound",
-        "lines": [
-          "Elizabeth",
-          "National Rail"
-        ],
-        "stepFreeAccess": "Full",
-        "boardingRamp": true,
-        "levelAccess": false
-      },
-      {
-        "id": "HUBPAD-Plat12-WB-elizabeth|national-rail",
-        "name": "Westbound Platform 12",
-        "direction": "Westbound",
-        "lines": [
-          "Elizabeth",
-          "National Rail"
-        ],
-        "stepFreeAccess": "Full",
-        "boardingRamp": true,
-        "levelAccess": false
-      },
-      {
-        "id": "HUBPAD-Plat13-WB-national-rail",
-        "name": "Westbound Platform 13",
-        "direction": "Westbound",
-        "lines": [
-          "National Rail"
-        ],
-        "stepFreeAccess": "Full",
-        "boardingRamp": true,
-        "levelAccess": false
-      },
-      {
-        "id": "HUBPAD-Plat14-WB-national-rail",
-        "name": "Westbound Platform 14",
-        "direction": "Westbound",
-        "lines": [
-          "National Rail"
-        ],
-        "stepFreeAccess": "Full",
-        "boardingRamp": true,
-        "levelAccess": false
-      },
-      {
-        "id": "HUBPAD-Plat15-WB-circle|hammersmith-city",
-        "name": "Westbound Platform 15",
-        "direction": "Westbound",
-        "lines": [
-          "Circle",
-          "Hammersmith & City"
-        ],
-        "stepFreeAccess": "Full",
-        "boardingRamp": false,
-        "levelAccess": true
-      },
-      {
-        "id": "HUBPAD-Plat16-EB-circle|hammersmith-city",
-        "name": "Eastbound Platform 16",
-        "direction": "Eastbound",
-        "lines": [
-          "Circle",
-          "Hammersmith & City"
-        ],
-        "stepFreeAccess": "Full",
-        "boardingRamp": false,
-        "levelAccess": true
-      },
-      {
-        "id": "HUBPAD-PlatA-EB-elizabeth",
-        "name": "Eastbound Platform A",
-        "direction": "Eastbound",
-        "lines": [
-          "Elizabeth"
-        ],
-        "stepFreeAccess": "Full",
-        "boardingRamp": false,
-        "levelAccess": true
-      },
-      {
-        "id": "HUBPAD-PlatB-WB-elizabeth",
-        "name": "Westbound Platform B",
-        "direction": "Westbound",
-        "lines": [
-          "Elizabeth"
-        ],
-        "stepFreeAccess": "Full",
-        "boardingRamp": false,
-        "levelAccess": true
-      }
-    ],
-    "lift_units": [
-      {
-        "id": "HUBPAD-Lift-2",
-        "name": "Lift 2",
-        "from": "The Lawn (concourse)",
-        "to": "D - L",
-        "limitedCapacity": false
-      },
-      {
-        "id": "HUBPAD-Lift-3",
-        "name": "Lift 3",
-        "from": "Booking Hall",
-        "to": "Platform area",
-        "limitedCapacity": false
-      },
-      {
-        "id": "HUBPAD-Lift-6",
-        "name": "Lift 6",
-        "from": "Entrance tunnel",
-        "to": "Elizabeth line ticket hall",
-        "limitedCapacity": false,
-        "via": "West entrance"
-      },
-      {
-        "id": "HUBPAD-Lift-7",
-        "name": "Lift 7",
-        "from": "Entrance tunnel",
-        "to": "Elizabeth line ticket hall",
-        "limitedCapacity": false,
-        "via": "Elizabeth line entrance"
-      },
-      {
-        "id": "HUBPAD-Lift-8",
-        "name": "Lift 8",
-        "from": "Elizabeth line ticket hall",
-        "to": "Elizabeth line lower level",
-        "limitedCapacity": false
-      },
-      {
-        "id": "HUBPAD-Lift-9",
-        "name": "Lift 9",
-        "from": "Elizabeth line ticket hall",
-        "to": "Elizabeth line lower level",
-        "limitedCapacity": false
-      },
-      {
-        "id": "HUBPAD-Lift-12",
-        "name": "Lift 12",
-        "from": "Elizabeth line lower level",
-        "to": "Bakerloo line lower",
-        "limitedCapacity": false
-      },
-      {
-        "id": "HUBPAD-Lift-X",
-        "name": "Lift X",
-        "from": "Bakerloo line lower upper",
-        "to": "Southbound Platform 4, Northbound Platform 3",
-        "limitedCapacity": false
-      },
-      {
-        "id": "HUBPAD-Lift-Y",
-        "name": "Lift Y",
-        "from": "Bakerloo/tube approach north",
-        "to": "Lawn ticket hall",
-        "limitedCapacity": false,
-        "via": "Arcade"
-      },
-      {
-        "id": "HUBPAD-Lift-Z",
-        "name": "Lift Z",
-        "from": "Bakerloo line landing",
-        "to": "Southbound Platform 4, Northbound Platform 3",
-        "limitedCapacity": false
-      }
-    ],
-    "id": "HUBPAD",
-    "zones": [
-      1
-    ],
-    "wifi": true,
-    "blueBadgeParking": false,
-    "taxiRank": true,
-    "interchange": {
-      "nationalRail": "None",
-      "bus": "None",
-      "pier": "None"
     },
-    "coordinates": {
-      "lat": 51.51658,
-      "lng": -0.175689
-    },
-    "toilets": [
+    "escalator_units": [
       {
-        "type": "Male",
-        "accessible": false,
-        "babyChanging": false,
-        "insideGateline": false,
-        "feeCharged": false,
-        "radarKey": false,
-        "opensWithStation": false,
-        "managedByTfL": false,
-        "location": "Located in National Rail station"
+        "id": "940GZZLUOXC-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
       },
       {
-        "type": "Female",
-        "accessible": false,
-        "babyChanging": true,
-        "insideGateline": false,
-        "feeCharged": false,
-        "radarKey": false,
-        "opensWithStation": false,
-        "managedByTfL": false,
-        "location": "Located in National Rail station"
+        "id": "940GZZLUOXC-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
       },
       {
-        "type": "Unisex",
-        "accessible": true,
-        "babyChanging": false,
-        "insideGateline": false,
-        "feeCharged": false,
-        "radarKey": false,
-        "opensWithStation": false,
-        "managedByTfL": false,
-        "location": "Located in National Rail station. Baby changing is standalone area and Changing Places toilet available."
+        "id": "940GZZLUOXC-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Southbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUOXC-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Northbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUOXC-Escalator-5",
+        "name": "Escalator 5",
+        "from": "Street",
+        "to": "Southbound Platform 5",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUOXC-Escalator-6",
+        "name": "Escalator 6",
+        "from": "Street",
+        "to": "Northbound Platform 6",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUOXC-Escalator-7",
+        "name": "Escalator 7",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUOXC-Escalator-8",
+        "name": "Escalator 8",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUOXC-Escalator-9",
+        "name": "Escalator 9",
+        "from": "Street",
+        "to": "Southbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUOXC-Escalator-10",
+        "name": "Escalator 10",
+        "from": "Street",
+        "to": "Northbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUOXC-Escalator-11",
+        "name": "Escalator 11",
+        "from": "Street",
+        "to": "Southbound Platform 5",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUOXC-Escalator-12",
+        "name": "Escalator 12",
+        "from": "Street",
+        "to": "Northbound Platform 6",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUOXC-Escalator-13",
+        "name": "Escalator 13",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUOXC-Escalator-14",
+        "name": "Escalator 14",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
       }
     ]
   },
   {
     "name": "Paddington",
-    "step_free": "to_vehicle",
     "lifts": 10,
     "escalators": 4,
     "platforms": [
@@ -22404,12 +23720,463 @@
         "opensWithStation": false,
         "managedByTfL": false,
         "location": "Located in National Rail station. Baby changing is standalone area and Changing Places toilet available."
+      }
+    ],
+    "escalator_units": [
+      {
+        "id": "HUBPAD-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBPAD-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBPAD-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Northbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "HUBPAD-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Southbound Platform 4",
+        "mocked": true
+      }
+    ]
+  },
+  {
+    "name": "Paddington",
+    "lifts": 10,
+    "escalators": 4,
+    "platforms": [
+      {
+        "id": "HUBPAD-Plat01-WB-circle|district",
+        "name": "Westbound Platform 1",
+        "direction": "Westbound",
+        "lines": [
+          "Circle",
+          "District"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false
+      },
+      {
+        "id": "HUBPAD-Plat02-EB-circle|district",
+        "name": "Eastbound Platform 2",
+        "direction": "Eastbound",
+        "lines": [
+          "Circle",
+          "District"
+        ],
+        "stepFreeAccess": "to_platform",
+        "gapMm": 0,
+        "stepMm": 133,
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "If travelling towards Liverpool Street, take the District Line towards Edgware Road and change there for the Circle line."
+      },
+      {
+        "id": "HUBPAD-Plat03-NB-bakerloo",
+        "name": "Northbound Platform 3",
+        "direction": "Northbound",
+        "lines": [
+          "Bakerloo"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false
+      },
+      {
+        "id": "HUBPAD-Plat04-SB-bakerloo",
+        "name": "Southbound Platform 4",
+        "direction": "Southbound",
+        "lines": [
+          "Bakerloo"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false
+      },
+      {
+        "id": "HUBPAD-Plat01-WB-elizabeth|national-rail",
+        "name": "Westbound Platform 1",
+        "direction": "Westbound",
+        "lines": [
+          "Elizabeth",
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false
+      },
+      {
+        "id": "HUBPAD-Plat02-WB-elizabeth|national-rail",
+        "name": "Westbound Platform 2",
+        "direction": "Westbound",
+        "lines": [
+          "Elizabeth",
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false
+      },
+      {
+        "id": "HUBPAD-Plat03-WB-elizabeth|national-rail",
+        "name": "Westbound Platform 3",
+        "direction": "Westbound",
+        "lines": [
+          "Elizabeth",
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false
+      },
+      {
+        "id": "HUBPAD-Plat04-WB-elizabeth|national-rail",
+        "name": "Westbound Platform 4",
+        "direction": "Westbound",
+        "lines": [
+          "Elizabeth",
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false
+      },
+      {
+        "id": "HUBPAD-Plat05-WB-elizabeth|national-rail",
+        "name": "Westbound Platform 5",
+        "direction": "Westbound",
+        "lines": [
+          "Elizabeth",
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false
+      },
+      {
+        "id": "HUBPAD-Plat06-WB-national-rail",
+        "name": "Westbound Platform 6",
+        "direction": "Westbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false
+      },
+      {
+        "id": "HUBPAD-Plat07-WB-national-rail",
+        "name": "Westbound Platform 7",
+        "direction": "Westbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false
+      },
+      {
+        "id": "HUBPAD-Plat08-WB-elizabeth|national-rail",
+        "name": "Westbound Platform 8",
+        "direction": "Westbound",
+        "lines": [
+          "Elizabeth",
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false
+      },
+      {
+        "id": "HUBPAD-Plat09-WB-elizabeth|national-rail",
+        "name": "Westbound Platform 9",
+        "direction": "Westbound",
+        "lines": [
+          "Elizabeth",
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false
+      },
+      {
+        "id": "HUBPAD-Plat10-WB-elizabeth|national-rail",
+        "name": "Westbound Platform 10",
+        "direction": "Westbound",
+        "lines": [
+          "Elizabeth",
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false
+      },
+      {
+        "id": "HUBPAD-Plat11-WB-elizabeth|national-rail",
+        "name": "Westbound Platform 11",
+        "direction": "Westbound",
+        "lines": [
+          "Elizabeth",
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false
+      },
+      {
+        "id": "HUBPAD-Plat12-WB-elizabeth|national-rail",
+        "name": "Westbound Platform 12",
+        "direction": "Westbound",
+        "lines": [
+          "Elizabeth",
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false
+      },
+      {
+        "id": "HUBPAD-Plat13-WB-national-rail",
+        "name": "Westbound Platform 13",
+        "direction": "Westbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false
+      },
+      {
+        "id": "HUBPAD-Plat14-WB-national-rail",
+        "name": "Westbound Platform 14",
+        "direction": "Westbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false
+      },
+      {
+        "id": "HUBPAD-Plat15-WB-circle|hammersmith-city",
+        "name": "Westbound Platform 15",
+        "direction": "Westbound",
+        "lines": [
+          "Circle",
+          "Hammersmith & City"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      },
+      {
+        "id": "HUBPAD-Plat16-EB-circle|hammersmith-city",
+        "name": "Eastbound Platform 16",
+        "direction": "Eastbound",
+        "lines": [
+          "Circle",
+          "Hammersmith & City"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      },
+      {
+        "id": "HUBPAD-PlatA-EB-elizabeth",
+        "name": "Eastbound Platform A",
+        "direction": "Eastbound",
+        "lines": [
+          "Elizabeth"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      },
+      {
+        "id": "HUBPAD-PlatB-WB-elizabeth",
+        "name": "Westbound Platform B",
+        "direction": "Westbound",
+        "lines": [
+          "Elizabeth"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      }
+    ],
+    "lift_units": [
+      {
+        "id": "HUBPAD-Lift-2",
+        "name": "Lift 2",
+        "from": "The Lawn (concourse)",
+        "to": "D - L",
+        "limitedCapacity": false
+      },
+      {
+        "id": "HUBPAD-Lift-3",
+        "name": "Lift 3",
+        "from": "Booking Hall",
+        "to": "Platform area",
+        "limitedCapacity": false
+      },
+      {
+        "id": "HUBPAD-Lift-6",
+        "name": "Lift 6",
+        "from": "Entrance tunnel",
+        "to": "Elizabeth line ticket hall",
+        "limitedCapacity": false,
+        "via": "West entrance"
+      },
+      {
+        "id": "HUBPAD-Lift-7",
+        "name": "Lift 7",
+        "from": "Entrance tunnel",
+        "to": "Elizabeth line ticket hall",
+        "limitedCapacity": false,
+        "via": "Elizabeth line entrance"
+      },
+      {
+        "id": "HUBPAD-Lift-8",
+        "name": "Lift 8",
+        "from": "Elizabeth line ticket hall",
+        "to": "Elizabeth line lower level",
+        "limitedCapacity": false
+      },
+      {
+        "id": "HUBPAD-Lift-9",
+        "name": "Lift 9",
+        "from": "Elizabeth line ticket hall",
+        "to": "Elizabeth line lower level",
+        "limitedCapacity": false
+      },
+      {
+        "id": "HUBPAD-Lift-12",
+        "name": "Lift 12",
+        "from": "Elizabeth line lower level",
+        "to": "Bakerloo line lower",
+        "limitedCapacity": false
+      },
+      {
+        "id": "HUBPAD-Lift-X",
+        "name": "Lift X",
+        "from": "Bakerloo line lower upper",
+        "to": "Southbound Platform 4, Northbound Platform 3",
+        "limitedCapacity": false
+      },
+      {
+        "id": "HUBPAD-Lift-Y",
+        "name": "Lift Y",
+        "from": "Bakerloo/tube approach north",
+        "to": "Lawn ticket hall",
+        "limitedCapacity": false,
+        "via": "Arcade"
+      },
+      {
+        "id": "HUBPAD-Lift-Z",
+        "name": "Lift Z",
+        "from": "Bakerloo line landing",
+        "to": "Southbound Platform 4, Northbound Platform 3",
+        "limitedCapacity": false
+      }
+    ],
+    "id": "HUBPAD",
+    "zones": [
+      1
+    ],
+    "wifi": true,
+    "blueBadgeParking": false,
+    "taxiRank": true,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.51658,
+      "lng": -0.175689
+    },
+    "toilets": [
+      {
+        "type": "Male",
+        "accessible": false,
+        "babyChanging": false,
+        "insideGateline": false,
+        "feeCharged": false,
+        "radarKey": false,
+        "opensWithStation": false,
+        "managedByTfL": false,
+        "location": "Located in National Rail station"
+      },
+      {
+        "type": "Female",
+        "accessible": false,
+        "babyChanging": true,
+        "insideGateline": false,
+        "feeCharged": false,
+        "radarKey": false,
+        "opensWithStation": false,
+        "managedByTfL": false,
+        "location": "Located in National Rail station"
+      },
+      {
+        "type": "Unisex",
+        "accessible": true,
+        "babyChanging": false,
+        "insideGateline": false,
+        "feeCharged": false,
+        "radarKey": false,
+        "opensWithStation": false,
+        "managedByTfL": false,
+        "location": "Located in National Rail station. Baby changing is standalone area and Changing Places toilet available."
+      }
+    ],
+    "escalator_units": [
+      {
+        "id": "HUBPAD-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBPAD-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBPAD-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Northbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "HUBPAD-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Southbound Platform 4",
+        "mocked": true
       }
     ]
   },
   {
     "name": "Park Royal",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -22479,7 +24246,6 @@
   },
   {
     "name": "Parsons Green",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -22525,7 +24291,6 @@
   },
   {
     "name": "Perivale",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -22595,7 +24360,6 @@
   },
   {
     "name": "Petts Wood",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -22697,7 +24461,6 @@
   },
   {
     "name": "Piccadilly Circus",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 11,
     "platforms": [
@@ -22785,11 +24548,89 @@
         "managedByTfL": false,
         "location": "Located in ticket hall"
       }
+    ],
+    "escalator_units": [
+      {
+        "id": "940GZZLUPCC-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUPCC-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUPCC-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Eastbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUPCC-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Westbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUPCC-Escalator-5",
+        "name": "Escalator 5",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUPCC-Escalator-6",
+        "name": "Escalator 6",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUPCC-Escalator-7",
+        "name": "Escalator 7",
+        "from": "Street",
+        "to": "Eastbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUPCC-Escalator-8",
+        "name": "Escalator 8",
+        "from": "Street",
+        "to": "Westbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUPCC-Escalator-9",
+        "name": "Escalator 9",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUPCC-Escalator-10",
+        "name": "Escalator 10",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUPCC-Escalator-11",
+        "name": "Escalator 11",
+        "from": "Street",
+        "to": "Eastbound Platform 3",
+        "mocked": true
+      }
     ]
   },
   {
     "name": "Pimlico",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 2,
     "platforms": [
@@ -22831,11 +24672,26 @@
     "coordinates": {
       "lat": 51.489095,
       "lng": -0.133761
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUPCO-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUPCO-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Pinner",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -22934,7 +24790,6 @@
   },
   {
     "name": "Plaistow",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -22994,7 +24849,6 @@
   },
   {
     "name": "Plumstead",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -23058,7 +24912,6 @@
   },
   {
     "name": "Pontoon Dock",
-    "step_free": "to_platform",
     "escalators": 0,
     "platforms": [
       {
@@ -23120,7 +24973,6 @@
   },
   {
     "name": "Poplar",
-    "step_free": "to_platform",
     "escalators": 0,
     "platforms": [
       {
@@ -23206,7 +25058,6 @@
   },
   {
     "name": "Preston Road",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -23276,7 +25127,6 @@
   },
   {
     "name": "Prince Regent",
-    "step_free": "to_platform",
     "escalators": 0,
     "platforms": [
       {
@@ -23338,7 +25188,6 @@
   },
   {
     "name": "Pudding Mill Lane",
-    "step_free": "to_platform",
     "escalators": 0,
     "platforms": [
       {
@@ -23401,7 +25250,6 @@
   },
   {
     "name": "Purley",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -23527,7 +25375,6 @@
   },
   {
     "name": "Putney Bridge",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -23573,7 +25420,6 @@
   },
   {
     "name": "Queen's Park",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -23665,7 +25511,6 @@
   },
   {
     "name": "Queens Road Peckham",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -23722,7 +25567,6 @@
   },
   {
     "name": "Queensbury",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -23803,7 +25647,6 @@
   },
   {
     "name": "Queensway",
-    "step_free": "none",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -23865,7 +25708,6 @@
   },
   {
     "name": "Ravenscourt Park",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -23911,7 +25753,6 @@
   },
   {
     "name": "Rayners Lane",
-    "step_free": "to_platform",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -23963,7 +25804,6 @@
   },
   {
     "name": "Reading",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -24066,7 +25906,6 @@
   },
   {
     "name": "Redbridge",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -24136,7 +25975,6 @@
   },
   {
     "name": "Regent's Park",
-    "step_free": "none",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -24198,7 +26036,6 @@
   },
   {
     "name": "Richmond",
-    "step_free": "to_platform",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -24354,7 +26191,6 @@
   },
   {
     "name": "Rickmansworth",
-    "step_free": "to_vehicle",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -24428,7 +26264,6 @@
   },
   {
     "name": "Roding Valley",
-    "step_free": "to_vehicle",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -24518,7 +26353,6 @@
   },
   {
     "name": "Romford",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -24653,7 +26487,6 @@
   },
   {
     "name": "Royal Albert",
-    "step_free": "to_platform",
     "escalators": 0,
     "platforms": [
       {
@@ -24715,7 +26548,6 @@
   },
   {
     "name": "Royal Oak",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -24763,7 +26595,6 @@
   },
   {
     "name": "Royal Victoria",
-    "step_free": "to_platform",
     "escalators": 0,
     "platforms": [
       {
@@ -24832,7 +26663,6 @@
   },
   {
     "name": "Ruislip",
-    "step_free": "to_vehicle",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -24906,7 +26736,6 @@
   },
   {
     "name": "Ruislip Gardens",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -24965,7 +26794,6 @@
   },
   {
     "name": "Ruislip Manor",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -25037,7 +26865,6 @@
   },
   {
     "name": "Russell Square",
-    "step_free": "none",
     "lifts": 3,
     "escalators": 0,
     "platforms": [
@@ -25106,7 +26933,6 @@
   },
   {
     "name": "Seven Kings",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -25212,7 +27038,6 @@
   },
   {
     "name": "Seven Sisters",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 4,
     "platforms": [
@@ -25323,11 +27148,40 @@
         "opensWithStation": false,
         "managedByTfL": true
       }
+    ],
+    "escalator_units": [
+      {
+        "id": "HUBSVS-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBSVS-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBSVS-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Northbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "HUBSVS-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Northbound Platform 4",
+        "mocked": true
+      }
     ]
   },
   {
     "name": "Shadwell",
-    "step_free": "to_platform",
     "escalators": 0,
     "platforms": [
       {
@@ -25404,7 +27258,6 @@
   },
   {
     "name": "Shenfield",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -25547,7 +27400,6 @@
   },
   {
     "name": "Shepherd's Bush",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 2,
     "platforms": [
@@ -25634,11 +27486,26 @@
     "coordinates": {
       "lat": 51.504374,
       "lng": -0.218813
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "HUBSPB-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Southbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBSPB-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Shepherd's Bush Market",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -25686,7 +27553,6 @@
   },
   {
     "name": "Shoreditch High Street",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -25760,7 +27626,6 @@
   },
   {
     "name": "Shortlands",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -25855,7 +27720,6 @@
   },
   {
     "name": "Sloane Square",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 2,
     "platforms": [
@@ -25899,11 +27763,26 @@
     "coordinates": {
       "lat": 51.492268,
       "lng": -0.156377
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUSSQ-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUSSQ-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Slough",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -26042,7 +27921,6 @@
   },
   {
     "name": "Snaresbrook",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -26112,7 +27990,6 @@
   },
   {
     "name": "South Ealing",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -26180,7 +28057,6 @@
   },
   {
     "name": "South Harrow",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -26226,7 +28102,6 @@
   },
   {
     "name": "South Kensington",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 5,
     "platforms": [
@@ -26292,11 +28167,47 @@
     "coordinates": {
       "lat": 51.494092,
       "lng": -0.174138
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUSKS-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUSKS-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUSKS-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Westbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUSKS-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Eastbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUSKS-Escalator-5",
+        "name": "Escalator 5",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "South Kenton",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -26344,7 +28255,6 @@
   },
   {
     "name": "South Quay",
-    "step_free": "to_platform",
     "escalators": 0,
     "platforms": [
       {
@@ -26406,7 +28316,6 @@
   },
   {
     "name": "South Ruislip",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -26487,7 +28396,6 @@
   },
   {
     "name": "South Tottenham",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -26549,7 +28457,6 @@
   },
   {
     "name": "South Wimbledon",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 2,
     "platforms": [
@@ -26592,11 +28499,26 @@
     "coordinates": {
       "lat": 51.415307,
       "lng": -0.192005
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUSWN-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUSWN-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "South Woodford",
-    "step_free": "to_vehicle",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -26658,7 +28580,6 @@
   },
   {
     "name": "Southall",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -26788,7 +28709,6 @@
   },
   {
     "name": "Southfields",
-    "step_free": "to_platform",
     "lifts": 1,
     "escalators": 0,
     "platforms": [
@@ -26843,7 +28763,6 @@
   },
   {
     "name": "Southgate",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 2,
     "platforms": [
@@ -26885,11 +28804,26 @@
     "coordinates": {
       "lat": 51.632313,
       "lng": -0.127816
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUSGT-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Eastbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUSGT-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Westbound Platform 2",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Southwark",
-    "step_free": "to_platform",
     "lifts": 2,
     "escalators": 8,
     "platforms": [
@@ -26948,11 +28882,68 @@
     "coordinates": {
       "lat": 51.503975,
       "lng": -0.10494
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUSWK-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUSWK-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUSWK-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUSWK-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUSWK-Escalator-5",
+        "name": "Escalator 5",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUSWK-Escalator-6",
+        "name": "Escalator 6",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUSWK-Escalator-7",
+        "name": "Escalator 7",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUSWK-Escalator-8",
+        "name": "Escalator 8",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "St Mary Cray",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -27040,7 +29031,6 @@
   },
   {
     "name": "St. James's Park",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -27088,7 +29078,6 @@
   },
   {
     "name": "St. John's Wood",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 2,
     "platforms": [
@@ -27165,11 +29154,26 @@
         "managedByTfL": true,
         "location": "Located in ticket hall"
       }
+    ],
+    "escalator_units": [
+      {
+        "id": "940GZZLUSJW-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUSJW-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      }
     ]
   },
   {
     "name": "St. Paul's",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 4,
     "platforms": [
@@ -27211,11 +29215,40 @@
     "coordinates": {
       "lat": 51.515035,
       "lng": -0.097707
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUSPU-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUSPU-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUSPU-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUSPU-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Stamford Brook",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -27285,7 +29318,6 @@
   },
   {
     "name": "Stanmore",
-    "step_free": "to_vehicle",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -27380,7 +29412,6 @@
   },
   {
     "name": "Star Lane",
-    "step_free": "to_platform",
     "escalators": 0,
     "platforms": [
       {
@@ -27450,7 +29481,6 @@
   },
   {
     "name": "Stepney Green",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -27498,7 +29528,6 @@
   },
   {
     "name": "Stockwell",
-    "step_free": "to_platform",
     "lifts": 0,
     "escalators": 3,
     "platforms": [
@@ -27564,11 +29593,33 @@
     "coordinates": {
       "lat": 51.472183,
       "lng": -0.122644
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUSKW-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUSKW-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Northbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUSKW-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Southbound Platform 3",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Stonebridge Park",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -27616,7 +29667,6 @@
   },
   {
     "name": "Stratford",
-    "step_free": "to_vehicle",
     "lifts": 17,
     "escalators": 2,
     "platforms": [
@@ -27963,11 +30013,26 @@
         "managedByTfL": true,
         "location": "Adjacent to DLR platform 16."
       }
+    ],
+    "escalator_units": [
+      {
+        "id": "HUBSRA-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBSRA-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Westbound Platform 2",
+        "mocked": true
+      }
     ]
   },
   {
     "name": "Stratford High Street",
-    "step_free": "to_platform",
     "escalators": 0,
     "platforms": [
       {
@@ -28030,7 +30095,6 @@
   },
   {
     "name": "Stratford International",
-    "step_free": "to_platform",
     "escalators": 0,
     "platforms": [
       {
@@ -28135,7 +30199,6 @@
   },
   {
     "name": "Streatham",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -28199,7 +30262,6 @@
   },
   {
     "name": "Sudbury Hill",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -28285,7 +30347,6 @@
   },
   {
     "name": "Sudbury Town",
-    "step_free": "to_vehicle",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -28375,7 +30436,6 @@
   },
   {
     "name": "Swanley",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -28463,7 +30523,6 @@
   },
   {
     "name": "Swiss Cottage",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 2,
     "platforms": [
@@ -28505,11 +30564,26 @@
     "coordinates": {
       "lat": 51.54368,
       "lng": -0.174894
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUSWC-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUSWC-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Taplow",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -28637,7 +30711,6 @@
   },
   {
     "name": "Temple",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -28685,7 +30758,6 @@
   },
   {
     "name": "Theydon Bois",
-    "step_free": "to_vehicle",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -28757,7 +30829,6 @@
   },
   {
     "name": "Tooting",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -28821,7 +30892,6 @@
   },
   {
     "name": "Tooting Bec",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 2,
     "platforms": [
@@ -28863,11 +30933,26 @@
     "coordinates": {
       "lat": 51.435676,
       "lng": -0.159736
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUTBC-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUTBC-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Tooting Broadway",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 3,
     "platforms": [
@@ -28909,11 +30994,33 @@
     "coordinates": {
       "lat": 51.427629,
       "lng": -0.168374
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUTBY-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUTBY-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUTBY-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Tottenham Court Road",
-    "step_free": "to_vehicle",
     "lifts": 9,
     "escalators": 6,
     "platforms": [
@@ -29078,11 +31185,54 @@
         "managedByTfL": true,
         "location": "Located in ticket hall"
       }
+    ],
+    "escalator_units": [
+      {
+        "id": "HUBTCR-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBTCR-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBTCR-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Northbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "HUBTCR-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Southbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "HUBTCR-Escalator-5",
+        "name": "Escalator 5",
+        "from": "Street",
+        "to": "Eastbound Platform A",
+        "mocked": true
+      },
+      {
+        "id": "HUBTCR-Escalator-6",
+        "name": "Escalator 6",
+        "from": "Street",
+        "to": "Westbound Platform B",
+        "mocked": true
+      }
     ]
   },
   {
     "name": "Tottenham Hale",
-    "step_free": "to_vehicle",
     "lifts": 3,
     "escalators": 2,
     "platforms": [
@@ -29216,11 +31366,26 @@
         "opensWithStation": false,
         "managedByTfL": true
       }
+    ],
+    "escalator_units": [
+      {
+        "id": "HUBTOM-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBTOM-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      }
     ]
   },
   {
     "name": "Totteridge & Whetstone",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -29290,7 +31455,6 @@
   },
   {
     "name": "Tower Gateway",
-    "step_free": "to_platform",
     "escalators": 0,
     "platforms": [
       {
@@ -29352,7 +31516,6 @@
   },
   {
     "name": "Tower Hill",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -29428,7 +31591,6 @@
   },
   {
     "name": "Tufnell Park",
-    "step_free": "none",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -29490,7 +31652,6 @@
   },
   {
     "name": "Turnham Green",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -29567,7 +31728,6 @@
   },
   {
     "name": "Turnpike Lane",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 3,
     "platforms": [
@@ -29609,11 +31769,33 @@
     "coordinates": {
       "lat": 51.59027,
       "lng": -0.102953
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUTPN-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Eastbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUTPN-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Westbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUTPN-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Eastbound Platform 1",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Twyford",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -29752,7 +31934,6 @@
   },
   {
     "name": "Upminster",
-    "step_free": "to_vehicle",
     "lifts": 3,
     "escalators": 0,
     "platforms": [
@@ -29911,7 +32092,6 @@
   },
   {
     "name": "Upminster Bridge",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -29981,7 +32161,6 @@
   },
   {
     "name": "Upney",
-    "step_free": "to_platform",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -30051,7 +32230,6 @@
   },
   {
     "name": "Upton Park",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -30099,7 +32277,6 @@
   },
   {
     "name": "Uxbridge",
-    "step_free": "to_vehicle",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -30194,7 +32371,6 @@
   },
   {
     "name": "Vauxhall",
-    "step_free": "to_vehicle",
     "lifts": 6,
     "escalators": 2,
     "platforms": [
@@ -30393,11 +32569,26 @@
         "managedByTfL": true,
         "location": "Located in bus station"
       }
+    ],
+    "escalator_units": [
+      {
+        "id": "HUBVXH-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Southbound",
+        "mocked": true
+      },
+      {
+        "id": "HUBVXH-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      }
     ]
   },
   {
     "name": "Victoria",
-    "step_free": "to_vehicle",
     "lifts": 6,
     "escalators": 6,
     "platforms": [
@@ -30786,11 +32977,54 @@
         "managedByTfL": false,
         "location": "Located in North ticket hall"
       }
+    ],
+    "escalator_units": [
+      {
+        "id": "HUBVIC-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBVIC-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBVIC-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Northbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "HUBVIC-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Southbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "HUBVIC-Escalator-5",
+        "name": "Escalator 5",
+        "from": "Street",
+        "to": "Southbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBVIC-Escalator-6",
+        "name": "Escalator 6",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      }
     ]
   },
   {
     "name": "Walthamstow Central",
-    "step_free": "to_vehicle",
     "lifts": 0,
     "escalators": 2,
     "platforms": [
@@ -30869,11 +33103,26 @@
     "coordinates": {
       "lat": 51.582963,
       "lng": -0.019885
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "HUBWHC-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Southbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBWHC-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Southbound Platform 1",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Wanstead",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 2,
     "platforms": [
@@ -30915,11 +33164,26 @@
     "coordinates": {
       "lat": 51.5755,
       "lng": 0.028527
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUWSD-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUWSD-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Warren Street",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 7,
     "platforms": [
@@ -30983,11 +33247,61 @@
     "coordinates": {
       "lat": 51.524949,
       "lng": -0.138321
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUWRR-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUWRR-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUWRR-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Northbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUWRR-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Southbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUWRR-Escalator-5",
+        "name": "Escalator 5",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUWRR-Escalator-6",
+        "name": "Escalator 6",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUWRR-Escalator-7",
+        "name": "Escalator 7",
+        "from": "Street",
+        "to": "Northbound Platform 3",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Warwick Avenue",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 2,
     "platforms": [
@@ -31029,11 +33343,26 @@
     "coordinates": {
       "lat": 51.523261,
       "lng": -0.183783
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUWKA-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUWKA-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Waterloo",
-    "step_free": "to_vehicle",
     "lifts": 4,
     "escalators": 23,
     "platforms": [
@@ -31209,11 +33538,173 @@
         "managedByTfL": false,
         "location": "Located in National Rail station"
       }
+    ],
+    "escalator_units": [
+      {
+        "id": "HUBWAT-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBWAT-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBWAT-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Northbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "HUBWAT-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Southbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "HUBWAT-Escalator-5",
+        "name": "Escalator 5",
+        "from": "Street",
+        "to": "Westbound Platform 5",
+        "mocked": true
+      },
+      {
+        "id": "HUBWAT-Escalator-6",
+        "name": "Escalator 6",
+        "from": "Street",
+        "to": "Eastbound Platform 6",
+        "mocked": true
+      },
+      {
+        "id": "HUBWAT-Escalator-7",
+        "name": "Escalator 7",
+        "from": "Street",
+        "to": "Eastbound Platform 25",
+        "mocked": true
+      },
+      {
+        "id": "HUBWAT-Escalator-8",
+        "name": "Escalator 8",
+        "from": "Street",
+        "to": "Westbound Platform 26",
+        "mocked": true
+      },
+      {
+        "id": "HUBWAT-Escalator-9",
+        "name": "Escalator 9",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBWAT-Escalator-10",
+        "name": "Escalator 10",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBWAT-Escalator-11",
+        "name": "Escalator 11",
+        "from": "Street",
+        "to": "Northbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "HUBWAT-Escalator-12",
+        "name": "Escalator 12",
+        "from": "Street",
+        "to": "Southbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "HUBWAT-Escalator-13",
+        "name": "Escalator 13",
+        "from": "Street",
+        "to": "Westbound Platform 5",
+        "mocked": true
+      },
+      {
+        "id": "HUBWAT-Escalator-14",
+        "name": "Escalator 14",
+        "from": "Street",
+        "to": "Eastbound Platform 6",
+        "mocked": true
+      },
+      {
+        "id": "HUBWAT-Escalator-15",
+        "name": "Escalator 15",
+        "from": "Street",
+        "to": "Eastbound Platform 25",
+        "mocked": true
+      },
+      {
+        "id": "HUBWAT-Escalator-16",
+        "name": "Escalator 16",
+        "from": "Street",
+        "to": "Westbound Platform 26",
+        "mocked": true
+      },
+      {
+        "id": "HUBWAT-Escalator-17",
+        "name": "Escalator 17",
+        "from": "Street",
+        "to": "Northbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBWAT-Escalator-18",
+        "name": "Escalator 18",
+        "from": "Street",
+        "to": "Southbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBWAT-Escalator-19",
+        "name": "Escalator 19",
+        "from": "Street",
+        "to": "Northbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "HUBWAT-Escalator-20",
+        "name": "Escalator 20",
+        "from": "Street",
+        "to": "Southbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "HUBWAT-Escalator-21",
+        "name": "Escalator 21",
+        "from": "Street",
+        "to": "Westbound Platform 5",
+        "mocked": true
+      },
+      {
+        "id": "HUBWAT-Escalator-22",
+        "name": "Escalator 22",
+        "from": "Street",
+        "to": "Eastbound Platform 6",
+        "mocked": true
+      },
+      {
+        "id": "HUBWAT-Escalator-23",
+        "name": "Escalator 23",
+        "from": "Street",
+        "to": "Eastbound Platform 25",
+        "mocked": true
+      }
     ]
   },
   {
     "name": "Watford",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -31283,7 +33774,6 @@
   },
   {
     "name": "Watford Junction",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -31473,7 +33963,6 @@
   },
   {
     "name": "Wembley Central",
-    "step_free": "to_vehicle",
     "lifts": 4,
     "escalators": 0,
     "platforms": [
@@ -31634,7 +34123,6 @@
   },
   {
     "name": "Wembley Park",
-    "step_free": "to_vehicle",
     "lifts": 5,
     "escalators": 0,
     "platforms": [
@@ -31803,7 +34291,6 @@
   },
   {
     "name": "West Acton",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -31873,7 +34360,6 @@
   },
   {
     "name": "West Brompton",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -31959,7 +34445,6 @@
   },
   {
     "name": "West Drayton",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -32114,7 +34599,6 @@
   },
   {
     "name": "West Ealing",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -32202,7 +34686,6 @@
   },
   {
     "name": "West Finchley",
-    "step_free": "to_vehicle",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -32290,7 +34773,6 @@
   },
   {
     "name": "West Ham",
-    "step_free": "to_vehicle",
     "lifts": 5,
     "escalators": 6,
     "platforms": [
@@ -32438,11 +34920,54 @@
     "coordinates": {
       "lat": 51.528371,
       "lng": 0.004907
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "HUBWEH-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBWEH-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBWEH-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Southbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "HUBWEH-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Northbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "HUBWEH-Escalator-5",
+        "name": "Escalator 5",
+        "from": "Street",
+        "to": "Westbound Platform 5",
+        "mocked": true
+      },
+      {
+        "id": "HUBWEH-Escalator-6",
+        "name": "Escalator 6",
+        "from": "Street",
+        "to": "Eastbound Platform 6",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "West Hampstead",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -32498,7 +35023,6 @@
   },
   {
     "name": "West Hampstead Thameslink",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -32593,7 +35117,6 @@
   },
   {
     "name": "West Harrow",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -32674,7 +35197,6 @@
   },
   {
     "name": "West India Quay",
-    "step_free": "to_platform",
     "escalators": 0,
     "platforms": [
       {
@@ -32747,7 +35269,6 @@
   },
   {
     "name": "West Kensington",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -32793,7 +35314,6 @@
   },
   {
     "name": "West Ruislip",
-    "step_free": "to_vehicle",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -32885,7 +35405,6 @@
   },
   {
     "name": "West Silvertown",
-    "step_free": "to_platform",
     "escalators": 0,
     "platforms": [
       {
@@ -32947,7 +35466,6 @@
   },
   {
     "name": "Westbourne Park",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -32995,7 +35513,6 @@
   },
   {
     "name": "Westferry",
-    "step_free": "to_platform",
     "escalators": 0,
     "platforms": [
       {
@@ -33071,7 +35588,6 @@
   },
   {
     "name": "Westminster",
-    "step_free": "to_vehicle",
     "lifts": 4,
     "escalators": 17,
     "platforms": [
@@ -33192,11 +35708,131 @@
         "managedByTfL": false,
         "location": "Located in public subway"
       }
+    ],
+    "escalator_units": [
+      {
+        "id": "HUBWSM-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBWSM-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBWSM-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Eastbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "HUBWSM-Escalator-4",
+        "name": "Escalator 4",
+        "from": "Street",
+        "to": "Westbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "HUBWSM-Escalator-5",
+        "name": "Escalator 5",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBWSM-Escalator-6",
+        "name": "Escalator 6",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBWSM-Escalator-7",
+        "name": "Escalator 7",
+        "from": "Street",
+        "to": "Eastbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "HUBWSM-Escalator-8",
+        "name": "Escalator 8",
+        "from": "Street",
+        "to": "Westbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "HUBWSM-Escalator-9",
+        "name": "Escalator 9",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBWSM-Escalator-10",
+        "name": "Escalator 10",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBWSM-Escalator-11",
+        "name": "Escalator 11",
+        "from": "Street",
+        "to": "Eastbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "HUBWSM-Escalator-12",
+        "name": "Escalator 12",
+        "from": "Street",
+        "to": "Westbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "HUBWSM-Escalator-13",
+        "name": "Escalator 13",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "HUBWSM-Escalator-14",
+        "name": "Escalator 14",
+        "from": "Street",
+        "to": "Eastbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "HUBWSM-Escalator-15",
+        "name": "Escalator 15",
+        "from": "Street",
+        "to": "Eastbound Platform 3",
+        "mocked": true
+      },
+      {
+        "id": "HUBWSM-Escalator-16",
+        "name": "Escalator 16",
+        "from": "Street",
+        "to": "Westbound Platform 4",
+        "mocked": true
+      },
+      {
+        "id": "HUBWSM-Escalator-17",
+        "name": "Escalator 17",
+        "from": "Street",
+        "to": "Westbound Platform 1",
+        "mocked": true
+      }
     ]
   },
   {
     "name": "White City",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -33280,7 +35916,6 @@
   },
   {
     "name": "White Hart Lane",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {
@@ -33374,7 +36009,6 @@
   },
   {
     "name": "Whitechapel",
-    "step_free": "to_vehicle",
     "lifts": 8,
     "escalators": 0,
     "platforms": [
@@ -33539,7 +36173,6 @@
   },
   {
     "name": "Willesden Green",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -33610,7 +36243,6 @@
   },
   {
     "name": "Willesden Junction",
-    "step_free": "to_vehicle",
     "lifts": 2,
     "escalators": 0,
     "platforms": [
@@ -33743,7 +36375,6 @@
   },
   {
     "name": "Wimbledon",
-    "step_free": "to_vehicle",
     "lifts": 4,
     "escalators": 0,
     "platforms": [
@@ -33952,7 +36583,6 @@
   },
   {
     "name": "Wimbledon Park",
-    "step_free": "to_vehicle",
     "lifts": 1,
     "escalators": 0,
     "platforms": [
@@ -34007,7 +36637,6 @@
   },
   {
     "name": "Wood Green",
-    "step_free": "none",
     "lifts": 0,
     "escalators": 3,
     "platforms": [
@@ -34049,11 +36678,33 @@
     "coordinates": {
       "lat": 51.597477,
       "lng": -0.109887
-    }
+    },
+    "escalator_units": [
+      {
+        "id": "940GZZLUWOG-Escalator-1",
+        "name": "Escalator 1",
+        "from": "Street",
+        "to": "Eastbound Platform 1",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUWOG-Escalator-2",
+        "name": "Escalator 2",
+        "from": "Street",
+        "to": "Westbound Platform 2",
+        "mocked": true
+      },
+      {
+        "id": "940GZZLUWOG-Escalator-3",
+        "name": "Escalator 3",
+        "from": "Street",
+        "to": "Eastbound Platform 1",
+        "mocked": true
+      }
+    ]
   },
   {
     "name": "Wood Lane",
-    "step_free": "to_platform",
     "lifts": 4,
     "escalators": 0,
     "platforms": [
@@ -34148,7 +36799,6 @@
   },
   {
     "name": "Woodford",
-    "step_free": "to_vehicle",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -34257,7 +36907,6 @@
   },
   {
     "name": "Woodside Park",
-    "step_free": "to_vehicle",
     "lifts": 0,
     "escalators": 0,
     "platforms": [
@@ -34343,7 +36992,6 @@
   },
   {
     "name": "Woolwich",
-    "step_free": "to_platform",
     "escalators": 0,
     "platforms": [
       {
@@ -34398,7 +37046,6 @@
   },
   {
     "name": "Woolwich Arsenal",
-    "step_free": "to_vehicle",
     "escalators": 0,
     "platforms": [
       {

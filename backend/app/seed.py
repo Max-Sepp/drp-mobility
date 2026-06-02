@@ -12,20 +12,21 @@ from app.models.station import Station
 # Reference data inserted on every startup. Idempotent (skips rows that already exist),
 # so editing the dataset adds new entries to existing databases but never removes or renames.
 #
-# Station data lives in data/stations.json. Tube stations are enriched from TfL's
-# step-free access feed (run temp/enrich_tube_stations.py then temp/merge_seed.py to
-# refresh). Non-tube stations (DLR, Overground, National Rail) retain their original data.
+# Station data lives in data/stations.json. All 387 stations across all TfL modes are
+# enriched from the TfL step-free access CSV feed (run temp/enrich_tube_stations.py to
+# refresh). The seed handles both enriched and legacy formats.
 #
 # A station's step-free access is not stored: it is derived from its platforms
 # (see Station.step_free), each of which carries its own `stepFreeAccess`.
 #
-# Each entry supports two formats:
-#   Enriched (tube):  { name, escalators,
-#                       platforms: [{ name, lines: [...], stepFreeAccess }],
-#                       lift_units: [{ name, from, to }] }
-#   Legacy (non-tube):{ name, escalators,
-#                       platforms: [{ name, lines: "Line1, Line2" }],
-#                       lift_units: [{ name, connection }] or lifts: <int> }
+# Enriched entry fields:
+#   name, escalators, platforms: [{ name, lines: [...], stepFreeAccess, ... }],
+#   lift_units: [{ name, from, to, limitedCapacity, ... }],
+#   escalator_units: [{ name, from, to, mocked: true }]  ← synthetic, no TfL topology source
+#
+# Legacy fallbacks (non-enriched / unmatched stations):
+#   platforms: [{ name, lines: "Line1, Line2" }]
+#   lift_units: [{ name, connection }] or lifts: <int> (count-only, synthesised)
 
 _DATA_PATH = Path(__file__).resolve().parent / "data" / "stations.json"
 _EQUIPMENT_TYPES = ["lift", "escalator"]
@@ -116,6 +117,9 @@ def seed_defaults(db: Session) -> None:
             return f"{unit['name']}: {unit['connection']}"
         return f"{unit['name']}: {unit.get('from', '')} → {unit.get('to', '')}"
 
+    def escalator_connection(unit: dict) -> str:
+        return f"{unit['name']}: {unit.get('from', 'Street')} → {unit.get('to', 'platform')}"
+
     lift_type_id = types["lift"].id
     escalator_type_id = types["escalator"].id
     for data in stations_data:
@@ -136,12 +140,18 @@ def seed_defaults(db: Session) -> None:
                     platform.id if platform else None,
                 )
 
-        # Escalators: count-based, distributed round-robin across platforms.
-        for i in range(data.get("escalators", 0)):
-            platform = station_platforms[i % len(station_platforms)] if station_platforms else None
-            target = platform.name if platform else "platforms"
-            add_equipment(
-                station.id, escalator_type_id, f"Escalator {i + 1}: street → {target}",
-                platform.id if platform else None,
-            )
+        # Escalators: prefer named units from escalator_units (mocked from enrichment script);
+        # otherwise fall back to count-based synthesis round-robin across platforms.
+        escalator_units = data.get("escalator_units")
+        if escalator_units:
+            for unit in escalator_units:
+                add_equipment(station.id, escalator_type_id, escalator_connection(unit), None)
+        else:
+            for i in range(data.get("escalators", 0)):
+                platform = station_platforms[i % len(station_platforms)] if station_platforms else None
+                target = platform.name if platform else "platforms"
+                add_equipment(
+                    station.id, escalator_type_id, f"Escalator {i + 1}: street → {target}",
+                    platform.id if platform else None,
+                )
     db.commit()
