@@ -10,6 +10,7 @@
     "generate:api": "openapi-typescript http://localhost:8000/openapi.json -o src/api/schema.d.ts"
   },
   "dependencies": {
+    "@expo/ngrok": "^4.0.0",
     "@react-navigation/native": "^7.2.5",
     "@react-navigation/native-stack": "^7.16.0",
     "@tamagui/animations-react-native": "^2.0.0",
