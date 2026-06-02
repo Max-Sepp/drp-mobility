@@ -15,5 +15,8 @@ export default tamaguiConfig
 
 export type Conf = typeof tamaguiConfig
 declare module 'tamagui' {
+  // Required Tamagui idiom: the empty interface merges our config's type into
+  // Tamagui's so themes/tokens are typed app-wide.
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   interface TamaguiCustomConfig extends Conf {}
 }

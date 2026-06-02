@@ -21,17 +21,29 @@ export const StationListItem = ({ name, lines, selected, onPress }: StationListI
     >
       <YStack
         style={{
-          width: 24, height: 24, borderRadius: 12, borderWidth: 2,
+          width: 24,
+          height: 24,
+          borderRadius: 12,
+          borderWidth: 2,
           borderColor: selected ? '#2d6a4f' : '#9ca3af',
           backgroundColor: selected ? '#2d6a4f' : 'transparent',
-          alignItems: 'center', justifyContent: 'center',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
-        {selected && <Text color="white" fontSize={13} fontWeight="700">✓</Text>}
+        {selected && (
+          <Text color="white" fontSize={13} fontWeight="700">
+            ✓
+          </Text>
+        )}
       </YStack>
       <YStack>
-        <Text fontSize={16} fontWeight="600" color="#111827">{name}</Text>
-        <Text fontSize={13} color="#6b7280" mt="$1">{lines.join(', ')}</Text>
+        <Text fontSize={16} fontWeight="600" color="#111827">
+          {name}
+        </Text>
+        <Text fontSize={13} color="#6b7280" mt="$1">
+          {lines.join(', ')}
+        </Text>
       </YStack>
     </XStack>
   )

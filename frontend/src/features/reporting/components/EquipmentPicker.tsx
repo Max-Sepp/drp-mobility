@@ -14,15 +14,24 @@ type EquipmentPickerProps = {
 }
 
 /** Single-select list of equipment connections; shows a spinner while loading and a message when empty. */
-export const EquipmentPicker = ({ label, loading, equipment, selectedId, onSelect, emptyText }: EquipmentPickerProps) => {
+export const EquipmentPicker = ({
+  label,
+  loading,
+  equipment,
+  selectedId,
+  onSelect,
+  emptyText,
+}: EquipmentPickerProps) => {
   return (
     <FormSection label={label}>
       {loading ? (
         <Spinner color="#9ca3af" />
       ) : equipment.length === 0 ? (
-        <Text fontSize={15} color="#9ca3af">{emptyText}</Text>
+        <Text fontSize={15} color="#9ca3af">
+          {emptyText}
+        </Text>
       ) : (
-        equipment.map(e => {
+        equipment.map((e) => {
           const selected = selectedId === e.id
           return (
             <XStack
@@ -33,22 +42,35 @@ export const EquipmentPicker = ({ label, loading, equipment, selectedId, onSelec
               onPress={() => onSelect(e.id)}
               mb="$2"
               style={{
-                paddingVertical: 12, paddingHorizontal: 14,
-                borderWidth: 1, borderColor: selected ? '#2d6a4f' : '#e5e7eb',
-                borderRadius: 8, backgroundColor: selected ? '#f0fdf4' : 'white',
+                paddingVertical: 12,
+                paddingHorizontal: 14,
+                borderWidth: 1,
+                borderColor: selected ? '#2d6a4f' : '#e5e7eb',
+                borderRadius: 8,
+                backgroundColor: selected ? '#f0fdf4' : 'white',
               }}
             >
               <YStack
                 style={{
-                  width: 22, height: 22, borderRadius: 4, borderWidth: 2,
+                  width: 22,
+                  height: 22,
+                  borderRadius: 4,
+                  borderWidth: 2,
                   borderColor: selected ? '#2d6a4f' : '#9ca3af',
                   backgroundColor: selected ? '#2d6a4f' : 'transparent',
-                  alignItems: 'center', justifyContent: 'center',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}
               >
-                {selected && <Text color="white" fontSize={12} fontWeight="700">✕</Text>}
+                {selected && (
+                  <Text color="white" fontSize={12} fontWeight="700">
+                    ✕
+                  </Text>
+                )}
               </YStack>
-              <Text fontSize={15} color="#111827">{e.connection}</Text>
+              <Text fontSize={15} color="#111827">
+                {e.connection}
+              </Text>
             </XStack>
           )
         })

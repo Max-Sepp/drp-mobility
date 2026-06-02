@@ -19,9 +19,12 @@ def _equipment_id(
 ) -> int:
     station = db.query(Station).filter_by(name=station_name).one()
     equipment_type = db.query(EquipmentType).filter_by(name=equipment_type_name).one()
-    return db.query(Equipment).filter_by(
-        station_id=station.id, equipment_type_id=equipment_type.id
-    ).first().id
+    return (
+        db.query(Equipment)
+        .filter_by(station_id=station.id, equipment_type_id=equipment_type.id)
+        .first()
+        .id
+    )
 
 
 def _base_payload(db: Session, **overrides) -> dict:
@@ -147,9 +150,7 @@ def test_resolved_failures_do_not_block_a_new_open_failure(db_session: Session) 
     db_session.commit()  # partial index only covers resolved=false rows, so this is allowed
 
     open_failures = (
-        db_session.query(Failure)
-        .filter_by(equipment_id=equipment_id, resolved=False)
-        .count()
+        db_session.query(Failure).filter_by(equipment_id=equipment_id, resolved=False).count()
     )
     assert open_failures == 1
 
@@ -279,9 +280,7 @@ def test_get_failure_returns_detail(client: TestClient, db_session: Session) -> 
     assert len(body["reports"]) == 1
 
 
-def test_get_failure_excludes_soft_deleted_reports(
-    client: TestClient, db_session: Session
-) -> None:
+def test_get_failure_excludes_soft_deleted_reports(client: TestClient, db_session: Session) -> None:
     payload = _base_payload(db_session)
     r1 = client.post("/outage-reports", json=payload)
     r2 = client.post(

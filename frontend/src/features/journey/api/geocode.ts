@@ -60,7 +60,7 @@ async function coordsFromAddress(query: string): Promise<{ lat: number; lon: num
 function conciseAddress(displayName: string): string {
   return displayName
     .split(',')
-    .map(part => part.trim())
+    .map((part) => part.trim())
     .filter(Boolean)
     .slice(0, 3)
     .join(', ')
@@ -80,7 +80,7 @@ export async function searchLocations(query: string): Promise<LocationSuggestion
   if (!res.ok) return []
   const body = await res.json().catch(() => null)
   if (!Array.isArray(body)) return []
-  return body.map(r => ({
+  return body.map((r) => ({
     label: conciseAddress(String(r.display_name)),
     lat: Number(r.lat),
     lon: Number(r.lon),
@@ -92,7 +92,9 @@ export async function searchLocations(query: string): Promise<LocationSuggestion
  * The postcode for a chosen suggestion: use Nominatim's own postcode when it gave one,
  * otherwise reverse-geocode its coordinates.
  */
-export async function postcodeForSuggestion(suggestion: LocationSuggestion): Promise<string | null> {
+export async function postcodeForSuggestion(
+  suggestion: LocationSuggestion,
+): Promise<string | null> {
   if (suggestion.postcode && POSTCODE_RE.test(suggestion.postcode)) {
     return normalisePostcode(suggestion.postcode)
   }

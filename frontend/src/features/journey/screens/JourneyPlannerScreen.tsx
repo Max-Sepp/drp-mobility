@@ -39,8 +39,13 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
     // Use the postcode already resolved from a dropdown selection; otherwise convert the
     // typed text (a postcode or coordinates) now. Either way we query postcode-to-postcode.
     const resolveField = (text: string, postcode: string | null) =>
-      postcode ? Promise.resolve({ postcode, label: text } as ResolvedLocation) : resolveToPostcode(text)
-    const [fromLoc, toLoc] = await Promise.all([resolveField(from, fromPostcode), resolveField(to, toPostcode)])
+      postcode
+        ? Promise.resolve({ postcode, label: text } as ResolvedLocation)
+        : resolveToPostcode(text)
+    const [fromLoc, toLoc] = await Promise.all([
+      resolveField(from, fromPostcode),
+      resolveField(to, toPostcode),
+    ])
     if ('error' in fromLoc) {
       setLoading(false)
       Alert.alert('Start location', fromLoc.error)
@@ -70,7 +75,12 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
     >
       {showInputs ? (
         <YStack px="$5" mt="$5" gap="$3">
-          <LocationInput label="From" value={from} onChangeText={setFrom} onResolved={setFromPostcode} />
+          <LocationInput
+            label="From"
+            value={from}
+            onChangeText={setFrom}
+            onResolved={setFromPostcode}
+          />
           <LocationInput label="To" value={to} onChangeText={setTo} onResolved={setToPostcode} />
 
           <YStack
@@ -97,21 +107,32 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
             gap="$3"
             pressStyle={{ opacity: 0.7 }}
             onPress={() => setEditing(true)}
-            style={{ borderWidth: 1.5, borderColor: '#d1d5db', borderRadius: 10, backgroundColor: '#f9fafb' }}
+            style={{
+              borderWidth: 1.5,
+              borderColor: '#d1d5db',
+              borderRadius: 10,
+              backgroundColor: '#f9fafb',
+            }}
           >
             <YStack flex={1} gap="$1">
               <XStack gap="$2" items="center">
                 <MaterialIcons name="trip-origin" size={14} color="#6b7280" style={{ width: 18 }} />
-                <Text fontSize={14} color="#111827" flex={1} numberOfLines={1}>{resolved.from.label}</Text>
+                <Text fontSize={14} color="#111827" flex={1} numberOfLines={1}>
+                  {resolved.from.label}
+                </Text>
               </XStack>
               <XStack gap="$2" items="center">
                 <MaterialIcons name="place" size={16} color="#6b7280" style={{ width: 18 }} />
-                <Text fontSize={14} color="#111827" flex={1} numberOfLines={1}>{resolved.to.label}</Text>
+                <Text fontSize={14} color="#111827" flex={1} numberOfLines={1}>
+                  {resolved.to.label}
+                </Text>
               </XStack>
             </YStack>
             <XStack items="center" gap="$1">
               <MaterialIcons name="edit" size={16} color="#2563eb" />
-              <Text fontSize={14} fontWeight="600" color="#2563eb">Edit</Text>
+              <Text fontSize={14} fontWeight="600" color="#2563eb">
+                Edit
+              </Text>
             </XStack>
           </XStack>
         )

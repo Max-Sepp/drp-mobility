@@ -25,7 +25,13 @@ export const ReportCustomScreen = ({ navigation, route }: ReportCustomScreenProp
 
   return (
     <FormScreenLayout
-      header={<ScreenHeader title="Describe the issue" subtitle={station} onBack={() => navigation.goBack()} />}
+      header={
+        <ScreenHeader
+          title="Describe the issue"
+          subtitle={station}
+          onBack={() => navigation.goBack()}
+        />
+      }
       footer={<SubmitBar onPress={submit} />}
     >
       <FormSection label="Issue description">
@@ -36,7 +42,13 @@ export const ReportCustomScreen = ({ navigation, route }: ReportCustomScreenProp
           placeholderTextColor="$gray9"
           numberOfLines={4}
           textAlignVertical="top"
-          style={{ minHeight: 100, borderColor: '#d1d5db', backgroundColor: '#f9fafb', color: '#111827', fontSize: 15 }}
+          style={{
+            minHeight: 100,
+            borderColor: '#d1d5db',
+            backgroundColor: '#f9fafb',
+            color: '#111827',
+            fontSize: 15,
+          }}
         />
       </FormSection>
 
@@ -46,7 +58,12 @@ export const ReportCustomScreen = ({ navigation, route }: ReportCustomScreenProp
           onChangeText={setArea}
           placeholder="-- select --"
           placeholderTextColor="$gray9"
-          style={{ borderColor: '#d1d5db', backgroundColor: '#f9fafb', color: '#111827', fontSize: 15 }}
+          style={{
+            borderColor: '#d1d5db',
+            backgroundColor: '#f9fafb',
+            color: '#111827',
+            fontSize: 15,
+          }}
         />
       </FormSection>
 

@@ -26,16 +26,34 @@ export const OutageReportCard = ({ report, expanded, onToggle }: OutageReportCar
 
   const header = (
     <XStack p="$4" items="center" gap="$3">
-      <YStack style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: '#b91c1c', alignItems: 'center', justifyContent: 'center' }}>
-        <Text color="white" fontWeight="700" fontSize={18}>!</Text>
-      </YStack>
-      <YStack flex={1}>
-        <Heading fontSize={14} color="#7f1d1d">{alertLabel(report)}</Heading>
-        <Text fontSize={12} color="#991b1b" mt="$1">
-          reported at {formatTime(report.breakdown_time)}{isToday(report.breakdown_time) ? ' today' : ''}
+      <YStack
+        style={{
+          width: 36,
+          height: 36,
+          borderRadius: 18,
+          backgroundColor: '#b91c1c',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Text color="white" fontWeight="700" fontSize={18}>
+          !
         </Text>
       </YStack>
-      {hasPhoto && <Text fontSize={12} color="#991b1b">{expanded ? '▲' : '▼'}</Text>}
+      <YStack flex={1}>
+        <Heading fontSize={14} color="#7f1d1d">
+          {alertLabel(report)}
+        </Heading>
+        <Text fontSize={12} color="#991b1b" mt="$1">
+          reported at {formatTime(report.breakdown_time)}
+          {isToday(report.breakdown_time) ? ' today' : ''}
+        </Text>
+      </YStack>
+      {hasPhoto && (
+        <Text fontSize={12} color="#991b1b">
+          {expanded ? '▲' : '▼'}
+        </Text>
+      )}
     </XStack>
   )
 
@@ -45,7 +63,9 @@ export const OutageReportCard = ({ report, expanded, onToggle }: OutageReportCar
         {header}
         {report.description ? (
           <YStack px="$4" pb="$4">
-            <Text fontSize={13} color="#7f1d1d">{report.description}</Text>
+            <Text fontSize={13} color="#7f1d1d">
+              {report.description}
+            </Text>
           </YStack>
         ) : null}
       </YStack>
@@ -59,7 +79,9 @@ export const OutageReportCard = ({ report, expanded, onToggle }: OutageReportCar
         {expanded && (
           <YStack px="$4" pb="$4" gap="$3">
             {report.description ? (
-              <Text fontSize={13} color="#7f1d1d">{report.description}</Text>
+              <Text fontSize={13} color="#7f1d1d">
+                {report.description}
+              </Text>
             ) : null}
             <Image
               source={{ uri: `${BASE_URL}/outage-reports/${report.id}/image` }}

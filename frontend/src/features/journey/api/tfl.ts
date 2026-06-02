@@ -43,7 +43,10 @@ export async function planJourney(from: string, to: string): Promise<JourneyPlan
   try {
     res = await fetch(url)
   } catch {
-    return { kind: 'error', message: 'Could not reach the journey planner. Check your connection and try again.' }
+    return {
+      kind: 'error',
+      message: 'Could not reach the journey planner. Check your connection and try again.',
+    }
   }
 
   if (res.ok) {
@@ -57,5 +60,8 @@ export async function planJourney(from: string, to: string): Promise<JourneyPlan
 
   // TfL surfaces a human-readable reason in `message` on 4xx (e.g. unknown location).
   const body = await res.json().catch(() => null)
-  return { kind: 'error', message: body?.message ?? 'Could not plan a journey for those locations.' }
+  return {
+    kind: 'error',
+    message: body?.message ?? 'Could not plan a journey for those locations.',
+  }
 }

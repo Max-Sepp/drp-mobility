@@ -1,0 +1,31 @@
+[tool.ruff]
+# CLAUDE.md targets Python 3.10+; the prod image is 3.11-slim.
+target-version = "py310"
+line-length = 100
+extend-exclude = ["venv", "dev.db"]
+
+[tool.ruff.lint]
+# E/W pycodestyle, F pyflakes, I import sorting, UP pyupgrade, B bugbear.
+select = ["E", "W", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.flake8-bugbear]
+# FastAPI's dependency-injection idiom puts these calls in argument defaults
+# (e.g. `repo: Repo = Depends(get_repo)`); that is intentional, not a B008 bug.
+extend-immutable-calls = [
+    "fastapi.Depends",
+    "fastapi.Query",
+    "fastapi.Path",
+    "fastapi.Body",
+    "fastapi.File",
+    "fastapi.Form",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# SQLAlchemy `Mapped["X"]` relationships and Pydantic forward references are
+# string class names resolved at runtime by the mapper / model registry, so
+# Ruff cannot see them statically (F821 false positives).
+"app/models/*" = ["F821"]
+"app/schemas/failure.py" = ["F821"]
+
+[tool.ruff.format]
+quote-style = "double"

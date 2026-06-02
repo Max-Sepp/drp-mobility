@@ -5,7 +5,8 @@ from app.database import Base
 
 
 class Failure(Base):
-    """A single outage of a piece of equipment, aggregating one or more user reports until resolved."""
+    """A single outage of a piece of equipment, aggregating one or more user reports
+    until resolved."""
 
     __tablename__ = "failures"
 
@@ -20,9 +21,11 @@ class Failure(Base):
 # Enforce the grouping invariant in the database: at most one *unresolved* failure per equipment.
 # This is a partial unique index — only rows where resolved is false are indexed — so any number of
 # resolved failures can coexist for the same equipment (sequential outages), while a second open one
-# is rejected. It closes the read-then-insert race in OutageReportRepository._find_or_create_failure,
-# where two concurrent reports could otherwise both create their own open failure.
-# `sqlite_where`/`postgresql_where` cover both the dev/test (SQLite) and production (PostgreSQL) engines.
+# is rejected. It closes the read-then-insert race in
+# OutageReportRepository._find_or_create_failure, where two concurrent reports could
+# otherwise both create their own open failure.
+# `sqlite_where`/`postgresql_where` cover both the dev/test (SQLite) and production
+# (PostgreSQL) engines.
 Index(
     "uq_failures_one_open_per_equipment",
     Failure.equipment_id,
