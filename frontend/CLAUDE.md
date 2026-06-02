@@ -51,6 +51,14 @@ These are app-level building blocks (`FormScreenLayout`, `ScreenHeader`, `Submit
 
 `stations.ts` contains client-side station data. The backend also exposes `/stations`; check whether the data you need is server-driven (fetched at runtime) or hard-coded here before duplicating.
 
+## Backend station/equipment data
+
+The backend seeds rich per-station data from `backend/app/data/stations.json` (enriched from TfL's step-free access CSV feed). Key points for frontend work:
+
+- **Step-free access is per-platform** (`stepFreeAccess` on each platform): `"Full"` / `"to_platform"` / `"to_train"` / `"none"`. There is no station-level step-free field.
+- **Named lift equipment** rows have descriptive `connection` strings (e.g. `"Lift A: Booking Hall → Westbound Platform 1"`).
+- **Named escalator equipment** rows exist but are **mocked** — the TfL feed has no escalator topology. The connections are synthesised estimates (`"Escalator 1: Street → Northbound Platform 2"`). Do not present them as authoritative routing information.
+
 ## Distribution (EAS-only)
 
 There is no web build. The app ships through EAS — slug `drp-mobility`, project `fa941353-94dc-490c-a5b0-209e52e4ee56`.

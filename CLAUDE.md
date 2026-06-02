@@ -20,3 +20,36 @@ Monorepo with two self-contained subprojects. There is no top-level package mana
 - **Typed contract is generated, not hand-written.** The frontend's `src/api/schema.d.ts` is produced from the backend's OpenAPI schema (`npm run generate:api` in `frontend/` with the backend running locally). When you change a FastAPI route signature or a Pydantic schema, regenerate.
 - **No migrations.** The backend uses `Base.metadata.create_all` at import time — there is no Alembic. Schema changes require deleting `backend/dev.db` once. Don't add backwards-compatibility hacks for old schemas; just regenerate.
 - **Idempotent seeding.** `backend/app/seed.py` runs on every startup and inserts reference rows (stations, equipment types, equipment) only if missing. Tests rely on this seed data being present.
+
+## Station data enrichment
+
+All station data lives in `backend/app/data/stations.json` (387 stations, all TfL modes). The script `temp/enrich_tube_stations.py` reads this file and enriches it from TfL's step-free access CSV feed (`temp/tfl-stationdata-detailed/`). Run it whenever the CSV data changes:
+
+```bash
+python3 temp/enrich_tube_stations.py
+# then delete backend/dev.db and restart uvicorn to reseed
+```
+
+### Enriched fields per station
+
+| Field | Source |
+|---|---|
+| `id` | NaPTAN HUB code (or UniqueId) from TfL CSV |
+| `zones` | `FareZones` (pipe-separated) |
+| `wifi`, `blueBadgeParking`, `taxiRank` | CSV boolean fields |
+| `interchange` | `{nationalRail, bus, pier}` with "Full"/"Partial"/"None" |
+| `coordinates` | Best ground-level point from StationPoints.csv |
+| `platforms[]` | Per-platform objects (see below) |
+| `lift_units[]` | Named lifts from Lifts.csv; or synthesised for deep-tube stations |
+| `escalator_units[]` | **MOCKED** — see note below |
+| `toilets[]` | From Toilets.csv |
+
+### Per-platform fields
+
+Each platform carries: `id`, `name`, `direction`, `lines[]`, `stepFreeAccess`, `accessibleEntrance`, `gapMm`, `stepMm`, `boardingRamp`, `levelAccess`.
+
+`stepFreeAccess` is derived via BFS on a step-free pathway graph (SameLevelPaths + RampRoutes + Lifts CSVs) from the station's virtual `-Outside` node. Values: `"Full"` / `"to_platform"` / `"to_train"` / `"none"`. There is **no station-level `step_free` field** — it is platform-only.
+
+### Escalator data is mocked
+
+TfL's step-free feed has no escalator topology data (escalators are not step-free routes). `escalator_units` are synthesised by distributing the escalator count round-robin across customer-facing platforms. Every unit is tagged `"mocked": true`. **This data is estimated and must be replaced with hand-curated data before treating as authoritative.**
