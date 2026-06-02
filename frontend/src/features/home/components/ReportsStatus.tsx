@@ -17,7 +17,13 @@ export const ReportsStatus = ({ loading, reports }: ReportsStatusProps) => {
 
   if (loading) {
     return (
-      <YStack mx="$4" mt="$4" p="$5" items="center" style={{ backgroundColor: '#f3f4f6', borderRadius: 10 }}>
+      <YStack
+        mx="$4"
+        mt="$4"
+        p="$5"
+        items="center"
+        style={{ backgroundColor: '#f3f4f6', borderRadius: 10 }}
+      >
         <Spinner color="#9ca3af" />
       </YStack>
     )
@@ -25,18 +31,38 @@ export const ReportsStatus = ({ loading, reports }: ReportsStatusProps) => {
 
   if (reports.length === 0) {
     return (
-      <YStack mx="$4" mt="$4" p="$5" items="center" gap="$3" style={{ backgroundColor: '#d8f3dc', borderRadius: 10 }}>
-        <YStack style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: '#2d6a4f', alignItems: 'center', justifyContent: 'center' }}>
-          <Text color="white" fontSize={24} fontWeight="700">✓</Text>
+      <YStack
+        mx="$4"
+        mt="$4"
+        p="$5"
+        items="center"
+        gap="$3"
+        style={{ backgroundColor: '#d8f3dc', borderRadius: 10 }}
+      >
+        <YStack
+          style={{
+            width: 48,
+            height: 48,
+            borderRadius: 24,
+            backgroundColor: '#2d6a4f',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Text color="white" fontSize={24} fontWeight="700">
+            ✓
+          </Text>
         </YStack>
-        <Heading fontSize={18} color="#1a3c2a">No known issues</Heading>
+        <Heading fontSize={18} color="#1a3c2a">
+          No known issues
+        </Heading>
       </YStack>
     )
   }
 
   return (
     <YStack mx="$4" mt="$4" gap="$2">
-      {reports.map(r => (
+      {reports.map((r) => (
         <OutageReportCard
           key={r.id}
           report={r}

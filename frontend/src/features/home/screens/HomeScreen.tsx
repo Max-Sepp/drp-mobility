@@ -19,7 +19,7 @@ export const HomeScreen = ({ navigation }: HomeScreenProps) => {
   const fetchReports = useCallback(async () => {
     setLoading(true)
     const { data } = await apiClient.GET('/outage-reports')
-    if (data) setReports(data.filter(r => r.failure.equipment.station.name === station))
+    if (data) setReports(data.filter((r) => r.failure.equipment.station.name === station))
     setLoading(false)
   }, [station])
 
@@ -43,7 +43,11 @@ export const HomeScreen = ({ navigation }: HomeScreenProps) => {
   }
 
   return (
-    <ScrollView flex={1} style={{ backgroundColor: '#f9fafb' }} contentContainerStyle={{ paddingBottom: 40 } as any}>
+    <ScrollView
+      flex={1}
+      style={{ backgroundColor: '#f9fafb' }}
+      contentContainerStyle={{ paddingBottom: 40 } as any}
+    >
       <StationHeader station={station} onPress={changeStation} />
       <ReportsStatus loading={loading} reports={reports} />
       <XStack
@@ -56,7 +60,9 @@ export const HomeScreen = ({ navigation }: HomeScreenProps) => {
         style={{ backgroundColor: '#111827', borderRadius: 10, height: 56, paddingHorizontal: 16 }}
       >
         <MaterialIcons name="directions" size={26} color="white" />
-        <Text color="white" fontSize={16} fontWeight="700">Plan a journey</Text>
+        <Text color="white" fontSize={16} fontWeight="700">
+          Plan a journey
+        </Text>
       </XStack>
       <QuickReportGrid onSelect={quickReport} />
     </ScrollView>

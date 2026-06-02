@@ -10,9 +10,15 @@ npm run start            # Expo dev server + QR for Expo Go
 npm run android          # open on Android emulator/device
 npm run ios              # open on iOS simulator (macOS only)
 npm run generate:api     # regenerate src/api/schema.d.ts from a backend running on :8000
+npm run lint             # ESLint (eslint-config-expo, flat config in eslint.config.js)
+npm run lint:fix         # ESLint with autofix
+npm run format           # Prettier write across the repo
+npm run format:check     # Prettier check only (CI-friendly)
 ```
 
 There is no test runner configured.
+
+Linting is ESLint 9 + `eslint-config-expo` (pinned to ESLint 9 — `eslint-plugin-react` isn't ESLint-10-ready). Formatting is Prettier (`.prettierrc.json`: single quotes, no semicolons, 100 cols), with `eslint-config-prettier` disabling stylistic ESLint rules so the two don't conflict. The generated `src/api/schema.d.ts` is excluded from both. `react-hooks/set-state-in-effect` is set to `warn`, not error.
 
 ## Entry and providers (`App.tsx`)
 
@@ -62,6 +68,7 @@ There is no web build. The app ships through EAS — slug `drp-mobility`, projec
 ## When working on UI
 
 For the primary persona (wheelchair / mobility-aid users) prefer:
+
 - Large tap targets and high contrast.
 - Status language that doesn't conflate "step-free to platform" with "step-free to train."
 - No colour-only status signals — pair colour with text or an icon.

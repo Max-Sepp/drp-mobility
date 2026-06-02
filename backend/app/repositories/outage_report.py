@@ -16,9 +16,7 @@ from app.schemas.outage_report import OutageReportCreate
 _ACTIVE_FILTER = ~exists().where(OutageReportDeletion.report_id == OutageReport.id)
 
 _REPORT_JOINEDLOAD = [
-    joinedload(OutageReport.failure)
-    .joinedload(Failure.equipment)
-    .joinedload(Equipment.station),
+    joinedload(OutageReport.failure).joinedload(Failure.equipment).joinedload(Equipment.station),
     joinedload(OutageReport.failure)
     .joinedload(Failure.equipment)
     .joinedload(Equipment.equipment_type),
@@ -60,16 +58,15 @@ class OutageReportRepository:
 
     def is_deleted(self, report_id: int) -> bool:
         """True if a soft-deletion record exists for this report id."""
-        return self._db.query(
-            exists().where(OutageReportDeletion.report_id == report_id)
-        ).scalar()
+        return self._db.query(exists().where(OutageReportDeletion.report_id == report_id)).scalar()
 
     # ------------------------------------------------------------------
     # Mutations
     # ------------------------------------------------------------------
 
     def create(self, payload: OutageReportCreate) -> OutageReport:
-        """Persist a new report, attaching it to the equipment's open Failure (creating one if needed)."""
+        """Persist a new report, attaching it to the equipment's open Failure
+        (creating one if needed)."""
         if self._db.get(Equipment, payload.equipment_id) is None:
             raise ValueError(f"equipment_id {payload.equipment_id} not found")
 
@@ -85,7 +82,8 @@ class OutageReportRepository:
         return self.get_active(report.id)
 
     def soft_delete(self, report: OutageReport, reason: str | None = None) -> None:
-        """Mark a report as deleted by inserting an OutageReportDeletion row; the report itself is preserved."""
+        """Mark a report as deleted by inserting an OutageReportDeletion row; the report
+        itself is preserved."""
         deletion = OutageReportDeletion(
             report_id=report.id,
             deleted_at=datetime.now(tz=timezone.utc),
@@ -107,13 +105,14 @@ class OutageReportRepository:
     # ------------------------------------------------------------------
 
     def _find_or_create_failure(self, equipment_id: int) -> Failure:
-        """Return the equipment's currently-open Failure, creating one if all prior failures are resolved.
+        """Return the equipment's currently-open Failure, creating one if all prior
+        failures are resolved.
 
         At most one unresolved Failure per equipment is enforced by a partial unique index. Because
         this is a read-then-insert, two concurrent reports for the same equipment can both miss the
         SELECT and try to INSERT a Failure; the index makes the loser's INSERT raise IntegrityError.
-        We catch that, roll back the failed insert, and re-read the open failure the winner committed
-        so both reports end up grouped under the same Failure.
+        We catch that, roll back the failed insert, and re-read the open failure the
+        winner committed so both reports end up grouped under the same Failure.
         """
         failure = self._find_open_failure(equipment_id)
         if failure is not None:
@@ -133,11 +132,7 @@ class OutageReportRepository:
 
     def _find_open_failure(self, equipment_id: int) -> Failure | None:
         """Return the equipment's single unresolved Failure, or None if all are resolved."""
-        return (
-            self._db.query(Failure)
-            .filter_by(equipment_id=equipment_id, resolved=False)
-            .first()
-        )
+        return self._db.query(Failure).filter_by(equipment_id=equipment_id, resolved=False).first()
 
 
 def get_repo(db: Session = Depends(get_db)) -> OutageReportRepository:

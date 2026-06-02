@@ -38,7 +38,7 @@ export const ReportFormScreen = ({ navigation, route }: ReportFormScreenProps) =
       if (!active) return
       if (data) {
         setEquipment(
-          data.filter(e => e.station.name === station && e.equipment_type.name === equipmentType),
+          data.filter((e) => e.station.name === station && e.equipment_type.name === equipmentType),
         )
       }
       setLoadingEquipment(false)
@@ -123,7 +123,13 @@ export const ReportFormScreen = ({ navigation, route }: ReportFormScreenProps) =
           placeholderTextColor="$gray9"
           numberOfLines={3}
           textAlignVertical="top"
-          style={{ minHeight: 80, borderColor: '#d1d5db', backgroundColor: '#f9fafb', color: '#111827', fontSize: 15 }}
+          style={{
+            minHeight: 80,
+            borderColor: '#d1d5db',
+            backgroundColor: '#f9fafb',
+            color: '#111827',
+            fontSize: 15,
+          }}
         />
       </FormSection>
     </FormScreenLayout>

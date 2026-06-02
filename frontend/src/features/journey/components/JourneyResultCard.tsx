@@ -66,7 +66,7 @@ function clockTime(local: string): string {
 function fareLabel(journey: Journey): string | null {
   const { fare, legs } = journey
   if (fare && fare.totalCost > 0) return `£${(fare.totalCost / 100).toFixed(2)}`
-  const walkingOnly = legs.length > 0 && legs.every(leg => leg.mode.name === 'walking')
+  const walkingOnly = legs.length > 0 && legs.every((leg) => leg.mode.name === 'walking')
   if (walkingOnly) return 'Free'
   return null
 }
@@ -104,12 +104,23 @@ export const JourneyResultCard = ({ journey, from, to }: JourneyResultCardProps)
       mt="$4"
       p="$4"
       gap="$3"
-      style={{ borderWidth: 1.5, borderColor: '#d1d5db', borderRadius: 10, backgroundColor: 'white' }}
+      style={{
+        borderWidth: 1.5,
+        borderColor: '#d1d5db',
+        borderRadius: 10,
+        backgroundColor: 'white',
+      }}
     >
       <XStack items="center" justify="space-between">
         <XStack items="baseline" gap="$2">
-          <Text fontSize={18} fontWeight="700" color="#111827">{journey.duration} min</Text>
-          {fare && <Text fontSize={15} fontWeight="600" color="#16a34a">{fare}</Text>}
+          <Text fontSize={18} fontWeight="700" color="#111827">
+            {journey.duration} min
+          </Text>
+          {fare && (
+            <Text fontSize={15} fontWeight="600" color="#16a34a">
+              {fare}
+            </Text>
+          )}
         </XStack>
         <Text fontSize={15} color="#374151">
           {clockTime(journey.startDateTime)} → {clockTime(journey.arrivalDateTime)}
@@ -127,8 +138,12 @@ export const JourneyResultCard = ({ journey, from, to }: JourneyResultCardProps)
               style={{ width: 24, marginTop: 1 }}
             />
             <YStack flex={1} gap="$0.5">
-              <Text fontSize={14} color="#111827">{humanizeSummary(leg.instruction.summary, [from, to])}</Text>
-              <Text fontSize={12} color="#6b7280">{leg.duration} min</Text>
+              <Text fontSize={14} color="#111827">
+                {humanizeSummary(leg.instruction.summary, [from, to])}
+              </Text>
+              <Text fontSize={12} color="#6b7280">
+                {leg.duration} min
+              </Text>
             </YStack>
           </XStack>
         ))}
@@ -143,8 +158,12 @@ export const JourneyResultCard = ({ journey, from, to }: JourneyResultCardProps)
               style={{ width: 24, marginTop: 1 }}
             />
             <YStack flex={1} gap="$0.5">
-              <Text fontSize={14} color="#6b7280">Waiting & connections</Text>
-              <Text fontSize={12} color="#6b7280">{waiting} min</Text>
+              <Text fontSize={14} color="#6b7280">
+                Waiting & connections
+              </Text>
+              <Text fontSize={12} color="#6b7280">
+                {waiting} min
+              </Text>
             </YStack>
           </XStack>
         )}

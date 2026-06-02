@@ -53,7 +53,7 @@ def create_outage_report(
     except ValueError as exc:
         # 422 Unprocessable Entity: payload parsed fine, but a referenced row
         # (e.g. equipment_id) doesn't exist — semantically invalid input.
-        raise HTTPException(status_code=422, detail=str(exc))
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 @router.get("", response_model=list[OutageReportSummary])
@@ -129,7 +129,5 @@ def download_image(
     if report is None:
         raise HTTPException(status_code=404, detail="Outage report not found")
     if report.image is None:
-        raise HTTPException(
-            status_code=404, detail="No image attached to this outage report"
-        )
+        raise HTTPException(status_code=404, detail="No image attached to this outage report")
     return Response(content=report.image, media_type=report.image_content_type)

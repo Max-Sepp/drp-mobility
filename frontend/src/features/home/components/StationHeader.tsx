@@ -15,10 +15,16 @@ export const StationHeader = ({ station, onPress }: StationHeaderProps) => {
       <Pressable onPress={onPress}>
         <YStack px="$5" py="$3">
           <XStack items="center" gap="$2">
-            <Heading fontSize={26} color="#1e3a5f">{station}</Heading>
-            <Text fontSize={20} color="#1e3a5f" style={{ marginTop: 4 }}>▾</Text>
+            <Heading fontSize={26} color="#1e3a5f">
+              {station}
+            </Heading>
+            <Text fontSize={20} color="#1e3a5f" style={{ marginTop: 4 }}>
+              ▾
+            </Text>
           </XStack>
-          <Text fontSize={12} color="#4a6fa5" mt="$1">tap to change station</Text>
+          <Text fontSize={12} color="#4a6fa5" mt="$1">
+            tap to change station
+          </Text>
         </YStack>
       </Pressable>
     </SafeAreaView>

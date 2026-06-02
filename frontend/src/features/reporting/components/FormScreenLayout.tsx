@@ -14,8 +14,16 @@ export const FormScreenLayout = ({ header, footer, children }: FormScreenLayoutP
   // behavior="height" on top of that double-counts and leaves dead space at the bottom, so
   // we only set a behavior on iOS.
   return (
-    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: 'white' }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView flex={1} style={{ backgroundColor: 'white' }} contentContainerStyle={{ paddingBottom: 16 } as any} keyboardShouldPersistTaps="handled">
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: 'white' }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <ScrollView
+        flex={1}
+        style={{ backgroundColor: 'white' }}
+        contentContainerStyle={{ paddingBottom: 16 } as any}
+        keyboardShouldPersistTaps="handled"
+      >
         {header}
         {children}
       </ScrollView>

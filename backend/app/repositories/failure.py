@@ -4,27 +4,29 @@ from sqlalchemy.orm import Session, joinedload
 
 from app.database import get_db
 from app.models.equipment import Equipment
-from app.models.equipment_type import EquipmentType
 from app.models.failure import Failure
 from app.models.outage_report import OutageReport
 from app.models.outage_report_deletion import OutageReportDeletion
-from app.models.station import Station
 
 # Excludes reports that have a corresponding OutageReportDeletion row (soft-deleted).
 _ACTIVE_FILTER = ~exists().where(OutageReportDeletion.report_id == OutageReport.id)
 
 # Eager-load options for Failure queries: pulls equipment + its station and type in one round trip,
-# so callers can read failure.equipment.station / .equipment_type without triggering lazy-load SELECTs.
+# so callers can read failure.equipment.station / .equipment_type without triggering
+# lazy-load SELECTs.
 _EQUIPMENT_JOINEDLOAD = [
     joinedload(Failure.equipment).joinedload(Equipment.station),
     joinedload(Failure.equipment).joinedload(Equipment.equipment_type),
 ]
 
-# Same idea, but for queries starting from OutageReport: walks report → failure → equipment → station/type
-# eagerly to avoid N+1 SELECTs when serializing a list of reports.
+# Same idea, but for queries starting from OutageReport: walks
+# report → failure → equipment → station/type eagerly to avoid N+1 SELECTs when
+# serializing a list of reports.
 _REPORT_JOINEDLOAD = [
     joinedload(OutageReport.failure).joinedload(Failure.equipment).joinedload(Equipment.station),
-    joinedload(OutageReport.failure).joinedload(Failure.equipment).joinedload(Equipment.equipment_type),
+    joinedload(OutageReport.failure)
+    .joinedload(Failure.equipment)
+    .joinedload(Equipment.equipment_type),
 ]
 
 
@@ -45,6 +47,7 @@ class FailureRepository:
 
     def list_all_with_stats(self) -> list[tuple]:
         """Return (Failure, first_reported, last_reported, report_count) for every failure."""
+
         def _active_subquery(agg):
             return (
                 select(agg)
@@ -80,7 +83,8 @@ class FailureRepository:
         )
 
     def resolve(self, failure: Failure) -> Failure:
-        """Mark a failure as resolved; subsequent reports on the same equipment will open a new Failure."""
+        """Mark a failure as resolved; subsequent reports on the same equipment will
+        open a new Failure."""
         failure.resolved = True
         self._db.commit()
         self._db.refresh(failure)

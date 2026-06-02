@@ -24,9 +24,12 @@ def _equipment_id(
 ) -> int:
     station = db.query(Station).filter_by(name=station_name).one()
     equipment_type = db.query(EquipmentType).filter_by(name=equipment_type_name).one()
-    return db.query(Equipment).filter_by(
-        station_id=station.id, equipment_type_id=equipment_type.id
-    ).first().id
+    return (
+        db.query(Equipment)
+        .filter_by(station_id=station.id, equipment_type_id=equipment_type.id)
+        .first()
+        .id
+    )
 
 
 def _valid_payload(db: Session) -> dict:
@@ -45,9 +48,11 @@ def _create_report(db: Session, **overrides) -> OutageReport:
 
     station = db.query(Station).filter_by(name=station_name).one()
     equipment_type = db.query(EquipmentType).filter_by(name=equipment_type_name).one()
-    equipment = db.query(Equipment).filter_by(
-        station_id=station.id, equipment_type_id=equipment_type.id
-    ).first()
+    equipment = (
+        db.query(Equipment)
+        .filter_by(station_id=station.id, equipment_type_id=equipment_type.id)
+        .first()
+    )
 
     # Reuse the equipment's open failure if one exists (a partial unique index allows only one
     # unresolved failure per equipment); otherwise start a new one.
@@ -131,9 +136,7 @@ def test_list_outage_reports_returns_all(client: TestClient, db_session: Session
     assert len(response.json()) == 2
 
 
-def test_list_outage_reports_ordered_newest_first(
-    client: TestClient, db_session: Session
-) -> None:
+def test_list_outage_reports_ordered_newest_first(client: TestClient, db_session: Session) -> None:
     older = _create_report(db_session, breakdown_time=datetime(2024, 1, 1, tzinfo=timezone.utc))
     newer = _create_report(db_session, breakdown_time=datetime(2024, 6, 1, tzinfo=timezone.utc))
 
@@ -143,9 +146,7 @@ def test_list_outage_reports_ordered_newest_first(
     assert ids == [newer.id, older.id]
 
 
-def test_list_outage_reports_excludes_soft_deleted(
-    client: TestClient, db_session: Session
-) -> None:
+def test_list_outage_reports_excludes_soft_deleted(client: TestClient, db_session: Session) -> None:
     r1 = _create_report(db_session)
     _create_report(db_session, station="Waterloo")
 
@@ -178,9 +179,7 @@ def test_get_outage_report_missing_returns_404(client: TestClient) -> None:
     assert response.json() == {"detail": "Outage report not found"}
 
 
-def test_get_outage_report_deleted_returns_404(
-    client: TestClient, db_session: Session
-) -> None:
+def test_get_outage_report_deleted_returns_404(client: TestClient, db_session: Session) -> None:
     report = _create_report(db_session)
     client.delete(f"/outage-reports/{report.id}")
 
@@ -203,9 +202,7 @@ def test_delete_outage_report_returns_204(client: TestClient, db_session: Sessio
     assert response.status_code == 204
 
 
-def test_delete_outage_report_does_not_remove_row(
-    client: TestClient, db_session: Session
-) -> None:
+def test_delete_outage_report_does_not_remove_row(client: TestClient, db_session: Session) -> None:
     report = _create_report(db_session)
 
     client.delete(f"/outage-reports/{report.id}")
@@ -220,9 +217,7 @@ def test_delete_outage_report_creates_deletion_record(
 
     client.delete(f"/outage-reports/{report.id}")
 
-    deletion = (
-        db_session.query(OutageReportDeletion).filter_by(report_id=report.id).one_or_none()
-    )
+    deletion = db_session.query(OutageReportDeletion).filter_by(report_id=report.id).one_or_none()
     assert deletion is not None
     assert deletion.deleted_at is not None
 
@@ -234,9 +229,7 @@ def test_delete_outage_report_missing_returns_404(client: TestClient) -> None:
     assert response.json() == {"detail": "Outage report not found"}
 
 
-def test_delete_outage_report_twice_returns_404(
-    client: TestClient, db_session: Session
-) -> None:
+def test_delete_outage_report_twice_returns_404(client: TestClient, db_session: Session) -> None:
     report = _create_report(db_session)
     client.delete(f"/outage-reports/{report.id}")
 
@@ -296,9 +289,7 @@ def test_upload_image_missing_report_returns_404(client: TestClient) -> None:
     assert response.json() == {"detail": "Outage report not found"}
 
 
-def test_upload_image_deleted_report_returns_404(
-    client: TestClient, db_session: Session
-) -> None:
+def test_upload_image_deleted_report_returns_404(client: TestClient, db_session: Session) -> None:
     report = _create_report(db_session)
     client.delete(f"/outage-reports/{report.id}")
 
@@ -351,9 +342,7 @@ def test_download_image_missing_report_returns_404(client: TestClient) -> None:
     assert response.json() == {"detail": "Outage report not found"}
 
 
-def test_download_image_deleted_report_returns_404(
-    client: TestClient, db_session: Session
-) -> None:
+def test_download_image_deleted_report_returns_404(client: TestClient, db_session: Session) -> None:
     report = _create_report(db_session)
     client.post(
         f"/outage-reports/{report.id}/image",

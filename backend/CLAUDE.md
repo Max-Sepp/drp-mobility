@@ -9,7 +9,12 @@ Guidance for Claude Code when working inside `backend/`. Top-level project conte
 uvicorn app.main:app --reload                       # dev server on :8000, docs at /docs
 pytest                                              # full suite
 pytest tests/test_outage_reports.py::test_name      # single test
+ruff check .                                        # lint
+ruff check --fix .                                  # lint + autofix
+ruff format .                                       # format
 ```
+
+Lint/format use [Ruff](https://docs.astral.sh/ruff/) (config in `pyproject.toml`). Ruff is a dev-only dependency — install it with `pip install -r requirements-dev.txt` (it is deliberately kept out of `requirements.txt` so the prod image stays lean). FastAPI's `Depends(...)`-in-default and SQLAlchemy/Pydantic string forward references are whitelisted in the config; don't "fix" those.
 
 A fresh dev DB is just `rm dev.db` — `create_all` + `seed_defaults` rebuild it on next startup. There are no migrations.
 

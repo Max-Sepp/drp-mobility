@@ -45,14 +45,20 @@ def seed_defaults(db: Session) -> None:
     for station_name, equipment_type_name, connection in _DEFAULT_EQUIPMENT:
         station = db.query(Station).filter_by(name=station_name).one()
         equipment_type = db.query(EquipmentType).filter_by(name=equipment_type_name).one()
-        if not db.query(Equipment).filter_by(
-            station_id=station.id,
-            equipment_type_id=equipment_type.id,
-            connection=connection,
-        ).first():
-            db.add(Equipment(
+        if (
+            not db.query(Equipment)
+            .filter_by(
                 station_id=station.id,
                 equipment_type_id=equipment_type.id,
                 connection=connection,
-            ))
+            )
+            .first()
+        ):
+            db.add(
+                Equipment(
+                    station_id=station.id,
+                    equipment_type_id=equipment_type.id,
+                    connection=connection,
+                )
+            )
     db.commit()

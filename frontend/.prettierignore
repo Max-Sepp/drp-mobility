@@ -1,0 +1,8 @@
+# Generated from the backend OpenAPI schema — never hand-edit or format.
+src/api/schema.d.ts
+
+node_modules/
+dist/
+.expo/
+.tamagui/
+package-lock.json

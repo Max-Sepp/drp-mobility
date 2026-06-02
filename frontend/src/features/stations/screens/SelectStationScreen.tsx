@@ -15,7 +15,9 @@ export const SelectStationScreen = ({ navigation, route }: SelectStationScreenPr
   const insets = useSafeAreaInsets()
 
   useEffect(() => {
-    const showSub = Keyboard.addListener('keyboardDidShow', e => setKeyboardHeight(e.endCoordinates.height))
+    const showSub = Keyboard.addListener('keyboardDidShow', (e) =>
+      setKeyboardHeight(e.endCoordinates.height),
+    )
     const hideSub = Keyboard.addListener('keyboardDidHide', () => setKeyboardHeight(0))
     return () => {
       showSub.remove()
@@ -23,9 +25,7 @@ export const SelectStationScreen = ({ navigation, route }: SelectStationScreenPr
     }
   }, [])
 
-  const filtered = STATIONS.filter(s =>
-    s.name.toLowerCase().includes(query.toLowerCase())
-  )
+  const filtered = STATIONS.filter((s) => s.name.toLowerCase().includes(query.toLowerCase()))
 
   function select(station: Station) {
     stationPicker.resolve(station)
@@ -38,7 +38,7 @@ export const SelectStationScreen = ({ navigation, route }: SelectStationScreenPr
 
       <FlatList
         data={filtered}
-        keyExtractor={item => item.name}
+        keyExtractor={(item) => item.name}
         ItemSeparatorComponent={() => (
           <Separator style={{ marginLeft: 58 }} borderColor="$borderColor" />
         )}
@@ -52,7 +52,16 @@ export const SelectStationScreen = ({ navigation, route }: SelectStationScreenPr
         )}
       />
 
-      <YStack px="$4" pt="$2.5" style={{ borderTopWidth: 1, borderTopColor: '#e5e7eb', paddingBottom: keyboardHeight > 0 ? 10 : (insets.bottom || 10), marginBottom: keyboardHeight > 0 ? keyboardHeight + insets.bottom : 0 }}>
+      <YStack
+        px="$4"
+        pt="$2.5"
+        style={{
+          borderTopWidth: 1,
+          borderTopColor: '#e5e7eb',
+          paddingBottom: keyboardHeight > 0 ? 10 : insets.bottom || 10,
+          marginBottom: keyboardHeight > 0 ? keyboardHeight + insets.bottom : 0,
+        }}
+      >
         <Input
           value={query}
           onChangeText={setQuery}
