@@ -1,18 +1,19 @@
-import { useEffect, useState } from 'react'
-import { FlatList, Keyboard } from 'react-native'
+import { useEffect, useMemo, useState } from 'react'
+import { ActivityIndicator, FlatList, Keyboard } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Input, Separator, YStack } from 'tamagui'
+import { Input, Separator, Text, YStack } from 'tamagui'
 import { ScreenHeader } from '@/components/ScreenHeader'
 import type { SelectStationScreenProps, Station } from '@/navigation/types'
 import { StationListItem } from '../components/StationListItem'
-import { STATIONS } from '../constants'
 import { stationPicker } from '../stationPicker'
+import { stationLines, useStations } from '../useStations'
 
 export const SelectStationScreen = ({ navigation, route }: SelectStationScreenProps) => {
   const { currentStation } = route.params
   const [query, setQuery] = useState('')
   const [keyboardHeight, setKeyboardHeight] = useState(0)
   const insets = useSafeAreaInsets()
+  const { stations, loading, error } = useStations()
 
   useEffect(() => {
     const showSub = Keyboard.addListener('keyboardDidShow', e => setKeyboardHeight(e.endCoordinates.height))
@@ -23,8 +24,9 @@ export const SelectStationScreen = ({ navigation, route }: SelectStationScreenPr
     }
   }, [])
 
-  const filtered = STATIONS.filter(s =>
-    s.name.toLowerCase().includes(query.toLowerCase())
+  const filtered = useMemo(
+    () => stations.filter(s => s.name.toLowerCase().includes(query.toLowerCase())),
+    [stations, query],
   )
 
   function select(station: Station) {
@@ -36,21 +38,36 @@ export const SelectStationScreen = ({ navigation, route }: SelectStationScreenPr
     <YStack flex={1} style={{ backgroundColor: 'white' }}>
       <ScreenHeader title="Select station" height={72} onBack={() => navigation.goBack()} />
 
-      <FlatList
-        data={filtered}
-        keyExtractor={item => item.name}
-        ItemSeparatorComponent={() => (
-          <Separator style={{ marginLeft: 58 }} borderColor="$borderColor" />
-        )}
-        renderItem={({ item }) => (
-          <StationListItem
-            name={item.name}
-            lines={item.lines}
-            selected={item.name === currentStation}
-            onPress={() => select(item.name as Station)}
-          />
-        )}
-      />
+      {loading ? (
+        <YStack flex={1} items="center" justify="center" gap="$3">
+          <ActivityIndicator size="large" color="#2d6a4f" />
+          <Text color="#6b7280">Loading stations…</Text>
+        </YStack>
+      ) : error ? (
+        <YStack flex={1} items="center" justify="center" px="$6">
+          <Text color="#991b1b" fontSize={15} style={{ textAlign: 'center' }}>
+            Couldn’t load stations. Check your connection and try again.
+          </Text>
+        </YStack>
+      ) : (
+        <FlatList
+          data={filtered}
+          keyExtractor={item => String(item.id)}
+          keyboardShouldPersistTaps="handled"
+          ItemSeparatorComponent={() => (
+            <Separator style={{ marginLeft: 58 }} borderColor="$borderColor" />
+          )}
+          renderItem={({ item }) => (
+            <StationListItem
+              name={item.name}
+              lines={stationLines(item)}
+              stepFree={item.step_free}
+              selected={item.name === currentStation}
+              onPress={() => select(item.name as Station)}
+            />
+          )}
+        />
+      )}
 
       <YStack px="$4" pt="$2.5" style={{ borderTopWidth: 1, borderTopColor: '#e5e7eb', paddingBottom: keyboardHeight > 0 ? 10 : (insets.bottom || 10), marginBottom: keyboardHeight > 0 ? keyboardHeight + insets.bottom : 0 }}>
         <Input

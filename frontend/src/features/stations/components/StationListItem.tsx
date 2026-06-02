@@ -1,14 +1,17 @@
 import { Text, XStack, YStack } from 'tamagui'
+import type { StationStepFree } from '../stepFree'
+import { StepFreeBadge } from './StepFreeBadge'
 
 type StationListItemProps = {
   name: string
   lines: string[]
+  stepFree: StationStepFree
   selected: boolean
   onPress: () => void
 }
 
-/** One selectable station row: a radio indicator, the station name, and its lines. */
-export const StationListItem = ({ name, lines, selected, onPress }: StationListItemProps) => {
+/** One selectable station row: a radio indicator, the station name, its lines, and a step-free badge. */
+export const StationListItem = ({ name, lines, stepFree, selected, onPress }: StationListItemProps) => {
   return (
     <XStack
       items="center"
@@ -29,9 +32,10 @@ export const StationListItem = ({ name, lines, selected, onPress }: StationListI
       >
         {selected && <Text color="white" fontSize={13} fontWeight="700">✓</Text>}
       </YStack>
-      <YStack>
+      <YStack flex={1} gap="$1.5">
         <Text fontSize={16} fontWeight="600" color="#111827">{name}</Text>
-        <Text fontSize={13} color="#6b7280" mt="$1">{lines.join(', ')}</Text>
+        {lines.length > 0 && <Text fontSize={13} color="#6b7280">{lines.join(', ')}</Text>}
+        <StepFreeBadge value={stepFree} compact />
       </YStack>
     </XStack>
   )

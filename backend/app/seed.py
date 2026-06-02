@@ -6,8 +6,8 @@ from sqlalchemy.orm import Session
 from app.models.equipment import Equipment
 from app.models.equipment_type import EquipmentType
 from app.models.line import Line
-from app.models.platform import Platform
-from app.models.station import StepFree, Station
+from app.models.platform import Platform, PlatformStepFree
+from app.models.station import Station
 
 # Reference data inserted on every startup. Idempotent (skips rows that already exist),
 # so editing the dataset adds new entries to existing databases but never removes or renames.
@@ -16,11 +16,14 @@ from app.models.station import StepFree, Station
 # step-free access feed (run temp/enrich_tube_stations.py then temp/merge_seed.py to
 # refresh). Non-tube stations (DLR, Overground, National Rail) retain their original data.
 #
+# A station's step-free access is not stored: it is derived from its platforms
+# (see Station.step_free), each of which carries its own `stepFreeAccess`.
+#
 # Each entry supports two formats:
-#   Enriched (tube):  { name, step_free, escalators,
-#                       platforms: [{ name, lines: [...] }],
+#   Enriched (tube):  { name, escalators,
+#                       platforms: [{ name, lines: [...], stepFreeAccess }],
 #                       lift_units: [{ name, from, to }] }
-#   Legacy (non-tube):{ name, step_free, escalators,
+#   Legacy (non-tube):{ name, escalators,
 #                       platforms: [{ name, lines: "Line1, Line2" }],
 #                       lift_units: [{ name, connection }] or lifts: <int> }
 
@@ -48,9 +51,7 @@ def seed_defaults(db: Session) -> None:
     stations = {s.name: s for s in db.query(Station).all()}
     for data in stations_data:
         if data["name"] not in stations:
-            stations[data["name"]] = Station(
-                name=data["name"], step_free=StepFree(data.get("step_free", "none"))
-            )
+            stations[data["name"]] = Station(name=data["name"])
             db.add(stations[data["name"]])
     db.flush()
 
@@ -71,6 +72,11 @@ def seed_defaults(db: Session) -> None:
             result.append(lines[name])
         return result
 
+    def platform_step_free(plat: dict) -> PlatformStepFree:
+        """Resolve a platform's step-free access. The dataset stores "Full" capitalised;
+        lower-casing maps it to the portable "full" value and leaves the rest unchanged."""
+        return PlatformStepFree(plat.get("stepFreeAccess", "none").lower())
+
     # Platforms (unique per station + name) ----------------------------------
     platforms = {(p.station_id, p.name): p for p in db.query(Platform).all()}
     for data in stations_data:
@@ -81,6 +87,7 @@ def seed_defaults(db: Session) -> None:
                 platforms[key] = Platform(
                     station_id=station.id,
                     name=plat["name"],
+                    step_free=platform_step_free(plat),
                     lines=lines_for(plat.get("lines", [])),
                 )
                 db.add(platforms[key])
