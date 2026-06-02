@@ -21,9 +21,24 @@ export type StepFreePresentation = {
   background: string
 }
 
-const ACCESSIBLE_GREEN = { accessible: true, icon: 'accessible', color: '#166534', background: '#dcfce7' } as const
-const PARTIAL_AMBER = { accessible: true, icon: 'accessible', color: '#92400e', background: '#fef3c7' } as const
-const NONE_RED = { accessible: false, icon: 'not-accessible', color: '#991b1b', background: '#fee2e2' } as const
+const ACCESSIBLE_GREEN = {
+  accessible: true,
+  icon: 'accessible',
+  color: '#166534',
+  background: '#dcfce7',
+} as const
+const PARTIAL_AMBER = {
+  accessible: true,
+  icon: 'accessible',
+  color: '#92400e',
+  background: '#fef3c7',
+} as const
+const NONE_RED = {
+  accessible: false,
+  icon: 'not-accessible',
+  color: '#991b1b',
+  background: '#fee2e2',
+} as const
 
 // Keyed by every value either scale can produce, so one map serves stations and platforms.
 const PRESENTATION: Record<AnyStepFree, StepFreePresentation> = {

@@ -67,8 +67,8 @@ function journeyStationNames(journey: Journey): string[] {
  */
 export function matchOutages(journey: Journey, outages: StationOutage[]): StationOutage[] {
   const touched = journeyStationNames(journey).map(normaliseStationName)
-  return outages.filter(outage => {
+  return outages.filter((outage) => {
     const target = normaliseStationName(outage.stationName)
-    return touched.some(name => name.includes(target) || target.includes(name))
+    return touched.some((name) => name.includes(target) || target.includes(name))
   })
 }

@@ -16,7 +16,8 @@ class StationRepository:
 
     @cached_list
     def list_all(self) -> list[StationDetail]:
-        """Return all stations (with their platforms) ordered by name, cached after the first call."""
+        """Return all stations (with their platforms) ordered by name, cached after the
+        first call."""
         # Eager-load platforms and their lines so the derived step_free and the platform
         # breakdown don't trigger per-station queries while serialising.
         rows = (

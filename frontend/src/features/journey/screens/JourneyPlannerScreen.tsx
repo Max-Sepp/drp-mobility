@@ -48,10 +48,15 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
     // Use the postcode already resolved from a dropdown selection; otherwise convert the
     // typed text (a postcode or coordinates) now. Either way we query postcode-to-postcode.
     const resolveField = (text: string, postcode: string | null) =>
-      postcode ? Promise.resolve({ postcode, label: text } as ResolvedLocation) : resolveToPostcode(text)
+      postcode
+        ? Promise.resolve({ postcode, label: text } as ResolvedLocation)
+        : resolveToPostcode(text)
     // Fetch our live outage data in parallel with resolving the locations.
     const outagesPromise = fetchStationOutages()
-    const [fromLoc, toLoc] = await Promise.all([resolveField(from, fromPostcode), resolveField(to, toPostcode)])
+    const [fromLoc, toLoc] = await Promise.all([
+      resolveField(from, fromPostcode),
+      resolveField(to, toPostcode),
+    ])
     if ('error' in fromLoc) {
       setLoading(false)
       Alert.alert('Start location', fromLoc.error)
@@ -74,7 +79,10 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
     // Flag journeys against our live outage data, then sort flagged ones to the bottom
     // (stable: TfL's ordering is preserved within the clean and flagged groups).
     const outages = await outagesPromise
-    const flagged = result.journeys.map(journey => ({ journey, outages: matchOutages(journey, outages) }))
+    const flagged = result.journeys.map((journey) => ({
+      journey,
+      outages: matchOutages(journey, outages),
+    }))
     flagged.sort((a, b) => Number(a.outages.length > 0) - Number(b.outages.length > 0))
     setResults(flagged)
     setEditing(false)
@@ -88,11 +96,18 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
     >
       {showInputs ? (
         <YStack px="$5" mt="$5" gap="$3">
-          <LocationInput label="From" value={from} onChangeText={setFrom} onResolved={setFromPostcode} />
+          <LocationInput
+            label="From"
+            value={from}
+            onChangeText={setFrom}
+            onResolved={setFromPostcode}
+          />
           <LocationInput label="To" value={to} onChangeText={setTo} onResolved={setToPostcode} />
 
           <YStack gap="$1.5">
-            <Text fontSize={14} fontWeight="600" color="#6b7280">Accessibility</Text>
+            <Text fontSize={14} fontWeight="600" color="#6b7280">
+              Accessibility
+            </Text>
             <XStack gap="$2">
               {LEVELS.map(({ value, label }) => {
                 const selected = level === value
@@ -112,7 +127,9 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
                       backgroundColor: selected ? '#111827' : '#f9fafb',
                     }}
                   >
-                    <Text fontSize={14} fontWeight="600" color={selected ? 'white' : '#374151'}>{label}</Text>
+                    <Text fontSize={14} fontWeight="600" color={selected ? 'white' : '#374151'}>
+                      {label}
+                    </Text>
                   </YStack>
                 )
               })}
@@ -143,28 +160,45 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
             gap="$3"
             pressStyle={{ opacity: 0.7 }}
             onPress={() => setEditing(true)}
-            style={{ borderWidth: 1.5, borderColor: '#d1d5db', borderRadius: 10, backgroundColor: '#f9fafb' }}
+            style={{
+              borderWidth: 1.5,
+              borderColor: '#d1d5db',
+              borderRadius: 10,
+              backgroundColor: '#f9fafb',
+            }}
           >
             <YStack flex={1} gap="$1">
               <XStack gap="$2" items="center">
                 <MaterialIcons name="trip-origin" size={14} color="#6b7280" style={{ width: 18 }} />
-                <Text fontSize={14} color="#111827" flex={1} numberOfLines={1}>{resolved.from.label}</Text>
+                <Text fontSize={14} color="#111827" flex={1} numberOfLines={1}>
+                  {resolved.from.label}
+                </Text>
               </XStack>
               <XStack gap="$2" items="center">
                 <MaterialIcons name="place" size={16} color="#6b7280" style={{ width: 18 }} />
-                <Text fontSize={14} color="#111827" flex={1} numberOfLines={1}>{resolved.to.label}</Text>
+                <Text fontSize={14} color="#111827" flex={1} numberOfLines={1}>
+                  {resolved.to.label}
+                </Text>
               </XStack>
             </YStack>
             <XStack items="center" gap="$1">
               <MaterialIcons name="edit" size={16} color="#2563eb" />
-              <Text fontSize={14} fontWeight="600" color="#2563eb">Edit</Text>
+              <Text fontSize={14} fontWeight="600" color="#2563eb">
+                Edit
+              </Text>
             </XStack>
           </XStack>
         )
       )}
 
       {results.map(({ journey, outages }, i) => (
-        <JourneyResultCard key={i} journey={journey} outages={outages} from={resolved?.from} to={resolved?.to} />
+        <JourneyResultCard
+          key={i}
+          journey={journey}
+          outages={outages}
+          from={resolved?.from}
+          to={resolved?.to}
+        />
       ))}
     </FormScreenLayout>
   )

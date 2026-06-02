@@ -22,7 +22,8 @@ class PlatformStepFree(str, enum.Enum):
 
 
 class Platform(Base):
-    """A platform at a station, identified by the line(s) it serves (e.g. "Victoria line — platform 1")."""
+    """A platform at a station, identified by the line(s) it serves
+    (e.g. "Victoria line — platform 1")."""
 
     __tablename__ = "platforms"
 

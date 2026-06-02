@@ -35,5 +35,5 @@ export function useStations(): UseStations {
 
 /** The distinct lines a station serves, gathered across all its platforms. */
 export function stationLines(station: StationDetail): string[] {
-  return [...new Set(station.platforms.flatMap(p => p.lines))].sort()
+  return [...new Set(station.platforms.flatMap((p) => p.lines))].sort()
 }

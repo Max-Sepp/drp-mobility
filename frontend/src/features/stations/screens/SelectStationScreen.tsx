@@ -16,7 +16,9 @@ export const SelectStationScreen = ({ navigation, route }: SelectStationScreenPr
   const { stations, loading, error } = useStations()
 
   useEffect(() => {
-    const showSub = Keyboard.addListener('keyboardDidShow', e => setKeyboardHeight(e.endCoordinates.height))
+    const showSub = Keyboard.addListener('keyboardDidShow', (e) =>
+      setKeyboardHeight(e.endCoordinates.height),
+    )
     const hideSub = Keyboard.addListener('keyboardDidHide', () => setKeyboardHeight(0))
     return () => {
       showSub.remove()
@@ -25,7 +27,7 @@ export const SelectStationScreen = ({ navigation, route }: SelectStationScreenPr
   }, [])
 
   const filtered = useMemo(
-    () => stations.filter(s => s.name.toLowerCase().includes(query.toLowerCase())),
+    () => stations.filter((s) => s.name.toLowerCase().includes(query.toLowerCase())),
     [stations, query],
   )
 
@@ -52,7 +54,7 @@ export const SelectStationScreen = ({ navigation, route }: SelectStationScreenPr
       ) : (
         <FlatList
           data={filtered}
-          keyExtractor={item => String(item.id)}
+          keyExtractor={(item) => String(item.id)}
           keyboardShouldPersistTaps="handled"
           ItemSeparatorComponent={() => (
             <Separator style={{ marginLeft: 58 }} borderColor="$borderColor" />
@@ -69,7 +71,16 @@ export const SelectStationScreen = ({ navigation, route }: SelectStationScreenPr
         />
       )}
 
-      <YStack px="$4" pt="$2.5" style={{ borderTopWidth: 1, borderTopColor: '#e5e7eb', paddingBottom: keyboardHeight > 0 ? 10 : (insets.bottom || 10), marginBottom: keyboardHeight > 0 ? keyboardHeight + insets.bottom : 0 }}>
+      <YStack
+        px="$4"
+        pt="$2.5"
+        style={{
+          borderTopWidth: 1,
+          borderTopColor: '#e5e7eb',
+          paddingBottom: keyboardHeight > 0 ? 10 : insets.bottom || 10,
+          marginBottom: keyboardHeight > 0 ? keyboardHeight + insets.bottom : 0,
+        }}
+      >
         <Input
           value={query}
           onChangeText={setQuery}

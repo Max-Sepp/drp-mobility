@@ -20,19 +20,32 @@ export const PlatformAccessCard = ({ platforms }: PlatformAccessCardProps) => {
 
   if (platforms.length === 0) return null
 
-  const stepFreeCount = platforms.filter(p => p.step_free !== 'none').length
+  const stepFreeCount = platforms.filter((p) => p.step_free !== 'none').length
 
   return (
-    <YStack mx="$4" mt="$4" gap="$2" style={{ backgroundColor: 'white', borderRadius: 10, borderWidth: 1, borderColor: '#e5e7eb', padding: 16 }}>
+    <YStack
+      mx="$4"
+      mt="$4"
+      gap="$2"
+      style={{
+        backgroundColor: 'white',
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: '#e5e7eb',
+        padding: 16,
+      }}
+    >
       <XStack
         items="center"
         justify="space-between"
         gap="$3"
-        onPress={collapsible ? () => setExpanded(v => !v) : undefined}
+        onPress={collapsible ? () => setExpanded((v) => !v) : undefined}
         pressStyle={collapsible ? { opacity: 0.6 } : undefined}
       >
         <YStack gap="$0.5">
-          <Text fontSize={15} fontWeight="700" color="#111827">Platform access</Text>
+          <Text fontSize={15} fontWeight="700" color="#111827">
+            Platform access
+          </Text>
           {collapsible && !expanded && (
             <Text fontSize={12} color="#6b7280">
               {stepFreeCount} of {platforms.length} platforms step-free
@@ -40,7 +53,11 @@ export const PlatformAccessCard = ({ platforms }: PlatformAccessCardProps) => {
           )}
         </YStack>
         {collapsible && (
-          <MaterialIcons name={expanded ? 'expand-less' : 'expand-more'} size={24} color="#6b7280" />
+          <MaterialIcons
+            name={expanded ? 'expand-less' : 'expand-more'}
+            size={24}
+            color="#6b7280"
+          />
         )}
       </XStack>
 
@@ -51,7 +68,9 @@ export const PlatformAccessCard = ({ platforms }: PlatformAccessCardProps) => {
               {i > 0 && <Separator borderColor="$borderColor" my="$2.5" />}
               <XStack items="center" justify="space-between" gap="$3">
                 <YStack flex={1} gap="$1">
-                  <Text fontSize={14} fontWeight="600" color="#111827">{platform.name}</Text>
+                  <Text fontSize={14} fontWeight="600" color="#111827">
+                    {platform.name}
+                  </Text>
                   <LineChips lines={platform.lines} />
                 </YStack>
                 <StepFreeBadge value={platform.step_free} compact />

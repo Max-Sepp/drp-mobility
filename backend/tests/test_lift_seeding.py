@@ -22,7 +22,9 @@ def _lift_connections(items: list[dict]) -> list[str]:
     return [e["connection"] for e in items if e["equipment_type"]["name"] == "lift"]
 
 
-def test_real_lift_carries_name_and_decoded_connection(client: TestClient, db_session: Session) -> None:
+def test_real_lift_carries_name_and_decoded_connection(
+    client: TestClient, db_session: Session
+) -> None:
     # Acton Town's two lifts run from the booking hall to the platforms.
     connections = _lift_connections(_equipment_for(client, db_session, "Acton Town"))
 
@@ -33,14 +35,18 @@ def test_real_lift_carries_name_and_decoded_connection(client: TestClient, db_se
     assert any("Booking Hall" in c and "Platform" in c for c in connections)
 
 
-def test_lift_connections_are_not_synthetic_placeholders(client: TestClient, db_session: Session) -> None:
+def test_lift_connections_are_not_synthetic_placeholders(
+    client: TestClient, db_session: Session
+) -> None:
     connections = _lift_connections(_equipment_for(client, db_session, "Acton Town"))
 
     # The old generator produced "Lift 1: street → platforms" style strings.
     assert not any(c.endswith("street → platforms") for c in connections)
 
 
-def test_seed_adds_non_tube_feed_station_with_real_lifts(client: TestClient, db_session: Session) -> None:
+def test_seed_adds_non_tube_feed_station_with_real_lifts(
+    client: TestClient, db_session: Session
+) -> None:
     # Bromley South is National Rail only — absent from the live-API tube base, but the
     # step-free feed lists it with two lifts, so seeding must now create it.
     names = {s["name"] for s in client.get("/stations").json()}

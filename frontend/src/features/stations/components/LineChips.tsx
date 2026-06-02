@@ -11,11 +11,18 @@ export const LineChips = ({ lines }: LineChipsProps) => {
   if (lines.length === 0) return null
   return (
     <XStack flexWrap="wrap" gap="$1.5">
-      {lines.map(name => {
+      {lines.map((name) => {
         const { background, foreground } = lineColour(name)
         return (
-          <XStack key={name} px="$2" py="$1" style={{ backgroundColor: background, borderRadius: 4 }}>
-            <Text fontSize={12} fontWeight="600" style={{ color: foreground }}>{name}</Text>
+          <XStack
+            key={name}
+            px="$2"
+            py="$1"
+            style={{ backgroundColor: background, borderRadius: 4 }}
+          >
+            <Text fontSize={12} fontWeight="600" style={{ color: foreground }}>
+              {name}
+            </Text>
           </XStack>
         )
       })}

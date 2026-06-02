@@ -31,7 +31,8 @@ class EquipmentRepository:
         return [EquipmentSummary.model_validate(e) for e in rows]
 
     def list_all(self, station_id: int | None = None) -> list[EquipmentSummary]:
-        """Return all equipment (optionally filtered to one station), ordered by station / type / connection."""
+        """Return all equipment (optionally filtered to one station), ordered by
+        station / type / connection."""
         all_equipment = self._all()
         if station_id is not None:
             return [e for e in all_equipment if e.station.id == station_id]

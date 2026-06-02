@@ -1,0 +1,5 @@
+# Dev-only tooling. Kept out of requirements.txt so the prod image (see Dockerfile)
+# stays lean. Install locally with: pip install -r requirements-dev.txt
+-r requirements.txt
+
+ruff==0.15.15

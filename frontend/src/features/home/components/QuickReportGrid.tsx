@@ -13,8 +13,16 @@ type GridItem = {
 }
 
 const GRID_ITEMS: GridItem[] = [
-  { label: 'Lift\nBroken', icon: 'elevator', action: { route: 'ReportForm', equipmentType: 'lift' } },
-  { label: 'Escalator\nBroken', icon: 'escalator', action: { route: 'ReportForm', equipmentType: 'escalator' } },
+  {
+    label: 'Lift\nBroken',
+    icon: 'elevator',
+    action: { route: 'ReportForm', equipmentType: 'lift' },
+  },
+  {
+    label: 'Escalator\nBroken',
+    icon: 'escalator',
+    action: { route: 'ReportForm', equipmentType: 'escalator' },
+  },
   { label: 'Overcrowding', icon: 'groups' },
   { label: 'Custom\nIssue', icon: 'edit-note', action: { route: 'ReportCustom' } },
 ]
@@ -27,9 +35,11 @@ type QuickReportGridProps = {
 export const QuickReportGrid = ({ onSelect }: QuickReportGridProps) => {
   return (
     <>
-      <Heading fontSize={13} fontWeight="600" color="#374151" mt="$4" mb="$2" mx="$4">Quick report</Heading>
+      <Heading fontSize={13} fontWeight="600" color="#374151" mt="$4" mb="$2" mx="$4">
+        Quick report
+      </Heading>
       <XStack flexWrap="wrap" mx="$4" gap="$2.5" justify="center">
-        {GRID_ITEMS.map(item => {
+        {GRID_ITEMS.map((item) => {
           const disabled = !item.action
           return (
             <YStack
@@ -38,10 +48,20 @@ export const QuickReportGrid = ({ onSelect }: QuickReportGridProps) => {
               opacity={disabled ? 0.4 : 1}
               pressStyle={disabled ? undefined : { opacity: 0.7 }}
               onPress={disabled ? undefined : () => onSelect(item.action!)}
-              style={{ aspectRatio: 1.3, borderWidth: 1.5, borderColor: '#d1d5db', borderRadius: 10, backgroundColor: 'white' }}
+              style={{
+                aspectRatio: 1.3,
+                borderWidth: 1.5,
+                borderColor: '#d1d5db',
+                borderRadius: 10,
+                backgroundColor: 'white',
+              }}
             >
               <YStack flex={1} items="center" justify="center" gap="$1.5">
-                <MaterialIcons name={item.icon} size={40} color={disabled ? '#9ca3af' : '#111827'} />
+                <MaterialIcons
+                  name={item.icon}
+                  size={40}
+                  color={disabled ? '#9ca3af' : '#111827'}
+                />
                 <Text
                   fontSize={15}
                   fontWeight="600"

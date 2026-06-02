@@ -12,8 +12,11 @@ class Equipment(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     station_id: Mapped[int] = mapped_column(ForeignKey("stations.id"), index=True)
     equipment_type_id: Mapped[int] = mapped_column(ForeignKey("equipment_types.id"), index=True)
-    # The platform this unit serves, when known (lifts/escalators that connect a platform to street).
-    platform_id: Mapped[int | None] = mapped_column(ForeignKey("platforms.id"), index=True, default=None)
+    # The platform this unit serves, when known (lifts/escalators that connect a
+    # platform to street).
+    platform_id: Mapped[int | None] = mapped_column(
+        ForeignKey("platforms.id"), index=True, default=None
+    )
     # Human-readable description of what this unit connects (e.g. "Platform 2 → Street").
     connection: Mapped[str] = mapped_column()
 

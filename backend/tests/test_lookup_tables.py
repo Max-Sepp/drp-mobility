@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 
 from app.models.station import Station
 
-
 # ---------------------------------------------------------------------------
 # GET /stations
 # ---------------------------------------------------------------------------

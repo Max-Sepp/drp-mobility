@@ -99,20 +99,25 @@ def seed_defaults(db: Session) -> None:
         (e.station_id, e.equipment_type_id, e.connection) for e in db.query(Equipment).all()
     }
 
-    def add_equipment(station_id: int, type_id: int, connection: str, platform_id: int | None) -> None:
+    def add_equipment(
+        station_id: int, type_id: int, connection: str, platform_id: int | None
+    ) -> None:
         key = (station_id, type_id, connection)
         if key in existing:
             return
         existing.add(key)
-        db.add(Equipment(
-            station_id=station_id,
-            equipment_type_id=type_id,
-            platform_id=platform_id,
-            connection=connection,
-        ))
+        db.add(
+            Equipment(
+                station_id=station_id,
+                equipment_type_id=type_id,
+                platform_id=platform_id,
+                connection=connection,
+            )
+        )
 
     def lift_connection(unit: dict) -> str:
-        """Build a connection string from either enriched {from, to} or legacy {connection} format."""
+        """Build a connection string from either enriched {from, to} or legacy
+        {connection} format."""
         if "connection" in unit:
             return f"{unit['name']}: {unit['connection']}"
         return f"{unit['name']}: {unit.get('from', '')} → {unit.get('to', '')}"
@@ -133,10 +138,14 @@ def seed_defaults(db: Session) -> None:
                 add_equipment(station.id, lift_type_id, lift_connection(unit), None)
         else:
             for i in range(data.get("lifts", 0)):
-                platform = station_platforms[i % len(station_platforms)] if station_platforms else None
+                platform = (
+                    station_platforms[i % len(station_platforms)] if station_platforms else None
+                )
                 target = platform.name if platform else "platforms"
                 add_equipment(
-                    station.id, lift_type_id, f"Lift {i + 1}: street → {target}",
+                    station.id,
+                    lift_type_id,
+                    f"Lift {i + 1}: street → {target}",
                     platform.id if platform else None,
                 )
 
@@ -148,10 +157,14 @@ def seed_defaults(db: Session) -> None:
                 add_equipment(station.id, escalator_type_id, escalator_connection(unit), None)
         else:
             for i in range(data.get("escalators", 0)):
-                platform = station_platforms[i % len(station_platforms)] if station_platforms else None
+                platform = (
+                    station_platforms[i % len(station_platforms)] if station_platforms else None
+                )
                 target = platform.name if platform else "platforms"
                 add_equipment(
-                    station.id, escalator_type_id, f"Escalator {i + 1}: street → {target}",
+                    station.id,
+                    escalator_type_id,
+                    f"Escalator {i + 1}: street → {target}",
                     platform.id if platform else None,
                 )
     db.commit()

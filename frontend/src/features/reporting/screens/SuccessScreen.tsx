@@ -16,9 +16,18 @@ export const SuccessScreen = ({ navigation }: SuccessScreenProps) => {
       <YStack
         items="center"
         justify="center"
-        style={{ width: 120, height: 120, borderRadius: 60, borderWidth: 3, borderColor: '#2d6a4f', backgroundColor: '#d8f3dc' }}
+        style={{
+          width: 120,
+          height: 120,
+          borderRadius: 60,
+          borderWidth: 3,
+          borderColor: '#2d6a4f',
+          backgroundColor: '#d8f3dc',
+        }}
       >
-        <Text fontSize={52} color="#2d6a4f">✓</Text>
+        <Text fontSize={52} color="#2d6a4f">
+          ✓
+        </Text>
       </YStack>
       <Heading>Submitted</Heading>
     </YStack>
