@@ -46,13 +46,21 @@ export const AuthForm = ({
       setError('Please enter a username and password.')
       return
     }
+
     setSubmitting(true)
     setError(null)
-    const result = await onSubmit(username.trim(), password)
-    if (result.ok) {
-      onSuccess()
-    } else {
-      setError(result.message)
+
+    try {
+      const result = await onSubmit(username.trim(), password)
+      if (result.ok) {
+        setSubmitting(false)
+        onSuccess()
+      } else {
+        setError(result.message)
+        setSubmitting(false)
+      }
+    } catch {
+      setError('Something went wrong. Please try again.')
       setSubmitting(false)
     }
   }
