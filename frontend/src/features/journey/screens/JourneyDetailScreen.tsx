@@ -17,15 +17,16 @@ import {
   LegStations,
   modeIcon,
   modeLabel,
+  stripStationSuffix,
 } from '../components/legDisplay'
 import { OutageDetail } from '../components/OutageDetail'
 
-/** The line + direction a transit leg runs on, e.g. "Victoria line towards Brixton". */
+/** The line + direction a transit leg runs on, e.g. "Victoria towards Brixton". */
 function lineLabel(leg: Leg): string | null {
   const option = leg.routeOptions?.[0]
   if (!option?.name) return null
   const direction = option.directions?.find(Boolean)
-  return direction ? `${option.name} towards ${direction}` : option.name
+  return direction ? `${option.name} towards ${stripStationSuffix(direction)}` : option.name
 }
 
 export const JourneyDetailScreen = ({ navigation, route }: JourneyDetailScreenProps) => {
@@ -211,7 +212,10 @@ export const JourneyDetailScreen = ({ navigation, route }: JourneyDetailScreenPr
                     resolveStation={resolveStation}
                     onStationPress={openStation}
                   />
-                  {leg.instruction.detailed &&
+                  {/* TfL's detailed text restates the line/direction for transit legs, so only
+                      show it when there's no line label (e.g. walking) and it adds something. */}
+                  {!line &&
+                    leg.instruction.detailed &&
                     leg.instruction.detailed !== leg.instruction.summary && (
                       <Text fontSize={13} color="#374151">
                         {humanizeSummary(leg.instruction.detailed, [from, to])}
