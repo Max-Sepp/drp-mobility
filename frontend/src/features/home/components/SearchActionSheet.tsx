@@ -337,7 +337,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
             />
             {/* pointerEvents="none" when collapsed so touches pass through to the
                 TouchableOpacity on native (editable=false alone doesn't stop touch capture). */}
-            <View style={{ flex: 1 }} pointerEvents={expanded ? 'auto' : 'none'}>
+            <View style={{ flex: 1, pointerEvents: expanded ? 'auto' : 'none' }}>
               <TextInput
                 ref={inputRef}
                 style={styles.searchInput}
