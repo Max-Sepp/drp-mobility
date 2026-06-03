@@ -28,6 +28,25 @@ export function normaliseStationName(name: string): string {
 }
 
 /**
+ * Resolve a TfL `commonName` ("Victoria Underground Station") to the matching name in our own
+ * station list ("Victoria"), or null if we don't have that station. Matches on normalised
+ * containment so the verbose TfL form lines up with our terse names. Used to make the stations
+ * in a planned journey link through to their station-detail screen.
+ */
+export function resolveStationName(commonName: string, knownNames: string[]): string | null {
+  const target = normaliseStationName(commonName)
+  // Prefer an exact normalised match before falling back to containment, so e.g. "Victoria"
+  // doesn't accidentally win over "Victoria Coach" when both are present.
+  const exact = knownNames.find((name) => normaliseStationName(name) === target)
+  if (exact) return exact
+  const partial = knownNames.find((name) => {
+    const n = normaliseStationName(name)
+    return n.includes(target) || target.includes(n)
+  })
+  return partial ?? null
+}
+
+/**
  * Stations with at least one *open* (unresolved) equipment failure, grouped by station
  * with the distinct equipment types affected. Returns `[]` on any error (e.g. the backend
  * is unreachable) so journey results still render — accessibility flagging is additive.

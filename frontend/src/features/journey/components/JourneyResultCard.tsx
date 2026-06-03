@@ -12,6 +12,76 @@ type JourneyResultCardProps = {
   // TfL echoes in its leg instructions back to the readable places the user chose.
   from?: ResolvedLocation
   to?: ResolvedLocation
+  // Maps a TfL station `commonName` to a station we have a detail screen for (or null), and
+  // opens that screen. Together these make the stations on a leg tappable.
+  resolveStation: (commonName: string) => string | null
+  onStationPress: (stationName: string) => void
+}
+
+/** Drop the "… Underground/Rail/DLR/Bus Station" suffix TfL appends, preserving case for display. */
+function stripStationSuffix(name: string): string {
+  return name.replace(/\s+(?:underground|rail|dlr|bus)?\s*station$/i, '').trim()
+}
+
+// Modes whose stops are train stations we hold accessibility data for. Bus/coach stops, river
+// piers, walking, etc. are deliberately excluded — their "points" aren't stations we can link to.
+const STATION_MODES = new Set([
+  'tube',
+  'dlr',
+  'overground',
+  'national-rail',
+  'elizabeth-line',
+  'tflrail',
+])
+
+/**
+ * The departure and arrival stations of a train leg, each a tappable link through to the
+ * station-detail screen when we recognise it. Non-train legs (bus, walking, …) and legs without
+ * named points render nothing.
+ */
+function LegStations({
+  leg,
+  resolveStation,
+  onStationPress,
+}: Pick<JourneyResultCardProps, 'resolveStation' | 'onStationPress'> & { leg: Journey['legs'][number] }) {
+  if (!STATION_MODES.has(leg.mode.name)) return null
+  const points = [leg.departurePoint?.commonName, leg.arrivalPoint?.commonName].filter(
+    (n): n is string => !!n,
+  )
+  if (points.length === 0) return null
+
+  return (
+    <XStack flexWrap="wrap" items="center" gap="$1.5" mt="$0.5">
+      {points.map((commonName, i) => {
+        const resolved = resolveStation(commonName)
+        return (
+          <XStack key={i} items="center" gap="$1.5">
+            {i > 0 && (
+              <MaterialIcons name="arrow-forward" size={13} color="#9ca3af" accessibilityLabel="to" />
+            )}
+            {resolved ? (
+              <Text
+                fontSize={13}
+                fontWeight="600"
+                color="#2563eb"
+                pressStyle={{ opacity: 0.6 }}
+                onPress={() => onStationPress(resolved)}
+                accessibilityRole="button"
+                accessibilityLabel={`View accessibility for ${resolved}`}
+                style={{ textDecorationLine: 'underline' }}
+              >
+                {resolved}
+              </Text>
+            ) : (
+              <Text fontSize={13} color="#6b7280">
+                {stripStationSuffix(commonName)}
+              </Text>
+            )}
+          </XStack>
+        )
+      })}
+    </XStack>
+  )
 }
 
 /** "Victoria: lift, escalator reported out of service" for each affected station. */
@@ -104,7 +174,14 @@ function humanizeSummary(summary: string, locations: (ResolvedLocation | undefin
  * total minus the legs) is interchange and waiting — shown as its own line so the breakdown
  * visibly adds up to the headline duration.
  */
-export const JourneyResultCard = ({ journey, outages = [], from, to }: JourneyResultCardProps) => {
+export const JourneyResultCard = ({
+  journey,
+  outages = [],
+  from,
+  to,
+  resolveStation,
+  onStationPress,
+}: JourneyResultCardProps) => {
   const fare = fareLabel(journey)
   const legTotal = journey.legs.reduce((sum, leg) => sum + leg.duration, 0)
   const waiting = journey.duration - legTotal
@@ -170,6 +247,11 @@ export const JourneyResultCard = ({ journey, outages = [], from, to }: JourneyRe
               <Text fontSize={14} color="#111827">
                 {humanizeSummary(leg.instruction.summary, [from, to])}
               </Text>
+              <LegStations
+                leg={leg}
+                resolveStation={resolveStation}
+                onStationPress={onStationPress}
+              />
               <Text fontSize={12} color="#6b7280">
                 {leg.duration} min
               </Text>

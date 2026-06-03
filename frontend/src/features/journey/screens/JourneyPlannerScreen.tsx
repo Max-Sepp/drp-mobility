@@ -1,11 +1,17 @@
 import { MaterialIcons } from '@expo/vector-icons'
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { Alert } from 'react-native'
 import { Text, XStack, YStack } from 'tamagui'
 import { ScreenHeader } from '@/components/ScreenHeader'
+import { useStations } from '@/features/stations'
 import { FormScreenLayout } from '@/features/reporting/components/FormScreenLayout'
 import type { JourneyPlannerScreenProps } from '@/navigation/types'
-import { fetchStationOutages, matchOutages, type StationOutage } from '../api/accessibility'
+import {
+  fetchStationOutages,
+  matchOutages,
+  resolveStationName,
+  type StationOutage,
+} from '../api/accessibility'
 import { type ResolvedLocation, resolveToPostcode } from '../api/geocode'
 import { type AccessibilityPreference, type Journey, planJourney } from '../api/tfl'
 import { JourneyResultCard } from '../components/JourneyResultCard'
@@ -35,6 +41,16 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
   // them. Editing stays true until the next successful plan so the user can change and re-run.
   const [editing, setEditing] = useState(false)
   const showInputs = results.length === 0 || editing
+
+  // Resolve the TfL station names on a journey to our own station list so each can link through
+  // to its detail screen (platform access, quick reports). Unknown stations stay non-tappable.
+  const { stations } = useStations()
+  const stationNames = useMemo(() => stations.map((s) => s.name), [stations])
+  const resolveStation = useCallback(
+    (commonName: string) => resolveStationName(commonName, stationNames),
+    [stationNames],
+  )
+  const openStation = (station: string) => navigation.navigate('Station', { station })
 
   async function run() {
     if (!from.trim() || !to.trim()) {
@@ -91,7 +107,7 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
 
   return (
     <FormScreenLayout
-      header={<ScreenHeader title="Plan a journey" onBack={() => navigation.goBack()} />}
+      header={<ScreenHeader title="Plan a journey" />}
       footer={null}
     >
       {showInputs ? (
@@ -198,6 +214,8 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
           outages={outages}
           from={resolved?.from}
           to={resolved?.to}
+          resolveStation={resolveStation}
+          onStationPress={openStation}
         />
       ))}
     </FormScreenLayout>

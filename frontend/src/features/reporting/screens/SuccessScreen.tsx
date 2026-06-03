@@ -6,7 +6,7 @@ import type { SuccessScreenProps } from '@/navigation/types'
 export const SuccessScreen = ({ navigation }: SuccessScreenProps) => {
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigation.reset({ index: 0, routes: [{ name: 'Home' }] })
+      navigation.reset({ index: 0, routes: [{ name: 'JourneyPlanner' }] })
     }, 2000)
     return () => clearTimeout(timer)
   }, [navigation])
