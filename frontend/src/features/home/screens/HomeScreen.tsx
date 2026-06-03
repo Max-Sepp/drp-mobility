@@ -1,10 +1,15 @@
 import { useFocusEffect } from '@react-navigation/native'
+import * as Location from 'expo-location'
 import { useCallback, useMemo, useState } from 'react'
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { ScrollView } from 'tamagui'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { apiClient } from '@/api/client'
 import type { components } from '@/api/schema.d'
 import { DEFAULT_STATION, stationPicker, useStations } from '@/features/stations'
+import { resolveToPostcode, type ResolvedLocation } from '@/features/journey/api/geocode'
 import type { Station, StationScreenProps } from '@/navigation/types'
+import { Colors } from '@/theme'
 import { PlatformAccessCard } from '../components/PlatformAccessCard'
 import { QuickReportGrid, type QuickReportAction } from '../components/QuickReportGrid'
 import { ReportsStatus } from '../components/ReportsStatus'
@@ -16,8 +21,10 @@ export const HomeScreen = ({ navigation, route }: StationScreenProps) => {
   const [station, setStation] = useState<Station>(route.params?.station ?? DEFAULT_STATION)
   const [reports, setReports] = useState<OutageReport[]>([])
   const [loading, setLoading] = useState(false)
+  const [goingHere, setGoingHere] = useState(false)
   const { stations } = useStations()
   const stationDetail = useMemo(() => stations.find((s) => s.name === station), [stations, station])
+  const insets = useSafeAreaInsets()
 
   const fetchReports = useCallback(async () => {
     setLoading(true)
@@ -26,8 +33,6 @@ export const HomeScreen = ({ navigation, route }: StationScreenProps) => {
     setLoading(false)
   }, [station])
 
-  // Refetch whenever the screen comes into focus (including the first time), so a report
-  // submitted on another screen shows when the user returns.
   useFocusEffect(
     useCallback(() => {
       fetchReports()
@@ -47,21 +52,94 @@ export const HomeScreen = ({ navigation, route }: StationScreenProps) => {
     }
   }
 
+  async function handleGoHere() {
+    setGoingHere(true)
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync()
+      if (status !== 'granted') {
+        Alert.alert('Location required', 'Enable location access in Settings to use this feature.')
+        return
+      }
+      const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })
+      const fromResult = await resolveToPostcode(
+        `${pos.coords.latitude},${pos.coords.longitude}`,
+      )
+      if ('error' in fromResult) {
+        Alert.alert('Location error', fromResult.error)
+        return
+      }
+      const toResult = await resolveToPostcode(station)
+      if ('error' in toResult) {
+        Alert.alert('Station error', `Couldn't find a postcode for ${station}. Try planning manually.`)
+        return
+      }
+      const from: ResolvedLocation = { postcode: fromResult.postcode, label: 'Current location' }
+      const to: ResolvedLocation = { postcode: toResult.postcode, label: station }
+      navigation.navigate('JourneyPlanner', { initialFrom: from, initialTo: to })
+    } finally {
+      setGoingHere(false)
+    }
+  }
+
   return (
-    <ScrollView
-      flex={1}
-      style={{ backgroundColor: '#f9fafb' }}
-      contentContainerStyle={{ paddingBottom: 40 } as any}
-    >
-      <StationHeader
-        station={station}
-        stepFree={stationDetail?.step_free}
-        onPress={changeStation}
-        onBack={navigation.canGoBack() ? () => navigation.goBack() : undefined}
-      />
-      {stationDetail && <PlatformAccessCard key={station} platforms={stationDetail.platforms} />}
-      <ReportsStatus loading={loading} reports={reports} />
-      <QuickReportGrid onSelect={quickReport} />
-    </ScrollView>
+    <View style={styles.screen}>
+      <ScrollView
+        flex={1}
+        style={{ backgroundColor: '#f9fafb' }}
+        contentContainerStyle={{ paddingBottom: 16 } as any}
+      >
+        <StationHeader
+          station={station}
+          stepFree={stationDetail?.step_free}
+          onPress={changeStation}
+          onBack={navigation.canGoBack() ? () => navigation.goBack() : undefined}
+        />
+        {stationDetail && <PlatformAccessCard key={station} platforms={stationDetail.platforms} />}
+        <ReportsStatus loading={loading} reports={reports} />
+        <QuickReportGrid onSelect={quickReport} />
+      </ScrollView>
+
+      {/* Sticky "Go here" footer */}
+      <View style={[styles.footer, { paddingBottom: insets.bottom + 12 }]}>
+        <TouchableOpacity
+          style={[styles.goHereBtn, goingHere && styles.goHereBtnDisabled]}
+          onPress={goingHere ? undefined : handleGoHere}
+          activeOpacity={0.85}
+        >
+          <Text style={styles.goHereText}>
+            {goingHere ? 'Getting location…' : `Go to ${station}`}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   )
 }
+
+const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: '#f9fafb',
+  },
+  footer: {
+    backgroundColor: '#ffffff',
+    paddingTop: 12,
+    paddingHorizontal: 20,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: '#e5e7eb',
+  },
+  goHereBtn: {
+    backgroundColor: Colors.blue,
+    borderRadius: 12,
+    height: 52,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  goHereBtnDisabled: {
+    backgroundColor: Colors.secondaryText,
+  },
+  goHereText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+})
