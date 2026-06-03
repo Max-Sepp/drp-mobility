@@ -1,4 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons'
+import * as Location from 'expo-location'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Alert } from 'react-native'
 import { Text, XStack, YStack } from 'tamagui'
@@ -47,6 +48,10 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
   )
   // Null means no accessibility filtering at all — TfL then returns every mode (tube, rail, …)
   // rather than only step-free routes. Each button toggles, so the user can deselect both.
+  const [fromIsCurrentLocation, setFromIsCurrentLocation] = useState(
+    route.params?.initialFrom?.label === 'Current location',
+  )
+  const [gettingLocation, setGettingLocation] = useState(false)
   const [level, setLevel] = useState<AccessibilityPreference | null>(null)
   // Null means leave now; a Date plans for departing at that time.
   const [departAt, setDepartAt] = useState<Date | null>(null)
@@ -76,6 +81,35 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
     reload()
     return navigation.addListener('focus', reload)
   }, [navigation])
+
+  const handleCurrentLocation = useCallback(async () => {
+    setGettingLocation(true)
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync()
+      if (status !== 'granted') {
+        Alert.alert('Location required', 'Enable location access in Settings to use this feature.')
+        return
+      }
+      const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })
+      const result = await resolveToPostcode(`${pos.coords.latitude},${pos.coords.longitude}`)
+      if ('error' in result) {
+        Alert.alert('Location error', result.error)
+        return
+      }
+      setFrom('Current location')
+      setFromPostcode(result.postcode)
+      setFromIsCurrentLocation(true)
+    } finally {
+      setGettingLocation(false)
+    }
+  }, [])
+
+  // Auto-fill "Current location" on first mount when no explicit origin was passed in.
+  useEffect(() => {
+    if (!route.params?.initialFrom) {
+      handleCurrentLocation().catch(() => {}) // Fail silently — user can type manually.
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function run() {
     if (!from.trim() || !to.trim()) {
@@ -160,9 +194,16 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
           <LocationInput
             label="From"
             value={from}
-            onChangeText={setFrom}
+            onChangeText={(text) => {
+              setFrom(text)
+              setFromIsCurrentLocation(false)
+            }}
             onResolved={setFromPostcode}
             isResolved={fromPostcode !== null}
+            textColor={fromIsCurrentLocation ? '#2563eb' : undefined}
+            textBold={fromIsCurrentLocation}
+            onCurrentLocation={handleCurrentLocation}
+            currentLocationLoading={gettingLocation}
           />
           <LocationInput
             label="To"

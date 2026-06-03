@@ -289,9 +289,10 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
           )
           return
         }
+        const from: ResolvedLocation = { postcode: fromResult.postcode, label: 'Current location' }
         const to: ResolvedLocation = { postcode: toPostcode, label: suggestion.label }
         collapse()
-        onLocationSelect(fromResult, to)
+        onLocationSelect(from, to)
       } finally {
         setGpsLoading(false)
       }

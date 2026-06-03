@@ -1,3 +1,4 @@
+import { MaterialIcons } from '@expo/vector-icons'
 import { useEffect, useRef, useState } from 'react'
 import { Input, Spinner, Text, XStack, YStack } from 'tamagui'
 import { type LocationSuggestion, postcodeForSuggestion, searchLocations } from '../api/geocode'
@@ -5,7 +6,6 @@ import { type LocationSuggestion, postcodeForSuggestion, searchLocations } from 
 const fieldStyle = {
   borderColor: '#d1d5db',
   backgroundColor: '#f9fafb',
-  color: '#111827',
   fontSize: 15,
 }
 
@@ -17,6 +17,16 @@ type LocationInputProps = {
   onResolved: (postcode: string | null) => void
   /** Pass true when the parent already holds a resolved postcode (e.g. pre-filled from GPS). */
   isResolved?: boolean
+  /** Override the input text colour (e.g. blue when showing "Current location"). */
+  textColor?: string
+  /** Bold the input text — used alongside textColor for the "Current location" display. */
+  textBold?: boolean
+  /**
+   * When provided, shows a "My location" option at the top of the idle dropdown (when the
+   * field is focused and empty). The parent owns the GPS logic; this is just the entry point.
+   */
+  onCurrentLocation?: () => void
+  currentLocationLoading?: boolean
 }
 
 /**
@@ -32,16 +42,27 @@ export const LocationInput = ({
   onChangeText,
   onResolved,
   isResolved: isResolvedProp,
+  textColor,
+  textBold,
+  onCurrentLocation,
+  currentLocationLoading,
 }: LocationInputProps) => {
   const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([])
   const [searching, setSearching] = useState(false)
   const [resolved, setResolved] = useState(isResolvedProp ?? false)
   const [focused, setFocused] = useState(false)
-  // Skip the search that the value change from a selection would otherwise trigger.
-  const skipNextSearch = useRef(false)
 
-  // Keep the tick in sync when the parent changes the resolved state externally
-  // (e.g. GPS postcode arrives after mount, or field is cleared from above).
+  // Initialised to true when the parent already has a resolved postcode on mount so the
+  // initial pre-filled value doesn't trigger a dropdown.
+  const skipNextSearch = useRef(isResolvedProp ?? false)
+
+  // Kept in sync during render (not via effect) so it is current when the search effect runs.
+  // Prevents the search from firing whenever the field is in a resolved state — including when
+  // the parent sets "Current location" + postcode in the same render batch.
+  const isResolvedRef = useRef(isResolvedProp ?? false)
+  isResolvedRef.current = isResolvedProp ?? false
+
+  // Keep the tick in sync when the parent changes the resolved state externally.
   useEffect(() => {
     if (isResolvedProp !== undefined) setResolved(isResolvedProp)
   }, [isResolvedProp])
@@ -51,11 +72,10 @@ export const LocationInput = ({
       skipNextSearch.current = false
       return
     }
+    if (isResolvedRef.current) return
+
     let active = true
     const tooShort = value.trim().length < 3
-    // All state updates happen inside the timer callback, never synchronously in the effect
-    // body. Short input clears the dropdown straight away (0ms); longer input is debounced so
-    // we don't fire a geocode request on every keystroke.
     const timer = setTimeout(
       async () => {
         if (tooShort) {
@@ -77,15 +97,12 @@ export const LocationInput = ({
     }
   }, [value])
 
-  // User typing invalidates any prior selection.
   function handleType(text: string) {
     setResolved(false)
     onResolved(null)
     onChangeText(text)
   }
 
-  // Empty the field and drop any resolved selection/suggestions. Setting the value to '' lets
-  // the search effect tear down the dropdown on its own.
   function clear() {
     setResolved(false)
     setSuggestions([])
@@ -98,12 +115,15 @@ export const LocationInput = ({
     setSearching(true)
     const postcode = await postcodeForSuggestion(suggestion)
     setSearching(false)
-    if (!postcode) return // keep the typed text; let the user try a postcode directly
+    if (!postcode) return
     skipNextSearch.current = true
     setResolved(true)
     onResolved(postcode)
     onChangeText(suggestion.label)
   }
+
+  // Show the "My location" idle dropdown when the field is focused and empty.
+  const showLocationShortcut = Boolean(onCurrentLocation) && focused && value.length === 0
 
   return (
     <YStack gap="$1.5">
@@ -117,15 +137,17 @@ export const LocationInput = ({
             value={value}
             onChangeText={handleType}
             onFocus={() => setFocused(true)}
-            onBlur={() => setFocused(false)}
-            // When the field loses focus, snap the caret (and scroll) back to the start so the
-            // beginning of a long address is visible rather than its tail. Left uncontrolled
-            // while focused so typing behaves normally.
+            onBlur={() => setTimeout(() => setFocused(false), 150)}
             selection={focused ? undefined : { start: 0, end: 0 }}
             placeholder="Address, postcode, or lat,long"
             placeholderTextColor="$gray9"
             autoCapitalize="none"
-            style={{ ...fieldStyle, paddingRight: 38 }}
+            style={{
+              ...fieldStyle,
+              paddingRight: 38,
+              color: textColor ?? '#111827',
+              fontWeight: textBold ? '700' : '400',
+            }}
           />
           {value.length > 0 && (
             <YStack
@@ -146,8 +168,6 @@ export const LocationInput = ({
             </YStack>
           )}
         </YStack>
-        {/* Status indicator sits outside, to the right of the input. The fixed width keeps the
-            input from shifting as the spinner/tick appears and disappears. */}
         <YStack width={20} items="center" justify="center">
           {searching ? (
             <Spinner size="small" color="#6b7280" />
@@ -159,11 +179,48 @@ export const LocationInput = ({
         </YStack>
       </XStack>
 
+      {/* Idle dropdown: "My location" shown when focused with an empty field */}
+      {showLocationShortcut && (
+        <YStack
+          style={{
+            marginRight: 28,
+            borderWidth: 1.5,
+            borderColor: '#d1d5db',
+            borderRadius: 10,
+            backgroundColor: 'white',
+            overflow: 'hidden',
+          }}
+        >
+          <YStack
+            px="$4"
+            justify="center"
+            pressStyle={currentLocationLoading ? undefined : { background: '#f3f4f6' }}
+            onPress={currentLocationLoading ? undefined : onCurrentLocation}
+            style={{ minHeight: 56 }}
+          >
+            {currentLocationLoading ? (
+              <XStack items="center" gap="$2">
+                <Spinner size="small" color="#2563eb" />
+                <Text fontSize={15} color="#6b7280">
+                  Getting location…
+                </Text>
+              </XStack>
+            ) : (
+              <XStack items="center" gap="$2">
+                <MaterialIcons name="my-location" size={16} color="#2563eb" />
+                <Text fontSize={15} fontWeight="600" color="#2563eb">
+                  My location
+                </Text>
+              </XStack>
+            )}
+          </YStack>
+        </YStack>
+      )}
+
+      {/* Suggestions dropdown: shown once the user has typed ≥3 characters */}
       {suggestions.length > 0 && (
         <YStack
           style={{
-            // Right-narrow by the status slot (20) + its gap (8) so the dropdown's right edge
-            // lines up with the input field rather than the wider row.
             marginRight: 28,
             borderWidth: 1.5,
             borderColor: '#d1d5db',
