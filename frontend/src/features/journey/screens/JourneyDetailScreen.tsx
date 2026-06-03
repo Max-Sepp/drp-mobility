@@ -17,6 +17,7 @@ import {
   LegStations,
   modeIcon,
   modeLabel,
+  RouteTags,
   stripStationSuffix,
 } from '../components/legDisplay'
 import { OutageDetail } from '../components/OutageDetail'
@@ -30,7 +31,7 @@ function lineLabel(leg: Leg): string | null {
 }
 
 export const JourneyDetailScreen = ({ navigation, route }: JourneyDetailScreenProps) => {
-  const { journey, from, to, outages = [], level, savedId } = route.params
+  const { journey, from, to, outages = [], level, savedId, tags } = route.params
 
   // A journey opened from the saved list arrives with its id; one opened from a fresh result
   // doesn't, so we look it up by signature to show the right Save/Remove state.
@@ -108,6 +109,8 @@ export const JourneyDetailScreen = ({ navigation, route }: JourneyDetailScreenPr
             backgroundColor: '#f9fafb',
           }}
         >
+          <RouteTags tags={tags} />
+
           {(from || to) && (
             <YStack gap="$1">
               {from && (

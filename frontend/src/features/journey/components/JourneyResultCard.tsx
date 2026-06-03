@@ -2,7 +2,7 @@ import { MaterialIcons } from '@expo/vector-icons'
 import { Text, XStack, YStack } from 'tamagui'
 import type { StationOutage } from '../api/accessibility'
 import type { ResolvedLocation } from '../api/geocode'
-import type { Journey } from '../api/tfl'
+import type { Journey, RouteTag } from '../api/tfl'
 import {
   clockTime,
   fareLabel,
@@ -12,6 +12,7 @@ import {
   modeLabel,
   outageWarning,
   type ResolveStation,
+  RouteTags,
   type StationPressHandler,
 } from './legDisplay'
 
@@ -19,6 +20,8 @@ type JourneyResultCardProps = {
   journey: Journey
   /** Stations on this journey we know to have broken step-free equipment, if any. */
   outages?: StationOutage[]
+  /** Why this route stands out (fastest / fewest changes / least walking). */
+  tags?: RouteTag[]
   // The resolved start/end the journey was planned between. Used to swap the bare postcodes
   // TfL echoes in its leg instructions back to the readable places the user chose.
   from?: ResolvedLocation
@@ -40,6 +43,7 @@ type JourneyResultCardProps = {
 export const JourneyResultCard = ({
   journey,
   outages = [],
+  tags,
   from,
   to,
   resolveStation,
@@ -84,6 +88,8 @@ export const JourneyResultCard = ({
           </Text>
         </XStack>
       )}
+
+      <RouteTags tags={tags} />
 
       <XStack items="center" justify="space-between">
         <XStack items="baseline" gap="$2">

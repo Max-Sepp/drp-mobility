@@ -1,7 +1,7 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import type { StationOutage } from '@/features/journey/api/accessibility'
 import type { ResolvedLocation } from '@/features/journey/api/geocode'
-import type { AccessibilityPreference, Journey } from '@/features/journey/api/tfl'
+import type { AccessibilityPreference, Journey, RouteTag } from '@/features/journey/api/tfl'
 
 // Stations and equipment types are backend rows (GET /stations, GET /equipment-types). Navigation
 // only carries the human-readable station name and the kind of equipment being reported; the
@@ -20,6 +20,7 @@ export type RootStackParamList = {
     outages?: StationOutage[]
     level?: AccessibilityPreference | null
     savedId?: string
+    tags?: RouteTag[]
   }
   // The list of journeys saved to the device.
   SavedJourneys: undefined

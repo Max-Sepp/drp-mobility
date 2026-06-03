@@ -14,14 +14,20 @@ import {
 } from '../api/accessibility'
 import { type ResolvedLocation, resolveToPostcode } from '../api/geocode'
 import { loadSavedJourneys } from '../api/savedJourneys'
-import { type AccessibilityPreference, type Journey, planJourney } from '../api/tfl'
+import {
+  type AccessibilityPreference,
+  type Journey,
+  planJourneyOptions,
+  type RouteTag,
+} from '../api/tfl'
 import { JourneyResultCard } from '../components/JourneyResultCard'
 import { formatDepart, LeaveAtField } from '../components/LeaveAtField'
 import { LocationInput } from '../components/LocationInput'
 
 type Resolved = { from: ResolvedLocation; to: ResolvedLocation }
-// A journey paired with the live outages (from our data) affecting the stations it touches.
-type JourneyResult = { journey: Journey; outages: StationOutage[] }
+// A journey paired with the live outages (from our data) affecting the stations it touches, and
+// the optimisation tags (fastest / fewest changes / …) that surfaced it.
+type JourneyResult = { journey: Journey; outages: StationOutage[]; tags: RouteTag[] }
 
 const LEVELS: { value: AccessibilityPreference; label: string }[] = [
   { value: 'StepFreeToVehicle', label: 'Step-free to train' },
@@ -100,7 +106,7 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
     }
     setResolved({ from: fromLoc, to: toLoc })
 
-    const result = await planJourney(fromLoc.postcode, toLoc.postcode, level, departAt)
+    const result = await planJourneyOptions(fromLoc.postcode, toLoc.postcode, level, departAt)
     if (result.kind !== 'journeys') {
       setLoading(false)
       Alert.alert('No journey', result.message)
@@ -110,8 +116,9 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
     // Flag journeys against our live outage data, then sort flagged ones to the bottom
     // (stable: TfL's ordering is preserved within the clean and flagged groups).
     const outages = await outagesPromise
-    const flagged = result.journeys.map((journey) => ({
+    const flagged = result.journeys.map(({ journey, tags }) => ({
       journey,
+      tags,
       outages: matchOutages(journey, outages),
     }))
     flagged.sort((a, b) => Number(a.outages.length > 0) - Number(b.outages.length > 0))
@@ -251,11 +258,12 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
         )
       )}
 
-      {results.map(({ journey, outages }, i) => (
+      {results.map(({ journey, outages, tags }, i) => (
         <JourneyResultCard
           key={i}
           journey={journey}
           outages={outages}
+          tags={tags}
           from={resolved?.from}
           to={resolved?.to}
           resolveStation={resolveStation}
@@ -267,6 +275,7 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
               to: resolved?.to,
               outages,
               level,
+              tags,
             })
           }
         />

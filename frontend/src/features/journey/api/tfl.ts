@@ -45,6 +45,12 @@ export type Leg = {
  */
 export type AccessibilityPreference = 'StepFreeToVehicle' | 'StepFreeToPlatform'
 
+/**
+ * Which route TfL optimises for. Querying each in turn surfaces genuinely different routes
+ * (rather than the same route at different times). See `planJourneyOptions`.
+ */
+export type JourneyPreference = 'LeastTime' | 'LeastInterchange' | 'LeastWalking'
+
 /** A complete door-to-door journey option returned by TfL. */
 export type Journey = {
   startDateTime: string
@@ -78,17 +84,20 @@ function departureParams(departAt: Date): string[] {
  * `resolveToPostcode`), which TfL resolves uniquely — so we never hit the ambiguous-text
  * "did you mean?" path. `accessibility` asks TfL to return only step-free routes; pass
  * `null`/omit it to apply no accessibility filtering (TfL then returns all modes, e.g. tube).
- * `departAt` plans for leaving at that time; omit/`null` to leave now.
+ * `departAt` plans for leaving at that time; omit/`null` to leave now. `preference` asks TfL to
+ * optimise for a particular criterion (see `planJourneyOptions`).
  */
 export async function planJourney(
   from: string,
   to: string,
   accessibility?: AccessibilityPreference | null,
   departAt?: Date | null,
+  preference?: JourneyPreference | null,
 ): Promise<JourneyPlanResult> {
   const params: string[] = []
   if (accessibility) params.push(`accessibilityPreference=${accessibility}`)
   if (departAt) params.push(...departureParams(departAt))
+  if (preference) params.push(`journeyPreference=${preference}`)
   const query = params.length > 0 ? `?${params.join('&')}` : ''
   const url = `${TFL_BASE}/Journey/JourneyResults/${encodeURIComponent(from)}/to/${encodeURIComponent(to)}${query}`
 
@@ -117,4 +126,74 @@ export async function planJourney(
     kind: 'error',
     message: body?.message ?? 'Could not plan a journey for those locations.',
   }
+}
+
+/** Why a route stands out, used to label it in the UI. */
+export type RouteTag = 'fastest' | 'fewest-changes' | 'least-walking'
+
+/** A journey paired with the optimisation criteria that surfaced it. */
+export type TaggedJourney = { journey: Journey; tags: RouteTag[] }
+
+/** Result of planning a set of distinct route options. */
+export type JourneyOptionsResult =
+  | { kind: 'journeys'; journeys: TaggedJourney[] }
+  | { kind: 'error'; message: string }
+
+const PREFERENCES: { preference: JourneyPreference; tag: RouteTag }[] = [
+  { preference: 'LeastTime', tag: 'fastest' },
+  { preference: 'LeastInterchange', tag: 'fewest-changes' },
+  { preference: 'LeastWalking', tag: 'least-walking' },
+]
+
+/**
+ * A route's identity, independent of departure time: the ordered modes and lines it uses. Two
+ * journeys with the same signature are the same route leaving at different times.
+ */
+function routeSignature(journey: Journey): string {
+  return journey.legs
+    .map((leg) => `${leg.mode.name}:${leg.routeOptions?.[0]?.name ?? ''}`)
+    .join('>')
+}
+
+/**
+ * Plan a set of genuinely different routes by asking TfL for each of its optimisation criteria in
+ * parallel (fastest / fewest changes / least walking), then collapsing the time-shifted repeats
+ * each criterion returns. Each distinct route keeps the tags of every criterion that surfaced it,
+ * so a route can be both "Fastest" and "Fewest changes". Accessibility and departure-time
+ * preferences are applied to every query. Succeeds on partial results; errors only if all fail.
+ */
+export async function planJourneyOptions(
+  from: string,
+  to: string,
+  accessibility?: AccessibilityPreference | null,
+  departAt?: Date | null,
+): Promise<JourneyOptionsResult> {
+  const results = await Promise.all(
+    PREFERENCES.map(({ preference }) => planJourney(from, to, accessibility, departAt, preference)),
+  )
+
+  // Merge in preference order, de-duplicating by route signature. The first criterion to surface a
+  // route owns the representative journey; later criteria just add their tag.
+  const bySignature = new Map<string, TaggedJourney>()
+  let lastError = 'No journeys found between those locations.'
+  results.forEach((result, i) => {
+    if (result.kind !== 'journeys') {
+      lastError = result.message
+      return
+    }
+    const { tag } = PREFERENCES[i]
+    for (const journey of result.journeys) {
+      const key = routeSignature(journey)
+      const existing = bySignature.get(key)
+      if (existing) {
+        if (!existing.tags.includes(tag)) existing.tags.push(tag)
+      } else {
+        bySignature.set(key, { journey, tags: [tag] })
+      }
+    }
+  })
+
+  const journeys = [...bySignature.values()]
+  if (journeys.length === 0) return { kind: 'error', message: lastError }
+  return { kind: 'journeys', journeys }
 }

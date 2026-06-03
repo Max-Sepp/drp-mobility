@@ -1,10 +1,42 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import { Text, XStack } from 'tamagui'
 import type { ResolvedLocation } from '../api/geocode'
-import type { Journey } from '../api/tfl'
+import type { Journey, RouteTag } from '../api/tfl'
 
 export type ResolveStation = (commonName: string) => string | null
 export type StationPressHandler = (stationName: string) => void
+
+const TAG_LABELS: Record<RouteTag, string> = {
+  fastest: 'Fastest',
+  'fewest-changes': 'Fewest changes',
+  'least-walking': 'Least walking',
+}
+
+/** Pill chips labelling why a route stands out (e.g. "Fastest", "Least walking"). */
+export function RouteTags({ tags }: { tags?: RouteTag[] }) {
+  if (!tags || tags.length === 0) return null
+  return (
+    <XStack flexWrap="wrap" gap="$1.5">
+      {tags.map((tag) => (
+        <XStack
+          key={tag}
+          px="$2"
+          py="$1"
+          style={{
+            backgroundColor: '#eff6ff',
+            borderColor: '#bfdbfe',
+            borderWidth: 1,
+            borderRadius: 999,
+          }}
+        >
+          <Text fontSize={11} fontWeight="700" color="#1d4ed8">
+            {TAG_LABELS[tag]}
+          </Text>
+        </XStack>
+      ))}
+    </XStack>
+  )
+}
 
 /** Drop the "… Underground/Rail/DLR/Bus Station" suffix TfL appends, preserving case for display. */
 export function stripStationSuffix(name: string): string {
