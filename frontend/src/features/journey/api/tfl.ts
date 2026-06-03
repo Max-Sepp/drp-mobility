@@ -62,17 +62,34 @@ export type JourneyPlanResult =
   | { kind: 'error'; message: string }
 
 /**
+ * TfL's `date` (yyyyMMdd) + `time` (HHmm) query params for a departure time. TfL works in
+ * London local time and our times are device-local (we assume a London device, as elsewhere),
+ * so read the wall-clock components straight off the Date.
+ */
+function departureParams(departAt: Date): string[] {
+  const pad = (n: number) => String(n).padStart(2, '0')
+  const date = `${departAt.getFullYear()}${pad(departAt.getMonth() + 1)}${pad(departAt.getDate())}`
+  const time = `${pad(departAt.getHours())}${pad(departAt.getMinutes())}`
+  return [`date=${date}`, `time=${time}`, 'timeIs=Departing']
+}
+
+/**
  * Plan a journey between two locations. Callers pass UK postcodes (see
  * `resolveToPostcode`), which TfL resolves uniquely — so we never hit the ambiguous-text
  * "did you mean?" path. `accessibility` asks TfL to return only step-free routes; pass
  * `null`/omit it to apply no accessibility filtering (TfL then returns all modes, e.g. tube).
+ * `departAt` plans for leaving at that time; omit/`null` to leave now.
  */
 export async function planJourney(
   from: string,
   to: string,
   accessibility?: AccessibilityPreference | null,
+  departAt?: Date | null,
 ): Promise<JourneyPlanResult> {
-  const query = accessibility ? `?accessibilityPreference=${accessibility}` : ''
+  const params: string[] = []
+  if (accessibility) params.push(`accessibilityPreference=${accessibility}`)
+  if (departAt) params.push(...departureParams(departAt))
+  const query = params.length > 0 ? `?${params.join('&')}` : ''
   const url = `${TFL_BASE}/Journey/JourneyResults/${encodeURIComponent(from)}/to/${encodeURIComponent(to)}${query}`
 
   let res: Response

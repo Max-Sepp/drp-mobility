@@ -16,6 +16,7 @@ import { type ResolvedLocation, resolveToPostcode } from '../api/geocode'
 import { loadSavedJourneys } from '../api/savedJourneys'
 import { type AccessibilityPreference, type Journey, planJourney } from '../api/tfl'
 import { JourneyResultCard } from '../components/JourneyResultCard'
+import { formatDepart, LeaveAtField } from '../components/LeaveAtField'
 import { LocationInput } from '../components/LocationInput'
 
 type Resolved = { from: ResolvedLocation; to: ResolvedLocation }
@@ -37,6 +38,8 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
   // Null means no accessibility filtering at all — TfL then returns every mode (tube, rail, …)
   // rather than only step-free routes. Each button toggles, so the user can deselect both.
   const [level, setLevel] = useState<AccessibilityPreference | null>(null)
+  // Null means leave now; a Date plans for departing at that time.
+  const [departAt, setDepartAt] = useState<Date | null>(null)
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState<JourneyResult[]>([])
   const [resolved, setResolved] = useState<Resolved | null>(null)
@@ -97,7 +100,7 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
     }
     setResolved({ from: fromLoc, to: toLoc })
 
-    const result = await planJourney(fromLoc.postcode, toLoc.postcode, level)
+    const result = await planJourney(fromLoc.postcode, toLoc.postcode, level, departAt)
     if (result.kind !== 'journeys') {
       setLoading(false)
       Alert.alert('No journey', result.message)
@@ -183,6 +186,8 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
             </XStack>
           </YStack>
 
+          <LeaveAtField value={departAt} onChange={setDepartAt} />
+
           <YStack
             mt="$2"
             items="center"
@@ -227,6 +232,14 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
                   {resolved.to.label}
                 </Text>
               </XStack>
+              {departAt && (
+                <XStack gap="$2" items="center">
+                  <MaterialIcons name="schedule" size={14} color="#6b7280" style={{ width: 18 }} />
+                  <Text fontSize={14} color="#6b7280" flex={1} numberOfLines={1}>
+                    Leaving {formatDepart(departAt)}
+                  </Text>
+                </XStack>
+              )}
             </YStack>
             <XStack items="center" gap="$1">
               <MaterialIcons name="edit" size={16} color="#2563eb" />
