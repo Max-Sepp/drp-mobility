@@ -93,8 +93,8 @@ export const LeaveAtField = ({ value, onChange }: LeaveAtFieldProps) => {
           gap="$0.5"
           pressStyle={{ opacity: 0.8 }}
           onPress={chooseLater}
-          accessibilityRole="button"
-          accessibilityLabel={
+          role="button"
+          aria-label={
             isLater ? `Leaving ${formatDepart(value)}, tap to change` : 'Leave later'
           }
           style={{

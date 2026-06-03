@@ -85,7 +85,7 @@ export function LegStations({
                 name="arrow-forward"
                 size={13}
                 color="#9ca3af"
-                accessibilityLabel="to"
+                aria-label="to"
               />
             )}
             {resolved ? (
@@ -95,8 +95,8 @@ export function LegStations({
                 color="#2563eb"
                 pressStyle={{ opacity: 0.6 }}
                 onPress={() => onStationPress(resolved)}
-                accessibilityRole="button"
-                accessibilityLabel={`View accessibility for ${resolved}`}
+                role="button"
+                aria-label={`View accessibility for ${resolved}`}
                 style={{ textDecorationLine: 'underline' }}
               >
                 {resolved}

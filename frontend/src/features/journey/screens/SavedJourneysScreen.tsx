@@ -87,8 +87,8 @@ export const SavedJourneysScreen = ({ navigation }: SavedJourneysScreenProps) =>
               savedId: item.id,
             })
           }
-          accessibilityRole="button"
-          accessibilityLabel={`Open saved journey ${item.from?.label ?? ''} to ${item.to?.label ?? ''}`}
+          role="button"
+          aria-label={`Open saved journey ${item.from?.label ?? ''} to ${item.to?.label ?? ''}`}
           style={{
             borderWidth: 1.5,
             borderColor: '#d1d5db',
@@ -122,8 +122,8 @@ export const SavedJourneysScreen = ({ navigation }: SavedJourneysScreenProps) =>
             name="delete-outline"
             size={22}
             color="#9ca3af"
-            accessibilityRole="button"
-            accessibilityLabel="Remove saved journey"
+            role="button"
+            aria-label="Remove saved journey"
             onPress={() => confirmDelete(item)}
             style={{ padding: 4 }}
           />

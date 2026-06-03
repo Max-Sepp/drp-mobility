@@ -61,8 +61,8 @@ export const JourneyResultCard = ({
       gap="$3"
       pressStyle={onPress ? { opacity: 0.7 } : undefined}
       onPress={onPress}
-      accessibilityRole={onPress ? 'button' : undefined}
-      accessibilityLabel={onPress ? 'View journey details' : undefined}
+      role={onPress ? 'button' : undefined}
+      aria-label={onPress ? 'View journey details' : undefined}
       style={{
         borderWidth: 1.5,
         borderColor: '#d1d5db',
@@ -114,7 +114,7 @@ export const JourneyResultCard = ({
               name={modeIcon(leg.mode.name)}
               size={22}
               color="#2563eb"
-              accessibilityLabel={modeLabel(leg.mode.name)}
+              aria-label={modeLabel(leg.mode.name)}
               style={{ width: 24, marginTop: 1 }}
             />
             <YStack flex={1} gap="$0.5">
@@ -139,7 +139,7 @@ export const JourneyResultCard = ({
               name="schedule"
               size={22}
               color="#6b7280"
-              accessibilityLabel="Waiting and connections"
+              aria-label="Waiting and connections"
               style={{ width: 24, marginTop: 1 }}
             />
             <YStack flex={1} gap="$0.5">

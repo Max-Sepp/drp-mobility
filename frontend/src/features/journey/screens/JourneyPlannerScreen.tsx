@@ -136,6 +136,7 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
       header={
         <ScreenHeader
           title="Plan a journey"
+          onBack={() => navigation.goBack()}
           right={
             <XStack
               items="center"
@@ -161,8 +162,15 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
             value={from}
             onChangeText={setFrom}
             onResolved={setFromPostcode}
+            isResolved={fromPostcode !== null}
           />
-          <LocationInput label="To" value={to} onChangeText={setTo} onResolved={setToPostcode} />
+          <LocationInput
+            label="To"
+            value={to}
+            onChangeText={setTo}
+            onResolved={setToPostcode}
+            isResolved={toPostcode !== null}
+          />
 
           <YStack gap="$1.5">
             <Text fontSize={14} fontWeight="600" color="#6b7280">

@@ -160,8 +160,8 @@ export const JourneyDetailScreen = ({ navigation, route }: JourneyDetailScreenPr
             pressStyle={{ opacity: 0.8 }}
             onPress={toggleSave}
             opacity={busy ? 0.6 : 1}
-            accessibilityRole="button"
-            accessibilityLabel={saved ? 'Remove from saved journeys' : 'Save this journey'}
+            role="button"
+            aria-label={saved ? 'Remove from saved journeys' : 'Save this journey'}
             style={{
               height: 48,
               borderRadius: 10,
@@ -198,7 +198,7 @@ export const JourneyDetailScreen = ({ navigation, route }: JourneyDetailScreenPr
                   name={modeIcon(leg.mode.name)}
                   size={24}
                   color="#2563eb"
-                  accessibilityLabel={modeLabel(leg.mode.name)}
+                  aria-label={modeLabel(leg.mode.name)}
                   style={{ width: 26, marginTop: 1 }}
                 />
                 <YStack flex={1} gap="$1">
@@ -263,7 +263,7 @@ export const JourneyDetailScreen = ({ navigation, route }: JourneyDetailScreenPr
                 name="schedule"
                 size={24}
                 color="#6b7280"
-                accessibilityLabel="Waiting and connections"
+                aria-label="Waiting and connections"
                 style={{ width: 26, marginTop: 1 }}
               />
               <YStack flex={1} gap="$0.5">

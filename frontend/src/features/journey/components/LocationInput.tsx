@@ -15,6 +15,8 @@ type LocationInputProps = {
   onChangeText: (text: string) => void
   /** Called with the postcode resolved from a chosen suggestion, or null when invalidated. */
   onResolved: (postcode: string | null) => void
+  /** Pass true when the parent already holds a resolved postcode (e.g. pre-filled from GPS). */
+  isResolved?: boolean
 }
 
 /**
@@ -24,13 +26,25 @@ type LocationInputProps = {
  * scenes. A tick on the right of the box confirms a resolved selection. Typing a postcode
  * or coordinates directly skips the dropdown — those are resolved at submit time.
  */
-export const LocationInput = ({ label, value, onChangeText, onResolved }: LocationInputProps) => {
+export const LocationInput = ({
+  label,
+  value,
+  onChangeText,
+  onResolved,
+  isResolved: isResolvedProp,
+}: LocationInputProps) => {
   const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([])
   const [searching, setSearching] = useState(false)
-  const [resolved, setResolved] = useState(false)
+  const [resolved, setResolved] = useState(isResolvedProp ?? false)
   const [focused, setFocused] = useState(false)
   // Skip the search that the value change from a selection would otherwise trigger.
   const skipNextSearch = useRef(false)
+
+  // Keep the tick in sync when the parent changes the resolved state externally
+  // (e.g. GPS postcode arrives after mount, or field is cleared from above).
+  useEffect(() => {
+    if (isResolvedProp !== undefined) setResolved(isResolvedProp)
+  }, [isResolvedProp])
 
   useEffect(() => {
     if (skipNextSearch.current) {
@@ -123,8 +137,8 @@ export const LocationInput = ({ label, value, onChangeText, onResolved }: Locati
               justify="center"
               pressStyle={{ opacity: 0.5 }}
               onPress={clear}
-              accessibilityRole="button"
-              accessibilityLabel={`Clear ${label}`}
+              role="button"
+              aria-label={`Clear ${label}`}
             >
               <Text fontSize={18} color="#9ca3af">
                 ✕
