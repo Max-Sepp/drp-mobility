@@ -34,13 +34,17 @@ const LEVELS: { value: AccessibilityPreference; label: string }[] = [
   { value: 'StepFreeToPlatform', label: 'Step-free to platform' },
 ]
 
-export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) => {
-  const [from, setFrom] = useState('')
-  const [to, setTo] = useState('')
+export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreenProps) => {
+  const [from, setFrom] = useState(route.params?.initialFrom?.label ?? '')
+  const [to, setTo] = useState(route.params?.initialTo?.label ?? '')
   // Postcode resolved from a chosen suggestion, used behind the scenes so the box can keep
   // showing the readable address. Null when the user typed a value we resolve at submit.
-  const [fromPostcode, setFromPostcode] = useState<string | null>(null)
-  const [toPostcode, setToPostcode] = useState<string | null>(null)
+  const [fromPostcode, setFromPostcode] = useState<string | null>(
+    route.params?.initialFrom?.postcode ?? null,
+  )
+  const [toPostcode, setToPostcode] = useState<string | null>(
+    route.params?.initialTo?.postcode ?? null,
+  )
   // Null means no accessibility filtering at all — TfL then returns every mode (tube, rail, …)
   // rather than only step-free routes. Each button toggles, so the user can deselect both.
   const [level, setLevel] = useState<AccessibilityPreference | null>(null)
@@ -138,8 +142,7 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
               gap="$1"
               pressStyle={{ opacity: 0.6 }}
               onPress={() => navigation.navigate('SavedJourneys')}
-              accessibilityRole="button"
-              accessibilityLabel={`Saved journeys${savedCount > 0 ? `, ${savedCount}` : ''}`}
+              role="button"
             >
               <MaterialIcons name="bookmark" size={18} color="#2563eb" />
               <Text fontSize={14} fontWeight="600" color="#2563eb">
