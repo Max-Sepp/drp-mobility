@@ -1,7 +1,7 @@
 import { Spinner, Text, XStack, YStack } from 'tamagui'
 import type { components } from '@/api/schema.d'
 import { FormSection } from './FormSection'
-import { Borders, Colors, Radii } from '@/theme'
+import { Borders, Colors, Opacity, Radii } from '@/theme'
 
 type Equipment = components['schemas']['EquipmentSummary']
 
@@ -38,7 +38,7 @@ export const EquipmentPicker = ({
               key={e.id}
               items="center"
               gap="$3"
-              pressStyle={{ opacity: 0.7 }}
+              pressStyle={{ opacity: Opacity.pressed }}
               onPress={() => onSelect(e.id)}
               mb="$2"
               style={{
@@ -55,7 +55,7 @@ export const EquipmentPicker = ({
                   width: 22,
                   height: 22,
                   borderRadius: Radii.xs,
-                  borderWidth: 2,
+                  borderWidth: Borders.thick,
                   borderColor: selected ? Colors.blue : Colors.placeholderText,
                   backgroundColor: selected ? Colors.blue : 'transparent',
                   alignItems: 'center',

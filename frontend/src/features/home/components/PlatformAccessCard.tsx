@@ -2,7 +2,7 @@ import { MaterialIcons } from '@expo/vector-icons'
 import { useState } from 'react'
 import { Separator, Text, XStack, YStack } from 'tamagui'
 import { LineChips, StepFreeBadge, type PlatformDetail } from '@/features/stations'
-import { Borders, Colors, Radii, Spacing } from '@/theme'
+import { Borders, Colors, Opacity, Radii, Spacing } from '@/theme'
 
 type PlatformAccessCardProps = {
   platforms: PlatformDetail[]
@@ -33,7 +33,7 @@ export const PlatformAccessCard = ({ platforms }: PlatformAccessCardProps) => {
         justify="space-between"
         gap="$3"
         onPress={() => setExpanded((v) => !v)}
-        pressStyle={{ opacity: 0.6 }}
+        pressStyle={{ opacity: Opacity.disabledMid }}
       >
         <YStack gap="$0.5">
           <Text fontSize={15} fontWeight="700" color={Colors.text}>

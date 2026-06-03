@@ -21,7 +21,7 @@ import {
   stripStationSuffix,
 } from '../components/legDisplay'
 import { OutageDetail } from '../components/OutageDetail'
-import { Borders, Colors, Heights, Radii } from '@/theme'
+import { Borders, Colors, Heights, Opacity, Radii } from '@/theme'
 
 function lineLabel(leg: Leg): string | null {
   const option = leg.routeOptions?.[0]
@@ -142,9 +142,9 @@ export const JourneyDetailScreen = ({ navigation, route }: JourneyDetailScreenPr
             items="center"
             justify="center"
             gap="$2"
-            pressStyle={{ opacity: 0.8 }}
+            pressStyle={{ opacity: Opacity.pressedLight }}
             onPress={toggleSave}
-            opacity={busy ? 0.6 : 1}
+            opacity={busy ? Opacity.disabledMid : 1}
             role="button"
             aria-label={saved ? 'Remove from saved journeys' : 'Save this journey'}
             style={{

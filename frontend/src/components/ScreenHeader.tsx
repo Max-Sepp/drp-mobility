@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Text, XStack, YStack } from 'tamagui'
 import { Heading } from '@/components/Heading'
-import { Colors, Spacing } from '@/theme'
+import { Colors, Opacity, Spacing } from '@/theme'
 
 type ScreenHeaderProps = {
   title: string
@@ -31,7 +31,7 @@ export const ScreenHeader = ({
             gap="$1"
             mb="$2"
             style={{ alignSelf: 'flex-start' }}
-            pressStyle={{ opacity: 0.6 }}
+            pressStyle={{ opacity: Opacity.disabledMid }}
             onPress={onBack}
           >
             <Ionicons name="chevron-back" size={18} color={Colors.blue} />

@@ -21,7 +21,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import type { RootStackParamList } from '@/navigation/types'
-import { Colors, Radii, Shadows, Spacing, Typography } from '@/theme'
+import { Colors, Overlays, Radii, Shadows, Spacing, Typography } from '@/theme'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Search'>
 
@@ -178,7 +178,7 @@ export function SearchScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.35)',
+    backgroundColor: Overlays.backdrop,
   },
   card: {
     position: 'absolute',
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
   handle: {
     width: 36,
     height: 4,
-    borderRadius: 2,
+    borderRadius: Radii.handle,
     backgroundColor: Colors.separator,
     alignSelf: 'center',
     marginBottom: Spacing.md,

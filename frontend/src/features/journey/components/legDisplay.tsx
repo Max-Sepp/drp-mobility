@@ -2,7 +2,7 @@ import { MaterialIcons } from '@expo/vector-icons'
 import { Text, XStack } from 'tamagui'
 import type { ResolvedLocation } from '../api/geocode'
 import type { Journey, RouteTag } from '../api/tfl'
-import { Borders, Colors, Radii } from '@/theme'
+import { Borders, Colors, Opacity, Radii } from '@/theme'
 
 export type ResolveStation = (commonName: string) => string | null
 export type StationPressHandler = (stationName: string) => void
@@ -94,7 +94,7 @@ export function LegStations({
                 fontSize={13}
                 fontWeight="600"
                 color={Colors.blue}
-                pressStyle={{ opacity: 0.6 }}
+                pressStyle={{ opacity: Opacity.disabledMid }}
                 onPress={() => onStationPress(resolved)}
                 role="button"
                 aria-label={`View accessibility for ${resolved}`}

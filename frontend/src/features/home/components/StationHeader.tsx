@@ -5,7 +5,7 @@ import { Text, XStack, YStack } from 'tamagui'
 import { Heading } from '@/components/Heading'
 import { StepFreeBadge } from '@/features/stations'
 import type { StationStepFree } from '@/features/stations/stepFree'
-import { Colors, Spacing, Typography } from '@/theme'
+import { Colors, Opacity, Spacing, Typography } from '@/theme'
 
 type StationHeaderProps = {
   station: string
@@ -24,7 +24,7 @@ export const StationHeader = ({ station, stepFree, onPress, onBack }: StationHea
           px="$5"
           pt="$2"
           style={{ alignSelf: 'flex-start' }}
-          pressStyle={{ opacity: 0.6 }}
+          pressStyle={{ opacity: Opacity.disabledMid }}
           onPress={onBack}
         >
           <Ionicons name="chevron-back" size={18} color={Colors.blue} />

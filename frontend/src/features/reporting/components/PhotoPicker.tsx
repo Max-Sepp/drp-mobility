@@ -2,7 +2,7 @@ import * as ImagePicker from 'expo-image-picker'
 import { Alert, Image } from 'react-native'
 import { Text, YStack } from 'tamagui'
 import { FormSection } from './FormSection'
-import { Colors, Radii } from '@/theme'
+import { Borders, Colors, Opacity, Radii } from '@/theme'
 
 type PhotoPickerProps = {
   photo: ImagePicker.ImagePickerAsset | null
@@ -45,10 +45,10 @@ export const PhotoPicker = ({
       <YStack
         items="center"
         justify="center"
-        pressStyle={{ opacity: 0.7 }}
+        pressStyle={{ opacity: Opacity.pressed }}
         onPress={pick}
         style={{
-          borderWidth: 2,
+          borderWidth: Borders.thick,
           borderColor: Colors.placeholderText,
           borderStyle: 'dashed',
           borderRadius: Radii.small,

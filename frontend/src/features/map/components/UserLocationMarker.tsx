@@ -1,6 +1,6 @@
 import { StyleSheet, View } from 'react-native'
 import { Marker } from 'react-native-maps'
-import { Colors } from '@/theme'
+import { Colors, Shadows } from '@/theme'
 
 type Props = {
   latitude: number
@@ -71,8 +71,7 @@ const styles = StyleSheet.create({
     borderColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: '0px 1px 4px rgba(0,0,0,0.3)',
-    elevation: 4,
+    ...Shadows.marker,
   },
   dotInner: {
     width: 6,

@@ -60,6 +60,8 @@ export const Radii = {
   pill: 999,
   small: 8,
   xs: 4,
+  handle: 2,  // drag handle bars
+  icon: 17,   // circular icon wrappers
 } as const
 
 // ---------------------------------------------------------------------------
@@ -79,6 +81,10 @@ export const Shadows = {
   top: {
     boxShadow: '0px -2px 8px rgba(0,0,0,0.06)',
     elevation: 3,
+  },
+  marker: {
+    boxShadow: '0px 1px 4px rgba(0,0,0,0.3)',
+    elevation: 4,
   },
 } as const
 
@@ -118,6 +124,27 @@ export const Spacing = {
 export const Borders = {
   thin:   1,
   medium: 1.5,
+  thick:  2,
+} as const
+
+// ---------------------------------------------------------------------------
+// Opacity
+// ---------------------------------------------------------------------------
+
+export const Opacity = {
+  disabled:    0.4, // fully disabled, non-interactive items
+  disabledMid: 0.6, // submitting / loading states
+  subtle:      0.5, // minor interactive affordance (e.g. clear button)
+  pressed:     0.7, // standard pressStyle feedback
+  pressedLight: 0.8, // lighter press feedback on dark / primary buttons
+} as const
+
+// ---------------------------------------------------------------------------
+// Overlays
+// ---------------------------------------------------------------------------
+
+export const Overlays = {
+  backdrop: 'rgba(0,0,0,0.35)', // modal backdrop tint
 } as const
 
 // ---------------------------------------------------------------------------

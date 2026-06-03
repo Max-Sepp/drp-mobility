@@ -2,7 +2,7 @@ import { Text, XStack, YStack } from 'tamagui'
 import type { StationStepFree } from '../stepFree'
 import { LineChips } from './LineChips'
 import { StepFreeBadge } from './StepFreeBadge'
-import { Colors, Radii } from '@/theme'
+import { Borders, Colors, Opacity, Radii } from '@/theme'
 
 type StationListItemProps = {
   name: string
@@ -19,7 +19,7 @@ export const StationListItem = ({ name, lines, stepFree, selected, onPress }: St
       py="$4"
       px="$5"
       gap="$3.5"
-      pressStyle={{ opacity: 0.7 }}
+      pressStyle={{ opacity: Opacity.pressed }}
       onPress={onPress}
       style={{ backgroundColor: selected ? Colors.successBg : Colors.card }}
     >
@@ -28,7 +28,7 @@ export const StationListItem = ({ name, lines, stepFree, selected, onPress }: St
           width: 24,
           height: 24,
           borderRadius: Radii.pill,
-          borderWidth: 2,
+          borderWidth: Borders.thick,
           borderColor: selected ? Colors.successDark : Colors.placeholderText,
           backgroundColor: selected ? Colors.successDark : 'transparent',
           alignItems: 'center',

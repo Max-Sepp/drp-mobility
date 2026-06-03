@@ -481,7 +481,7 @@ const styles = StyleSheet.create({
   handle: {
     width: 36,
     height: 4,
-    borderRadius: 2,
+    borderRadius: Radii.handle,
     backgroundColor: Colors.separator,
     alignSelf: 'center',
     marginBottom: Spacing.md,
@@ -535,7 +535,7 @@ const styles = StyleSheet.create({
   placesTileIcon: {
     width: 50,
     height: 50,
-    borderRadius: Radii.small + 4,
+    borderRadius: Radii.button,
     backgroundColor: Colors.searchBg,
     alignItems: 'center',
     justifyContent: 'center',
@@ -551,7 +551,7 @@ const styles = StyleSheet.create({
   savedRowIcon: {
     width: 34,
     height: 34,
-    borderRadius: 17,
+    borderRadius: Radii.icon,
     backgroundColor: Colors.searchBg,
     alignItems: 'center',
     justifyContent: 'center',
@@ -570,7 +570,7 @@ const styles = StyleSheet.create({
   resultRowIcon: {
     width: 34,
     height: 34,
-    borderRadius: 17,
+    borderRadius: Radii.icon,
     backgroundColor: Colors.searchBg,
     alignItems: 'center',
     justifyContent: 'center',

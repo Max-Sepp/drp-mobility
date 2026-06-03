@@ -1,7 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import { Text, XStack, YStack } from 'tamagui'
 import { Heading } from '@/components/Heading'
-import { Borders, Colors, Radii, Typography } from '@/theme'
+import { Borders, Colors, Opacity, Radii, Typography } from '@/theme'
 
 export type QuickReportAction =
   | { route: 'ReportForm'; equipmentType: 'lift' | 'escalator' }
@@ -44,8 +44,8 @@ export const QuickReportGrid = ({ onSelect }: QuickReportGridProps) => {
             <YStack
               key={item.label}
               width="47%"
-              opacity={disabled ? 0.4 : 1}
-              pressStyle={disabled ? undefined : { opacity: 0.7 }}
+              opacity={disabled ? Opacity.disabled : 1}
+              pressStyle={disabled ? undefined : { opacity: Opacity.pressed }}
               onPress={disabled ? undefined : () => onSelect(item.action!)}
               style={{
                 aspectRatio: 1.3,

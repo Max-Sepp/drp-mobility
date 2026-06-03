@@ -2,7 +2,7 @@ import { MaterialIcons } from '@expo/vector-icons'
 import { useEffect, useRef, useState } from 'react'
 import { Input, Spinner, Text, XStack, YStack } from 'tamagui'
 import { type LocationSuggestion, postcodeForSuggestion, searchLocations } from '../api/geocode'
-import { Borders, Colors, Radii } from '@/theme'
+import { Borders, Colors, Opacity, Radii } from '@/theme'
 
 const fieldStyle = {
   borderColor: Colors.border,
@@ -158,7 +158,7 @@ export const LocationInput = ({
               b={0}
               px="$2"
               justify="center"
-              pressStyle={{ opacity: 0.5 }}
+              pressStyle={{ opacity: Opacity.subtle }}
               onPress={clear}
               role="button"
               aria-label={`Clear ${label}`}

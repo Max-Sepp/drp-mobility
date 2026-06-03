@@ -25,7 +25,7 @@ import {
 import { JourneyResultCard } from '../components/JourneyResultCard'
 import { formatDepart, LeaveAtField } from '../components/LeaveAtField'
 import { LocationInput } from '../components/LocationInput'
-import { Borders, Colors, Heights, Radii, Typography } from '@/theme'
+import { Borders, Colors, Heights, Opacity, Radii, Typography } from '@/theme'
 
 type Resolved = { from: ResolvedLocation; to: ResolvedLocation }
 type JourneyResult = { journey: Journey; outages: StationOutage[]; tags: RouteTag[] }
@@ -163,7 +163,7 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
             <XStack
               items="center"
               gap="$1"
-              pressStyle={{ opacity: 0.6 }}
+              pressStyle={{ opacity: Opacity.disabledMid }}
               onPress={() => navigation.navigate('SavedJourneys')}
               role="button"
             >
@@ -214,7 +214,7 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
                     flex={1}
                     items="center"
                     justify="center"
-                    pressStyle={{ opacity: 0.8 }}
+                    pressStyle={{ opacity: Opacity.pressedLight }}
                     onPress={() => setLevel((prev) => (prev === value ? null : value))}
                     style={{
                       minHeight: Heights.touchTarget,
@@ -239,9 +239,9 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
             mt="$2"
             items="center"
             justify="center"
-            pressStyle={{ opacity: 0.8 }}
+            pressStyle={{ opacity: Opacity.pressedLight }}
             onPress={loading ? undefined : run}
-            opacity={loading ? 0.6 : 1}
+            opacity={loading ? Opacity.disabledMid : 1}
             style={{ backgroundColor: Colors.text, borderRadius: Radii.button, height: Heights.button }}
           >
             <Text color={Colors.card} fontSize={16} fontWeight="700">
@@ -257,7 +257,7 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
             p="$3"
             items="center"
             gap="$3"
-            pressStyle={{ opacity: 0.7 }}
+            pressStyle={{ opacity: Opacity.pressed }}
             onPress={() => setEditing(true)}
             style={{
               borderWidth: Borders.medium,

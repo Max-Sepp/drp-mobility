@@ -8,7 +8,7 @@ import { parseUtc } from '@/lib/datetime'
 import type { SavedJourneysScreenProps } from '@/navigation/types'
 import { deleteJourney, loadSavedJourneys, type SavedJourney } from '../api/savedJourneys'
 import { clockTime } from '../components/legDisplay'
-import { Borders, Colors, Radii } from '@/theme'
+import { Borders, Colors, Opacity, Radii } from '@/theme'
 
 function savedAtLabel(iso: string): string {
   const d = parseUtc(iso)
@@ -74,7 +74,7 @@ export const SavedJourneysScreen = ({ navigation }: SavedJourneysScreenProps) =>
           p="$4"
           gap="$3"
           items="center"
-          pressStyle={{ opacity: 0.7 }}
+          pressStyle={{ opacity: Opacity.pressed }}
           onPress={() =>
             navigation.navigate('JourneyDetail', {
               journey: item.journey,

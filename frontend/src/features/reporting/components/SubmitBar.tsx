@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Spinner, Text, YStack } from 'tamagui'
-import { Borders, Colors, Heights, Radii } from '@/theme'
+import { Borders, Colors, Heights, Opacity, Radii } from '@/theme'
 
 type SubmitBarProps = {
   onPress: () => void
@@ -17,9 +17,9 @@ export const SubmitBar = ({ onPress, submitting = false, label = 'Submit' }: Sub
         my="$3"
         items="center"
         justify="center"
-        pressStyle={{ opacity: 0.8 }}
+        pressStyle={{ opacity: Opacity.pressedLight }}
         onPress={submitting ? undefined : onPress}
-        opacity={submitting ? 0.6 : 1}
+        opacity={submitting ? Opacity.disabledMid : 1}
         style={{ backgroundColor: Colors.text, borderRadius: Radii.button, height: Heights.button }}
       >
         {submitting ? (

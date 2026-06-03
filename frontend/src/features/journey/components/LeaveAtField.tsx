@@ -2,7 +2,7 @@ import { MaterialIcons } from '@expo/vector-icons'
 import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker'
 import { Platform } from 'react-native'
 import { Text, XStack, YStack } from 'tamagui'
-import { Borders, Colors, Heights, Radii } from '@/theme'
+import { Borders, Colors, Heights, Opacity, Radii } from '@/theme'
 
 type LeaveAtFieldProps = {
   /** The chosen departure time, or null to leave now. */
@@ -76,7 +76,7 @@ export const LeaveAtField = ({ value, onChange }: LeaveAtFieldProps) => {
         <YStack
           items="center"
           justify="center"
-          pressStyle={{ opacity: 0.8 }}
+          pressStyle={{ opacity: Opacity.pressedLight }}
           onPress={() => onChange(null)}
           style={{
             ...SEGMENT_STYLE,
@@ -92,7 +92,7 @@ export const LeaveAtField = ({ value, onChange }: LeaveAtFieldProps) => {
           items="center"
           justify="center"
           gap="$0.5"
-          pressStyle={{ opacity: 0.8 }}
+          pressStyle={{ opacity: Opacity.pressedLight }}
           onPress={chooseLater}
           role="button"
           aria-label={

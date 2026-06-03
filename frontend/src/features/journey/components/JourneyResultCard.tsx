@@ -15,7 +15,7 @@ import {
   RouteTags,
   type StationPressHandler,
 } from './legDisplay'
-import { Borders, Colors, Radii } from '@/theme'
+import { Borders, Colors, Opacity, Radii } from '@/theme'
 
 type JourneyResultCardProps = {
   journey: Journey
@@ -47,7 +47,7 @@ export const JourneyResultCard = ({
       mt="$4"
       p="$4"
       gap="$3"
-      pressStyle={onPress ? { opacity: 0.7 } : undefined}
+      pressStyle={onPress ? { opacity: Opacity.pressed } : undefined}
       onPress={onPress}
       role={onPress ? 'button' : undefined}
       aria-label={onPress ? 'View journey details' : undefined}
