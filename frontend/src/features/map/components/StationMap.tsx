@@ -1,67 +1,56 @@
-import Mapbox from '@rnmapbox/maps'
 import { useState } from 'react'
 import { StyleSheet } from 'react-native'
+import MapView, { Marker, Region } from 'react-native-maps'
 import { useAppLocation } from '@/lib/LocationContext'
 import stationMarkers from '../data/stationMarkers.json'
 import { StationMarker } from './StationMarker'
 
-Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_TOKEN ?? '')
-
-const LONDON_CENTER: [number, number] = [-0.1276, 51.5074]
-const DEFAULT_ZOOM = 13
-
-// [[ne_lng, ne_lat], [sw_lng, sw_lat]]
-type Bounds = [[number, number], [number, number]]
+const LONDON: Region = {
+  latitude: 51.5074,
+  longitude: -0.1276,
+  latitudeDelta: 0.05,
+  longitudeDelta: 0.05,
+}
 
 type Props = { onStationPress: (name: string) => void }
 
 export function StationMap({ onStationPress }: Props) {
   const coords = useAppLocation()
-  const [bounds, setBounds] = useState<Bounds | null>(null)
+  const [region, setRegion] = useState<Region | null>(null)
 
-  const centerCoordinate: [number, number] = coords
-    ? [coords.longitude, coords.latitude]
-    : LONDON_CENTER
+  const initialRegion: Region = coords
+    ? { latitude: coords.latitude, longitude: coords.longitude, latitudeDelta: 0.02, longitudeDelta: 0.02 }
+    : LONDON
 
-  const visibleStations = bounds
+  const visibleStations = region
     ? stationMarkers.filter(
         (m) =>
-          m.lat <= bounds[0][1] &&
-          m.lat >= bounds[1][1] &&
-          m.lng <= bounds[0][0] &&
-          m.lng >= bounds[1][0],
+          m.lat >= region.latitude - region.latitudeDelta / 2 &&
+          m.lat <= region.latitude + region.latitudeDelta / 2 &&
+          m.lng >= region.longitude - region.longitudeDelta / 2 &&
+          m.lng <= region.longitude + region.longitudeDelta / 2,
       )
     : []
 
-  function handleRegionChange(feature: GeoJSON.Feature) {
-    const vb = feature?.properties?.visibleBounds as Bounds | undefined
-    if (vb) setBounds(vb)
-  }
-
   return (
-    <Mapbox.MapView
+    <MapView
       style={styles.map}
-      styleURL="mapbox://styles/mapbox/light-v11"
-      onRegionDidChange={handleRegionChange}
+      initialRegion={initialRegion}
+      onRegionChangeComplete={setRegion}
+      showsUserLocation
+      showsMyLocationButton={false}
     >
-      <Mapbox.Camera
-        defaultSettings={{
-          centerCoordinate,
-          zoomLevel: DEFAULT_ZOOM,
-        }}
-      />
-      <Mapbox.UserLocation visible />
       {visibleStations.map((station) => (
-        <Mapbox.PointAnnotation
+        <Marker
           key={station.name}
-          id={station.name}
-          coordinate={[station.lng, station.lat]}
-          onSelected={() => onStationPress(station.name)}
+          coordinate={{ latitude: station.lat, longitude: station.lng }}
+          onPress={() => onStationPress(station.name)}
+          tracksViewChanges={false}
         >
           <StationMarker lines={station.lines} />
-        </Mapbox.PointAnnotation>
+        </Marker>
       ))}
-    </Mapbox.MapView>
+    </MapView>
   )
 }
 
