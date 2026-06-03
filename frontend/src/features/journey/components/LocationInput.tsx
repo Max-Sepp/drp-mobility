@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Input, Spinner, Text, YStack } from 'tamagui'
+import { Input, Spinner, Text, XStack, YStack } from 'tamagui'
 import { type LocationSuggestion, postcodeForSuggestion, searchLocations } from '../api/geocode'
 
 const fieldStyle = {
@@ -28,6 +28,7 @@ export const LocationInput = ({ label, value, onChangeText, onResolved }: Locati
   const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([])
   const [searching, setSearching] = useState(false)
   const [resolved, setResolved] = useState(false)
+  const [focused, setFocused] = useState(false)
   // Skip the search that the value change from a selection would otherwise trigger.
   const skipNextSearch = useRef(false)
 
@@ -62,6 +63,15 @@ export const LocationInput = ({ label, value, onChangeText, onResolved }: Locati
     onChangeText(text)
   }
 
+  // Empty the field and drop any resolved selection/suggestions. Setting the value to '' lets
+  // the search effect tear down the dropdown on its own.
+  function clear() {
+    setResolved(false)
+    setSuggestions([])
+    onResolved(null)
+    onChangeText('')
+  }
+
   async function choose(suggestion: LocationSuggestion) {
     setSuggestions([])
     setSearching(true)
@@ -80,31 +90,60 @@ export const LocationInput = ({ label, value, onChangeText, onResolved }: Locati
         {label}
       </Text>
 
-      <YStack position="relative" justify="center">
-        <Input
-          value={value}
-          onChangeText={handleType}
-          placeholder="Address, postcode, or lat,long"
-          placeholderTextColor="$gray9"
-          autoCapitalize="none"
-          style={{ ...fieldStyle, paddingRight: 38 }}
-        />
-        {(searching || resolved) && (
-          <YStack position="absolute" r={12} t={0} b={0} justify="center">
-            {searching ? (
-              <Spinner size="small" color="#6b7280" />
-            ) : (
-              <Text fontSize={18} fontWeight="700" color="#16a34a">
-                ✓
+      <XStack items="center" gap={8}>
+        <YStack flex={1} position="relative" justify="center">
+          <Input
+            value={value}
+            onChangeText={handleType}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
+            // When the field loses focus, snap the caret (and scroll) back to the start so the
+            // beginning of a long address is visible rather than its tail. Left uncontrolled
+            // while focused so typing behaves normally.
+            selection={focused ? undefined : { start: 0, end: 0 }}
+            placeholder="Address, postcode, or lat,long"
+            placeholderTextColor="$gray9"
+            autoCapitalize="none"
+            style={{ ...fieldStyle, paddingRight: 38 }}
+          />
+          {value.length > 0 && (
+            <YStack
+              position="absolute"
+              r={4}
+              t={0}
+              b={0}
+              px="$2"
+              justify="center"
+              pressStyle={{ opacity: 0.5 }}
+              onPress={clear}
+              accessibilityRole="button"
+              accessibilityLabel={`Clear ${label}`}
+            >
+              <Text fontSize={18} color="#9ca3af">
+                ✕
               </Text>
-            )}
-          </YStack>
-        )}
-      </YStack>
+            </YStack>
+          )}
+        </YStack>
+        {/* Status indicator sits outside, to the right of the input. The fixed width keeps the
+            input from shifting as the spinner/tick appears and disappears. */}
+        <YStack width={20} items="center" justify="center">
+          {searching ? (
+            <Spinner size="small" color="#6b7280" />
+          ) : resolved ? (
+            <Text fontSize={18} fontWeight="700" color="#16a34a">
+              ✓
+            </Text>
+          ) : null}
+        </YStack>
+      </XStack>
 
       {suggestions.length > 0 && (
         <YStack
           style={{
+            // Right-narrow by the status slot (20) + its gap (8) so the dropdown's right edge
+            // lines up with the input field rather than the wider row.
+            marginRight: 28,
             borderWidth: 1.5,
             borderColor: '#d1d5db',
             borderRadius: 10,

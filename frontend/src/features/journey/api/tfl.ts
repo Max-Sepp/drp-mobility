@@ -8,12 +8,26 @@ const TFL_BASE = 'https://api.tfl.gov.uk'
 /** A single transit mode used on a leg, e.g. `walking`, `tube`, `bus`. */
 type Mode = { name: string }
 
+/** A point a leg departs from or arrives at, e.g. a station. */
+type Point = { commonName?: string }
+
 /** One leg of a journey (a continuous stretch on a single mode). */
 export type Leg = {
   duration: number
   mode: Mode
   instruction: { summary: string }
+  // The stations/stops this leg runs between. Used to cross-reference our own live outage
+  // data; optional because walking legs and some points may omit a name.
+  departurePoint?: Point
+  arrivalPoint?: Point
 }
+
+/**
+ * How step-free a journey must be. `StepFreeToVehicle` is fully step-free from street onto
+ * the train (strictest, safest for wheelchair users); `StepFreeToPlatform` allows a
+ * possible gap/step between platform and train.
+ */
+export type AccessibilityPreference = 'StepFreeToVehicle' | 'StepFreeToPlatform'
 
 /** A complete door-to-door journey option returned by TfL. */
 export type Journey = {
@@ -34,10 +48,16 @@ export type JourneyPlanResult =
 /**
  * Plan a journey between two locations. Callers pass UK postcodes (see
  * `resolveToPostcode`), which TfL resolves uniquely — so we never hit the ambiguous-text
- * "did you mean?" path.
+ * "did you mean?" path. `accessibility` asks TfL to return only step-free routes; pass
+ * `null`/omit it to apply no accessibility filtering (TfL then returns all modes, e.g. tube).
  */
-export async function planJourney(from: string, to: string): Promise<JourneyPlanResult> {
-  const url = `${TFL_BASE}/Journey/JourneyResults/${encodeURIComponent(from)}/to/${encodeURIComponent(to)}`
+export async function planJourney(
+  from: string,
+  to: string,
+  accessibility?: AccessibilityPreference | null,
+): Promise<JourneyPlanResult> {
+  const query = accessibility ? `?accessibilityPreference=${accessibility}` : ''
+  const url = `${TFL_BASE}/Journey/JourneyResults/${encodeURIComponent(from)}/to/${encodeURIComponent(to)}${query}`
 
   let res: Response
   try {

@@ -12,6 +12,10 @@ pytest tests/test_outage_reports.py::test_name      # single test
 ruff check .                                        # lint
 ruff check --fix .                                  # lint + autofix
 ruff format .                                       # format
+
+# Refresh station data from TfL CSVs (run from repo root):
+python3 temp/enrich_tube_stations.py
+rm dev.db && uvicorn app.main:app --reload          # reseed with updated data
 ```
 
 Lint/format use [Ruff](https://docs.astral.sh/ruff/) (config in `pyproject.toml`). Ruff is a dev-only dependency — install it with `pip install -r requirements-dev.txt` (it is deliberately kept out of `requirements.txt` so the prod image stays lean). FastAPI's `Depends(...)`-in-default and SQLAlchemy/Pydantic string forward references are whitelisted in the config; don't "fix" those.
@@ -64,6 +68,18 @@ The grouping invariant is the non-obvious part:
 - `conftest.py` creates a fresh in-memory SQLite engine per test (`StaticPool` so the connection is shared across threads), runs `create_all`, then calls `seed_defaults`. The `client` fixture overrides `get_db` to use that session.
 - Tests assume seed data is present (e.g. they query `Station.filter_by(name="Victoria")`). Don't write tests that create stations/equipment directly — extend the seed or look up the seeded rows.
 - `test_failures.py` covers the grouping rules and the partial unique index; `test_lookup_tables.py` covers the cached `/stations` and `/equipment-types` endpoints; `test_outage_reports.py` covers CRUD + image upload.
+- `test_lift_seeding.py` verifies named lifts are seeded correctly from the TfL enriched data.
+- `test_lines.py` checks platform names and line assignments for key stations.
+
+## Station seed data (`app/data/stations.json`)
+
+All 387 stations are enriched from `temp/tfl-stationdata-detailed/` via `temp/enrich_tube_stations.py`. Key points:
+
+- **No station-level `step_free`** — step-free access is per-platform only (`stepFreeAccess` on each platform object).
+- **`stepFreeAccess`** is derived by BFS on a step-free pathway graph (SameLevelPaths + RampRoutes + Lifts CSVs from the `-Outside` virtual node). Values: `"Full"` / `"to_platform"` / `"to_train"` / `"none"`.
+- **`lift_units`** come from Lifts.csv for stations in that feed; deep-tube stations with no CSV entry get synthesised units (shared concourse → all platforms).
+- **`escalator_units` are mocked** — the TfL feed has no escalator topology. Units are synthesised by distributing the escalator count round-robin across customer-facing platforms and tagged `"mocked": true`. This data must be replaced with hand-curated data before treating as authoritative.
+- The `Station` ORM model only stores `id` and `name` — all other fields are in the JSON and used only during seeding to create `Platform` and `Equipment` rows.
 
 ## Schema changes — workflow
 

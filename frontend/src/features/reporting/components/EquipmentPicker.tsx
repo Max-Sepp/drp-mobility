@@ -68,7 +68,7 @@ export const EquipmentPicker = ({
                   </Text>
                 )}
               </YStack>
-              <Text fontSize={15} color="#111827">
+              <Text flex={1} fontSize={15} color="#111827">
                 {e.connection}
               </Text>
             </XStack>

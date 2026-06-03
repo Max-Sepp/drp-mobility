@@ -149,7 +149,7 @@ export interface paths {
         };
         /**
          * List Stations
-         * @description Return all available stations.
+         * @description Return all available stations, each with its platforms and per-platform step-free access.
          */
         get: operations["list_stations_stations_get"];
         put?: never;
@@ -316,15 +316,61 @@ export interface components {
             image_content_type?: string | null;
         };
         /**
+         * PlatformSchema
+         * @description Public representation of a Platform row, including its own step-free access.
+         */
+        PlatformSchema: {
+            /** Name */
+            name: string;
+            step_free: components["schemas"]["PlatformStepFree"];
+            /** Lines */
+            lines: string[];
+        };
+        /**
+         * PlatformStepFree
+         * @description A single platform's step-free accessibility, as published by TfL.
+         *
+         *     Ordered weakest-to-strongest. `to_train` and `full` both mean a passenger can board the
+         *     train without a step; TfL labels them differently in the feed so both are preserved.
+         * @enum {string}
+         */
+        PlatformStepFree: "none" | "to_platform" | "to_train" | "full";
+        /**
+         * StationDetail
+         * @description A station plus its platforms, each with their own step-free access and lines.
+         *
+         *     `step_free` is the summary derived from these platforms (see Station.step_free).
+         */
+        StationDetail: {
+            /** Id */
+            id: number;
+            /** Name */
+            name: string;
+            step_free: components["schemas"]["StepFree"];
+            /** Platforms */
+            platforms: components["schemas"]["PlatformSchema"][];
+        };
+        /**
          * StationSchema
-         * @description Public representation of a Station row.
+         * @description Public representation of a Station row. Kept lean because it is embedded in other
+         *     payloads (e.g. equipment / outage reports); use StationDetail for the platform breakdown.
          */
         StationSchema: {
             /** Id */
             id: number;
             /** Name */
             name: string;
+            step_free: components["schemas"]["StepFree"];
         };
+        /**
+         * StepFree
+         * @description A station's step-free accessibility, as published by TfL.
+         *
+         *     Ordered weakest-to-strongest: no step-free access, step-free from street to platform
+         *     only, and step-free all the way from street onto the train.
+         * @enum {string}
+         */
+        StepFree: "none" | "to_platform" | "to_vehicle";
         /** ValidationError */
         ValidationError: {
             /** Location */
@@ -625,7 +671,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["StationSchema"][];
+                    "application/json": components["schemas"]["StationDetail"][];
                 };
             };
         };
