@@ -1,4 +1,7 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
+import type { StationOutage } from '@/features/journey/api/accessibility'
+import type { ResolvedLocation } from '@/features/journey/api/geocode'
+import type { AccessibilityPreference, Journey } from '@/features/journey/api/tfl'
 
 // Stations and equipment types are backend rows (GET /stations, GET /equipment-types). Navigation
 // only carries the human-readable station name and the kind of equipment being reported; the
@@ -8,6 +11,18 @@ export type EquipmentType = 'lift' | 'escalator'
 
 export type RootStackParamList = {
   JourneyPlanner: undefined
+  // The expanded view of a single journey. `savedId` is set when opened from the saved list, so
+  // the screen can show Remove instead of Save. The journey and its context are plain JSON.
+  JourneyDetail: {
+    journey: Journey
+    from?: ResolvedLocation
+    to?: ResolvedLocation
+    outages?: StationOutage[]
+    level?: AccessibilityPreference | null
+    savedId?: string
+  }
+  // The list of journeys saved to the device.
+  SavedJourneys: undefined
   // The station-specific screen (platform access, quick reports, station picker). Reached by
   // tapping a station in a planned journey; `station` is optional so it can also open standalone.
   Station: { station?: Station }
@@ -18,6 +33,8 @@ export type RootStackParamList = {
 }
 
 export type JourneyPlannerScreenProps = NativeStackScreenProps<RootStackParamList, 'JourneyPlanner'>
+export type JourneyDetailScreenProps = NativeStackScreenProps<RootStackParamList, 'JourneyDetail'>
+export type SavedJourneysScreenProps = NativeStackScreenProps<RootStackParamList, 'SavedJourneys'>
 export type StationScreenProps = NativeStackScreenProps<RootStackParamList, 'Station'>
 export type SelectStationScreenProps = NativeStackScreenProps<RootStackParamList, 'SelectStation'>
 export type ReportFormScreenProps = NativeStackScreenProps<RootStackParamList, 'ReportForm'>

@@ -11,15 +11,31 @@ type Mode = { name: string }
 /** A point a leg departs from or arrives at, e.g. a station. */
 type Point = { commonName?: string }
 
+/** A line/route a leg runs on, e.g. `name: "Victoria"`, `directions: ["Brixton"]`. */
+type RouteOption = { name?: string; directions?: string[] }
+
+/** A disruption affecting a leg, e.g. a part-suspended line. */
+type Disruption = { description?: string; category?: string }
+
 /** One leg of a journey (a continuous stretch on a single mode). */
 export type Leg = {
   duration: number
   mode: Mode
-  instruction: { summary: string }
+  // `summary` is the one-line instruction; `detailed` is TfL's longer turn-by-turn text.
+  instruction: { summary: string; detailed?: string }
+  // Per-leg wall-clock times (London local, no timezone designator — see `clockTime`).
+  departureTime?: string
+  arrivalTime?: string
   // The stations/stops this leg runs between. Used to cross-reference our own live outage
   // data; optional because walking legs and some points may omit a name.
   departurePoint?: Point
   arrivalPoint?: Point
+  // The line(s) the leg runs on.
+  routeOptions?: RouteOption[]
+  // The intermediate stops along the leg's path.
+  path?: { stopPoints?: { name?: string }[] }
+  isDisrupted?: boolean
+  disruptions?: Disruption[]
 }
 
 /**

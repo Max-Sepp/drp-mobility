@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useFocusEffect } from '@react-navigation/native'
+import { useCallback, useMemo, useState } from 'react'
 import { ScrollView } from 'tamagui'
 import { apiClient } from '@/api/client'
 import type { components } from '@/api/schema.d'
@@ -25,11 +26,13 @@ export const HomeScreen = ({ navigation, route }: StationScreenProps) => {
     setLoading(false)
   }, [station])
 
-  useEffect(() => {
-    fetchReports()
-    const unsub = navigation.addListener('focus', fetchReports)
-    return unsub
-  }, [fetchReports, navigation])
+  // Refetch whenever the screen comes into focus (including the first time), so a report
+  // submitted on another screen shows when the user returns.
+  useFocusEffect(
+    useCallback(() => {
+      fetchReports()
+    }, [fetchReports]),
+  )
 
   function changeStation() {
     stationPicker.register(setStation)

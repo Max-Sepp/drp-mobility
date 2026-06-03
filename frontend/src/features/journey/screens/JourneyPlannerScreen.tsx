@@ -1,5 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Alert } from 'react-native'
 import { Text, XStack, YStack } from 'tamagui'
 import { ScreenHeader } from '@/components/ScreenHeader'
@@ -13,6 +13,7 @@ import {
   type StationOutage,
 } from '../api/accessibility'
 import { type ResolvedLocation, resolveToPostcode } from '../api/geocode'
+import { loadSavedJourneys } from '../api/savedJourneys'
 import { type AccessibilityPreference, type Journey, planJourney } from '../api/tfl'
 import { JourneyResultCard } from '../components/JourneyResultCard'
 import { LocationInput } from '../components/LocationInput'
@@ -53,6 +54,15 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
     [stationNames],
   )
   const openStation = (station: string) => navigation.navigate('Station', { station })
+
+  // Count of saved journeys for the header badge, refreshed whenever the screen regains focus
+  // (a journey may have been saved or removed on the detail screen).
+  const [savedCount, setSavedCount] = useState(0)
+  useEffect(() => {
+    const reload = () => loadSavedJourneys().then((s) => setSavedCount(s.length))
+    reload()
+    return navigation.addListener('focus', reload)
+  }, [navigation])
 
   async function run() {
     if (!from.trim() || !to.trim()) {
@@ -109,7 +119,26 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
 
   return (
     <FormScreenLayout
-      header={<ScreenHeader title="Plan a journey" />}
+      header={
+        <ScreenHeader
+          title="Plan a journey"
+          right={
+            <XStack
+              items="center"
+              gap="$1"
+              pressStyle={{ opacity: 0.6 }}
+              onPress={() => navigation.navigate('SavedJourneys')}
+              accessibilityRole="button"
+              accessibilityLabel={`Saved journeys${savedCount > 0 ? `, ${savedCount}` : ''}`}
+            >
+              <MaterialIcons name="bookmark" size={18} color="#2563eb" />
+              <Text fontSize={14} fontWeight="600" color="#2563eb">
+                Saved{savedCount > 0 ? ` (${savedCount})` : ''}
+              </Text>
+            </XStack>
+          }
+        />
+      }
       footer={null}
     >
       {showInputs ? (
@@ -218,6 +247,15 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
           to={resolved?.to}
           resolveStation={resolveStation}
           onStationPress={openStation}
+          onPress={() =>
+            navigation.navigate('JourneyDetail', {
+              journey,
+              from: resolved?.from,
+              to: resolved?.to,
+              outages,
+              level,
+            })
+          }
         />
       ))}
     </FormScreenLayout>
