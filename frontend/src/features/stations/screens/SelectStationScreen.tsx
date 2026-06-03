@@ -7,6 +7,7 @@ import type { SelectStationScreenProps, Station } from '@/navigation/types'
 import { Borders, Colors } from '@/theme'
 import { StationListItem } from '../components/StationListItem'
 import { stationPicker } from '../stationPicker'
+import { fuzzyScore } from '@/lib/fuzzy'
 import { stationLines, useStations } from '../useStations'
 
 export const SelectStationScreen = ({ navigation, route }: SelectStationScreenProps) => {
@@ -27,10 +28,14 @@ export const SelectStationScreen = ({ navigation, route }: SelectStationScreenPr
     }
   }, [])
 
-  const filtered = useMemo(
-    () => stations.filter((s) => s.name.toLowerCase().includes(query.toLowerCase())),
-    [stations, query],
-  )
+  const filtered = useMemo(() => {
+    if (!query) return stations
+    return stations
+      .map((s) => ({ station: s, score: fuzzyScore(query, s.name) }))
+      .filter(({ score }) => score > 0)
+      .sort((a, b) => b.score - a.score)
+      .map(({ station }) => station)
+  }, [stations, query])
 
   function select(station: Station) {
     stationPicker.resolve(station)

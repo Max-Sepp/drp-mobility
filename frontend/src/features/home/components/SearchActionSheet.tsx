@@ -48,6 +48,7 @@ import {
   type ResolvedLocation,
 } from '@/features/journey/api/geocode'
 import { useStations, type StationDetail } from '@/features/stations/useStations'
+import { fuzzyScore } from '@/lib/fuzzy'
 import { Colors, Radii, Shadows, Spacing, Typography } from '@/theme'
 
 // ---------------------------------------------------------------------------
@@ -216,11 +217,13 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
         return
       }
       setSearching(true)
-      const q = query.toLowerCase()
       const timer = setTimeout(async () => {
         const matched = stations
-          .filter((s) => s.name.toLowerCase().includes(q))
+          .map((s) => ({ station: s, score: fuzzyScore(query, s.name) }))
+          .filter(({ score }) => score > 0)
+          .sort((a, b) => b.score - a.score)
           .slice(0, 5)
+          .map(({ station }) => station)
         setStationResults(matched)
         const locs = await searchLocations(query)
         setLocationResults(locs)
