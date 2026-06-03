@@ -174,8 +174,12 @@ def seed_defaults(db: Session) -> None:
     # Demo trusted account ---------------------------------------------------
     # Signup always yields an untrusted user and there is no in-app promotion flow yet, so seed one
     # trusted account (password "password123") to demonstrate trusted-reporter behaviour.
-    user_repo = UserRepository(db)
-    if user_repo.get_by_username("trusted_demo") is None:
-        demo = user_repo.create("trusted_demo", "password123")
-        demo.role = UserRole.TRUSTED.value
-        db.commit()
+    # IMPORTANT: only seed demo credentials when explicitly enabled.
+    import os
+
+    if os.environ.get("DRP_SEED_DEMO_USERS") == "1":
+        user_repo = UserRepository(db)
+        if user_repo.get_by_username("trusted_demo") is None:
+            demo = user_repo.create("trusted_demo", "password123")
+            demo.role = UserRole.TRUSTED.value
+            db.commit()
