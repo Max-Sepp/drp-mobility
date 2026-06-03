@@ -6,7 +6,7 @@ Guidance for Claude Code when working inside `backend/`. Top-level project conte
 
 ```bash
 # from backend/, with venv activated and requirements installed
-uvicorn app.main:app --reload                       # dev server on :8000, docs at /docs
+DEV=true uvicorn app.main:app --reload              # dev server on :8000, docs at /docs
 pytest                                              # full suite
 pytest tests/test_outage_reports.py::test_name      # single test
 ruff check .                                        # lint
@@ -15,8 +15,10 @@ ruff format .                                       # format
 
 # Refresh station data from TfL CSVs (run from repo root):
 python3 temp/enrich_tube_stations.py
-rm dev.db && uvicorn app.main:app --reload          # reseed with updated data
+rm dev.db && DEV=true uvicorn app.main:app --reload # reseed with updated data
 ```
+
+`DEV=true` enables the CORS middleware that allows the Expo web dev server (ports 8081/19006) to reach the API. Without it CORS headers are not set — this is intentional; the native app does not go through a browser so CORS is irrelevant in production.
 
 Lint/format use [Ruff](https://docs.astral.sh/ruff/) (config in `pyproject.toml`). Ruff is a dev-only dependency — install it with `pip install -r requirements-dev.txt` (it is deliberately kept out of `requirements.txt` so the prod image stays lean). FastAPI's `Depends(...)`-in-default and SQLAlchemy/Pydantic string forward references are whitelisted in the config; don't "fix" those.
 
