@@ -4,47 +4,69 @@ import type { ReactNode } from 'react'
 
 type Coords = Location.LocationObject['coords']
 
-const LocationContext = createContext<Coords | null>(null)
+type LocationState = {
+  coords: Coords | null
+  heading: number | null // degrees clockwise from true north, null if unavailable
+}
+
+const LocationContext = createContext<LocationState>({ coords: null, heading: null })
 
 /**
- * Silently requests foreground permission on mount and starts a position watch.
- * Cached coords are available instantly to any child via useAppLocation().
- * If permission is denied at launch, coords stays null — call sites request
- * permission themselves (with a user-visible prompt) when they actually need it.
+ * Silently requests foreground permission on mount and starts a position + heading watch.
+ * Cached values are available instantly to any child via useAppLocation() / useAppHeading().
+ * If permission is denied at launch, both stay null.
  */
 export function LocationProvider({ children }: { children: ReactNode }) {
   const [coords, setCoords] = useState<Coords | null>(null)
-  const subRef = useRef<Location.LocationSubscription | null>(null)
+  const [heading, setHeading] = useState<number | null>(null)
+  const posSubRef = useRef<Location.LocationSubscription | null>(null)
+  const headSubRef = useRef<Location.LocationSubscription | null>(null)
 
   useEffect(() => {
     let cancelled = false
 
     Location.requestForegroundPermissionsAsync().then(({ status }) => {
       if (cancelled || status !== 'granted') return
+
       Location.watchPositionAsync(
-        // 30 s time gate + 50 m distance gate — OS picks whichever fires first.
         { accuracy: Location.Accuracy.Balanced, timeInterval: 30_000, distanceInterval: 50 },
         (loc) => setCoords(loc.coords),
       ).then((sub) => {
-        if (cancelled) {
-          sub.remove()
-          return
-        }
-        subRef.current = sub
+        if (cancelled) { sub.remove(); return }
+        posSubRef.current = sub
+      })
+
+      Location.watchHeadingAsync((h) => {
+        const deg = h.trueHeading >= 0 ? h.trueHeading : h.magHeading
+        setHeading(deg >= 0 ? deg : null)
+      }).then((sub) => {
+        if (cancelled) { sub.remove(); return }
+        headSubRef.current = sub as unknown as Location.LocationSubscription
       })
     })
 
     return () => {
       cancelled = true
-      subRef.current?.remove()
-      subRef.current = null
+      posSubRef.current?.remove()
+      headSubRef.current?.remove()
+      posSubRef.current = null
+      headSubRef.current = null
     }
   }, [])
 
-  return <LocationContext.Provider value={coords}>{children}</LocationContext.Provider>
+  return (
+    <LocationContext.Provider value={{ coords, heading }}>
+      {children}
+    </LocationContext.Provider>
+  )
 }
 
 /** Returns the most recently cached device coordinates, or null if unavailable. */
 export function useAppLocation(): Coords | null {
-  return useContext(LocationContext)
+  return useContext(LocationContext).coords
+}
+
+/** Returns the device heading in degrees clockwise from true north, or null if unavailable. */
+export function useAppHeading(): number | null {
+  return useContext(LocationContext).heading
 }

@@ -2,8 +2,9 @@ import { useEffect, useRef } from 'react'
 import { StyleSheet } from 'react-native'
 import MapView, { PoiClickEvent, Region } from 'react-native-maps'
 import { fuzzyScore } from '@/lib/fuzzy'
-import { useAppLocation } from '@/lib/LocationContext'
+import { useAppHeading, useAppLocation } from '@/lib/LocationContext'
 import stationMarkers from '../data/stationMarkers.json'
+import { UserLocationMarker } from './UserLocationMarker'
 
 const LONDON: Region = {
   latitude: 51.5074,
@@ -56,6 +57,7 @@ type Props = { onStationPress: (name: string) => void }
 
 export function StationMap({ onStationPress }: Props) {
   const coords = useAppLocation()
+  const heading = useAppHeading()
   const mapRef = useRef<MapView>(null)
 
   // Animate to user location the first time coords become available.
@@ -82,9 +84,16 @@ export function StationMap({ onStationPress }: Props) {
       style={styles.map}
       initialRegion={LONDON}
       onPoiClick={handlePoiClick}
-      showsUserLocation
       showsMyLocationButton={false}
-    />
+    >
+      {coords && (
+        <UserLocationMarker
+          latitude={coords.latitude}
+          longitude={coords.longitude}
+          heading={heading}
+        />
+      )}
+    </MapView>
   )
 }
 
