@@ -329,18 +329,22 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
               color={Colors.secondaryText}
               style={{ marginRight: 6 }}
             />
-            <TextInput
-              ref={inputRef}
-              style={styles.searchInput}
-              placeholder="Where to?"
-              placeholderTextColor={Colors.placeholderText}
-              editable={expanded}
-              autoCapitalize="none"
-              autoCorrect={false}
-              returnKeyType="search"
-              value={query}
-              onChangeText={setQuery}
-            />
+            {/* pointerEvents="none" when collapsed so touches pass through to the
+                TouchableOpacity on native (editable=false alone doesn't stop touch capture). */}
+            <View style={{ flex: 1 }} pointerEvents={expanded ? 'auto' : 'none'}>
+              <TextInput
+                ref={inputRef}
+                style={styles.searchInput}
+                placeholder="Where to?"
+                placeholderTextColor={Colors.placeholderText}
+                editable={expanded}
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="search"
+                value={query}
+                onChangeText={setQuery}
+              />
+            </View>
             {!expanded && (
               <MaterialIcons name="mic" size={16} color={Colors.secondaryText} />
             )}
