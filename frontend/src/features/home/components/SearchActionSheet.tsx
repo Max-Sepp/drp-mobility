@@ -49,6 +49,7 @@ import {
 } from '@/features/journey/api/geocode'
 import { useStations, type StationDetail } from '@/features/stations/useStations'
 import { fuzzyScore } from '@/lib/fuzzy'
+import { useAppLocation } from '@/lib/LocationContext'
 import { Colors, Radii, Shadows, Spacing, Typography } from '@/theme'
 
 // ---------------------------------------------------------------------------
@@ -208,6 +209,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
     const inputRef = useRef<TextInput>(null)
 
     const { stations } = useStations()
+    const cachedCoords = useAppLocation()
 
     // Start translated down so only COLLAPSED_VISIBLE is showing.
     const translateY = useRef(new Animated.Value(SLIDE_OFFSET)).current
@@ -279,12 +281,10 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
           )
           return
         }
-        const pos = await Location.getCurrentPositionAsync({
-          accuracy: Location.Accuracy.Balanced,
-        })
-        const fromResult = await resolveToPostcode(
-          `${pos.coords.latitude},${pos.coords.longitude}`,
-        )
+        const pos =
+          cachedCoords ??
+          (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })).coords
+        const fromResult = await resolveToPostcode(`${pos.latitude},${pos.longitude}`)
         if ('error' in fromResult) {
           Alert.alert('Location error', fromResult.error)
           return

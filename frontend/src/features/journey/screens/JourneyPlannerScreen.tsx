@@ -14,6 +14,7 @@ import {
   type StationOutage,
 } from '../api/accessibility'
 import { type ResolvedLocation, resolveToPostcode } from '../api/geocode'
+import { useAppLocation } from '@/lib/LocationContext'
 import { loadSavedJourneys } from '../api/savedJourneys'
 import {
   type AccessibilityPreference,
@@ -57,6 +58,7 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
 
   const { stations } = useStations()
   const stationNames = useMemo(() => stations.map((s) => s.name), [stations])
+  const cachedCoords = useAppLocation()
   const resolveStation = useCallback(
     (commonName: string) => resolveStationName(commonName, stationNames),
     [stationNames],
@@ -78,8 +80,10 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
         Alert.alert('Location required', 'Enable location access in Settings to use this feature.')
         return
       }
-      const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })
-      const result = await resolveToPostcode(`${pos.coords.latitude},${pos.coords.longitude}`)
+      const pos =
+        cachedCoords ??
+        (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })).coords
+      const result = await resolveToPostcode(`${pos.latitude},${pos.longitude}`)
       if ('error' in result) {
         Alert.alert('Location error', result.error)
         return

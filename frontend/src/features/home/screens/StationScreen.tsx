@@ -8,6 +8,7 @@ import { apiClient } from '@/api/client'
 import type { components } from '@/api/schema.d'
 import { DEFAULT_STATION, stationPicker, useStations } from '@/features/stations'
 import { resolveToPostcode, type ResolvedLocation } from '@/features/journey/api/geocode'
+import { useAppLocation } from '@/lib/LocationContext'
 import type { Station, StationScreenProps } from '@/navigation/types'
 import { Colors, Heights, Radii, Spacing } from '@/theme'
 import { PlatformAccessCard } from '../components/PlatformAccessCard'
@@ -25,6 +26,7 @@ export const StationScreen = ({ navigation, route }: StationScreenProps) => {
   const { stations } = useStations()
   const stationDetail = useMemo(() => stations.find((s) => s.name === station), [stations, station])
   const insets = useSafeAreaInsets()
+  const cachedCoords = useAppLocation()
 
   const fetchReports = useCallback(async () => {
     setLoading(true)
@@ -60,10 +62,10 @@ export const StationScreen = ({ navigation, route }: StationScreenProps) => {
         Alert.alert('Location required', 'Enable location access in Settings to use this feature.')
         return
       }
-      const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })
-      const fromResult = await resolveToPostcode(
-        `${pos.coords.latitude},${pos.coords.longitude}`,
-      )
+      const pos =
+        cachedCoords ??
+        (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })).coords
+      const fromResult = await resolveToPostcode(`${pos.latitude},${pos.longitude}`)
       if ('error' in fromResult) {
         Alert.alert('Location error', fromResult.error)
         return
