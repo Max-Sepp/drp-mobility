@@ -10,6 +10,7 @@ from app.models.equipment import Equipment
 from app.models.failure import Failure
 from app.models.outage_report import OutageReport
 from app.models.outage_report_deletion import OutageReportDeletion
+from app.models.user import UserRole
 from app.schemas.outage_report import OutageReportCreate
 
 # Excludes reports that have a corresponding OutageReportDeletion row (soft-deleted).
@@ -64,7 +65,9 @@ class OutageReportRepository:
     # Mutations
     # ------------------------------------------------------------------
 
-    def create(self, payload: OutageReportCreate) -> OutageReport:
+    def create(
+        self, payload: OutageReportCreate, reporter_role: str = UserRole.UNTRUSTED.value
+    ) -> OutageReport:
         """Persist a new report, attaching it to the equipment's open Failure
         (creating one if needed)."""
         if self._db.get(Equipment, payload.equipment_id) is None:
@@ -76,6 +79,7 @@ class OutageReportRepository:
             failure_id=failure.id,
             breakdown_time=payload.breakdown_time,
             description=payload.description,
+            reporter_role=reporter_role,
         )
         self._db.add(report)
         self._db.commit()

@@ -1,4 +1,4 @@
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 
 import pytest
 from fastapi.testclient import TestClient
@@ -8,6 +8,8 @@ from sqlalchemy.pool import StaticPool
 
 from app.database import Base, get_db
 from app.main import app
+from app.models.user import UserRole
+from app.repositories.user import UserRepository
 from app.seed import seed_defaults
 
 
@@ -38,3 +40,25 @@ def client(db_session: Session) -> Iterator[TestClient]:
     with TestClient(app) as test_client:
         yield test_client
     app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def auth_headers_factory(db_session: Session) -> Callable[..., dict[str, str]]:
+    """Return a factory that creates a user with the given role and returns Bearer auth headers.
+
+    Signup always yields an `untrusted` user, so to exercise trusted-reporter behaviour we set the
+    role directly on the freshly created row before minting a session token.
+    """
+    repo = UserRepository(db_session)
+    counter = {"n": 0}
+
+    def _make(role: UserRole = UserRole.UNTRUSTED) -> dict[str, str]:
+        counter["n"] += 1
+        user = repo.create(f"user{counter['n']}", "password123")
+        if role != UserRole.UNTRUSTED:
+            user.role = role.value
+            db_session.commit()
+        session = repo.create_session(user)
+        return {"Authorization": f"Bearer {session.token}"}
+
+    return _make

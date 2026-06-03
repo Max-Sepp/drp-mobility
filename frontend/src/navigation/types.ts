@@ -31,6 +31,10 @@ export type RootStackParamList = {
   ReportForm: { equipmentType: EquipmentType; station: Station }
   ReportCustom: { station: Station }
   Success: undefined
+  // Auth is optional: these are pushed on top of the normal stack (e.g. from the header) and
+  // dismissed with goBack on success or cancel — there is no login wall.
+  Login: undefined
+  Signup: undefined
 }
 
 export type JourneyPlannerScreenProps = NativeStackScreenProps<RootStackParamList, 'JourneyPlanner'>
@@ -41,3 +45,5 @@ export type SelectStationScreenProps = NativeStackScreenProps<RootStackParamList
 export type ReportFormScreenProps = NativeStackScreenProps<RootStackParamList, 'ReportForm'>
 export type ReportCustomScreenProps = NativeStackScreenProps<RootStackParamList, 'ReportCustom'>
 export type SuccessScreenProps = NativeStackScreenProps<RootStackParamList, 'Success'>
+export type LoginScreenProps = NativeStackScreenProps<RootStackParamList, 'Login'>
+export type SignupScreenProps = NativeStackScreenProps<RootStackParamList, 'Signup'>

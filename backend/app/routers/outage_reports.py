@@ -3,6 +3,8 @@ import os
 from fastapi import APIRouter, Depends, HTTPException, UploadFile
 from fastapi.responses import Response
 
+from app.dependencies.auth import get_optional_user
+from app.models.user import User, UserRole
 from app.repositories.outage_report import OutageReportRepository, get_repo
 from app.schemas.outage_report import OutageReportCreate, OutageReportSummary
 
@@ -43,13 +45,17 @@ def _resolve_content_type(file: UploadFile) -> str:
 def create_outage_report(
     payload: OutageReportCreate,
     repo: OutageReportRepository = Depends(get_repo),
+    current_user: User | None = Depends(get_optional_user),
 ) -> OutageReportSummary:
     """Submit a new outage report (without an image).
 
-    To attach an image, follow up with POST /outage-reports/{id}/image.
+    Open to anonymous callers: the report is tagged with the authenticated user's role, or
+    `untrusted` when submitted without a valid token. To attach an image, follow up with
+    POST /outage-reports/{id}/image.
     """
+    reporter_role = current_user.role if current_user else UserRole.UNTRUSTED.value
     try:
-        return repo.create(payload)
+        return repo.create(payload, reporter_role=reporter_role)
     except ValueError as exc:
         # 422 Unprocessable Entity: payload parsed fine, but a referenced row
         # (e.g. equipment_id) doesn't exist — semantically invalid input.
