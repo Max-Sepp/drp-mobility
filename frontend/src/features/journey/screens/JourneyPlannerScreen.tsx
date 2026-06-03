@@ -1,5 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Alert } from 'react-native'
 import { Text, XStack, YStack } from 'tamagui'
 import { ScreenHeader } from '@/components/ScreenHeader'
@@ -13,13 +13,21 @@ import {
   type StationOutage,
 } from '../api/accessibility'
 import { type ResolvedLocation, resolveToPostcode } from '../api/geocode'
-import { type AccessibilityPreference, type Journey, planJourney } from '../api/tfl'
+import { loadSavedJourneys } from '../api/savedJourneys'
+import {
+  type AccessibilityPreference,
+  type Journey,
+  planJourneyOptions,
+  type RouteTag,
+} from '../api/tfl'
 import { JourneyResultCard } from '../components/JourneyResultCard'
+import { formatDepart, LeaveAtField } from '../components/LeaveAtField'
 import { LocationInput } from '../components/LocationInput'
 
 type Resolved = { from: ResolvedLocation; to: ResolvedLocation }
-// A journey paired with the live outages (from our data) affecting the stations it touches.
-type JourneyResult = { journey: Journey; outages: StationOutage[] }
+// A journey paired with the live outages (from our data) affecting the stations it touches, and
+// the optimisation tags (fastest / fewest changes / …) that surfaced it.
+type JourneyResult = { journey: Journey; outages: StationOutage[]; tags: RouteTag[] }
 
 const LEVELS: { value: AccessibilityPreference; label: string }[] = [
   { value: 'StepFreeToVehicle', label: 'Step-free to train' },
@@ -36,6 +44,8 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
   // Null means no accessibility filtering at all — TfL then returns every mode (tube, rail, …)
   // rather than only step-free routes. Each button toggles, so the user can deselect both.
   const [level, setLevel] = useState<AccessibilityPreference | null>(null)
+  // Null means leave now; a Date plans for departing at that time.
+  const [departAt, setDepartAt] = useState<Date | null>(null)
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState<JourneyResult[]>([])
   const [resolved, setResolved] = useState<Resolved | null>(null)
@@ -53,6 +63,15 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
     [stationNames],
   )
   const openStation = (station: string) => navigation.navigate('Station', { station })
+
+  // Count of saved journeys for the header badge, refreshed whenever the screen regains focus
+  // (a journey may have been saved or removed on the detail screen).
+  const [savedCount, setSavedCount] = useState(0)
+  useEffect(() => {
+    const reload = () => loadSavedJourneys().then((s) => setSavedCount(s.length))
+    reload()
+    return navigation.addListener('focus', reload)
+  }, [navigation])
 
   async function run() {
     if (!from.trim() || !to.trim()) {
@@ -87,7 +106,7 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
     }
     setResolved({ from: fromLoc, to: toLoc })
 
-    const result = await planJourney(fromLoc.postcode, toLoc.postcode, level)
+    const result = await planJourneyOptions(fromLoc.postcode, toLoc.postcode, level, departAt)
     if (result.kind !== 'journeys') {
       setLoading(false)
       Alert.alert('No journey', result.message)
@@ -97,8 +116,9 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
     // Flag journeys against our live outage data, then sort flagged ones to the bottom
     // (stable: TfL's ordering is preserved within the clean and flagged groups).
     const outages = await outagesPromise
-    const flagged = result.journeys.map((journey) => ({
+    const flagged = result.journeys.map(({ journey, tags }) => ({
       journey,
+      tags,
       outages: matchOutages(journey, outages),
     }))
     flagged.sort((a, b) => Number(a.outages.length > 0) - Number(b.outages.length > 0))
@@ -109,7 +129,26 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
 
   return (
     <FormScreenLayout
-      header={<ScreenHeader title="Plan a journey" />}
+      header={
+        <ScreenHeader
+          title="Plan a journey"
+          right={
+            <XStack
+              items="center"
+              gap="$1"
+              pressStyle={{ opacity: 0.6 }}
+              onPress={() => navigation.navigate('SavedJourneys')}
+              accessibilityRole="button"
+              accessibilityLabel={`Saved journeys${savedCount > 0 ? `, ${savedCount}` : ''}`}
+            >
+              <MaterialIcons name="bookmark" size={18} color="#2563eb" />
+              <Text fontSize={14} fontWeight="600" color="#2563eb">
+                Saved{savedCount > 0 ? ` (${savedCount})` : ''}
+              </Text>
+            </XStack>
+          }
+        />
+      }
       footer={null}
     >
       {showInputs ? (
@@ -153,6 +192,8 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
               })}
             </XStack>
           </YStack>
+
+          <LeaveAtField value={departAt} onChange={setDepartAt} />
 
           <YStack
             mt="$2"
@@ -198,6 +239,14 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
                   {resolved.to.label}
                 </Text>
               </XStack>
+              {departAt && (
+                <XStack gap="$2" items="center">
+                  <MaterialIcons name="schedule" size={14} color="#6b7280" style={{ width: 18 }} />
+                  <Text fontSize={14} color="#6b7280" flex={1} numberOfLines={1}>
+                    Leaving {formatDepart(departAt)}
+                  </Text>
+                </XStack>
+              )}
             </YStack>
             <XStack items="center" gap="$1">
               <MaterialIcons name="edit" size={16} color="#2563eb" />
@@ -209,15 +258,26 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
         )
       )}
 
-      {results.map(({ journey, outages }, i) => (
+      {results.map(({ journey, outages, tags }, i) => (
         <JourneyResultCard
           key={i}
           journey={journey}
           outages={outages}
+          tags={tags}
           from={resolved?.from}
           to={resolved?.to}
           resolveStation={resolveStation}
           onStationPress={openStation}
+          onPress={() =>
+            navigation.navigate('JourneyDetail', {
+              journey,
+              from: resolved?.from,
+              to: resolved?.to,
+              outages,
+              level,
+              tags,
+            })
+          }
         />
       ))}
     </FormScreenLayout>

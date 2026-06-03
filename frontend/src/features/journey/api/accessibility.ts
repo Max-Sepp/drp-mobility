@@ -6,8 +6,52 @@
 import { apiClient } from '@/api/client'
 import type { Journey } from './tfl'
 
+/** One specific broken piece of equipment at a station, with its reported detail. */
+export type OutageUnit = {
+  /** "lift" or "escalator". */
+  equipmentType: string
+  /** The full connection description, e.g. "Lift A: Booking Hall → Railway platform 1". */
+  connection: string
+  /** Platform endpoints named in the connection, e.g. ["Railway platform 1"]. May be empty
+   *  for connectors between non-platform areas (street ↔ booking hall, footbridge, …). */
+  platformEndpoints: string[]
+  reportCount: number
+  lastReported: string | null
+  /** Escalator topology is not published by TfL, so escalator connections are estimates. */
+  estimated: boolean
+}
+
 /** A station with one or more pieces of step-free equipment currently reported broken. */
-export type StationOutage = { stationName: string; equipmentTypes: string[] }
+export type StationOutage = {
+  stationName: string
+  equipmentTypes: string[]
+  units: OutageUnit[]
+}
+
+/**
+ * Pull the area names out of a connection string. "Lift A: Booking Hall → Railway platform 1"
+ * becomes ["Booking Hall", "Railway platform 1"].
+ */
+function connectionEndpoints(connection: string): string[] {
+  const afterName = connection.includes(':')
+    ? connection.slice(connection.indexOf(':') + 1)
+    : connection
+  return afterName
+    .split('→')
+    .map((part) => part.trim())
+    .filter(Boolean)
+}
+
+/**
+ * The platform(s) a connection touches. Endpoints that name a platform are kept (and any
+ * comma-joined list, e.g. "Northbound Platform 1, Southbound Platform 2", is split out).
+ */
+function platformEndpoints(connection: string): string[] {
+  return connectionEndpoints(connection)
+    .filter((endpoint) => /platform/i.test(endpoint))
+    .flatMap((endpoint) => endpoint.split(',').map((p) => p.trim()))
+    .filter(Boolean)
+}
 
 // Suffixes TfL appends to station names that our own names (e.g. "Victoria") omit.
 const STATION_SUFFIX_RE = /\s+(?:underground|rail|dlr|bus)?\s*station$/
@@ -55,18 +99,28 @@ export async function fetchStationOutages(): Promise<StationOutage[]> {
   const { data, error } = await apiClient.GET('/failures')
   if (error || !data) return []
 
-  const byStation = new Map<string, Set<string>>()
+  const byStation = new Map<string, OutageUnit[]>()
   for (const failure of data) {
     if (failure.resolved) continue
-    const station = failure.equipment.station.name
-    const types = byStation.get(station) ?? new Set<string>()
-    types.add(failure.equipment.equipment_type.name)
-    byStation.set(station, types)
+    const { equipment } = failure
+    const station = equipment.station.name
+    const type = equipment.equipment_type.name
+    const units = byStation.get(station) ?? []
+    units.push({
+      equipmentType: type,
+      connection: equipment.connection,
+      platformEndpoints: platformEndpoints(equipment.connection),
+      reportCount: failure.report_count,
+      lastReported: failure.last_reported,
+      estimated: type === 'escalator',
+    })
+    byStation.set(station, units)
   }
 
-  return [...byStation].map(([stationName, types]) => ({
+  return [...byStation].map(([stationName, units]) => ({
     stationName,
-    equipmentTypes: [...types],
+    equipmentTypes: [...new Set(units.map((u) => u.equipmentType))],
+    units,
   }))
 }
 

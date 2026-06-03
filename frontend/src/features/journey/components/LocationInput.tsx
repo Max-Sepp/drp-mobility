@@ -37,19 +37,26 @@ export const LocationInput = ({ label, value, onChangeText, onResolved }: Locati
       skipNextSearch.current = false
       return
     }
-    if (value.trim().length < 3) {
-      setSuggestions([])
-      setSearching(false)
-      return
-    }
     let active = true
-    setSearching(true)
-    const timer = setTimeout(async () => {
-      const results = await searchLocations(value)
-      if (!active) return
-      setSuggestions(results)
-      setSearching(false)
-    }, 400)
+    const tooShort = value.trim().length < 3
+    // All state updates happen inside the timer callback, never synchronously in the effect
+    // body. Short input clears the dropdown straight away (0ms); longer input is debounced so
+    // we don't fire a geocode request on every keystroke.
+    const timer = setTimeout(
+      async () => {
+        if (tooShort) {
+          setSuggestions([])
+          setSearching(false)
+          return
+        }
+        setSearching(true)
+        const results = await searchLocations(value)
+        if (!active) return
+        setSuggestions(results)
+        setSearching(false)
+      },
+      tooShort ? 0 : 400,
+    )
     return () => {
       active = false
       clearTimeout(timer)
