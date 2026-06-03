@@ -8,6 +8,7 @@ import { FormScreenLayout } from '../components/FormScreenLayout'
 import { FormSection } from '../components/FormSection'
 import { PhotoPicker } from '../components/PhotoPicker'
 import { SubmitBar } from '../components/SubmitBar'
+import { Colors, Typography } from '@/theme'
 
 export const ReportCustomScreen = ({ navigation, route }: ReportCustomScreenProps) => {
   const { station } = route.params
@@ -44,10 +45,10 @@ export const ReportCustomScreen = ({ navigation, route }: ReportCustomScreenProp
           textAlignVertical="top"
           style={{
             minHeight: 100,
-            borderColor: '#d1d5db',
-            backgroundColor: '#f9fafb',
-            color: '#111827',
-            fontSize: 15,
+            borderColor: Colors.border,
+            backgroundColor: Colors.searchBg,
+            color: Colors.text,
+            fontSize: Typography.body.fontSize,
           }}
         />
       </FormSection>
@@ -59,10 +60,10 @@ export const ReportCustomScreen = ({ navigation, route }: ReportCustomScreenProp
           placeholder="-- select --"
           placeholderTextColor="$gray9"
           style={{
-            borderColor: '#d1d5db',
-            backgroundColor: '#f9fafb',
-            color: '#111827',
-            fontSize: 15,
+            borderColor: Colors.border,
+            backgroundColor: Colors.searchBg,
+            color: Colors.text,
+            fontSize: Typography.body.fontSize,
           }}
         />
       </FormSection>

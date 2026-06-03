@@ -1,5 +1,6 @@
 import { Text, XStack } from 'tamagui'
 import { lineColour } from '../lineColours'
+import { Radii } from '@/theme'
 
 type LineChipsProps = {
   lines: string[]
@@ -18,7 +19,7 @@ export const LineChips = ({ lines }: LineChipsProps) => {
             key={name}
             px="$2"
             py="$1"
-            style={{ backgroundColor: background, borderRadius: 4 }}
+            style={{ backgroundColor: background, borderRadius: Radii.xs }}
           >
             <Text fontSize={12} fontWeight="600" style={{ color: foreground }}>
               {name}

@@ -11,6 +11,7 @@ import { FormScreenLayout } from '../components/FormScreenLayout'
 import { FormSection } from '../components/FormSection'
 import { PhotoPicker } from '../components/PhotoPicker'
 import { SubmitBar } from '../components/SubmitBar'
+import { Colors, Typography } from '@/theme'
 
 type Equipment = components['schemas']['EquipmentSummary']
 
@@ -125,10 +126,10 @@ export const ReportFormScreen = ({ navigation, route }: ReportFormScreenProps) =
           textAlignVertical="top"
           style={{
             minHeight: 80,
-            borderColor: '#d1d5db',
-            backgroundColor: '#f9fafb',
-            color: '#111827',
-            fontSize: 15,
+            borderColor: Colors.border,
+            backgroundColor: Colors.searchBg,
+            color: Colors.text,
+            fontSize: Typography.body.fontSize,
           }}
         />
       </FormSection>

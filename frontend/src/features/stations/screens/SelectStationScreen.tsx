@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ActivityIndicator, FlatList, Keyboard } from 'react-native'
+import { ActivityIndicator, FlatList, Keyboard, StyleSheet } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Input, Separator, Text, YStack } from 'tamagui'
 import { ScreenHeader } from '@/components/ScreenHeader'
 import type { SelectStationScreenProps, Station } from '@/navigation/types'
+import { Borders, Colors } from '@/theme'
 import { StationListItem } from '../components/StationListItem'
 import { stationPicker } from '../stationPicker'
 import { stationLines, useStations } from '../useStations'
@@ -37,18 +38,18 @@ export const SelectStationScreen = ({ navigation, route }: SelectStationScreenPr
   }
 
   return (
-    <YStack flex={1} style={{ backgroundColor: 'white' }}>
+    <YStack flex={1} style={{ backgroundColor: Colors.card }}>
       <ScreenHeader title="Select station" height={72} onBack={() => navigation.goBack()} />
 
       {loading ? (
         <YStack flex={1} items="center" justify="center" gap="$3">
-          <ActivityIndicator size="large" color="#2d6a4f" />
-          <Text color="#6b7280">Loading stations…</Text>
+          <ActivityIndicator size="large" color={Colors.blue} />
+          <Text color={Colors.secondaryText}>Loading stations…</Text>
         </YStack>
       ) : error ? (
         <YStack flex={1} items="center" justify="center" px="$6">
-          <Text color="#991b1b" fontSize={15} style={{ textAlign: 'center' }}>
-            Couldn’t load stations. Check your connection and try again.
+          <Text color={Colors.dangerDark} fontSize={15} style={{ textAlign: 'center' }}>
+            Couldn't load stations. Check your connection and try again.
           </Text>
         </YStack>
       ) : (
@@ -74,12 +75,13 @@ export const SelectStationScreen = ({ navigation, route }: SelectStationScreenPr
       <YStack
         px="$4"
         pt="$2.5"
-        style={{
-          borderTopWidth: 1,
-          borderTopColor: '#e5e7eb',
-          paddingBottom: keyboardHeight > 0 ? 10 : insets.bottom || 10,
-          marginBottom: keyboardHeight > 0 ? keyboardHeight + insets.bottom : 0,
-        }}
+        style={[
+          styles.searchBar,
+          {
+            paddingBottom: keyboardHeight > 0 ? 10 : insets.bottom || 10,
+            marginBottom: keyboardHeight > 0 ? keyboardHeight + insets.bottom : 0,
+          },
+        ]}
       >
         <Input
           value={query}
@@ -88,9 +90,16 @@ export const SelectStationScreen = ({ navigation, route }: SelectStationScreenPr
           placeholderTextColor="$gray9"
           autoCorrect={false}
           size="$4"
-          style={{ borderWidth: 0, backgroundColor: 'transparent', color: '#111827' }}
+          style={{ borderWidth: 0, backgroundColor: 'transparent', color: Colors.text }}
         />
       </YStack>
     </YStack>
   )
 }
+
+const styles = StyleSheet.create({
+  searchBar: {
+    borderTopWidth: Borders.thin,
+    borderTopColor: Colors.border,
+  },
+})

@@ -2,6 +2,7 @@ import { MaterialIcons } from '@expo/vector-icons'
 import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker'
 import { Platform } from 'react-native'
 import { Text, XStack, YStack } from 'tamagui'
+import { Borders, Colors, Heights, Radii } from '@/theme'
 
 type LeaveAtFieldProps = {
   /** The chosen departure time, or null to leave now. */
@@ -21,9 +22,9 @@ export function formatDepart(date: Date): string {
 
 const SEGMENT_STYLE = {
   flex: 1,
-  minHeight: 48,
-  borderRadius: 10,
-  borderWidth: 1.5,
+  minHeight: Heights.touchTarget,
+  borderRadius: Radii.button,
+  borderWidth: Borders.medium,
 } as const
 
 /**
@@ -68,7 +69,7 @@ export const LeaveAtField = ({ value, onChange }: LeaveAtFieldProps) => {
 
   return (
     <YStack gap="$1.5">
-      <Text fontSize={14} fontWeight="600" color="#6b7280">
+      <Text fontSize={14} fontWeight="600" color={Colors.secondaryText}>
         Leave at
       </Text>
       <XStack gap="$2">
@@ -79,11 +80,11 @@ export const LeaveAtField = ({ value, onChange }: LeaveAtFieldProps) => {
           onPress={() => onChange(null)}
           style={{
             ...SEGMENT_STYLE,
-            borderColor: !isLater ? '#111827' : '#d1d5db',
-            backgroundColor: !isLater ? '#111827' : '#f9fafb',
+            borderColor: !isLater ? Colors.text : Colors.border,
+            backgroundColor: !isLater ? Colors.text : Colors.searchBg,
           }}
         >
-          <Text fontSize={14} fontWeight="600" color={!isLater ? 'white' : '#374151'}>
+          <Text fontSize={14} fontWeight="600" color={!isLater ? Colors.card : Colors.text}>
             Now
           </Text>
         </YStack>
@@ -100,13 +101,13 @@ export const LeaveAtField = ({ value, onChange }: LeaveAtFieldProps) => {
           style={{
             ...SEGMENT_STYLE,
             paddingHorizontal: 8,
-            borderColor: isLater ? '#111827' : '#d1d5db',
-            backgroundColor: isLater ? '#111827' : '#f9fafb',
+            borderColor: isLater ? Colors.text : Colors.border,
+            backgroundColor: isLater ? Colors.text : Colors.searchBg,
           }}
         >
           <XStack items="center" gap="$1.5">
-            <MaterialIcons name="schedule" size={16} color={isLater ? 'white' : '#374151'} />
-            <Text fontSize={14} fontWeight="600" color={isLater ? 'white' : '#374151'}>
+            <MaterialIcons name="schedule" size={16} color={isLater ? Colors.card : Colors.text} />
+            <Text fontSize={14} fontWeight="600" color={isLater ? Colors.card : Colors.text}>
               {isLater ? formatDepart(value) : 'Later'}
             </Text>
           </XStack>

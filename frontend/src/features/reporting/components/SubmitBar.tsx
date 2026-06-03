@@ -1,5 +1,7 @@
+import { StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Spinner, Text, YStack } from 'tamagui'
+import { Borders, Colors, Heights, Radii } from '@/theme'
 
 type SubmitBarProps = {
   onPress: () => void
@@ -7,13 +9,9 @@ type SubmitBarProps = {
   label?: string
 }
 
-/** Fixed bottom bar holding the primary submit button; shows a spinner while submitting. */
 export const SubmitBar = ({ onPress, submitting = false, label = 'Submit' }: SubmitBarProps) => {
   return (
-    <SafeAreaView
-      edges={['bottom']}
-      style={{ backgroundColor: 'white', borderTopWidth: 1, borderTopColor: '#e5e7eb' }}
-    >
+    <SafeAreaView edges={['bottom']} style={styles.safe}>
       <YStack
         mx="$5"
         my="$3"
@@ -22,12 +20,12 @@ export const SubmitBar = ({ onPress, submitting = false, label = 'Submit' }: Sub
         pressStyle={{ opacity: 0.8 }}
         onPress={submitting ? undefined : onPress}
         opacity={submitting ? 0.6 : 1}
-        style={{ backgroundColor: '#111827', borderRadius: 10, height: 52 }}
+        style={{ backgroundColor: Colors.text, borderRadius: Radii.button, height: Heights.button }}
       >
         {submitting ? (
-          <Spinner color="white" />
+          <Spinner color={Colors.card} />
         ) : (
-          <Text color="white" fontSize={16} fontWeight="700">
+          <Text color={Colors.card} fontSize={16} fontWeight="700">
             {label}
           </Text>
         )}
@@ -35,3 +33,11 @@ export const SubmitBar = ({ onPress, submitting = false, label = 'Submit' }: Sub
     </SafeAreaView>
   )
 }
+
+const styles = StyleSheet.create({
+  safe: {
+    backgroundColor: Colors.card,
+    borderTopWidth: Borders.thin,
+    borderTopColor: Colors.border,
+  },
+})

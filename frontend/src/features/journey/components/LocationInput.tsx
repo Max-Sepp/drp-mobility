@@ -2,10 +2,11 @@ import { MaterialIcons } from '@expo/vector-icons'
 import { useEffect, useRef, useState } from 'react'
 import { Input, Spinner, Text, XStack, YStack } from 'tamagui'
 import { type LocationSuggestion, postcodeForSuggestion, searchLocations } from '../api/geocode'
+import { Borders, Colors, Radii } from '@/theme'
 
 const fieldStyle = {
-  borderColor: '#d1d5db',
-  backgroundColor: '#f9fafb',
+  borderColor: Colors.border,
+  backgroundColor: Colors.searchBg,
   fontSize: 15,
 }
 
@@ -127,7 +128,7 @@ export const LocationInput = ({
 
   return (
     <YStack gap="$1.5">
-      <Text fontSize={14} fontWeight="600" color="#6b7280">
+      <Text fontSize={14} fontWeight="600" color={Colors.secondaryText}>
         {label}
       </Text>
 
@@ -145,7 +146,7 @@ export const LocationInput = ({
             style={{
               ...fieldStyle,
               paddingRight: 38,
-              color: textColor ?? '#111827',
+              color: textColor ?? Colors.text,
               fontWeight: textBold ? '700' : '400',
             }}
           />
@@ -162,7 +163,7 @@ export const LocationInput = ({
               role="button"
               aria-label={`Clear ${label}`}
             >
-              <Text fontSize={18} color="#9ca3af">
+              <Text fontSize={18} color={Colors.placeholderText}>
                 ✕
               </Text>
             </YStack>
@@ -170,9 +171,9 @@ export const LocationInput = ({
         </YStack>
         <YStack width={20} items="center" justify="center">
           {searching ? (
-            <Spinner size="small" color="#6b7280" />
+            <Spinner size="small" color={Colors.secondaryText} />
           ) : resolved ? (
-            <Text fontSize={18} fontWeight="700" color="#16a34a">
+            <Text fontSize={18} fontWeight="700" color={Colors.success}>
               ✓
             </Text>
           ) : null}
@@ -184,31 +185,31 @@ export const LocationInput = ({
         <YStack
           style={{
             marginRight: 28,
-            borderWidth: 1.5,
-            borderColor: '#d1d5db',
-            borderRadius: 10,
-            backgroundColor: 'white',
+            borderWidth: Borders.medium,
+            borderColor: Colors.border,
+            borderRadius: Radii.button,
+            backgroundColor: Colors.card,
             overflow: 'hidden',
           }}
         >
           <YStack
             px="$4"
             justify="center"
-            pressStyle={currentLocationLoading ? undefined : { background: '#f3f4f6' }}
+            pressStyle={currentLocationLoading ? undefined : { background: Colors.searchBg }}
             onPress={currentLocationLoading ? undefined : onCurrentLocation}
             style={{ minHeight: 56 }}
           >
             {currentLocationLoading ? (
               <XStack items="center" gap="$2">
-                <Spinner size="small" color="#2563eb" />
-                <Text fontSize={15} color="#6b7280">
+                <Spinner size="small" color={Colors.blue} />
+                <Text fontSize={15} color={Colors.secondaryText}>
                   Getting location…
                 </Text>
               </XStack>
             ) : (
               <XStack items="center" gap="$2">
-                <MaterialIcons name="my-location" size={16} color="#2563eb" />
-                <Text fontSize={15} fontWeight="600" color="#2563eb">
+                <MaterialIcons name="my-location" size={16} color={Colors.blue} />
+                <Text fontSize={15} fontWeight="600" color={Colors.blue}>
                   My location
                 </Text>
               </XStack>
@@ -222,10 +223,10 @@ export const LocationInput = ({
         <YStack
           style={{
             marginRight: 28,
-            borderWidth: 1.5,
-            borderColor: '#d1d5db',
-            borderRadius: 10,
-            backgroundColor: 'white',
+            borderWidth: Borders.medium,
+            borderColor: Colors.border,
+            borderRadius: Radii.button,
+            backgroundColor: Colors.card,
             overflow: 'hidden',
           }}
         >
@@ -234,19 +235,19 @@ export const LocationInput = ({
               key={`${suggestion.lat},${suggestion.lon}-${i}`}
               px="$4"
               justify="center"
-              pressStyle={{ background: '#f3f4f6' }}
+              pressStyle={{ background: Colors.searchBg }}
               onPress={() => choose(suggestion)}
               style={{
                 minHeight: 56,
-                borderTopWidth: i === 0 ? 0 : 1,
-                borderTopColor: '#e5e7eb',
+                borderTopWidth: i === 0 ? 0 : Borders.thin,
+                borderTopColor: Colors.border,
               }}
             >
-              <Text fontSize={15} color="#111827" numberOfLines={1}>
+              <Text fontSize={15} color={Colors.text} numberOfLines={1}>
                 {suggestion.label}
               </Text>
               {suggestion.postcode && (
-                <Text fontSize={13} color="#6b7280">
+                <Text fontSize={13} color={Colors.secondaryText}>
                   {suggestion.postcode}
                 </Text>
               )}

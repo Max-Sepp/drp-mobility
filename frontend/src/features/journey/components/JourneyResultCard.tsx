@@ -15,31 +15,19 @@ import {
   RouteTags,
   type StationPressHandler,
 } from './legDisplay'
+import { Borders, Colors, Radii } from '@/theme'
 
 type JourneyResultCardProps = {
   journey: Journey
-  /** Stations on this journey we know to have broken step-free equipment, if any. */
   outages?: StationOutage[]
-  /** Why this route stands out (fastest / fewest changes / least walking). */
   tags?: RouteTag[]
-  // The resolved start/end the journey was planned between. Used to swap the bare postcodes
-  // TfL echoes in its leg instructions back to the readable places the user chose.
   from?: ResolvedLocation
   to?: ResolvedLocation
-  // Maps a TfL station `commonName` to a station we have a detail screen for (or null), and
-  // opens that screen. Together these make the stations on a leg tappable.
   resolveStation: ResolveStation
   onStationPress: StationPressHandler
-  /** Opens the expanded journey detail screen for this journey. */
   onPress?: () => void
 }
 
-/**
- * One journey option: total duration, depart/arrive times, and the ordered legs, each shown
- * with a mode icon. Per-leg durations cover only time in motion, so any remaining time (the
- * total minus the legs) is interchange and waiting — shown as its own line so the breakdown
- * visibly adds up to the headline duration. Tapping the card opens the expanded detail view.
- */
 export const JourneyResultCard = ({
   journey,
   outages = [],
@@ -64,10 +52,10 @@ export const JourneyResultCard = ({
       role={onPress ? 'button' : undefined}
       aria-label={onPress ? 'View journey details' : undefined}
       style={{
-        borderWidth: 1.5,
-        borderColor: '#d1d5db',
-        borderRadius: 10,
-        backgroundColor: 'white',
+        borderWidth: Borders.medium,
+        borderColor: Colors.border,
+        borderRadius: Radii.button,
+        backgroundColor: Colors.card,
       }}
     >
       {outages.length > 0 && (
@@ -76,14 +64,14 @@ export const JourneyResultCard = ({
           p="$2.5"
           items="flex-start"
           style={{
-            backgroundColor: '#fffbeb',
-            borderWidth: 1,
-            borderColor: '#fcd34d',
-            borderRadius: 8,
+            backgroundColor: Colors.warningBg,
+            borderWidth: Borders.thin,
+            borderColor: Colors.warningBorder,
+            borderRadius: Radii.small,
           }}
         >
           <Text fontSize={15}>⚠️</Text>
-          <Text fontSize={13} color="#92400e" flex={1}>
+          <Text fontSize={13} color={Colors.warningDark} flex={1}>
             {outageWarning(outages)}
           </Text>
         </XStack>
@@ -93,16 +81,16 @@ export const JourneyResultCard = ({
 
       <XStack items="center" justify="space-between">
         <XStack items="baseline" gap="$2">
-          <Text fontSize={18} fontWeight="700" color="#111827">
+          <Text fontSize={18} fontWeight="700" color={Colors.text}>
             {journey.duration} min
           </Text>
           {fare && (
-            <Text fontSize={15} fontWeight="600" color="#16a34a">
+            <Text fontSize={15} fontWeight="600" color={Colors.success}>
               {fare}
             </Text>
           )}
         </XStack>
-        <Text fontSize={15} color="#374151">
+        <Text fontSize={15} color={Colors.text}>
           {clockTime(journey.startDateTime)} → {clockTime(journey.arrivalDateTime)}
         </Text>
       </XStack>
@@ -113,12 +101,12 @@ export const JourneyResultCard = ({
             <MaterialIcons
               name={modeIcon(leg.mode.name)}
               size={22}
-              color="#2563eb"
+              color={Colors.blue}
               aria-label={modeLabel(leg.mode.name)}
               style={{ width: 24, marginTop: 1 }}
             />
             <YStack flex={1} gap="$0.5">
-              <Text fontSize={14} color="#111827">
+              <Text fontSize={14} color={Colors.text}>
                 {humanizeSummary(leg.instruction.summary, [from, to])}
               </Text>
               <LegStations
@@ -126,7 +114,7 @@ export const JourneyResultCard = ({
                 resolveStation={resolveStation}
                 onStationPress={onStationPress}
               />
-              <Text fontSize={12} color="#6b7280">
+              <Text fontSize={12} color={Colors.secondaryText}>
                 {leg.duration} min
               </Text>
             </YStack>
@@ -138,15 +126,15 @@ export const JourneyResultCard = ({
             <MaterialIcons
               name="schedule"
               size={22}
-              color="#6b7280"
+              color={Colors.secondaryText}
               aria-label="Waiting and connections"
               style={{ width: 24, marginTop: 1 }}
             />
             <YStack flex={1} gap="$0.5">
-              <Text fontSize={14} color="#6b7280">
+              <Text fontSize={14} color={Colors.secondaryText}>
                 Waiting & connections
               </Text>
-              <Text fontSize={12} color="#6b7280">
+              <Text fontSize={12} color={Colors.secondaryText}>
                 {waiting} min
               </Text>
             </YStack>
@@ -156,10 +144,10 @@ export const JourneyResultCard = ({
 
       {onPress && (
         <XStack items="center" justify="flex-end" gap="$1">
-          <Text fontSize={13} fontWeight="600" color="#2563eb">
+          <Text fontSize={13} fontWeight="600" color={Colors.blue}>
             View details
           </Text>
-          <MaterialIcons name="chevron-right" size={18} color="#2563eb" />
+          <MaterialIcons name="chevron-right" size={18} color={Colors.blue} />
         </XStack>
       )}
     </YStack>

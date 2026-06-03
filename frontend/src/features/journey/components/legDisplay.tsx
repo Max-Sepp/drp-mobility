@@ -2,6 +2,7 @@ import { MaterialIcons } from '@expo/vector-icons'
 import { Text, XStack } from 'tamagui'
 import type { ResolvedLocation } from '../api/geocode'
 import type { Journey, RouteTag } from '../api/tfl'
+import { Borders, Colors, Radii } from '@/theme'
 
 export type ResolveStation = (commonName: string) => string | null
 export type StationPressHandler = (stationName: string) => void
@@ -23,13 +24,13 @@ export function RouteTags({ tags }: { tags?: RouteTag[] }) {
           px="$2"
           py="$1"
           style={{
-            backgroundColor: '#eff6ff',
-            borderColor: '#bfdbfe',
-            borderWidth: 1,
-            borderRadius: 999,
+            backgroundColor: Colors.blueBg,
+            borderColor: Colors.border,
+            borderWidth: Borders.thin,
+            borderRadius: Radii.pill,
           }}
         >
-          <Text fontSize={11} fontWeight="700" color="#1d4ed8">
+          <Text fontSize={11} fontWeight="700" color={Colors.blue}>
             {TAG_LABELS[tag]}
           </Text>
         </XStack>
@@ -84,7 +85,7 @@ export function LegStations({
               <MaterialIcons
                 name="arrow-forward"
                 size={13}
-                color="#9ca3af"
+                color={Colors.tertiaryText}
                 aria-label="to"
               />
             )}
@@ -92,7 +93,7 @@ export function LegStations({
               <Text
                 fontSize={13}
                 fontWeight="600"
-                color="#2563eb"
+                color={Colors.blue}
                 pressStyle={{ opacity: 0.6 }}
                 onPress={() => onStationPress(resolved)}
                 role="button"
@@ -102,7 +103,7 @@ export function LegStations({
                 {resolved}
               </Text>
             ) : (
-              <Text fontSize={13} color="#6b7280">
+              <Text fontSize={13} color={Colors.secondaryText}>
                 {stripStationSuffix(commonName)}
               </Text>
             )}

@@ -9,7 +9,7 @@ import type { components } from '@/api/schema.d'
 import { DEFAULT_STATION, stationPicker, useStations } from '@/features/stations'
 import { resolveToPostcode, type ResolvedLocation } from '@/features/journey/api/geocode'
 import type { Station, StationScreenProps } from '@/navigation/types'
-import { Colors } from '@/theme'
+import { Colors, Heights, Radii, Spacing } from '@/theme'
 import { PlatformAccessCard } from '../components/PlatformAccessCard'
 import { QuickReportGrid, type QuickReportAction } from '../components/QuickReportGrid'
 import { ReportsStatus } from '../components/ReportsStatus'
@@ -85,7 +85,7 @@ export const StationScreen = ({ navigation, route }: StationScreenProps) => {
     <View style={styles.screen}>
       <ScrollView
         flex={1}
-        style={{ backgroundColor: '#f9fafb' }}
+        style={{ backgroundColor: Colors.background }}
         contentContainerStyle={{ paddingBottom: 16 } as any}
       >
         <StationHeader
@@ -118,19 +118,19 @@ export const StationScreen = ({ navigation, route }: StationScreenProps) => {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#f9fafb',
+    backgroundColor: Colors.background,
   },
   footer: {
-    backgroundColor: '#ffffff',
-    paddingTop: 12,
-    paddingHorizontal: 20,
+    backgroundColor: Colors.card,
+    paddingTop: Spacing.md,
+    paddingHorizontal: Spacing.xl,
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#e5e7eb',
+    borderTopColor: Colors.border,
   },
   goHereBtn: {
     backgroundColor: Colors.blue,
-    borderRadius: 12,
-    height: 52,
+    borderRadius: Radii.button,
+    height: Heights.button,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.secondaryText,
   },
   goHereText: {
-    color: '#ffffff',
+    color: Colors.card,
     fontSize: 16,
     fontWeight: '700',
   },

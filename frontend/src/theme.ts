@@ -1,7 +1,5 @@
 // Central design tokens for the app.
-// All new components should import from here rather than hardcoding values.
-// Neo-brutalist screens (report forms, journey planner) may still use their
-// own inline styles for now; migrate them gradually.
+// All components should import from here — never hardcode colours, radii, or spacing.
 
 import { StyleSheet } from 'react-native'
 
@@ -34,10 +32,21 @@ export const Colors = {
   blue: '#007AFF', // iOS blue
   blueDark: '#0062CC',
 
-  // Semantic
+  // Semantic — base colours
   success: '#34C759',
   warning: '#FF9500',
   danger: '#FF3B30',
+
+  // Semantic — tinted backgrounds and dark variants (for alert boxes, badges)
+  successBg:     '#D1FAE5',
+  successDark:   '#059669',
+  warningBg:     '#FFFBEB',
+  warningDark:   '#92400E',
+  warningBorder: '#FCD34D',
+  dangerBg:      '#FEF2F2',
+  dangerDark:    '#B91C1C',
+  dangerBorder:  '#FECACA',
+  blueBg:        '#EFF6FF', // very light blue for tags / pill fills
 } as const
 
 // ---------------------------------------------------------------------------
@@ -100,6 +109,24 @@ export const Spacing = {
   xl: 20,
   xxl: 24,
   section: 32,
+} as const
+
+// ---------------------------------------------------------------------------
+// Borders
+// ---------------------------------------------------------------------------
+
+export const Borders = {
+  thin:   1,
+  medium: 1.5,
+} as const
+
+// ---------------------------------------------------------------------------
+// Heights
+// ---------------------------------------------------------------------------
+
+export const Heights = {
+  button:      52,
+  touchTarget: 48,
 } as const
 
 // ---------------------------------------------------------------------------
