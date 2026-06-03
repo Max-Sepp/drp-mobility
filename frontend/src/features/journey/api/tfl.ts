@@ -14,9 +14,6 @@ type Point = { commonName?: string }
 /** A line/route a leg runs on, e.g. `name: "Victoria"`, `directions: ["Brixton"]`. */
 type RouteOption = { name?: string; directions?: string[] }
 
-/** A disruption affecting a leg, e.g. a part-suspended line. */
-type Disruption = { description?: string; category?: string }
-
 /** One leg of a journey (a continuous stretch on a single mode). */
 export type Leg = {
   duration: number
@@ -34,8 +31,6 @@ export type Leg = {
   routeOptions?: RouteOption[]
   // The intermediate stops along the leg's path.
   path?: { stopPoints?: { name?: string }[] }
-  isDisrupted?: boolean
-  disruptions?: Disruption[]
 }
 
 /**
@@ -146,12 +141,24 @@ const PREFERENCES: { preference: JourneyPreference; tag: RouteTag }[] = [
 ]
 
 /**
- * A route's identity, independent of departure time: the ordered modes and lines it uses. Two
- * journeys with the same signature are the same route leaving at different times.
+ * A route's identity, independent of departure time: the ordered transit legs keyed by their
+ * boarding and alighting stations. Two journeys with the same signature are the same route
+ * leaving at different times.
+ *
+ * Keyed on stations rather than line name on purpose: parallel lines that share the same track
+ * (e.g. District vs Circle between St. James's Park and Westminster) board and alight at the
+ * same stations, so TfL returns them as separate journeys minutes apart — but to a rider they
+ * are the same route, taken on whichever train comes first. Comparing the stations collapses
+ * them. Walking legs are reduced to a marker; they're connective and their named endpoints (raw
+ * addresses) vary between otherwise-identical journeys.
  */
 function routeSignature(journey: Journey): string {
   return journey.legs
-    .map((leg) => `${leg.mode.name}:${leg.routeOptions?.[0]?.name ?? ''}`)
+    .map((leg) =>
+      leg.mode.name === 'walking'
+        ? 'walk'
+        : `${leg.mode.name}:${leg.departurePoint?.commonName ?? ''}>${leg.arrivalPoint?.commonName ?? ''}`,
+    )
     .join('>')
 }
 

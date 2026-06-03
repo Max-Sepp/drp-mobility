@@ -229,26 +229,6 @@ export const JourneyDetailScreen = ({ navigation, route }: JourneyDetailScreenPr
                       {stopCount} {stopCount === 1 ? 'stop' : 'stops'}
                     </Text>
                   )}
-                  {leg.isDisrupted && leg.disruptions?.some((d) => d.description) && (
-                    <YStack
-                      gap="$1"
-                      p="$2"
-                      style={{
-                        backgroundColor: '#fef2f2',
-                        borderWidth: 1,
-                        borderColor: '#fecaca',
-                        borderRadius: 6,
-                      }}
-                    >
-                      {leg.disruptions
-                        .filter((d) => d.description)
-                        .map((d, j) => (
-                          <Text key={j} fontSize={12} color="#b91c1c">
-                            {d.description}
-                          </Text>
-                        ))}
-                    </YStack>
-                  )}
                   <Text fontSize={12} color="#6b7280">
                     {legTimes ? `${legTimes} · ${leg.duration} min` : `${leg.duration} min`}
                   </Text>
