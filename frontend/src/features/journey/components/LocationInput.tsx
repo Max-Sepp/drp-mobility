@@ -243,14 +243,14 @@ export const LocationInput = ({
                 borderTopColor: Colors.border,
               }}
             >
-              <Text fontSize={15} color={Colors.text} numberOfLines={1}>
+              <Text fontSize={15} fontWeight="600" color={Colors.text} numberOfLines={1}>
                 {suggestion.label}
               </Text>
-              {suggestion.postcode && (
-                <Text fontSize={13} color={Colors.secondaryText}>
-                  {suggestion.postcode}
+              {suggestion.subtitle ? (
+                <Text fontSize={13} color={Colors.secondaryText} numberOfLines={1}>
+                  {suggestion.subtitle}
                 </Text>
-              )}
+              ) : null}
             </YStack>
           ))}
         </YStack>

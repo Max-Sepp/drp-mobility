@@ -168,9 +168,14 @@ function LocationResultRow({
         <MaterialIcons name="place" size={16} color={Colors.secondaryText} />
       </View>
       <View style={{ flex: 1 }}>
-        <Text style={[Typography.body, { color: Colors.text }]} numberOfLines={2}>
+        <Text style={[Typography.body, { color: Colors.text, fontWeight: '600' }]} numberOfLines={1}>
           {suggestion.label}
         </Text>
+        {suggestion.subtitle ? (
+          <Text style={[Typography.caption, { color: Colors.secondaryText }]} numberOfLines={1}>
+            {suggestion.subtitle}
+          </Text>
+        ) : null}
       </View>
       <MaterialIcons name="chevron-right" size={16} color={Colors.tertiaryText} />
     </TouchableOpacity>

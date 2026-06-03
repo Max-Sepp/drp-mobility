@@ -26,7 +26,15 @@ export type ResolvedLocation = { postcode: string; label: string }
 export type ResolveResult = ResolvedLocation | { error: string }
 
 /** A candidate place for the address autocomplete dropdown. */
-export type LocationSuggestion = { label: string; lat: number; lon: number; postcode?: string }
+export type LocationSuggestion = {
+  /** Main name — used as the input-box value when selected and as the journey destination label. */
+  label: string
+  /** Cleaned location context shown below the main name in the dropdown (may be empty). */
+  subtitle: string
+  lat: number
+  lon: number
+  postcode?: string
+}
 
 /** Normalise a postcode to upper-case with a single space before the final three chars. */
 function normalisePostcode(raw: string): string {
@@ -46,11 +54,31 @@ async function postcodeFromCoords(lat: number, lon: number): Promise<string | nu
   return body?.result?.[0]?.postcode ?? null
 }
 
+type MapboxContext = { id: string; text: string }
+
 /** Extract a UK postcode from a Mapbox feature's context array, if present. */
-function postcodeFromContext(
-  context: Array<{ id: string; text: string }> = [],
-): string | undefined {
+function postcodeFromContext(context: MapboxContext[] = []): string | undefined {
   return context.find((c) => c.id.startsWith('postcode.'))?.text
+}
+
+/**
+ * Build the subtitle string from a Mapbox context chain.
+ * Drops: postcode entries, region ("England" etc.).
+ * Drops "Greater London" district when the place "London" is already present (redundant).
+ * Replaces the country entry with "UK".
+ * Result is the remaining parts joined with ", " (may be empty).
+ */
+function buildSubtitle(context: MapboxContext[]): string {
+  const placeText = context.find((c) => c.id.startsWith('place.'))?.text?.toLowerCase()
+  const parts = context
+    .filter((c) => {
+      if (c.id.startsWith('postcode.') || c.id.startsWith('region.')) return false
+      if (c.id.startsWith('district.') && placeText === 'london' && c.text === 'Greater London')
+        return false
+      return true
+    })
+    .map((c) => (c.id.startsWith('country.') ? 'UK' : c.text))
+  return parts.join(', ')
 }
 
 /**
@@ -74,11 +102,12 @@ async function coordsFromAddress(query: string): Promise<{ lat: number; lon: num
 /**
  * Address autocomplete: up to five candidate places biased to Greater London, for a
  * free-text query to populate a selection dropdown. Returns nothing for very short queries
- * or input that is already a postcode/coordinate (those need no lookup).
+ * or coordinate input (those need no lookup). Postcodes are passed through to Mapbox so
+ * the user gets a proper suggestion rather than no results.
  */
 export async function searchLocations(query: string): Promise<LocationSuggestion[]> {
   const q = query.trim()
-  if (q.length < 3 || POSTCODE_RE.test(q) || COORD_RE.test(q)) return []
+  if (q.length < 3 || COORD_RE.test(q)) return []
   const url =
     `${MAPBOX_BASE}/${encodeURIComponent(q)}.json` +
     `?access_token=${MAPBOX_TOKEN}&country=gb` +
@@ -87,12 +116,27 @@ export async function searchLocations(query: string): Promise<LocationSuggestion
   if (!res.ok) return []
   const body = await res.json().catch(() => null)
   if (!Array.isArray(body?.features)) return []
-  return body.features.map((f: { place_name: string; center: [number, number]; context?: Array<{ id: string; text: string }> }) => ({
-    label: f.place_name.replace(/, United Kingdom$/, ''),
-    lat: f.center[1],
-    lon: f.center[0],
-    postcode: postcodeFromContext(f.context),
-  }))
+  return body.features.map(
+    (f: {
+      text: string
+      address?: string
+      center: [number, number]
+      context?: MapboxContext[]
+    }) => {
+      const context = f.context ?? []
+      // For address features Mapbox puts the house number in `address` and the street in `text`.
+      const label = f.address ? `${f.address} ${f.text}` : f.text
+      // For postcode-type results the postcode is the feature itself, not in context.
+      const postcode = postcodeFromContext(context) ?? (POSTCODE_RE.test(label) ? label : undefined)
+      return {
+        label,
+        subtitle: buildSubtitle(context),
+        lat: f.center[1],
+        lon: f.center[0],
+        postcode,
+      }
+    },
+  )
 }
 
 /**
