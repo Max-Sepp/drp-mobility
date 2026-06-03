@@ -16,11 +16,15 @@ ruff format .                                       # format
 # Refresh station data from TfL CSVs (run from repo root):
 python3 temp/enrich_tube_stations.py
 rm dev.db && uvicorn app.main:app --reload          # reseed with updated data
+
+# Full reseed of any database, incl. Postgres (run from backend/):
+python scripts/reseed.py                            # drops ALL tables, rebuilds, reseeds
+python scripts/reseed.py --yes                      # skip the confirmation prompt
 ```
 
 Lint/format use [Ruff](https://docs.astral.sh/ruff/) (config in `pyproject.toml`). Ruff is a dev-only dependency — install it with `pip install -r requirements-dev.txt` (it is deliberately kept out of `requirements.txt` so the prod image stays lean). FastAPI's `Depends(...)`-in-default and SQLAlchemy/Pydantic string forward references are whitelisted in the config; don't "fix" those.
 
-A fresh dev DB is just `rm dev.db` — `create_all` + `seed_defaults` rebuild it on next startup. There are no migrations.
+A fresh dev DB is just `rm dev.db` — `create_all` + `seed_defaults` rebuild it on next startup. There are no migrations. For Postgres (no file to delete) — or to force a rebuild that picks up edited `stations.json`, since `seed_defaults` is insert-if-missing and won't refresh existing rows — use `python scripts/reseed.py`, which drops every table (including user data), recreates the schema, and reseeds.
 
 ## Composition root (`app/main.py`)
 
