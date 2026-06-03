@@ -32,7 +32,7 @@ export type RootStackParamList = {
   SelectStation: { currentStation: Station }
   ReportForm: { equipmentType: EquipmentType; station: Station }
   ReportCustom: { station: Station }
-  Success: undefined
+  Success: { station: Station }
 }
 
 export type MapHomeScreenProps = NativeStackScreenProps<RootStackParamList, 'MapHome'>

@@ -4,10 +4,11 @@ import { Heading } from '@/components/Heading'
 import type { SuccessScreenProps } from '@/navigation/types'
 import { Colors, Radii } from '@/theme'
 
-export const SuccessScreen = ({ navigation }: SuccessScreenProps) => {
+export const SuccessScreen = ({ navigation, route }: SuccessScreenProps) => {
+  const { station } = route.params
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigation.reset({ index: 0, routes: [{ name: 'JourneyPlanner' }] })
+      navigation.reset({ index: 0, routes: [{ name: 'MapHome' }, { name: 'Station', params: { station } }] })
     }, 2000)
     return () => clearTimeout(timer)
   }, [navigation])

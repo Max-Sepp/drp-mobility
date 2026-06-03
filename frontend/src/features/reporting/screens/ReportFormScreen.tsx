@@ -92,7 +92,7 @@ export const ReportFormScreen = ({ navigation, route }: ReportFormScreenProps) =
         })
         if (imgError) throw new Error(`Image upload failed: ${JSON.stringify(imgError)}`)
       }
-      navigation.replace('Success')
+      navigation.replace('Success', { station })
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Something went wrong. Please try again.'
       Alert.alert('Error', msg)
