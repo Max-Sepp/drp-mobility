@@ -33,7 +33,9 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
   // showing the readable address. Null when the user typed a value we resolve at submit.
   const [fromPostcode, setFromPostcode] = useState<string | null>(null)
   const [toPostcode, setToPostcode] = useState<string | null>(null)
-  const [level, setLevel] = useState<AccessibilityPreference>('StepFreeToVehicle')
+  // Null means no accessibility filtering at all — TfL then returns every mode (tube, rail, …)
+  // rather than only step-free routes. Each button toggles, so the user can deselect both.
+  const [level, setLevel] = useState<AccessibilityPreference | null>(null)
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState<JourneyResult[]>([])
   const [resolved, setResolved] = useState<Resolved | null>(null)
@@ -122,7 +124,7 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
 
           <YStack gap="$1.5">
             <Text fontSize={14} fontWeight="600" color="#6b7280">
-              Accessibility
+              Accessibility (optional)
             </Text>
             <XStack gap="$2">
               {LEVELS.map(({ value, label }) => {
@@ -134,7 +136,7 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
                     items="center"
                     justify="center"
                     pressStyle={{ opacity: 0.8 }}
-                    onPress={() => setLevel(value)}
+                    onPress={() => setLevel((prev) => (prev === value ? null : value))}
                     style={{
                       minHeight: 48,
                       borderRadius: 10,

@@ -48,14 +48,16 @@ export type JourneyPlanResult =
 /**
  * Plan a journey between two locations. Callers pass UK postcodes (see
  * `resolveToPostcode`), which TfL resolves uniquely — so we never hit the ambiguous-text
- * "did you mean?" path. `accessibility` asks TfL to return only step-free routes.
+ * "did you mean?" path. `accessibility` asks TfL to return only step-free routes; pass
+ * `null`/omit it to apply no accessibility filtering (TfL then returns all modes, e.g. tube).
  */
 export async function planJourney(
   from: string,
   to: string,
-  accessibility: AccessibilityPreference,
+  accessibility?: AccessibilityPreference | null,
 ): Promise<JourneyPlanResult> {
-  const url = `${TFL_BASE}/Journey/JourneyResults/${encodeURIComponent(from)}/to/${encodeURIComponent(to)}?accessibilityPreference=${accessibility}`
+  const query = accessibility ? `?accessibilityPreference=${accessibility}` : ''
+  const url = `${TFL_BASE}/Journey/JourneyResults/${encodeURIComponent(from)}/to/${encodeURIComponent(to)}${query}`
 
   let res: Response
   try {
