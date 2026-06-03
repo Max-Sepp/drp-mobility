@@ -1,5 +1,5 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import { HomeScreen } from '@/features/home'
+import { StationScreen } from '@/features/home'
 import { MapHomeScreen } from '@/features/home/screens/MapHomeScreen'
 import { SelectStationScreen } from '@/features/stations'
 import { ReportCustomScreen, ReportFormScreen, SuccessScreen } from '@/features/reporting'
@@ -17,7 +17,7 @@ export default function RootNavigator() {
       <Stack.Screen name="JourneyPlanner" component={JourneyPlannerScreen} />
       <Stack.Screen name="JourneyDetail" component={JourneyDetailScreen} />
       <Stack.Screen name="SavedJourneys" component={SavedJourneysScreen} />
-      <Stack.Screen name="Station" component={HomeScreen} />
+      <Stack.Screen name="Station" component={StationScreen} />
       <Stack.Screen name="SelectStation" component={SelectStationScreen} />
       <Stack.Screen name="ReportForm" component={ReportFormScreen} />
       <Stack.Screen name="ReportCustom" component={ReportCustomScreen} />

@@ -17,7 +17,7 @@ import { StationHeader } from '../components/StationHeader'
 
 type OutageReport = components['schemas']['OutageReportSummary']
 
-export const HomeScreen = ({ navigation, route }: StationScreenProps) => {
+export const StationScreen = ({ navigation, route }: StationScreenProps) => {
   const [station, setStation] = useState<Station>(route.params?.station ?? DEFAULT_STATION)
   const [reports, setReports] = useState<OutageReport[]>([])
   const [loading, setLoading] = useState(false)
