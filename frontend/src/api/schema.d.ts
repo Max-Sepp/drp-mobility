@@ -347,6 +347,10 @@ export interface components {
             /** Name */
             name: string;
             step_free: components["schemas"]["StepFree"];
+            /** Latitude */
+            latitude?: number | null;
+            /** Longitude */
+            longitude?: number | null;
             /** Platforms */
             platforms: components["schemas"]["PlatformSchema"][];
         };

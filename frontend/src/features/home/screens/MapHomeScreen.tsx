@@ -3,7 +3,7 @@ import { useFocusEffect } from '@react-navigation/native'
 import { useCallback, useRef, useState } from 'react'
 import { Alert, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { MapPlaceholder } from '@/features/map/components/MapPlaceholder'
+import { StationMap } from '@/features/map/components/StationMap'
 import { loadSavedJourneys, type SavedJourney } from '@/features/journey/api/savedJourneys'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import type { RootStackParamList } from '@/navigation/types'
@@ -62,7 +62,7 @@ export function MapHomeScreen({ navigation }: Props) {
   return (
     <View style={styles.screen}>
       {/* Map fills the entire screen background */}
-      <MapPlaceholder />
+      <StationMap onStationPress={openStation} />
 
       {/* Top-right icon buttons, safe-area aware */}
       <SafeAreaView edges={['top']} style={[styles.topSafe, { pointerEvents: 'box-none' }]}>
