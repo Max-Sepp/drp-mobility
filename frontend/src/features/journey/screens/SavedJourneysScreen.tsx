@@ -6,6 +6,7 @@ import { ScreenHeader } from '@/components/ScreenHeader'
 import { FormScreenLayout } from '@/features/reporting/components/FormScreenLayout'
 import { parseUtc } from '@/lib/datetime'
 import type { SavedJourneysScreenProps } from '@/navigation/types'
+import { useAuth } from '@/features/auth'
 import { deleteJourney, loadSavedJourneys, type SavedJourney } from '../api/savedJourneys'
 import { clockTime } from '../components/legDisplay'
 
@@ -23,9 +24,10 @@ function savedAtLabel(iso: string): string {
 export const SavedJourneysScreen = ({ navigation }: SavedJourneysScreenProps) => {
   const [saved, setSaved] = useState<SavedJourney[]>([])
   const [loading, setLoading] = useState(true)
+  const { status } = useAuth()
 
-  // Reload whenever the screen regains focus so a journey saved or removed on the detail
-  // screen is reflected when the user comes back here.
+  // Reload on focus (journey saved/removed on detail screen) and whenever auth status changes
+  // (logout clears the list immediately without needing a navigation event).
   useEffect(() => {
     const reload = () =>
       loadSavedJourneys()
@@ -34,7 +36,7 @@ export const SavedJourneysScreen = ({ navigation }: SavedJourneysScreenProps) =>
     reload()
     const unsubscribe = navigation.addListener('focus', reload)
     return unsubscribe
-  }, [navigation])
+  }, [navigation, status])
 
   function confirmDelete(item: SavedJourney) {
     const label = `${item.from?.label ?? 'Start'} → ${item.to?.label ?? 'Destination'}`

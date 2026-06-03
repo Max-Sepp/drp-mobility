@@ -34,3 +34,6 @@ class User(Base):
     sessions: Mapped[list["AuthSession"]] = relationship(
         "AuthSession", back_populates="user", cascade="all, delete-orphan"
     )
+    journeys: Mapped[list["SavedJourney"]] = relationship(  # noqa: F821
+        "SavedJourney", back_populates="user", cascade="all, delete-orphan"
+    )

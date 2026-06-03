@@ -84,6 +84,50 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/journeys": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Journeys
+         * @description Return the authenticated user's saved journeys, newest first.
+         */
+        get: operations["list_journeys_journeys_get"];
+        put?: never;
+        /**
+         * Save Journey
+         * @description Save a journey snapshot for the authenticated user.
+         */
+        post: operations["save_journey_journeys_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/journeys/{journey_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete Journey
+         * @description Remove a saved journey belonging to the authenticated user.
+         */
+        delete: operations["delete_journey_journeys__journey_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/outage-reports": {
         parameters: {
             query?: never;
@@ -429,6 +473,36 @@ export interface components {
          */
         PlatformStepFree: "none" | "to_platform" | "to_train" | "full";
         /**
+         * SavedJourneyCreate
+         * @description Request body for POST /journeys.
+         */
+        SavedJourneyCreate: {
+            /** Id */
+            id: string;
+            /**
+             * Saved At
+             * Format: date-time
+             */
+            saved_at: string;
+            /** Payload */
+            payload: string;
+        };
+        /**
+         * SavedJourneyOut
+         * @description A saved journey as returned to the client.
+         */
+        SavedJourneyOut: {
+            /** Id */
+            id: string;
+            /**
+             * Saved At
+             * Format: date-time
+             */
+            saved_at: string;
+            /** Payload */
+            payload: string;
+        };
+        /**
          * StationDetail
          * @description A station plus its platforms, each with their own step-free access and lines.
          *
@@ -608,6 +682,88 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UserPublic"];
+                };
+            };
+        };
+    };
+    list_journeys_journeys_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SavedJourneyOut"][];
+                };
+            };
+        };
+    };
+    save_journey_journeys_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SavedJourneyCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SavedJourneyOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_journey_journeys__journey_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                journey_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

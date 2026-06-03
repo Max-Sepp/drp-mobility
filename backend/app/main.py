@@ -11,10 +11,11 @@ from app.models import line as _line  # noqa: F401
 from app.models import outage_report as _outage_report  # noqa: F401
 from app.models import outage_report_deletion as _outage_report_deletion  # noqa: F401
 from app.models import platform as _platform  # noqa: F401
+from app.models import saved_journey as _saved_journey  # noqa: F401
 from app.models import session as _session  # noqa: F401
 from app.models import station as _station  # noqa: F401
 from app.models import user as _user  # noqa: F401
-from app.routers import auth, equipment, equipment_types, failures, outage_reports, stations
+from app.routers import auth, equipment, equipment_types, failures, journeys, outage_reports, stations
 from app.seed import seed_defaults
 
 # Schema bootstrap at import time: no Alembic migrations are configured.
@@ -26,6 +27,7 @@ with SessionLocal() as session:
 app = FastAPI()
 
 app.include_router(auth.router)
+app.include_router(journeys.router)
 app.include_router(outage_reports.router)
 app.include_router(failures.router)
 app.include_router(stations.router)
