@@ -8,7 +8,7 @@ from app.schemas.user import AuthResponse, UserCreate, UserPublic
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
-_bearer = HTTPBearer()
+_bearer = HTTPBearer(auto_error=False)
 
 
 @router.post("/signup", response_model=AuthResponse, status_code=201)
