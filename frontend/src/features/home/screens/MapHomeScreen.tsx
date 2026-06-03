@@ -55,7 +55,7 @@ export function MapHomeScreen({ navigation }: Props) {
     navigation.navigate('Station', { station: stationName })
   }
 
-  function openJourneyFromTo(from: ResolvedLocation, to: ResolvedLocation) {
+  function openJourneyFromTo(from: ResolvedLocation | undefined, to: ResolvedLocation) {
     navigation.navigate('JourneyPlanner', { initialFrom: from, initialTo: to })
   }
 

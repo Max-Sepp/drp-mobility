@@ -191,7 +191,7 @@ type Props = {
   savedJourneys: SavedJourney[]
   onSavedJourneyPress: (item: SavedJourney) => void
   onStationPress: (stationName: string) => void
-  onLocationSelect: (from: ResolvedLocation, to: ResolvedLocation) => void
+  onLocationSelect: (from: ResolvedLocation | undefined, to: ResolvedLocation) => void
 }
 
 export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
@@ -273,22 +273,6 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
     async function handleLocationSelect(suggestion: LocationSuggestion) {
       setGpsLoading(true)
       try {
-        const { status } = await Location.requestForegroundPermissionsAsync()
-        if (status !== 'granted') {
-          Alert.alert(
-            'Location required',
-            'Please enable location access in Settings to use this feature.',
-          )
-          return
-        }
-        const pos =
-          cachedCoords ??
-          (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })).coords
-        const fromResult = await resolveToPostcode(`${pos.latitude},${pos.longitude}`)
-        if ('error' in fromResult) {
-          Alert.alert('Location error', fromResult.error)
-          return
-        }
         const toPostcode = await postcodeForSuggestion(suggestion)
         if (!toPostcode) {
           Alert.alert(
@@ -297,8 +281,22 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
           )
           return
         }
-        const from: ResolvedLocation = { postcode: fromResult.postcode, label: 'Current location' }
         const to: ResolvedLocation = { postcode: toPostcode, label: suggestion.label }
+
+        // Attempt to resolve current location for the "from" field, but don't
+        // block navigation if unavailable — the journey planner handles an empty from.
+        let from: ResolvedLocation | undefined
+        const { status } = await Location.requestForegroundPermissionsAsync()
+        if (status === 'granted') {
+          const pos =
+            cachedCoords ??
+            (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })).coords
+          const fromResult = await resolveToPostcode(`${pos.latitude},${pos.longitude}`)
+          if (!('error' in fromResult)) {
+            from = { postcode: fromResult.postcode, label: 'Current location' }
+          }
+        }
+
         collapse()
         onLocationSelect(from, to)
       } finally {

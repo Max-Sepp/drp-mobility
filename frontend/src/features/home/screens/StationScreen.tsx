@@ -57,26 +57,27 @@ export const StationScreen = ({ navigation, route }: StationScreenProps) => {
   async function handleGoHere() {
     setGoingHere(true)
     try {
-      const { status } = await Location.requestForegroundPermissionsAsync()
-      if (status !== 'granted') {
-        Alert.alert('Location required', 'Enable location access in Settings to use this feature.')
-        return
-      }
-      const pos =
-        cachedCoords ??
-        (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })).coords
-      const fromResult = await resolveToPostcode(`${pos.latitude},${pos.longitude}`)
-      if ('error' in fromResult) {
-        Alert.alert('Location error', fromResult.error)
-        return
-      }
       const toResult = await resolveToPostcode(station)
       if ('error' in toResult) {
         Alert.alert('Station error', `Couldn't find a postcode for ${station}. Try planning manually.`)
         return
       }
-      const from: ResolvedLocation = { postcode: fromResult.postcode, label: 'Current location' }
       const to: ResolvedLocation = { postcode: toResult.postcode, label: station }
+
+      // Attempt to resolve current location for "from", but don't block
+      // navigation if unavailable — the journey planner handles an empty from.
+      let from: ResolvedLocation | undefined
+      const { status } = await Location.requestForegroundPermissionsAsync()
+      if (status === 'granted') {
+        const pos =
+          cachedCoords ??
+          (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })).coords
+        const fromResult = await resolveToPostcode(`${pos.latitude},${pos.longitude}`)
+        if (!('error' in fromResult)) {
+          from = { postcode: fromResult.postcode, label: 'Current location' }
+        }
+      }
+
       navigation.navigate('JourneyPlanner', { initialFrom: from, initialTo: to })
     } finally {
       setGoingHere(false)

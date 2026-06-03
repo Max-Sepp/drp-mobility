@@ -72,12 +72,14 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
     return navigation.addListener('focus', reload)
   }, [navigation])
 
-  const handleCurrentLocation = useCallback(async () => {
+  const handleCurrentLocation = useCallback(async (silent = false) => {
     setGettingLocation(true)
     try {
       const { status } = await Location.requestForegroundPermissionsAsync()
       if (status !== 'granted') {
-        Alert.alert('Location required', 'Enable location access in Settings to use this feature.')
+        if (!silent) {
+          Alert.alert('Location required', 'Enable location access in Settings to use this feature.')
+        }
         return
       }
       const pos =
@@ -85,7 +87,7 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
         (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })).coords
       const result = await resolveToPostcode(`${pos.latitude},${pos.longitude}`)
       if ('error' in result) {
-        Alert.alert('Location error', result.error)
+        if (!silent) Alert.alert('Location error', result.error)
         return
       }
       setFrom('Current location')
@@ -94,11 +96,11 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
     } finally {
       setGettingLocation(false)
     }
-  }, [])
+  }, [cachedCoords])
 
   useEffect(() => {
     if (!route.params?.initialFrom) {
-      handleCurrentLocation().catch(() => {})
+      handleCurrentLocation(true).catch(() => {})
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
