@@ -38,15 +38,15 @@ export const Colors = {
   danger: '#FF3B30',
 
   // Semantic — tinted backgrounds and dark variants (for alert boxes, badges)
-  successBg:     '#D1FAE5',
-  successDark:   '#059669',
-  warningBg:     '#FFFBEB',
-  warningDark:   '#92400E',
+  successBg: '#D1FAE5',
+  successDark: '#059669',
+  warningBg: '#FFFBEB',
+  warningDark: '#92400E',
   warningBorder: '#FCD34D',
-  dangerBg:      '#FEF2F2',
-  dangerDark:    '#B91C1C',
-  dangerBorder:  '#FECACA',
-  blueBg:        '#EFF6FF', // very light blue for tags / pill fills
+  dangerBg: '#FEF2F2',
+  dangerDark: '#B91C1C',
+  dangerBorder: '#FECACA',
+  blueBg: '#EFF6FF', // very light blue for tags / pill fills
 } as const
 
 // ---------------------------------------------------------------------------
@@ -60,8 +60,8 @@ export const Radii = {
   pill: 999,
   small: 8,
   xs: 4,
-  handle: 2,  // drag handle bars
-  icon: 17,   // circular icon wrappers
+  handle: 2, // drag handle bars
+  icon: 17, // circular icon wrappers
 } as const
 
 // ---------------------------------------------------------------------------
@@ -122,9 +122,9 @@ export const Spacing = {
 // ---------------------------------------------------------------------------
 
 export const Borders = {
-  thin:   1,
+  thin: 1,
   medium: 1.5,
-  thick:  2,
+  thick: 2,
 } as const
 
 // ---------------------------------------------------------------------------
@@ -132,10 +132,10 @@ export const Borders = {
 // ---------------------------------------------------------------------------
 
 export const Opacity = {
-  disabled:    0.4, // fully disabled, non-interactive items
+  disabled: 0.4, // fully disabled, non-interactive items
   disabledMid: 0.6, // submitting / loading states
-  subtle:      0.5, // minor interactive affordance (e.g. clear button)
-  pressed:     0.7, // standard pressStyle feedback
+  subtle: 0.5, // minor interactive affordance (e.g. clear button)
+  pressed: 0.7, // standard pressStyle feedback
   pressedLight: 0.8, // lighter press feedback on dark / primary buttons
 } as const
 
@@ -152,7 +152,7 @@ export const Overlays = {
 // ---------------------------------------------------------------------------
 
 export const Heights = {
-  button:      52,
+  button: 52,
   touchTarget: 48,
 } as const
 

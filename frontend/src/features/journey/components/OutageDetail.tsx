@@ -51,10 +51,14 @@ const VERDICTS: Record<UnitVerdict, VerdictStyle> = {
 function roleText(role: StationRole, lines: string[]): string | null {
   const service = lines.length > 0 ? ` (${lines.join(' / ')})` : ''
   switch (role) {
-    case 'board': return `You board here${service}`
-    case 'alight': return `You exit here${service}`
-    case 'interchange': return `You change here${service}`
-    default: return null
+    case 'board':
+      return `You board here${service}`
+    case 'alight':
+      return `You exit here${service}`
+    case 'interchange':
+      return `You change here${service}`
+    default:
+      return null
   }
 }
 
@@ -70,10 +74,14 @@ function reportMeta(unit: AssessedUnit): string {
 
 function verdictDetail(unit: AssessedUnit): string {
   switch (unit.verdict) {
-    case 'on-your-platform': return 'Serves a platform your service uses here.'
-    case 'shared-route': return 'Connects areas you pass through here.'
-    case 'other-platform': return "Serves a platform your route doesn't appear to use."
-    default: return "Couldn't confirm whether this is on your route."
+    case 'on-your-platform':
+      return 'Serves a platform your service uses here.'
+    case 'shared-route':
+      return 'Connects areas you pass through here.'
+    case 'other-platform':
+      return "Serves a platform your route doesn't appear to use."
+    default:
+      return "Couldn't confirm whether this is on your route."
   }
 }
 
@@ -91,7 +99,11 @@ export const OutageDetail = ({ assessments }: { assessments: OutageAssessment[] 
             key={station.stationName}
             gap="$2.5"
             p="$3"
-            style={{ borderWidth: Borders.medium, borderColor: Colors.border, borderRadius: Radii.button }}
+            style={{
+              borderWidth: Borders.medium,
+              borderColor: Colors.border,
+              borderRadius: Radii.button,
+            }}
           >
             <YStack gap="$0.5">
               <Text fontSize={15} fontWeight="700" color={Colors.text}>

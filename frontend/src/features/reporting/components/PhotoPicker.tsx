@@ -25,14 +25,20 @@ export const PhotoPicker = ({
             Alert.alert('Permission required', 'Camera access is needed to take a photo.')
             return
           }
-          const result = await ImagePicker.launchCameraAsync({ mediaTypes: ['images'], quality: 0.8 })
+          const result = await ImagePicker.launchCameraAsync({
+            mediaTypes: ['images'],
+            quality: 0.8,
+          })
           if (!result.canceled) onPicked(result.assets[0])
         },
       },
       {
         text: 'Choose from library',
         onPress: async () => {
-          const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.8 })
+          const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ['images'],
+            quality: 0.8,
+          })
           if (!result.canceled) onPicked(result.assets[0])
         },
       },
@@ -57,7 +63,10 @@ export const PhotoPicker = ({
         }}
       >
         {photo ? (
-          <Image source={{ uri: photo.uri }} style={{ width: '100%', height: '100%', resizeMode: 'cover' }} />
+          <Image
+            source={{ uri: photo.uri }}
+            style={{ width: '100%', height: '100%', resizeMode: 'cover' }}
+          />
         ) : (
           <Text fontSize={14} color={Colors.placeholderText}>
             [ + ] tap to upload image

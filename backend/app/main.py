@@ -9,13 +9,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.database import Base, SessionLocal, engine
 from app.events import broker
 
-# Surface our app's INFO logs (uvicorn configures its own loggers, but not the root logger
-# our app modules log through). Honour an optional LOG_LEVEL env var, defaulting to INFO.
-logging.basicConfig(
-    level=os.getenv("LOG_LEVEL", "INFO"),
-    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
-)
-
 # Each model module must be imported here so its table is registered on Base.metadata
 # before `create_all` runs. Adding a new model? Import it in this block too.
 from app.models import equipment as _equipment  # noqa: F401
@@ -30,8 +23,24 @@ from app.models import saved_journey as _saved_journey  # noqa: F401
 from app.models import session as _session  # noqa: F401
 from app.models import station as _station  # noqa: F401
 from app.models import user as _user  # noqa: F401
-from app.routers import auth, equipment, equipment_types, failures, journeys, outage_reports, stations, users
+from app.routers import (
+    auth,
+    equipment,
+    equipment_types,
+    failures,
+    journeys,
+    outage_reports,
+    stations,
+    users,
+)
 from app.seed import seed_defaults
+
+# Surface our app's INFO logs (uvicorn configures its own loggers, but not the root logger
+# our app modules log through). Honour an optional LOG_LEVEL env var, defaulting to INFO.
+logging.basicConfig(
+    level=os.getenv("LOG_LEVEL", "INFO"),
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+)
 
 # Schema bootstrap at import time: no Alembic migrations are configured.
 Base.metadata.create_all(bind=engine)

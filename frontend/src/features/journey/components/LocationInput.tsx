@@ -1,7 +1,11 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import { useEffect, useRef, useState } from 'react'
 import { Input, Spinner, Text, XStack, YStack } from 'tamagui'
-import { type LocationSuggestion, postcodeForSuggestion, searchLocations } from '@/features/journey/api/geocode'
+import {
+  type LocationSuggestion,
+  postcodeForSuggestion,
+  searchLocations,
+} from '@/features/journey/api/geocode'
 import { Borders, Colors, Opacity, Radii } from '@/theme'
 
 const fieldStyle = {

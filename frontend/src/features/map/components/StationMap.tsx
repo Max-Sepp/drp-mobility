@@ -66,7 +66,12 @@ export function StationMap({ onStationPress }: Props) {
     if (coords && !centredRef.current) {
       centredRef.current = true
       mapRef.current?.animateToRegion(
-        { latitude: coords.latitude, longitude: coords.longitude, latitudeDelta: 0.02, longitudeDelta: 0.02 },
+        {
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+          latitudeDelta: 0.02,
+          longitudeDelta: 0.02,
+        },
         600,
       )
     }

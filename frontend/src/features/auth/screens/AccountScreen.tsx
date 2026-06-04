@@ -36,21 +36,40 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
   }
 
   const currentTravellerType = user.traveller_type ?? 'adult'
-  const currentTT = TRAVELLER_TYPES.find((t) => t.code === currentTravellerType) ?? TRAVELLER_TYPES[0]
+  const currentTT =
+    TRAVELLER_TYPES.find((t) => t.code === currentTravellerType) ?? TRAVELLER_TYPES[0]
 
   function openPicker() {
     if (saving) return
     setModalVisible(true)
     Animated.parallel([
-      Animated.timing(backdropAnim, { toValue: 1, duration: 220, useNativeDriver: USE_NATIVE_DRIVER }),
-      Animated.spring(sheetAnim, { toValue: 0, stiffness: 130, damping: 22, mass: 1, useNativeDriver: USE_NATIVE_DRIVER }),
+      Animated.timing(backdropAnim, {
+        toValue: 1,
+        duration: 220,
+        useNativeDriver: USE_NATIVE_DRIVER,
+      }),
+      Animated.spring(sheetAnim, {
+        toValue: 0,
+        stiffness: 130,
+        damping: 22,
+        mass: 1,
+        useNativeDriver: USE_NATIVE_DRIVER,
+      }),
     ]).start()
   }
 
   function closePicker() {
     Animated.parallel([
-      Animated.timing(backdropAnim, { toValue: 0, duration: 180, useNativeDriver: USE_NATIVE_DRIVER }),
-      Animated.timing(sheetAnim, { toValue: 500, duration: 220, useNativeDriver: USE_NATIVE_DRIVER }),
+      Animated.timing(backdropAnim, {
+        toValue: 0,
+        duration: 180,
+        useNativeDriver: USE_NATIVE_DRIVER,
+      }),
+      Animated.timing(sheetAnim, {
+        toValue: 500,
+        duration: 220,
+        useNativeDriver: USE_NATIVE_DRIVER,
+      }),
     ]).start(() => setModalVisible(false))
   }
 
@@ -87,7 +106,6 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
       footer={null}
     >
       <YStack px="$5" mt="$5" gap="$6">
-
         {/* Username */}
         <YStack gap="$2">
           <Text fontSize={12} fontWeight="600" color={Colors.secondaryText} letterSpacing={0.8}>
@@ -95,7 +113,9 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
           </Text>
           <XStack items="center" gap="$3" style={styles.card}>
             <Ionicons name="person-circle" size={36} color={Colors.blue} />
-            <Text fontSize={15} fontWeight="600" color={Colors.text}>{user.username}</Text>
+            <Text fontSize={15} fontWeight="600" color={Colors.text}>
+              {user.username}
+            </Text>
           </XStack>
         </YStack>
 
@@ -110,7 +130,9 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
             onPress={openPicker}
           >
             <YStack flex={1} gap={2}>
-              <Text fontSize={15} fontWeight="500" color={Colors.text}>{currentTT.name}</Text>
+              <Text fontSize={15} fontWeight="500" color={Colors.text}>
+                {currentTT.name}
+              </Text>
               <Text fontSize={13} color={Colors.secondaryText} numberOfLines={1}>
                 {currentTT.description}
               </Text>
@@ -128,17 +150,13 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
           onPress={handleSignOut}
         >
           <Ionicons name="log-out-outline" size={20} color={Colors.danger} />
-          <Text fontSize={15} fontWeight="600" color={Colors.danger}>Log out</Text>
+          <Text fontSize={15} fontWeight="600" color={Colors.danger}>
+            Log out
+          </Text>
         </XStack>
-
       </YStack>
 
-      <Modal
-        visible={modalVisible}
-        transparent
-        animationType="none"
-        onRequestClose={closePicker}
-      >
+      <Modal visible={modalVisible} transparent animationType="none" onRequestClose={closePicker}>
         <View style={styles.modalRoot}>
           {/* Backdrop fades in independently of the sheet */}
           <Animated.View
@@ -155,7 +173,11 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
           <Animated.View style={[styles.sheet, { transform: [{ translateY: sheetAnim }] }]}>
             <View style={styles.handle} />
             <RNText style={styles.sheetTitle}>TRAVELLER TYPE</RNText>
-            <ScrollView showsVerticalScrollIndicator={false} bounces={false} style={styles.optionList}>
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              bounces={false}
+              style={styles.optionList}
+            >
               {TRAVELLER_TYPES.map((tt, i) => {
                 const selected = currentTravellerType === tt.code
                 const isLast = i === TRAVELLER_TYPES.length - 1

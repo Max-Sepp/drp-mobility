@@ -25,15 +25,15 @@ function makeJourney(modes: string[], fareP = 300): Journey {
   }
 }
 
-const railJourney      = makeJourney(['tube'])
-const busJourney       = makeJourney(['bus'])
-const tramJourney      = makeJourney(['tram'])
-const walkJourney      = { ...makeJourney(['walking']), fare: undefined }
-const mixedRailBus     = makeJourney(['tube', 'bus'])
-const mixedTramRail    = makeJourney(['tram', 'national-rail'])
-const nationalRail     = makeJourney(['national-rail'])
-const elizabethLine    = makeJourney(['elizabeth-line'])
-const overground       = makeJourney(['overground'])
+const railJourney = makeJourney(['tube'])
+const busJourney = makeJourney(['bus'])
+const tramJourney = makeJourney(['tram'])
+const walkJourney = { ...makeJourney(['walking']), fare: undefined }
+const mixedRailBus = makeJourney(['tube', 'bus'])
+const mixedTramRail = makeJourney(['tram', 'national-rail'])
+const nationalRail = makeJourney(['national-rail'])
+const elizabethLine = makeJourney(['elizabeth-line'])
+const overground = makeJourney(['overground'])
 
 // ---------------------------------------------------------------------------
 // railcardApplies

@@ -25,16 +25,58 @@ export type TravellerType = {
 }
 
 export const TRAVELLER_TYPES: TravellerType[] = [
-  { code: 'adult',          name: 'Adult',                     description: 'Standard adult fare',                                                                                        discount: 0,     },
-  { code: 'railcard_holder', name: 'Railcard Holder',          description: '1/3 off Tube, Overground, National Rail, DLR & Elizabeth line fares. Requires a valid railcard (e.g. 16-25, Senior) linked to your Oyster card. Does not apply to buses or trams.', discount: 1 / 3, railcardOnly: true },
-  { code: 'apprentice',     name: 'Apprentice',                description: '50% off adult pay-as-you-go fares',                                                                          discount: 0.5,   },
-  { code: 'student_18plus', name: '18+ Student',               description: 'No discount on pay-as-you-go fares',                                                                         discount: 0,     },
-  { code: '16plus',         name: '16+',                       description: '50% off Tube & rail, free bus & tram',                                                                        discount: 0.5,   },
-  { code: '11_15',          name: '11–15',                     description: '50% off Tube & rail, free bus & tram',                                                                        discount: 0.5,   },
-  { code: '5_10',           name: '5–10',                      description: 'Free travel on all TfL services',                                                                             discount: 1,     },
-  { code: 'jobcentre',      name: 'Jobcentre Plus',            description: '50% off adult pay-as-you-go fares',                                                                           discount: 0.5,   },
-  { code: 'disabled',       name: 'Disabled Persons Railcard', description: '1/3 off fares (Oyster registered)',                                                                           discount: 1 / 3, },
-  { code: 'veterans',       name: 'Veterans',                  description: 'Free travel on all TfL services',                                                                             discount: 1,     },
+  { code: 'adult', name: 'Adult', description: 'Standard adult fare', discount: 0 },
+  {
+    code: 'railcard_holder',
+    name: 'Railcard Holder',
+    description:
+      '1/3 off Tube, Overground, National Rail, DLR & Elizabeth line fares. Requires a valid railcard (e.g. 16-25, Senior) linked to your Oyster card. Does not apply to buses or trams.',
+    discount: 1 / 3,
+    railcardOnly: true,
+  },
+  {
+    code: 'apprentice',
+    name: 'Apprentice',
+    description: '50% off adult pay-as-you-go fares',
+    discount: 0.5,
+  },
+  {
+    code: 'student_18plus',
+    name: '18+ Student',
+    description: 'No discount on pay-as-you-go fares',
+    discount: 0,
+  },
+  {
+    code: '16plus',
+    name: '16+',
+    description: '50% off Tube & rail, free bus & tram',
+    discount: 0.5,
+  },
+  {
+    code: '11_15',
+    name: '11–15',
+    description: '50% off Tube & rail, free bus & tram',
+    discount: 0.5,
+  },
+  { code: '5_10', name: '5–10', description: 'Free travel on all TfL services', discount: 1 },
+  {
+    code: 'jobcentre',
+    name: 'Jobcentre Plus',
+    description: '50% off adult pay-as-you-go fares',
+    discount: 0.5,
+  },
+  {
+    code: 'disabled',
+    name: 'Disabled Persons Railcard',
+    description: '1/3 off fares (Oyster registered)',
+    discount: 1 / 3,
+  },
+  {
+    code: 'veterans',
+    name: 'Veterans',
+    description: 'Free travel on all TfL services',
+    discount: 1,
+  },
 ]
 
 // ---------------------------------------------------------------------------
@@ -61,14 +103,22 @@ export type Railcard = {
 const RAILCARD_DISCOUNT = 1 / 3
 
 export const RAILCARDS: Railcard[] = [
-  { code: 'YNG', name: '16-25 Railcard',              description: '1/3 off rail fares' },
-  { code: 'Y30', name: '26-30 Railcard',              description: '1/3 off rail fares' },
-  { code: 'SRN', name: 'Senior Railcard (60+)',        description: '1/3 off rail fares' },
-  { code: '2TR', name: 'Two Together Railcard',        description: '1/3 off when travelling with one other' },
-  { code: 'FAM', name: 'Family & Friends Railcard',   description: '1/3 off adult rail fares' },
-  { code: 'DIS', name: 'Disabled Persons Railcard',   description: '1/3 off rail fares' },
-  { code: 'HMF', name: 'HM Forces Railcard',          description: '1/3 off rail fares' },
-  { code: 'NGC', name: 'Network Railcard',             description: '1/3 off off-peak rail fares in Network SE' },
+  { code: 'YNG', name: '16-25 Railcard', description: '1/3 off rail fares' },
+  { code: 'Y30', name: '26-30 Railcard', description: '1/3 off rail fares' },
+  { code: 'SRN', name: 'Senior Railcard (60+)', description: '1/3 off rail fares' },
+  {
+    code: '2TR',
+    name: 'Two Together Railcard',
+    description: '1/3 off when travelling with one other',
+  },
+  { code: 'FAM', name: 'Family & Friends Railcard', description: '1/3 off adult rail fares' },
+  { code: 'DIS', name: 'Disabled Persons Railcard', description: '1/3 off rail fares' },
+  { code: 'HMF', name: 'HM Forces Railcard', description: '1/3 off rail fares' },
+  {
+    code: 'NGC',
+    name: 'Network Railcard',
+    description: '1/3 off off-peak rail fares in Network SE',
+  },
 ]
 
 // ---------------------------------------------------------------------------

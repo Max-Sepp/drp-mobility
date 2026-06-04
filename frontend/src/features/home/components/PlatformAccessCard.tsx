@@ -47,7 +47,11 @@ export const PlatformAccessCard = ({ platforms }: PlatformAccessCardProps) => {
             </Text>
           )}
         </YStack>
-        <MaterialIcons name={expanded ? 'expand-less' : 'expand-more'} size={24} color={Colors.secondaryText} />
+        <MaterialIcons
+          name={expanded ? 'expand-less' : 'expand-more'}
+          size={24}
+          color={Colors.secondaryText}
+        />
       </XStack>
 
       {expanded && (

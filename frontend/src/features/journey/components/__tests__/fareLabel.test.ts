@@ -10,7 +10,13 @@ vi.mock('tamagui', () => ({ Text: null, XStack: null }))
 vi.mock('@expo/vector-icons', () => ({ MaterialIcons: null }))
 vi.mock('@/theme', () => ({
   Borders: {},
-  Colors: { blue: '#007AFF', secondaryText: '#8E8E93', warningBg: '', warningBorder: '', warningDark: '' },
+  Colors: {
+    blue: '#007AFF',
+    secondaryText: '#8E8E93',
+    warningBg: '',
+    warningBorder: '',
+    warningDark: '',
+  },
   Opacity: { pressed: 0.7 },
   Radii: {},
 }))
