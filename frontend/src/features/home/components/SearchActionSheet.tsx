@@ -1,13 +1,11 @@
-// Animated bottom sheet that lives inside MapHomeScreen.
-// The card is always mounted; tapping the search bar slides it UP in place
-// (translateY: SLIDE_OFFSET → 0). No new screen is pushed.
+// Bottom sheet for MapHomeScreen — three snap positions:
+//   collapsed  → search bar only (just peeking at the bottom)
+//   mid        → ~50% screen height, shows Places + Saved Journeys
+//   full       → ~88% screen height, search active
 //
-// Collapsed: shows Places row + Saved Journeys.
-// Expanded, empty query: same content (idle state).
-// Expanded, query ≥ 3 chars: debounced station + address search results replace the body.
-//
-// Single spring covers 100% of the travel for a clean, continuous slide.
-// Dismiss reverses with a slightly stiffer spring for a snappier close.
+// Dragging works from the handle, search row, or anywhere on the body content
+// (when not at full snap the body ScrollView has scrollEnabled=false so no conflict).
+// Tapping the search bar snaps to full and immediately focuses the input.
 
 import { MaterialIcons } from '@expo/vector-icons'
 import * as Location from 'expo-location'
@@ -52,12 +50,36 @@ import { Colors, Radii, Shadows, Spacing, Typography } from '@/theme'
 // ---------------------------------------------------------------------------
 
 const SCREEN_H = Dimensions.get('window').height
-// Total card height (sets how much map is visible above when expanded: ~18%).
-const SHEET_H = SCREEN_H * 0.82
-// How much of the card is visible in the collapsed state.
-const COLLAPSED_VISIBLE = 300
-// How far to translate the card down so only COLLAPSED_VISIBLE is shown.
-const SLIDE_OFFSET = SHEET_H - COLLAPSED_VISIBLE
+// Total card height — generous enough for full-snap content.
+const SHEET_H = SCREEN_H * 0.88
+// Mid snap: bottom 50% of screen visible.
+const MID_H = SCREEN_H * 0.5
+
+// translateY values — sheet is bottom-anchored; positive Y pushes it down.
+// SNAP_COLLAPSED is computed inside the component (depends on bottom inset).
+const SNAP_MID = SHEET_H - MID_H
+const SNAP_FULL = 0
+
+type SnapState = 'collapsed' | 'mid' | 'full'
+
+function computeTarget(
+  landing: number,
+  vy: number,
+  current: SnapState,
+  snapCollapsed: number,
+): SnapState {
+  // Fast fling overrides distance-based snap.
+  if (vy < -0.8) return current === 'collapsed' ? 'mid' : 'full'
+  if (vy > 0.8) return current === 'full' ? 'mid' : 'collapsed'
+  // Otherwise snap to nearest.
+  const dFull = Math.abs(landing - SNAP_FULL)
+  const dMid = Math.abs(landing - SNAP_MID)
+  const dCollapsed = Math.abs(landing - snapCollapsed)
+  const minDist = Math.min(dFull, dMid, dCollapsed)
+  if (minDist === dFull) return 'full'
+  if (minDist === dMid) return 'mid'
+  return 'collapsed'
+}
 
 // ---------------------------------------------------------------------------
 // Public handle
@@ -94,10 +116,7 @@ function PlacesRow({
   const [scrollX, setScrollX] = useState(0)
   const [containerWidth, setContainerWidth] = useState(0)
 
-  // Compute content width directly from tile count — avoids onContentSizeChange
-  // being unreliable on web (it reports scrollWidth = clientWidth).
-  // Tile width is from styles.placesTile (64px), gap is Spacing.md (12px).
-  const tileCount = NAMED_PLACES.length + savedPlaces.custom.length + 1 // +1 for Add
+  const tileCount = NAMED_PLACES.length + savedPlaces.custom.length + 1
   const contentWidth = tileCount * 64 + (tileCount - 1) * Spacing.md
 
   const scrollable = containerWidth > 0 && contentWidth > containerWidth
@@ -130,7 +149,9 @@ function PlacesRow({
               onLongPress={() => onLongPress(key)}
               accessibilityRole="button"
               accessibilityLabel={saved ? `${label}: ${savedPlaces[key]!.address}` : `Set ${label}`}
-              accessibilityHint={saved ? 'Tap to plan journey. Long press to edit or remove.' : 'Tap to set your address'}
+              accessibilityHint={
+                saved ? 'Tap to plan journey. Long press to edit or remove.' : 'Tap to set your address'
+              }
             >
               <View style={[styles.placesTileIcon, saved && styles.placesTileIconSaved]}>
                 <MaterialIcons name={icon} size={22} color={saved ? Colors.card : Colors.blue} />
@@ -168,11 +189,7 @@ function PlacesRow({
             </Text>
           </TouchableOpacity>
         ))}
-        <TouchableOpacity
-          style={styles.placesTile}
-          activeOpacity={0.75}
-          onPress={onAddPress}
-        >
+        <TouchableOpacity style={styles.placesTile} activeOpacity={0.75} onPress={onAddPress}>
           <View style={styles.placesTileIcon}>
             <MaterialIcons name="add" size={22} color={Colors.blue} />
           </View>
@@ -181,7 +198,12 @@ function PlacesRow({
       </ScrollView>
       {scrollable && (
         <View style={styles.scrollbarTrack}>
-          <View style={[styles.scrollbarThumb, { width: thumbWidth, transform: [{ translateX: thumbLeft }] }]} />
+          <View
+            style={[
+              styles.scrollbarThumb,
+              { width: thumbWidth, transform: [{ translateX: thumbLeft }] },
+            ]}
+          />
         </View>
       )}
     </View>
@@ -291,20 +313,123 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
     ref,
   ) {
     const insets = useSafeAreaInsets()
-    const [expanded, setExpanded] = useState(false)
+
+    // Collapsed: just handle zone + search bar + bottom safe area.
+    // ~88px of content + bottom inset.
+    const SNAP_COLLAPSED = SHEET_H - (88 + insets.bottom)
+
+    const [snap, setSnap] = useState<SnapState>('mid')
     const [query, setQuery] = useState('')
     const [stationResults, setStationResults] = useState<StationDetail[]>([])
     const [locationResults, setLocationResults] = useState<LocationSuggestion[]>([])
     const [searching, setSearching] = useState(false)
     const [gpsLoading, setGpsLoading] = useState(false)
+
     const inputRef = useRef<TextInput>(null)
+    const snapRef = useRef<SnapState>('mid')
+    // Keeps snap geometry up-to-date for PanResponder closures (created once).
+    const snapPointsRef = useRef({ collapsed: SNAP_COLLAPSED, mid: SNAP_MID, full: SNAP_FULL })
+    snapPointsRef.current = { collapsed: SNAP_COLLAPSED, mid: SNAP_MID, full: SNAP_FULL }
+    // Forward to PanResponder closures so they always call the latest snapTo.
+    const snapToRef = useRef<(target: SnapState, withFocus?: boolean) => void>(() => {})
+    // Shared drag origin across both pan responders.
+    const dragStartRef = useRef(SNAP_MID)
 
     const { stations } = useStations()
     const cachedCoords = useAppLocation()
 
-    // Start translated down so only COLLAPSED_VISIBLE is showing. A lazy useState keeps the single
-    // Animated.Value stable across renders while staying safe to read during render.
-    const [translateY] = useState(() => new Animated.Value(SLIDE_OFFSET))
+    const [translateY] = useState(() => new Animated.Value(SNAP_MID))
+
+    // ── Pan responders ────────────────────────────────────────────────────
+    // headerPanHandlers: always active — on the drag handle and search row.
+    // contentPanHandlers: only claims when not at full snap, so the ScrollView
+    //   can scroll normally when the sheet is fully open.
+
+    const [headerPanHandlers] = useState(() =>
+      PanResponder.create({
+        onMoveShouldSetPanResponder: (_evt, g) =>
+          Math.abs(g.dy) > 8 && Math.abs(g.dy) > Math.abs(g.dx),
+        onPanResponderGrant: () => {
+          translateY.stopAnimation((val) => {
+            dragStartRef.current = val
+          })
+        },
+        onPanResponderMove: (_evt, g) => {
+          const max = snapPointsRef.current.collapsed
+          translateY.setValue(Math.max(0, Math.min(max, dragStartRef.current + g.dy)))
+        },
+        onPanResponderRelease: (_evt, g) => {
+          const { collapsed } = snapPointsRef.current
+          const target = computeTarget(
+            dragStartRef.current + g.dy,
+            g.vy,
+            snapRef.current,
+            collapsed,
+          )
+          snapToRef.current(target)
+        },
+      }).panHandlers,
+    )
+
+    const [contentPanHandlers] = useState(() =>
+      PanResponder.create({
+        onMoveShouldSetPanResponder: (_evt, g) => {
+          if (snapRef.current === 'full') return false
+          return Math.abs(g.dy) > 8 && Math.abs(g.dy) > Math.abs(g.dx)
+        },
+        onPanResponderGrant: () => {
+          translateY.stopAnimation((val) => {
+            dragStartRef.current = val
+          })
+        },
+        onPanResponderMove: (_evt, g) => {
+          const max = snapPointsRef.current.collapsed
+          translateY.setValue(Math.max(0, Math.min(max, dragStartRef.current + g.dy)))
+        },
+        onPanResponderRelease: (_evt, g) => {
+          const { collapsed } = snapPointsRef.current
+          const target = computeTarget(
+            dragStartRef.current + g.dy,
+            g.vy,
+            snapRef.current,
+            collapsed,
+          )
+          snapToRef.current(target)
+        },
+      }).panHandlers,
+    )
+
+    // ── Snap action ───────────────────────────────────────────────────────
+
+    const snapTo = useCallback(
+      (target: SnapState, withFocus = false) => {
+        setSnap(target)
+        snapRef.current = target
+
+        if (target !== 'full') {
+          Keyboard.dismiss()
+          setQuery('')
+        }
+
+        if (withFocus && target === 'full') {
+          // Wait one frame so React re-renders with editable=true before focusing.
+          setTimeout(() => inputRef.current?.focus(), 50)
+        }
+
+        Animated.spring(translateY, {
+          toValue: snapPointsRef.current[target],
+          stiffness: 160,
+          damping: 24,
+          mass: 0.9,
+          useNativeDriver: USE_NATIVE_DRIVER,
+        }).start()
+      },
+      [translateY],
+    )
+
+    snapToRef.current = snapTo
+
+    useImperativeHandle(ref, () => ({ expand: () => snapToRef.current('mid') }), [])
 
     // ── Debounced search ──────────────────────────────────────────────────
 
@@ -331,73 +456,6 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
       return () => clearTimeout(timer)
     }, [query, stations])
 
-    // ── Animation helpers ─────────────────────────────────────────────────
-
-    const expand = useCallback(() => {
-      setExpanded(true)
-      Animated.spring(translateY, {
-        toValue: 0,
-        stiffness: 130,
-        damping: 22,
-        mass: 1.1,
-        useNativeDriver: USE_NATIVE_DRIVER,
-      }).start(() => {
-        inputRef.current?.focus()
-      })
-    }, [translateY])
-
-    const collapse = useCallback(() => {
-      Keyboard.dismiss()
-      setQuery('')
-      Animated.spring(translateY, {
-        toValue: SLIDE_OFFSET,
-        stiffness: 200,
-        damping: 28,
-        mass: 0.9,
-        useNativeDriver: USE_NATIVE_DRIVER,
-      }).start(() => setExpanded(false))
-    }, [translateY])
-
-    useImperativeHandle(ref, () => ({ expand }), [expand])
-
-    // ── Drag to slide ─────────────────────────────────────────────────────
-    // The drag handle implies the sheet can be dragged; wire that up so dragging up expands and
-    // dragging down collapses, snapping on release. Tap-to-expand still works because the pan only
-    // claims the gesture once the finger has moved vertically — a tap never triggers it. expand /
-    // collapse are stable (their only dependency is the stable Animated.Value), so the responder
-    // created once below always calls the right version.
-
-    // Created once via a lazy initialiser; panHandlers is a plain value (not a ref) so it's safe to
-    // spread during render. `dragStart` lives in the responder's own closure — shared across its
-    // handlers and persisting between grant/move/release — holding the sheet's translateY when the
-    // drag began so the move tracks the finger 1:1.
-    // react-hooks/refs mis-reads the responder's closure-captured `dragStart` as a ref accessed
-    // during render; it's an ordinary closure variable and the responder is built exactly once.
-    // eslint-disable-next-line react-hooks/refs
-    const [panHandlers] = useState(() => {
-      let dragStart = SLIDE_OFFSET
-      return PanResponder.create({
-        onMoveShouldSetPanResponder: (_evt, g) =>
-          Math.abs(g.dy) > 8 && Math.abs(g.dy) > Math.abs(g.dx),
-        onPanResponderGrant: () => {
-          translateY.stopAnimation((value) => {
-            dragStart = value
-          })
-        },
-        onPanResponderMove: (_evt, g) => {
-          translateY.setValue(Math.min(SLIDE_OFFSET, Math.max(0, dragStart + g.dy)))
-        },
-        onPanResponderRelease: (_evt, g) => {
-          const landing = dragStart + g.dy
-          const flungUp = g.vy < -0.5
-          const flungDown = g.vy > 0.5
-          // Snap to whichever end is closer, unless the gesture was a clear fling either way.
-          if (flungUp || (!flungDown && landing < SLIDE_OFFSET / 2)) expand()
-          else collapse()
-        },
-      }).panHandlers
-    })
-
     // ── Location tap handler ──────────────────────────────────────────────
 
     async function handleLocationSelect(suggestion: LocationSuggestion) {
@@ -413,8 +471,6 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
         }
         const to: ResolvedLocation = { postcode: toPostcode, label: suggestion.label }
 
-        // Attempt to resolve current location for the "from" field, but don't
-        // block navigation if unavailable — the journey planner handles an empty from.
         let from: ResolvedLocation | undefined
         const { status } = await Location.requestForegroundPermissionsAsync()
         if (status === 'granted') {
@@ -428,7 +484,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
           }
         }
 
-        collapse()
+        snapTo('collapsed')
         onLocationSelect(from, to)
       } finally {
         setGpsLoading(false)
@@ -437,6 +493,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
 
     // ── Render ────────────────────────────────────────────────────────────
 
+    const atFull = snap === 'full'
     const hasQuery = query.length >= 3
     const hasResults = stationResults.length > 0 || locationResults.length > 0
 
@@ -450,17 +507,17 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
           },
         ]}
       >
-        {/* Drag handle — its zone is draggable to slide the sheet up/down */}
-        <View {...panHandlers} style={styles.handleZone}>
+        {/* Drag handle — always draggable */}
+        <View {...headerPanHandlers} style={styles.handleZone}>
           <View style={styles.handle} />
         </View>
 
-        {/* Search bar — also draggable, so the whole header acts as a grab area */}
-        <View {...panHandlers} style={styles.searchRow}>
+        {/* Search bar — also always draggable; tap opens full snap + focuses */}
+        <View {...headerPanHandlers} style={styles.searchRow}>
           <TouchableOpacity
-            style={[styles.searchPill, expanded && styles.searchPillExpanded]}
-            onPress={expanded ? undefined : expand}
-            activeOpacity={expanded ? 1 : 0.8}
+            style={[styles.searchPill, atFull && styles.searchPillExpanded]}
+            onPress={!atFull ? () => snapTo('full', true) : undefined}
+            activeOpacity={atFull ? 1 : 0.8}
           >
             <MaterialIcons
               name="search"
@@ -468,15 +525,14 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
               color={Colors.secondaryText}
               style={{ marginRight: 6 }}
             />
-            {/* pointerEvents="none" when collapsed so touches pass through to the
-                TouchableOpacity on native (editable=false alone doesn't stop touch capture). */}
-            <View style={{ flex: 1, pointerEvents: expanded ? 'auto' : 'none' }}>
+            {/* pointerEvents="none" when not at full so taps pass through to TouchableOpacity */}
+            <View style={{ flex: 1, pointerEvents: atFull ? 'auto' : 'none' }}>
               <TextInput
                 ref={inputRef}
                 style={styles.searchInput}
                 placeholder="Where to?"
                 placeholderTextColor={Colors.placeholderText}
-                editable={expanded}
+                editable={atFull}
                 autoCapitalize="none"
                 autoCorrect={false}
                 returnKeyType="search"
@@ -484,112 +540,131 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
                 onChangeText={setQuery}
               />
             </View>
-            {!expanded && <MaterialIcons name="mic" size={16} color={Colors.secondaryText} />}
-            {expanded && searching && (
+            {!atFull && <MaterialIcons name="mic" size={16} color={Colors.secondaryText} />}
+            {atFull && searching && (
               <ActivityIndicator size="small" color={Colors.secondaryText} />
             )}
           </TouchableOpacity>
 
-          {expanded && (
-            <TouchableOpacity onPress={collapse} style={styles.cancelBtn} activeOpacity={0.7}>
+          {atFull && (
+            <TouchableOpacity
+              onPress={() => snapTo('collapsed')}
+              style={styles.cancelBtn}
+              activeOpacity={0.7}
+            >
               <Text style={[Typography.bodyBold, { color: Colors.blue }]}>Cancel</Text>
             </TouchableOpacity>
           )}
         </View>
 
-        {/* Body: search results when querying, idle content otherwise */}
-        {hasQuery ? (
-          <ScrollView
-            style={styles.resultsScroll}
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
-          >
-            {gpsLoading && (
-              <View style={styles.gpsLoadingRow}>
-                <ActivityIndicator size="small" color={Colors.blue} />
-                <Text style={[Typography.caption, { color: Colors.secondaryText, marginLeft: 8 }]}>
-                  Getting your location…
-                </Text>
-              </View>
-            )}
-
-            {stationResults.length > 0 && (
-              <View>
-                <Text style={styles.sectionLabel}>STATIONS</Text>
-                {stationResults.map((s) => (
-                  <View key={s.id}>
-                    <StationResultRow
-                      station={s}
-                      onPress={() => {
-                        collapse()
-                        onStationPress(s.name)
-                      }}
-                    />
-                    <View style={styles.separator} />
+        {/* Body — always mounted so it slides off-screen rather than popping out */}
+        <View {...contentPanHandlers} style={styles.bodyWrapper}>
+            {hasQuery ? (
+              <ScrollView
+                style={styles.resultsScroll}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+                scrollEnabled={atFull}
+              >
+                {gpsLoading && (
+                  <View style={styles.gpsLoadingRow}>
+                    <ActivityIndicator size="small" color={Colors.blue} />
+                    <Text
+                      style={[Typography.caption, { color: Colors.secondaryText, marginLeft: 8 }]}
+                    >
+                      Getting your location…
+                    </Text>
                   </View>
-                ))}
-              </View>
-            )}
+                )}
 
-            {locationResults.length > 0 && (
-              <View style={{ marginTop: stationResults.length > 0 ? Spacing.lg : 0 }}>
-                <Text style={styles.sectionLabel}>PLACES</Text>
-                {locationResults.map((loc, i) => (
-                  <View key={i}>
-                    <LocationResultRow suggestion={loc} onPress={() => handleLocationSelect(loc)} />
-                    <View style={styles.separator} />
+                {stationResults.length > 0 && (
+                  <View>
+                    <Text style={styles.sectionLabel}>STATIONS</Text>
+                    {stationResults.map((s) => (
+                      <View key={s.id}>
+                        <StationResultRow
+                          station={s}
+                          onPress={() => {
+                            snapTo('collapsed')
+                            onStationPress(s.name)
+                          }}
+                        />
+                        <View style={styles.separator} />
+                      </View>
+                    ))}
                   </View>
-                ))}
-              </View>
-            )}
+                )}
 
-            {!searching && !hasResults && (
-              <View style={styles.emptyState}>
-                <MaterialIcons name="search-off" size={36} color={Colors.tertiaryText} />
-                <Text
-                  style={[
-                    Typography.caption,
-                    { color: Colors.secondaryText, marginTop: Spacing.sm },
-                  ]}
-                >
-                  {`No results for "${query}"`}
-                </Text>
-              </View>
-            )}
-          </ScrollView>
-        ) : (
-          <>
-            <PlacesRow
-              savedPlaces={savedPlaces}
-              onPress={onPlacePress}
-              onLongPress={onPlaceLongPress}
-              onCustomPlacePress={onCustomPlacePress}
-              onCustomPlaceLongPress={onCustomPlaceLongPress}
-              onAddPress={onAddCustomPlace}
-            />
+                {locationResults.length > 0 && (
+                  <View style={{ marginTop: stationResults.length > 0 ? Spacing.lg : 0 }}>
+                    <Text style={styles.sectionLabel}>PLACES</Text>
+                    {locationResults.map((loc, i) => (
+                      <View key={i}>
+                        <LocationResultRow
+                          suggestion={loc}
+                          onPress={() => handleLocationSelect(loc)}
+                        />
+                        <View style={styles.separator} />
+                      </View>
+                    ))}
+                  </View>
+                )}
 
-            <View>
-              <Text style={styles.sectionLabel}>SAVED JOURNEYS</Text>
-              {savedJourneys.length === 0 ? (
-                <Text
-                  style={[Typography.caption, { color: Colors.secondaryText, paddingVertical: 6 }]}
-                >
-                  No saved journeys yet — plan one to save it here.
-                </Text>
-              ) : (
-                <FlatList
-                  data={savedJourneys}
-                  keyExtractor={(item) => item.id}
-                  scrollEnabled={false}
-                  renderItem={({ item }) => (
-                    <SavedRow item={item} onPress={() => onSavedJourneyPress(item)} />
-                  )}
-                  ItemSeparatorComponent={() => <View style={styles.separator} />}
+                {!searching && !hasResults && (
+                  <View style={styles.emptyState}>
+                    <MaterialIcons name="search-off" size={36} color={Colors.tertiaryText} />
+                    <Text
+                      style={[
+                        Typography.caption,
+                        { color: Colors.secondaryText, marginTop: Spacing.sm },
+                      ]}
+                    >
+                      {`No results for "${query}"`}
+                    </Text>
+                  </View>
+                )}
+              </ScrollView>
+            ) : (
+              <ScrollView
+                showsVerticalScrollIndicator={false}
+                scrollEnabled={atFull}
+                keyboardShouldPersistTaps="handled"
+              >
+                <PlacesRow
+                  savedPlaces={savedPlaces}
+                  onPress={onPlacePress}
+                  onLongPress={onPlaceLongPress}
+                  onCustomPlacePress={onCustomPlacePress}
+                  onCustomPlaceLongPress={onCustomPlaceLongPress}
+                  onAddPress={onAddCustomPlace}
                 />
-              )}
-            </View>
-          </>
-        )}
+
+                <View>
+                  <Text style={styles.sectionLabel}>SAVED JOURNEYS</Text>
+                  {savedJourneys.length === 0 ? (
+                    <Text
+                      style={[
+                        Typography.caption,
+                        { color: Colors.secondaryText, paddingVertical: 6 },
+                      ]}
+                    >
+                      No saved journeys yet — plan one to save it here.
+                    </Text>
+                  ) : (
+                    <FlatList
+                      data={savedJourneys}
+                      keyExtractor={(item) => item.id}
+                      scrollEnabled={false}
+                      renderItem={({ item }) => (
+                        <SavedRow item={item} onPress={() => onSavedJourneyPress(item)} />
+                      )}
+                      ItemSeparatorComponent={() => <View style={styles.separator} />}
+                    />
+                  )}
+                </View>
+              </ScrollView>
+            )}
+        </View>
       </Animated.View>
     )
   },
@@ -613,7 +688,6 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.sm,
     ...Shadows.top,
   },
-  // Enlarged, full-width hit area around the handle so it's easy to grab and drag.
   handleZone: {
     alignItems: 'center',
     paddingTop: 4,
@@ -652,6 +726,12 @@ const styles = StyleSheet.create({
     padding: 0,
   },
   cancelBtn: {},
+
+  // Body wrapper — contentPanHandlers spread here so anywhere on the body is draggable
+  // when not at full snap.
+  bodyWrapper: {
+    flex: 1,
+  },
 
   // Places
   placesSection: {
