@@ -30,15 +30,15 @@
       {
         "id": "940GZZDLABR-Lift-1",
         "name": "Lift 1",
-        "from": "BOOKH",
-        "to": "DLRN",
+        "from": "Booking Hall",
+        "to": "DLR northbound platform",
         "limitedCapacity": false
       },
       {
         "id": "940GZZDLABR-Lift-2",
         "name": "Lift 2",
-        "from": "BOOKH",
-        "to": "DLRS",
+        "from": "Booking Hall",
+        "to": "DLR southbound platform",
         "limitedCapacity": false
       }
     ],
@@ -114,36 +114,36 @@
       {
         "id": "HUBABW-Lift-1",
         "name": "Lift A",
-        "from": "FELIX",
-        "to": "HARRO",
+        "from": "Felixstowe Road entrance",
+        "to": "Harrow Manorway entrance",
         "limitedCapacity": false
       },
       {
         "id": "HUBABW-Lift-2",
         "name": "Lift B",
-        "from": "FELIX",
-        "to": "HARRO",
+        "from": "Felixstowe Road entrance",
+        "to": "Harrow Manorway entrance",
         "limitedCapacity": false
       },
       {
         "id": "HUBABW-Lift-3",
         "name": "Lift C",
-        "from": "WILTO",
-        "to": "HARRO",
+        "from": "Wilton Road entrance",
+        "to": "Harrow Manorway entrance",
         "limitedCapacity": false
       },
       {
         "id": "HUBABW-Lift-4",
         "name": "Lift D",
-        "from": "WILTO",
-        "to": "HARRO",
+        "from": "Wilton Road entrance",
+        "to": "Harrow Manorway entrance",
         "limitedCapacity": false
       },
       {
         "id": "HUBABW-Lift-6",
         "name": "Lift F",
         "from": "Ticket Hall",
-        "to": "Railway platform, RPLC",
+        "to": "Railway platform, Railway platform C",
         "limitedCapacity": false
       },
       {
@@ -238,14 +238,14 @@
       {
         "id": "910GACTONML-Lift-1",
         "name": "Lift A",
-        "from": "AC-S",
+        "from": "Ticket Hall (south)",
         "to": "Railway platform 1",
         "limitedCapacity": false
       },
       {
         "id": "910GACTONML-Lift-2",
         "name": "Lift B",
-        "from": "AC-S",
+        "from": "Ticket Hall (south)",
         "to": "Railway platform 2",
         "limitedCapacity": false
       }
@@ -404,6 +404,92 @@
         "location": "Located in ticket hall"
       }
     ]
+  },
+  {
+    "name": "Addington Village",
+    "platforms": [
+      {
+        "id": "940GZZCRADV-EB-tram",
+        "name": "Eastbound",
+        "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      },
+      {
+        "id": "940GZZCRADV-WB-tram",
+        "name": "Westbound",
+        "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "940GZZCRADV",
+    "zones": [],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.356486,
+      "lng": -0.032396
+    }
+  },
+  {
+    "name": "Addiscombe",
+    "platforms": [
+      {
+        "id": "940GZZCRADD-EB-tram",
+        "name": "Eastbound",
+        "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      },
+      {
+        "id": "940GZZCRADD-WB-tram",
+        "name": "Westbound",
+        "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "940GZZCRADD",
+    "zones": [],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.380152,
+      "lng": -0.073357
+    }
   },
   {
     "name": "Aldgate",
@@ -754,6 +840,49 @@
     ]
   },
   {
+    "name": "Ampere Way",
+    "platforms": [
+      {
+        "id": "940GZZCRAMP-EB-tram",
+        "name": "Eastbound",
+        "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "to_platform",
+        "boardingRamp": false,
+        "levelAccess": false
+      },
+      {
+        "id": "940GZZCRAMP-WB-tram",
+        "name": "Westbound",
+        "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "to_platform",
+        "boardingRamp": false,
+        "levelAccess": false
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "940GZZCRAMP",
+    "zones": [],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.382143,
+      "lng": -0.123442
+    }
+  },
+  {
     "name": "Angel",
     "lifts": 0,
     "escalators": 6,
@@ -905,6 +1034,49 @@
     ]
   },
   {
+    "name": "Arena",
+    "platforms": [
+      {
+        "id": "940GZZCRARA-EB-tram",
+        "name": "Eastbound",
+        "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "to_platform",
+        "boardingRamp": false,
+        "levelAccess": false
+      },
+      {
+        "id": "940GZZCRARA-WB-tram",
+        "name": "Westbound",
+        "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "to_platform",
+        "boardingRamp": false,
+        "levelAccess": false
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "940GZZCRARA",
+    "zones": [],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.389335,
+      "lng": -0.056528
+    }
+  },
+  {
     "name": "Arnos Grove",
     "lifts": 0,
     "escalators": 0,
@@ -1014,6 +1186,49 @@
     "coordinates": {
       "lat": 51.558463,
       "lng": -0.105662
+    }
+  },
+  {
+    "name": "Avenue Road",
+    "platforms": [
+      {
+        "id": "940GZZCRAVE-EB-tram",
+        "name": "Eastbound",
+        "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "to_platform",
+        "boardingRamp": false,
+        "levelAccess": false
+      },
+      {
+        "id": "940GZZCRAVE-WB-tram",
+        "name": "Westbound",
+        "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "to_platform",
+        "boardingRamp": false,
+        "levelAccess": false
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "940GZZCRAVE",
+    "zones": [],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.406887,
+      "lng": -0.048882
     }
   },
   {
@@ -1448,7 +1663,7 @@
       {
         "id": "HUBBAN-Lift-7",
         "name": "Lift A",
-        "from": "R-KWS",
+        "from": "King William Street entrance",
         "to": "Booking Hall (north)",
         "limitedCapacity": false,
         "notes": "Lift available on request. Press button to alert staff."
@@ -1456,7 +1671,7 @@
       {
         "id": "HUBBAN-Lift-8",
         "name": "Lift 8",
-        "from": "S-BLO",
+        "from": "Bloomberg Arcade entrance",
         "to": "Bakerloo line mezzanine",
         "limitedCapacity": false
       },
@@ -2226,6 +2441,166 @@
     }
   },
   {
+    "name": "Beckenham Junction",
+    "platforms": [
+      {
+        "id": "HUBBEK-WB-tram",
+        "name": "Westbound",
+        "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      },
+      {
+        "id": "HUBBEK-Plat01-WB-national-rail",
+        "name": "Westbound Platform 1",
+        "direction": "Westbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false,
+        "accessibilityNote": "Level access via Rectory Road"
+      },
+      {
+        "id": "HUBBEK-Plat02-WB-national-rail",
+        "name": "Westbound Platform 2",
+        "direction": "Westbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false,
+        "accessibilityNote": "Level access via Rectory Road"
+      },
+      {
+        "id": "HUBBEK-Plat03-EB-national-rail",
+        "name": "Eastbound Platform 3",
+        "direction": "Eastbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false,
+        "accessibilityNote": "Level access via High Street or Car Park"
+      },
+      {
+        "id": "HUBBEK-Plat04-WB-national-rail",
+        "name": "Westbound Platform 4",
+        "direction": "Westbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false,
+        "accessibilityNote": "Level access via High Street or Car Park"
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "HUBBEK",
+    "zones": [
+      4
+    ],
+    "wifi": false,
+    "blueBadgeParking": true,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "Partial",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.410594,
+      "lng": -0.025904
+    },
+    "toilets": [
+      {
+        "type": "Male",
+        "accessible": false,
+        "babyChanging": false,
+        "insideGateline": false,
+        "feeCharged": false,
+        "radarKey": false,
+        "opensWithStation": false,
+        "managedByTfL": false,
+        "location": "Located in National Rail station"
+      },
+      {
+        "type": "Female",
+        "accessible": false,
+        "babyChanging": false,
+        "insideGateline": false,
+        "feeCharged": false,
+        "radarKey": false,
+        "opensWithStation": false,
+        "managedByTfL": false,
+        "location": "Located in National Rail station"
+      },
+      {
+        "type": "Unisex",
+        "accessible": true,
+        "babyChanging": false,
+        "insideGateline": false,
+        "feeCharged": false,
+        "radarKey": false,
+        "opensWithStation": false,
+        "managedByTfL": false,
+        "location": "Located in National Rail station"
+      }
+    ]
+  },
+  {
+    "name": "Beckenham Road",
+    "platforms": [
+      {
+        "id": "940GZZCRBRD-EB-tram",
+        "name": "Eastbound",
+        "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      },
+      {
+        "id": "940GZZCRBRD-WB-tram",
+        "name": "Westbound",
+        "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "940GZZCRBRD",
+    "zones": [],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.409363,
+      "lng": -0.043629
+    }
+  },
+  {
     "name": "Becontree",
     "lifts": 0,
     "escalators": 0,
@@ -2293,6 +2668,92 @@
         "location": "Located on platform 1"
       }
     ]
+  },
+  {
+    "name": "Beddington Lane",
+    "platforms": [
+      {
+        "id": "940GZZCRBED-EB-tram",
+        "name": "Eastbound",
+        "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      },
+      {
+        "id": "940GZZCRBED-WB-tram",
+        "name": "Westbound",
+        "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "940GZZCRBED",
+    "zones": [],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.388108,
+      "lng": -0.141078
+    }
+  },
+  {
+    "name": "Belgrave Walk",
+    "platforms": [
+      {
+        "id": "940GZZCRBGV-EB-tram",
+        "name": "Eastbound",
+        "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      },
+      {
+        "id": "940GZZCRBGV-WB-tram",
+        "name": "Westbound",
+        "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "940GZZCRBGV",
+    "zones": [],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.399341,
+      "lng": -0.179524
+    }
   },
   {
     "name": "Belsize Park",
@@ -2509,6 +2970,61 @@
     ]
   },
   {
+    "name": "Birkbeck",
+    "platforms": [
+      {
+        "id": "HUBBIR-EB-tram",
+        "name": "Eastbound",
+        "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "to_platform",
+        "boardingRamp": false,
+        "levelAccess": false
+      },
+      {
+        "id": "HUBBIR-WB-tram",
+        "name": "Westbound",
+        "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "to_platform",
+        "boardingRamp": false,
+        "levelAccess": false
+      },
+      {
+        "id": "HUBBIR-Plat01-national-rail",
+        "name": "Platform 1",
+        "lines": [
+          "rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "HUBBIR",
+    "zones": [
+      4
+    ],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "Partial",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.403738,
+      "lng": -0.055285
+    }
+  },
+  {
     "name": "Blackfriars",
     "lifts": 6,
     "escalators": 4,
@@ -2709,6 +3225,49 @@
     ]
   },
   {
+    "name": "Blackhorse Lane",
+    "platforms": [
+      {
+        "id": "940GZZCRBLA-EB-tram",
+        "name": "Eastbound",
+        "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      },
+      {
+        "id": "940GZZCRBLA-WB-tram",
+        "name": "Westbound",
+        "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "940GZZCRBLA",
+    "zones": [],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.385683,
+      "lng": -0.071745
+    }
+  },
+  {
     "name": "Blackhorse Road",
     "lifts": 2,
     "escalators": 2,
@@ -2838,14 +3397,14 @@
       {
         "id": "940GZZDLBLA-Lift-1",
         "name": "Lift 1",
-        "from": "DITCH",
+        "from": "Ditchburn Place entrance",
         "to": "DLR eastbound",
         "limitedCapacity": false
       },
       {
         "id": "940GZZDLBLA-Lift-2",
         "name": "Lift 2",
-        "from": "DITCH",
+        "from": "Ditchburn Place entrance",
         "to": "DLR westbound",
         "limitedCapacity": false
       }
@@ -2966,7 +3525,7 @@
       {
         "id": "HUBBDS-Lift-4",
         "name": "Lift A",
-        "from": "C-STR",
+        "from": "Street entrance (central)",
         "to": "Booking Hall",
         "limitedCapacity": false
       },
@@ -3284,14 +3843,14 @@
       {
         "id": "940GZZDLBOW-Lift-1",
         "name": "Lift 1",
-        "from": "BOWRD",
+        "from": "Bow Road entrance",
         "to": "DLR northbound",
         "limitedCapacity": false
       },
       {
         "id": "940GZZDLBOW-Lift-2",
         "name": "Lift 2",
-        "from": "BOWRD",
+        "from": "Bow Road entrance",
         "to": "DLR southbound",
         "limitedCapacity": false
       }
@@ -3481,13 +4040,13 @@
         "id": "910GBRENTX-Lift-4",
         "name": "Lift 4",
         "from": "Entrance (east)",
-        "to": "EML",
+        "to": "Main station level",
         "limitedCapacity": false
       },
       {
         "id": "910GBRENTX-Lift-5",
         "name": "Lift 5",
-        "from": "EML",
+        "from": "Main station level",
         "to": "Footbridge",
         "limitedCapacity": false
       }
@@ -3774,7 +4333,7 @@
       {
         "id": "910GBROCKLY-Lift-1",
         "name": "Lift 1",
-        "from": "Brdge",
+        "from": "Footbridge",
         "to": "Railway platform (north)",
         "limitedCapacity": false
       }
@@ -4687,7 +5246,7 @@
       {
         "id": "HUBCAW-Lift-DLR S2",
         "name": "Lift DLR S2",
-        "from": "SHW",
+        "from": "Shopping centre (west entrance)",
         "to": "DLR northbound",
         "limitedCapacity": false,
         "via": "DLR M"
@@ -4695,7 +5254,7 @@
       {
         "id": "HUBCAW-Lift-DLR S3",
         "name": "Lift DLR S3",
-        "from": "SHE",
+        "from": "Shopping centre (east entrance)",
         "to": "DLR southbound",
         "limitedCapacity": false,
         "via": "DLR M"
@@ -4703,7 +5262,7 @@
       {
         "id": "HUBCAW-Lift-LU 1",
         "name": "Lift LU 1",
-        "from": "PLA, J Mez, UBST",
+        "from": "Port of London Authority building, Jubilee line mezzanine, Underground station entrance",
         "to": "Jubilee line booking hall",
         "limitedCapacity": false
       },
@@ -4720,7 +5279,7 @@
         "from": "Harrods level east",
         "to": "Booking Hall",
         "limitedCapacity": false,
-        "via": "QE"
+        "via": "Quay East atrium"
       },
       {
         "id": "HUBCAW-Lift-B",
@@ -4903,7 +5462,7 @@
       {
         "id": "HUBCAN-Lift-1",
         "name": "Lift 1",
-        "from": "BOW",
+        "from": "Bow Road entrance",
         "to": "Booking Hall",
         "limitedCapacity": false
       },
@@ -5139,7 +5698,7 @@
         "id": "HUBCST-Lift-1",
         "name": "Lift 1",
         "from": "National Rail",
-        "to": "NR E",
+        "to": "National Rail (east)",
         "limitedCapacity": false
       }
     ],
@@ -5398,14 +5957,14 @@
       {
         "id": "910GCRSHLTN-Lift-1",
         "name": "Lift 1",
-        "from": "FOT",
+        "from": "Station forecourt",
         "to": "Railway platform (east)",
         "limitedCapacity": false
       },
       {
         "id": "910GCRSHLTN-Lift-2",
         "name": "Lift 2",
-        "from": "FOT",
+        "from": "Station forecourt",
         "to": "Railway platform (west)",
         "limitedCapacity": false
       }
@@ -5490,6 +6049,38 @@
       "lng": -0.026342
     },
     "lifts": 2
+  },
+  {
+    "name": "Centrale",
+    "platforms": [
+      {
+        "id": "940GZZCRCTR-EB-tram",
+        "name": "Eastbound",
+        "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "940GZZCRCTR",
+    "zones": [],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.375855,
+      "lng": -0.10377
+    }
   },
   {
     "name": "Chadwell Heath",
@@ -6356,6 +6947,38 @@
     ]
   },
   {
+    "name": "Church Street",
+    "platforms": [
+      {
+        "id": "940GZZCRCHR-WB-tram",
+        "name": "Westbound",
+        "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "940GZZCRCHR",
+    "zones": [],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.374006,
+      "lng": -0.105082
+    }
+  },
+  {
     "name": "City Thameslink",
     "escalators": 0,
     "platforms": [
@@ -6390,14 +7013,14 @@
       {
         "id": "910GCTMSLNK-Lift-1",
         "name": "Lift 1",
-        "from": "UGLH",
+        "from": "Upper concourse",
         "to": "Railway platform (north)",
         "limitedCapacity": false
       },
       {
         "id": "910GCTMSLNK-Lift-2",
         "name": "Lift 2",
-        "from": "UGLH",
+        "from": "Upper concourse",
         "to": "Railway platform (south)",
         "limitedCapacity": false
       }
@@ -6525,28 +7148,28 @@
         "id": "HUBCLJ-Lift-1",
         "name": "Lift 1",
         "from": "National Rail concourse",
-        "to": "RPL-K",
+        "to": "Railway platform K",
         "limitedCapacity": false
       },
       {
         "id": "HUBCLJ-Lift-2",
         "name": "Lift 2",
         "from": "Subway",
-        "to": "RPL-K",
+        "to": "Railway platform K",
         "limitedCapacity": false
       },
       {
         "id": "HUBCLJ-Lift-3",
         "name": "Lift 3",
         "from": "National Rail concourse",
-        "to": "RPL-B",
+        "to": "Railway platform B",
         "limitedCapacity": false
       },
       {
         "id": "HUBCLJ-Lift-4",
         "name": "Lift 4",
         "from": "Subway",
-        "to": "RPL-B",
+        "to": "Railway platform B",
         "limitedCapacity": false
       }
     ],
@@ -6781,7 +7404,7 @@
         "id": "940GZZLUCKS-Lift-1",
         "name": "Lift 1",
         "from": "Booking Hall",
-        "to": "C-CAR",
+        "to": "Car park",
         "limitedCapacity": false
       }
     ],
@@ -6942,6 +7565,49 @@
     ]
   },
   {
+    "name": "Coombe Lane",
+    "platforms": [
+      {
+        "id": "940GZZCRCOO-EB-tram",
+        "name": "Eastbound",
+        "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      },
+      {
+        "id": "940GZZCRCOO-WB-tram",
+        "name": "Westbound",
+        "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "940GZZCRCOO",
+    "zones": [],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.359362,
+      "lng": -0.05547
+    }
+  },
+  {
     "name": "Coulsdon South",
     "escalators": 0,
     "platforms": [
@@ -6976,14 +7642,14 @@
       {
         "id": "910GCOLSDNS-Lift-1",
         "name": "Lift 1",
-        "from": "BRIDG",
+        "from": "Bridge",
         "to": "Railway platform (north)",
         "limitedCapacity": false
       },
       {
         "id": "910GCOLSDNS-Lift-2",
         "name": "Lift 2",
-        "from": "BRIDG",
+        "from": "Bridge",
         "to": "Railway platform (south)",
         "limitedCapacity": false
       }
@@ -7112,14 +7778,14 @@
       {
         "id": "940GZZDLCLA-Lift-1",
         "name": "Lift 1",
-        "from": "CROSA",
+        "from": "Station concourse",
         "to": "DLR_S",
         "limitedCapacity": true
       },
       {
         "id": "940GZZDLCLA-Lift-2",
         "name": "Lift 2",
-        "from": "CROSA",
+        "from": "Station concourse",
         "to": "DLR northbound",
         "limitedCapacity": true
       }
@@ -7287,21 +7953,21 @@
         "id": "HUBCYP-Lift-1",
         "name": "Lift 1",
         "from": "National Rail concourse",
-        "to": "Railway platform (north), RPLFS",
+        "to": "Railway platform (north), Railway platform F (south)",
         "limitedCapacity": false
       },
       {
         "id": "HUBCYP-Lift-2",
         "name": "Lift 2",
         "from": "National Rail concourse",
-        "to": "RPL T, Railway platform (south)",
+        "to": "Railway platform (through), Railway platform (south)",
         "limitedCapacity": false
       },
       {
         "id": "HUBCYP-Lift-3",
         "name": "Lift 3",
         "from": "National Rail concourse",
-        "to": "RPLFN",
+        "to": "Railway platform F (north)",
         "limitedCapacity": false
       }
     ],
@@ -7409,7 +8075,7 @@
       {
         "id": "HUBCUS-Lift-4",
         "name": "Lift 4",
-        "from": "WalkW",
+        "from": "Covered walkway (west)",
         "to": "Eastbound Platform 3, Westbound Platform 4",
         "limitedCapacity": false
       },
@@ -7417,20 +8083,20 @@
         "id": "HUBCUS-Lift-1",
         "name": "Lift 1",
         "from": "Victoria line",
-        "to": "WalkC",
+        "to": "Covered walkway (centre)",
         "limitedCapacity": false
       },
       {
         "id": "HUBCUS-Lift-2",
         "name": "Lift 2",
         "from": "Eastbound Platform 3, Westbound Platform 4",
-        "to": "WalkE",
+        "to": "Covered walkway (east)",
         "limitedCapacity": false
       },
       {
         "id": "HUBCUS-Lift-3",
         "name": "Lift 3",
-        "from": "CBH",
+        "from": "Booking Hall",
         "to": "Elizabeth line eastbound, Elizabeth line westbound",
         "limitedCapacity": false
       }
@@ -7496,7 +8162,7 @@
       {
         "id": "HUBCUT-Lift-1",
         "name": "Lift 1",
-        "from": "CREEK",
+        "from": "Deptford Creek entrance",
         "to": "Northbound Platform 2, Southbound Platform 1",
         "limitedCapacity": false,
         "via": "Concourse"
@@ -8316,6 +8982,49 @@
     ]
   },
   {
+    "name": "Dundonald Road",
+    "platforms": [
+      {
+        "id": "940GZZCRDDR-EB-tram",
+        "name": "Eastbound",
+        "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      },
+      {
+        "id": "940GZZCRDDR-WB-tram",
+        "name": "Westbound",
+        "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "940GZZCRDDR",
+    "zones": [],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.417434,
+      "lng": -0.207511
+    }
+  },
+  {
     "name": "Ealing Broadway",
     "lifts": 4,
     "escalators": 0,
@@ -8778,6 +9487,9 @@
         "id": "HUBECY-EB-tram",
         "name": "Eastbound",
         "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
         "stepFreeAccess": "to_platform",
         "boardingRamp": false,
         "levelAccess": false
@@ -8858,6 +9570,9 @@
         "id": "HUBECY-WB-tram",
         "name": "Westbound",
         "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
         "stepFreeAccess": "Full",
         "boardingRamp": false,
         "levelAccess": true
@@ -9073,7 +9788,7 @@
       {
         "id": "940GZZDLEIN-Lift-1",
         "name": "Lift 1",
-        "from": "BLACK",
+        "from": "Blackwall Way entrance",
         "to": "DLR eastbound",
         "limitedCapacity": false,
         "via": "Booking Hall"
@@ -9081,7 +9796,7 @@
       {
         "id": "940GZZDLEIN-Lift-2",
         "name": "Lift 2",
-        "from": "BLACK",
+        "from": "Blackwall Way entrance",
         "to": "DLR westbound",
         "limitedCapacity": false,
         "via": "Booking Hall"
@@ -9089,7 +9804,7 @@
       {
         "id": "940GZZDLEIN-Lift-3",
         "name": "Lift 3",
-        "from": "ASPEN",
+        "from": "Aspen Way entrance",
         "to": "Booking Hall",
         "limitedCapacity": false
       }
@@ -9691,6 +10406,75 @@
         "opensWithStation": false,
         "managedByTfL": true,
         "location": "Located on platform 1"
+      }
+    ]
+  },
+  {
+    "name": "Elmers End",
+    "platforms": [
+      {
+        "id": "HUBELM-Plat01-WB-tram",
+        "name": "Westbound Platform 1",
+        "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      },
+      {
+        "id": "HUBELM-Plat02-NB-national-rail",
+        "name": "Northbound Platform 2",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false
+      },
+      {
+        "id": "HUBELM-Plat03-SB-national-rail",
+        "name": "Southbound Platform 3",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "HUBELM",
+    "zones": [
+      4
+    ],
+    "wifi": false,
+    "blueBadgeParking": true,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "Partial",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.399291,
+      "lng": -0.050126
+    },
+    "toilets": [
+      {
+        "type": "Male",
+        "accessible": false,
+        "babyChanging": false,
+        "insideGateline": false,
+        "feeCharged": false,
+        "radarKey": false,
+        "opensWithStation": false,
+        "managedByTfL": false,
+        "location": "Located in National Rail station"
       }
     ]
   },
@@ -10610,6 +11394,49 @@
     ]
   },
   {
+    "name": "Fieldway",
+    "platforms": [
+      {
+        "id": "940GZZCRFLD-EB-tram",
+        "name": "Eastbound",
+        "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      },
+      {
+        "id": "940GZZCRFLD-WB-tram",
+        "name": "Westbound",
+        "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "940GZZCRFLD",
+    "zones": [],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.350903,
+      "lng": -0.023932
+    }
+  },
+  {
     "name": "Finchley Central",
     "lifts": 2,
     "escalators": 0,
@@ -10869,35 +11696,35 @@
       {
         "id": "HUBFPK-Lift-1",
         "name": "Lift 1",
-        "from": "Cor N",
+        "from": "Corridor (north)",
         "to": "Northbound Platform 2, Eastbound Platform 1",
         "limitedCapacity": false
       },
       {
         "id": "HUBFPK-Lift-3",
         "name": "Lift 3",
-        "from": "Cor N",
+        "from": "Corridor (north)",
         "to": "Southbound Platform 4, Westbound Platform 3",
         "limitedCapacity": false
       },
       {
         "id": "HUBFPK-Lift1A",
         "name": "Lift 1A",
-        "from": "Cor N",
+        "from": "Corridor (north)",
         "to": "Railway platform (south)",
         "limitedCapacity": false
       },
       {
         "id": "HUBFPK-Lift 2",
         "name": "Lift 2",
-        "from": "Cor N",
+        "from": "Corridor (north)",
         "to": "Entrance",
         "limitedCapacity": false
       },
       {
         "id": "HUBFPK-Lift 7",
         "name": "Lift 7",
-        "from": "Cor N",
+        "from": "Corridor (north)",
         "to": "Railway platform (north)",
         "limitedCapacity": false
       }
@@ -10972,21 +11799,21 @@
       {
         "id": "910GFRSTGT-Lift-1",
         "name": "Lift A",
-        "from": "Crdr",
+        "from": "Corridor",
         "to": "Railway platform 1",
         "limitedCapacity": false
       },
       {
         "id": "910GFRSTGT-Lift-2",
         "name": "Lift B",
-        "from": "Crdr",
+        "from": "Corridor",
         "to": "Railway platform 2",
         "limitedCapacity": false
       },
       {
         "id": "910GFRSTGT-Lift-3",
         "name": "Lift C",
-        "from": "EntF",
+        "from": "Entrance F",
         "to": "Railway platform 3",
         "limitedCapacity": false
       }
@@ -11059,14 +11886,14 @@
       {
         "id": "910GFORESTH-Lift-1",
         "name": "Lift 1",
-        "from": "BRBG",
+        "from": "Station footbridge",
         "to": "Railway platform (north)",
         "limitedCapacity": false
       },
       {
         "id": "910GFORESTH-Lift-2",
         "name": "Lift 2",
-        "from": "BRBG",
+        "from": "Station footbridge",
         "to": "Railway platform (south)",
         "limitedCapacity": false
       }
@@ -11278,6 +12105,38 @@
         "mocked": true
       }
     ]
+  },
+  {
+    "name": "George Street",
+    "platforms": [
+      {
+        "id": "940GZZCRCEN-WB-tram",
+        "name": "Westbound",
+        "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "940GZZCRCEN",
+    "zones": [],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.373975,
+      "lng": -0.098746
+    }
   },
   {
     "name": "Gidea Park",
@@ -11964,6 +12823,49 @@
     ]
   },
   {
+    "name": "Gravel Hill",
+    "platforms": [
+      {
+        "id": "940GZZCRGRA-EB-tram",
+        "name": "Eastbound",
+        "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      },
+      {
+        "id": "940GZZCRGRA-WB-tram",
+        "name": "Westbound",
+        "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "940GZZCRGRA",
+    "zones": [],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.352786,
+      "lng": -0.037509
+    }
+  },
+  {
     "name": "Great Portland Street",
     "lifts": 0,
     "escalators": 0,
@@ -12478,15 +13380,15 @@
       {
         "id": "HUBGNW-Lift-1",
         "name": "Lift 1",
-        "from": "WALLW",
+        "from": "Walkway (west)",
         "to": "DLR E, Railway platform (west)",
         "limitedCapacity": false
       },
       {
         "id": "HUBGNW-Lift-2",
         "name": "Lift 2",
-        "from": "WALLW",
-        "to": "DLRW",
+        "from": "Walkway (west)",
+        "to": "DLR westbound platform",
         "limitedCapacity": false
       }
     ],
@@ -12675,7 +13577,7 @@
       {
         "id": "910GHAKNYNM-Lift-1",
         "name": "Lift 1",
-        "from": "IENT",
+        "from": "Station entrance (inner)",
         "to": "Railway platform 1",
         "limitedCapacity": false
       }
@@ -13623,7 +14525,7 @@
       {
         "id": "910GHANWELL-Lift-2",
         "name": "Lift B",
-        "from": "NEnt",
+        "from": "North entrance",
         "to": "Railway platform",
         "limitedCapacity": false
       },
@@ -13839,6 +14741,49 @@
     ]
   },
   {
+    "name": "Harrington Road",
+    "platforms": [
+      {
+        "id": "940GZZCRHAR-EB-tram",
+        "name": "Eastbound",
+        "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      },
+      {
+        "id": "940GZZCRHAR-WB-tram",
+        "name": "Westbound",
+        "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "940GZZCRHAR",
+    "zones": [],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.399444,
+      "lng": -0.060384
+    }
+  },
+  {
     "name": "Harrow & Wealdstone",
     "lifts": 4,
     "escalators": 0,
@@ -14032,7 +14977,7 @@
       {
         "id": "HUBHOH-Lift-1",
         "name": "Lift 1",
-        "from": "B-COL",
+        "from": "Booking Hall (colonnade)",
         "to": "Booking Hall",
         "limitedCapacity": false
       },
@@ -16627,7 +17572,7 @@
       {
         "id": "940GZZDLISL-Lift-1",
         "name": "Lift 1",
-        "from": "MANCH",
+        "from": "Manchester Road entrance",
         "to": "Northbound Platform 2, Southbound Platform 1",
         "limitedCapacity": false
       }
@@ -17504,7 +18449,7 @@
       {
         "id": "940GZZDLKGV-Lift-2",
         "name": "Lift 2",
-        "from": "PIER",
+        "from": "Pier entrance",
         "to": "Bridge (east)",
         "limitedCapacity": false
       }
@@ -17526,6 +18471,49 @@
       "lng": 0.061771
     },
     "lifts": 2
+  },
+  {
+    "name": "King Henry's Drive",
+    "platforms": [
+      {
+        "id": "940GZZCRKGH-EB-tram",
+        "name": "Eastbound",
+        "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      },
+      {
+        "id": "940GZZCRKGH-WB-tram",
+        "name": "Westbound",
+        "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "940GZZCRKGH",
+    "zones": [],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.345575,
+      "lng": -0.020528
+    }
   },
   {
     "name": "King's Cross & St Pancras International",
@@ -17910,7 +18898,7 @@
       {
         "id": "HUBKGX-Lift-10",
         "name": "Lift 10",
-        "from": "KC911",
+        "from": "Station concourse",
         "to": "Northern line ticket hall",
         "limitedCapacity": false
       },
@@ -18642,21 +19630,21 @@
       {
         "id": "910GLANGLEY-Lift-1",
         "name": "Lift A",
-        "from": "FB L",
+        "from": "Footbridge (lower)",
         "to": "Railway platform 3",
         "limitedCapacity": false
       },
       {
         "id": "910GLANGLEY-Lift-2",
         "name": "Lift B",
-        "from": "FB L",
+        "from": "Footbridge (lower)",
         "to": "Railway platform 2",
         "limitedCapacity": false
       },
       {
         "id": "910GLANGLEY-Lift-3",
         "name": "Lift C",
-        "from": "FB L",
+        "from": "Footbridge (lower)",
         "to": "Railway platform 1",
         "limitedCapacity": false
       }
@@ -18757,6 +19745,49 @@
     "coordinates": {
       "lat": 51.513387,
       "lng": -0.217799
+    }
+  },
+  {
+    "name": "Lebanon Road",
+    "platforms": [
+      {
+        "id": "940GZZCRLEB-EB-tram",
+        "name": "Eastbound",
+        "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      },
+      {
+        "id": "940GZZCRLEB-WB-tram",
+        "name": "Westbound",
+        "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "940GZZCRLEB",
+    "zones": [],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.375176,
+      "lng": -0.084687
     }
   },
   {
@@ -19073,35 +20104,35 @@
       {
         "id": "HUBLHS-Lift-1",
         "name": "Lift 1",
-        "from": "BRANC",
-        "to": "DLRE",
+        "from": "Branch Road entrance",
+        "to": "DLR eastbound platform",
         "limitedCapacity": true
       },
       {
         "id": "HUBLHS-Lift-2",
         "name": "Lift 2",
-        "from": "BRANC",
-        "to": "DLRW",
+        "from": "Branch Road entrance",
+        "to": "DLR westbound platform",
         "limitedCapacity": true
       },
       {
         "id": "HUBLHS-Lift-3",
         "name": "Lift 3",
-        "from": "BUTCH",
-        "to": "DLRE",
+        "from": "Butcher Row entrance",
+        "to": "DLR eastbound platform",
         "limitedCapacity": true
       },
       {
         "id": "HUBLHS-Lift-4",
         "name": "Lift 4",
-        "from": "BUTCH",
-        "to": "DLRW",
+        "from": "Butcher Row entrance",
+        "to": "DLR westbound platform",
         "limitedCapacity": true
       },
       {
         "id": "HUBLHS-Lift-5",
         "name": "Lift 5",
-        "from": "BUTCH",
+        "from": "Butcher Row entrance",
         "to": "Railway platform (east)",
         "limitedCapacity": true
       }
@@ -19424,7 +20455,7 @@
         "id": "HUBLST-Lift-A",
         "name": "Lift G",
         "from": "Elizabeth line booking hall",
-        "to": "H-EL",
+        "to": "Elizabeth line upper concourse",
         "limitedCapacity": false
       }
     ],
@@ -19544,6 +20575,49 @@
         "mocked": true
       }
     ]
+  },
+  {
+    "name": "Lloyd Park",
+    "platforms": [
+      {
+        "id": "940GZZCRLOY-EB-tram",
+        "name": "Eastbound",
+        "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      },
+      {
+        "id": "940GZZCRLOY-WB-tram",
+        "name": "Westbound",
+        "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "940GZZCRLOY",
+    "zones": [],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.364238,
+      "lng": -0.081782
+    }
   },
   {
     "name": "London Bridge",
@@ -19905,14 +20979,14 @@
       {
         "id": "HUBLCY-Lift-1",
         "name": "Lift 1",
-        "from": "DRERD",
+        "from": "Airport terminal entrance",
         "to": "DLR eastbound, DLR westbound",
         "limitedCapacity": false
       },
       {
         "id": "HUBLCY-Lift-2",
         "name": "Lift 2",
-        "from": "DRERD",
+        "from": "Airport terminal entrance",
         "to": "DLR eastbound, DLR westbound",
         "limitedCapacity": false
       }
@@ -20156,14 +21230,14 @@
       {
         "id": "910GMDNHEAD-Lift-1",
         "name": "Lift 1",
-        "from": "SP",
+        "from": "Station Parade",
         "to": "Railway platform 2",
         "limitedCapacity": false
       },
       {
         "id": "910GMDNHEAD-Lift-2",
         "name": "Lift 2",
-        "from": "SP",
+        "from": "Station Parade",
         "to": "Railway platform 3",
         "limitedCapacity": false
       }
@@ -20567,7 +21641,7 @@
       {
         "id": "910GMRYLAND-Lift-3",
         "name": "Lift A",
-        "from": "LEntr",
+        "from": "Lower entrance",
         "to": "Railway platform 3",
         "limitedCapacity": false,
         "via": "Ticket Hall"
@@ -20767,6 +21841,49 @@
     ]
   },
   {
+    "name": "Merton Park",
+    "platforms": [
+      {
+        "id": "940GZZCRMTP-EB-tram",
+        "name": "Eastbound",
+        "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      },
+      {
+        "id": "940GZZCRMTP-WB-tram",
+        "name": "Westbound",
+        "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "940GZZCRMTP",
+    "zones": [],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.414795,
+      "lng": -0.201431
+    }
+  },
+  {
     "name": "Mile End",
     "lifts": 0,
     "escalators": 0,
@@ -20879,6 +21996,49 @@
     }
   },
   {
+    "name": "Mitcham",
+    "platforms": [
+      {
+        "id": "940GZZCRMCH-EB-tram",
+        "name": "Eastbound",
+        "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      },
+      {
+        "id": "940GZZCRMCH-WB-tram",
+        "name": "Westbound",
+        "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "940GZZCRMCH",
+    "zones": [],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.397403,
+      "lng": -0.172888
+    }
+  },
+  {
     "name": "Mitcham Eastfields",
     "escalators": 0,
     "platforms": [
@@ -20911,15 +22071,15 @@
       {
         "id": "910GESTFLDS-Lift-1",
         "name": "Lift 1",
-        "from": "Fbdg",
-        "to": "EntG",
+        "from": "Footbridge",
+        "to": "Entrance G",
         "limitedCapacity": false
       },
       {
         "id": "910GESTFLDS-Lift-2",
         "name": "Lift 2",
-        "from": "Fbdg",
-        "to": "EntL",
+        "from": "Footbridge",
+        "to": "Entrance L",
         "limitedCapacity": false
       }
     ],
@@ -20940,6 +22100,88 @@
       "lng": -0.154146
     },
     "lifts": 2
+  },
+  {
+    "name": "Mitcham Junction",
+    "platforms": [
+      {
+        "id": "HUBMJT-EB-tram",
+        "name": "Eastbound",
+        "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      },
+      {
+        "id": "HUBMJT-Plat01-NB-national-rail",
+        "name": "Northbound Platform 1",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "HUBMJT-Plat02-SB-national-rail",
+        "name": "Southbound Platform 2",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "HUBMJT-WB-tram",
+        "name": "Westbound",
+        "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "HUBMJT",
+    "zones": [
+      4
+    ],
+    "wifi": false,
+    "blueBadgeParking": true,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "Partial",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.392738,
+      "lng": -0.158124
+    },
+    "toilets": [
+      {
+        "type": "Unisex",
+        "accessible": true,
+        "babyChanging": false,
+        "insideGateline": false,
+        "feeCharged": false,
+        "radarKey": false,
+        "opensWithStation": false,
+        "managedByTfL": false,
+        "location": "Located in National Rail station"
+      }
+    ]
   },
   {
     "name": "Monument",
@@ -21189,7 +22431,7 @@
         "id": "HUBZMG-Lift-1",
         "name": "Lift B",
         "from": "Booking Hall (west)",
-        "to": "MMLW",
+        "to": "Platform mezzanine (west)",
         "limitedCapacity": false,
         "via": "Westbound Platform 2"
       },
@@ -21203,17 +22445,17 @@
       {
         "id": "HUBZMG-Lift-5",
         "name": "Lift C",
-        "from": "MLPW",
+        "from": "Metropolitan line platform (west)",
         "to": "Northbound Platform 7, Southbound Platform 8",
         "limitedCapacity": false
       },
       {
         "id": "HUBZMG-Lift-2",
         "name": "Lift D",
-        "from": "MMEL",
-        "to": "MMLE",
+        "from": "Upper mezzanine (east)",
+        "to": "Lower mezzanine (east)",
         "limitedCapacity": false,
-        "via": "MLPE"
+        "via": "Metropolitan line platform (east)"
       }
     ],
     "id": "HUBZMG",
@@ -21387,6 +22629,49 @@
     ]
   },
   {
+    "name": "Morden Road",
+    "platforms": [
+      {
+        "id": "940GZZCRMDN-EB-tram",
+        "name": "Eastbound",
+        "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      },
+      {
+        "id": "940GZZCRMDN-WB-tram",
+        "name": "Westbound",
+        "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "940GZZCRMDN",
+    "zones": [],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.409288,
+      "lng": -0.192387
+    }
+  },
+  {
     "name": "Mornington Crescent",
     "lifts": 2,
     "escalators": 0,
@@ -21490,6 +22775,38 @@
     "coordinates": {
       "lat": 51.553985,
       "lng": -0.249837
+    }
+  },
+  {
+    "name": "New Addington",
+    "platforms": [
+      {
+        "id": "940GZZCRNWA-WB-tram",
+        "name": "Westbound",
+        "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "940GZZCRNWA",
+    "zones": [],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.343155,
+      "lng": -0.01779
     }
   },
   {
@@ -24460,6 +25777,49 @@
     "lifts": 4
   },
   {
+    "name": "Phipps Bridge",
+    "platforms": [
+      {
+        "id": "940GZZCRPHI-EB-tram",
+        "name": "Eastbound",
+        "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      },
+      {
+        "id": "940GZZCRPHI-WB-tram",
+        "name": "Westbound",
+        "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "940GZZCRPHI",
+    "zones": [],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.40423,
+      "lng": -0.182249
+    }
+  },
+  {
     "name": "Piccadilly Circus",
     "lifts": 0,
     "escalators": 11,
@@ -24880,14 +26240,14 @@
       {
         "id": "910GPLMS-Lift-1",
         "name": "Lift 1",
-        "from": "Ent T",
+        "from": "Entrance T",
         "to": "Railway platform (west)",
         "limitedCapacity": false
       },
       {
         "id": "910GPLMS-Lift-2",
         "name": "Lift 2",
-        "from": "Ent P",
+        "from": "Entrance P",
         "to": "Railway platform (east)",
         "limitedCapacity": false
       }
@@ -24941,14 +26301,14 @@
       {
         "id": "940GZZDLPDK-Lift-1",
         "name": "Lift 1",
-        "from": "NWR",
+        "from": "North Woolwich Road entrance",
         "to": "DLR westbound",
         "limitedCapacity": false
       },
       {
         "id": "940GZZDLPDK-Lift-2",
         "name": "Lift 2",
-        "from": "NWR",
+        "from": "North Woolwich Road entrance",
         "to": "DLR eastbound",
         "limitedCapacity": false
       }
@@ -25025,17 +26385,17 @@
         "id": "940GZZDLPOP-Lift-1",
         "name": "Lift 1",
         "from": "Concourse",
-        "to": "BRIDG",
+        "to": "Bridge",
         "limitedCapacity": true,
-        "via": "DLRES, Eastbound Platform 1"
+        "via": "DLR platform (east side), Eastbound Platform 1"
       },
       {
         "id": "940GZZDLPOP-Lift-2",
         "name": "Lift 2",
         "from": "Concourse",
-        "to": "BRIDG",
+        "to": "Bridge",
         "limitedCapacity": true,
-        "via": "DLRWL, Westbound Platform 4"
+        "via": "DLR platform (west), Westbound Platform 4"
       }
     ],
     "id": "940GZZDLPOP",
@@ -25164,7 +26524,7 @@
         "id": "940GZZDLPRE-Lift-2",
         "name": "Lift 2",
         "from": "Bridge",
-        "to": "CONNA",
+        "to": "Interchange area",
         "limitedCapacity": false
       }
     ],
@@ -25974,6 +27334,38 @@
     ]
   },
   {
+    "name": "Reeves Corner",
+    "platforms": [
+      {
+        "id": "940GZZCRRVC-EB-tram",
+        "name": "Eastbound",
+        "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "940GZZCRRVC",
+    "zones": [],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.374744,
+      "lng": -0.106244
+    }
+  },
+  {
     "name": "Regent's Park",
     "lifts": 2,
     "escalators": 0,
@@ -26133,7 +27525,7 @@
         "id": "HUBRMD-Lift-2",
         "name": "Lift 2",
         "from": "National Rail concourse",
-        "to": "Railway platform (east), District line platforms 4–5, District line platforms 6–7, RPL T",
+        "to": "Railway platform (east), District line platforms 4–5, District line platforms 6–7, Railway platform (through)",
         "limitedCapacity": false
       }
     ],
@@ -26632,14 +28024,14 @@
         "id": "940GZZDLRVC-Lift-2",
         "name": "Lift 2",
         "from": "Booking Hall",
-        "to": "SEA",
+        "to": "Dock entrance",
         "limitedCapacity": false
       },
       {
         "id": "940GZZDLRVC-Lift-3",
         "name": "Lift 3",
         "from": "Booking Hall",
-        "to": "VICTO",
+        "to": "Royal Victoria Dock",
         "limitedCapacity": false
       }
     ],
@@ -26929,6 +28321,49 @@
     "coordinates": {
       "lat": 51.523071,
       "lng": -0.124285
+    }
+  },
+  {
+    "name": "Sandilands",
+    "platforms": [
+      {
+        "id": "940GZZCRSAN-EB-tram",
+        "name": "Eastbound",
+        "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      },
+      {
+        "id": "940GZZCRSAN-WB-tram",
+        "name": "Westbound",
+        "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "940GZZCRSAN",
+    "zones": [],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.375163,
+      "lng": -0.078912
     }
   },
   {
@@ -27233,7 +28668,7 @@
       {
         "id": "HUBSDE-Lift-1",
         "name": "Lift 1",
-        "from": "CORNW",
+        "from": "Cable Street entrance",
         "to": "Eastbound Platform 1, Westbound Platform 2",
         "limitedCapacity": false
       }
@@ -27682,21 +29117,21 @@
         "id": "910GSHRTLND-Lift-1",
         "name": "Lift 1",
         "from": "Railway platform 1",
-        "to": "OB",
+        "to": "Outbound platform",
         "limitedCapacity": false
       },
       {
         "id": "910GSHRTLND-Lift-2",
         "name": "Lift 2",
         "from": "Railway platform 2",
-        "to": "OB",
+        "to": "Outbound platform",
         "limitedCapacity": false
       },
       {
         "id": "910GSHRTLND-Lift-3",
         "name": "Lift 3",
-        "from": "EntCC",
-        "to": "OB",
+        "from": "Station concourse entrance",
+        "to": "Outbound platform",
         "limitedCapacity": false
       }
     ],
@@ -28284,14 +29719,14 @@
       {
         "id": "940GZZDLSOQ-Lift-1",
         "name": "Lift 1",
-        "from": "LSC",
+        "from": "Station concourse",
         "to": "DLR southbound",
         "limitedCapacity": true
       },
       {
         "id": "940GZZDLSOQ-Lift-2",
         "name": "Lift 2",
-        "from": "LSC",
+        "from": "Station concourse",
         "to": "DLR northbound",
         "limitedCapacity": true
       }
@@ -29441,22 +30876,22 @@
       {
         "id": "940GZZDLSTL-Lift-1",
         "name": "Lift 1",
-        "from": "DLRN, DLRS",
-        "to": "BOOKH",
+        "from": "DLR northbound platform, DLR southbound platform",
+        "to": "Booking Hall",
         "limitedCapacity": false
       },
       {
         "id": "940GZZDLSTL-Lift-2",
         "name": "Lift 2",
-        "from": "STEPH",
-        "to": "BOOKH",
+        "from": "Station approach",
+        "to": "Booking Hall",
         "limitedCapacity": false
       },
       {
         "id": "940GZZDLSTL-Lift-3",
         "name": "Lift 3",
-        "from": "BOOKH",
-        "to": "STARL",
+        "from": "Booking Hall",
+        "to": "Star Lane entrance",
         "limitedCapacity": false
       }
     ],
@@ -30062,15 +31497,15 @@
       {
         "id": "940GZZDLSHS-Lift-1",
         "name": "Lift 1",
-        "from": "BOOKH",
-        "to": "DLRS",
+        "from": "Booking Hall",
+        "to": "DLR southbound platform",
         "limitedCapacity": false
       },
       {
         "id": "940GZZDLSHS-Lift-2",
         "name": "Lift 2",
-        "from": "BOOKH",
-        "to": "DLRN",
+        "from": "Booking Hall",
+        "to": "DLR northbound platform",
         "limitedCapacity": false
       }
     ],
@@ -30757,6 +32192,49 @@
     }
   },
   {
+    "name": "Therapia Lane",
+    "platforms": [
+      {
+        "id": "940GZZCRTPA-EB-tram",
+        "name": "Eastbound",
+        "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      },
+      {
+        "id": "940GZZCRTPA-WB-tram",
+        "name": "Westbound",
+        "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "940GZZCRTPA",
+    "zones": [],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.385535,
+      "lng": -0.128578
+    }
+  },
+  {
     "name": "Theydon Bois",
     "lifts": 0,
     "escalators": 0,
@@ -31095,7 +32573,7 @@
       {
         "id": "HUBTCR-Lift-1",
         "name": "Lift B",
-        "from": "D-NPE",
+        "from": "North passage (east)",
         "to": "Booking Hall",
         "limitedCapacity": false
       },
@@ -31484,14 +32962,14 @@
       {
         "id": "HUBTOG-Lift-1",
         "name": "Lift 1",
-        "from": "MINOR",
+        "from": "Minories entrance",
         "to": "DLR 2",
         "limitedCapacity": true
       },
       {
         "id": "HUBTOG-Lift-2",
         "name": "Lift 2",
-        "from": "MINOR",
+        "from": "Minories entrance",
         "to": "DLR 2",
         "limitedCapacity": true
       }
@@ -31567,7 +33045,7 @@
       {
         "id": "940GZZLUTWH-Lift-2",
         "name": "Lift 2",
-        "from": "B-JUB",
+        "from": "Jubilee Walkway entrance",
         "to": "Westbound Platform 1",
         "limitedCapacity": false
       }
@@ -31862,22 +33340,22 @@
       {
         "id": "910GTWYFORD-Lift-1",
         "name": "Lift 1",
-        "from": "Bdg",
+        "from": "Footbridge",
         "to": "Railway platform 2",
         "limitedCapacity": false
       },
       {
         "id": "910GTWYFORD-Lift-2",
         "name": "Lift 2",
-        "from": "Bdg",
+        "from": "Footbridge",
         "to": "Railway platform 3",
         "limitedCapacity": false
       },
       {
         "id": "910GTWYFORD-Lift-3",
         "name": "Lift 3",
-        "from": "Bdg",
-        "to": "EntHB",
+        "from": "Footbridge",
+        "to": "Station entrance",
         "limitedCapacity": false
       }
     ],
@@ -32489,7 +33967,7 @@
       {
         "id": "HUBVXH-Lift-1",
         "name": "Lift 1",
-        "from": "B-B-E",
+        "from": "Bus station bridge (east)",
         "to": "Booking Hall",
         "limitedCapacity": false
       },
@@ -33024,6 +34502,49 @@
     ]
   },
   {
+    "name": "Waddon Marsh",
+    "platforms": [
+      {
+        "id": "940GZZCRWAD-EB-tram",
+        "name": "Eastbound",
+        "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      },
+      {
+        "id": "940GZZCRWAD-WB-tram",
+        "name": "Westbound",
+        "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "940GZZCRWAD",
+    "zones": [],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.376684,
+      "lng": -0.118349
+    }
+  },
+  {
     "name": "Walthamstow Central",
     "lifts": 0,
     "escalators": 2,
@@ -33120,6 +34641,49 @@
         "mocked": true
       }
     ]
+  },
+  {
+    "name": "Wandle Park",
+    "platforms": [
+      {
+        "id": "940GZZCRWAN-EB-tram",
+        "name": "Eastbound",
+        "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      },
+      {
+        "id": "940GZZCRWAN-WB-tram",
+        "name": "Westbound",
+        "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "940GZZCRWAN",
+    "zones": [],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.373164,
+      "lng": -0.113105
+    }
   },
   {
     "name": "Wanstead",
@@ -33460,7 +35024,7 @@
       {
         "id": "HUBWAT-Lift-1",
         "name": "Lift 1",
-        "from": "WCArr",
+        "from": "Waterloo & City line arrival area",
         "to": "Metropolitan line booking hall",
         "limitedCapacity": false
       },
@@ -33475,15 +35039,15 @@
       {
         "id": "HUBWAT-Lift-3",
         "name": "Lift 3",
-        "from": "Metropolitan line booking hall, NRDP",
+        "from": "Metropolitan line booking hall, National Rail departure platforms",
         "to": "Railway platform",
         "limitedCapacity": false,
-        "via": "TSC"
+        "via": "Through station concourse"
       },
       {
         "id": "HUBWAT-Lift-4",
         "name": "Lift 4",
-        "from": "B-WOR",
+        "from": "Booking Hall (Waterloo Road side)",
         "to": "Railway platform",
         "limitedCapacity": false
       }
@@ -33892,14 +35456,14 @@
         "id": "HUBWFJ-Lift-1",
         "name": "Lift 1",
         "from": "Subway",
-        "to": "Railway platform D, RPL-A",
+        "to": "Railway platform D, Railway platform A",
         "limitedCapacity": false
       },
       {
         "id": "HUBWFJ-Lift-2",
         "name": "Lift 2",
         "from": "Subway",
-        "to": "RPLAM",
+        "to": "Railway platform A",
         "limitedCapacity": false
       },
       {
@@ -33960,6 +35524,38 @@
         "location": "Located in ticket hall"
       }
     ]
+  },
+  {
+    "name": "Wellesley Road",
+    "platforms": [
+      {
+        "id": "940GZZCRWEL-EB-tram",
+        "name": "Eastbound",
+        "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "940GZZCRWEL",
+    "zones": [],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.375466,
+      "lng": -0.097478
+    }
   },
   {
     "name": "Wembley Central",
@@ -34233,7 +35829,7 @@
         "id": "940GZZLUWYP-Lift-5",
         "name": "Lift 5",
         "from": "Booking Hall",
-        "to": "E-STA",
+        "to": "Stadium exit (east)",
         "limitedCapacity": false
       }
     ],
@@ -34444,6 +36040,77 @@
     }
   },
   {
+    "name": "West Croydon",
+    "platforms": [
+      {
+        "id": "HUBWCY-EB-tram",
+        "name": "Eastbound",
+        "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "to_train",
+        "boardingRamp": false,
+        "levelAccess": true
+      },
+      {
+        "id": "HUBWCY-Plat01-NB-london-overground|national-rail",
+        "name": "Northbound Platform 1",
+        "direction": "Northbound",
+        "lines": [
+          "London Overground",
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "accessibleEntrance": "London Road car park",
+        "boardingRamp": true,
+        "levelAccess": false
+      },
+      {
+        "id": "HUBWCY-Plat03-NB-national-rail",
+        "name": "Southbound Platform 3",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "accessibleEntrance": "London Road car park",
+        "boardingRamp": true,
+        "levelAccess": false
+      },
+      {
+        "id": "HUBWCY-Plat04-SB-national-rail",
+        "name": "Southbound Platform 4",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "accessibleEntrance": "Station Road entrance (restricted hours)",
+        "boardingRamp": true,
+        "levelAccess": false
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "HUBWCY",
+    "zones": [
+      5
+    ],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "Partial",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.378619,
+      "lng": -0.103397
+    }
+  },
+  {
     "name": "West Drayton",
     "escalators": 0,
     "platforms": [
@@ -34651,7 +36318,7 @@
         "from": "Footbridge",
         "to": "Railway platform 2",
         "limitedCapacity": false,
-        "via": "DRAYT"
+        "via": "Drayton Green Road entrance"
       }
     ],
     "id": "910GWEALING",
@@ -35542,28 +37209,28 @@
       {
         "id": "940GZZDLWFE-Lift-1",
         "name": "Lift 1",
-        "from": "WIDR, WFERR",
+        "from": "Westferry Road side entrance, Westferry Road entrance",
         "to": "DLR eastbound",
         "limitedCapacity": false
       },
       {
         "id": "940GZZDLWFE-Lift-2",
         "name": "Lift 2",
-        "from": "WIDR, WFERR",
+        "from": "Westferry Road side entrance, Westferry Road entrance",
         "to": "DLR westbound",
         "limitedCapacity": false
       },
       {
         "id": "940GZZDLWFE-Lift-3",
         "name": "Lift 3",
-        "from": "WIDR, WFERR",
+        "from": "Westferry Road side entrance, Westferry Road entrance",
         "to": "DLR eastbound",
         "limitedCapacity": false
       },
       {
         "id": "940GZZDLWFE-Lift-4",
         "name": "Lift 4",
-        "from": "WIDR, WFERR",
+        "from": "Westferry Road side entrance, Westferry Road entrance",
         "to": "DLR westbound",
         "limitedCapacity": false
       }
@@ -36382,6 +38049,9 @@
         "id": "HUBWIM-EB-tram",
         "name": "Eastbound",
         "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
         "stepFreeAccess": "Full",
         "boardingRamp": false,
         "levelAccess": true
@@ -36906,6 +38576,49 @@
     ]
   },
   {
+    "name": "Woodside",
+    "platforms": [
+      {
+        "id": "940GZZCRWOD-EB-tram",
+        "name": "Eastbound",
+        "direction": "Eastbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      },
+      {
+        "id": "940GZZCRWOD-WB-tram",
+        "name": "Westbound",
+        "direction": "Westbound",
+        "lines": [
+          "Tram"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": false,
+        "levelAccess": true
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "940GZZCRWOD",
+    "zones": [],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.388249,
+      "lng": -0.064839
+    }
+  },
+  {
     "name": "Woodside Park",
     "lifts": 0,
     "escalators": 0,
@@ -37099,24 +38812,24 @@
       {
         "id": "HUBWWA-Lift 1",
         "name": "Lift B",
-        "from": "DLRB",
+        "from": "DLR concourse",
         "to": "Railway platform (west)",
         "limitedCapacity": false
       },
       {
         "id": "HUBWWA-Lift-2",
         "name": "Lift C",
-        "from": "BED",
+        "from": "Beresford Square entrance",
         "to": "DLR",
         "limitedCapacity": false
       },
       {
         "id": "HUBWWA-Lift-3",
         "name": "Lift A",
-        "from": "WOO",
+        "from": "Station concourse",
         "to": "DLR",
         "limitedCapacity": false,
-        "via": "DLRI"
+        "via": "DLR interchange concourse"
       }
     ],
     "id": "HUBWWA",

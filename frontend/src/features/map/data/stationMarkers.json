@@ -34,6 +34,22 @@
     ]
   },
   {
+    "name": "Addington Village",
+    "lat": 51.356486,
+    "lng": -0.032396,
+    "lines": [
+      "Tram"
+    ]
+  },
+  {
+    "name": "Addiscombe",
+    "lat": 51.380152,
+    "lng": -0.073357,
+    "lines": [
+      "Tram"
+    ]
+  },
+  {
     "name": "Aldgate",
     "lat": 51.514244,
     "lng": -0.075689,
@@ -77,6 +93,14 @@
     ]
   },
   {
+    "name": "Ampere Way",
+    "lat": 51.382143,
+    "lng": -0.123442,
+    "lines": [
+      "Tram"
+    ]
+  },
+  {
     "name": "Angel",
     "lat": 51.53176,
     "lng": -0.105386,
@@ -93,6 +117,14 @@
     ]
   },
   {
+    "name": "Arena",
+    "lat": 51.389335,
+    "lng": -0.056528,
+    "lines": [
+      "Tram"
+    ]
+  },
+  {
     "name": "Arnos Grove",
     "lat": 51.616445,
     "lng": -0.133063,
@@ -106,6 +138,14 @@
     "lng": -0.105662,
     "lines": [
       "Piccadilly"
+    ]
+  },
+  {
+    "name": "Avenue Road",
+    "lat": 51.406887,
+    "lng": -0.048882,
+    "lines": [
+      "Tram"
     ]
   },
   {
@@ -204,11 +244,44 @@
     ]
   },
   {
+    "name": "Beckenham Junction",
+    "lat": 51.410594,
+    "lng": -0.025904,
+    "lines": [
+      "National Rail",
+      "Tram"
+    ]
+  },
+  {
+    "name": "Beckenham Road",
+    "lat": 51.409363,
+    "lng": -0.043629,
+    "lines": [
+      "Tram"
+    ]
+  },
+  {
     "name": "Becontree",
     "lat": 51.54033,
     "lng": 0.127016,
     "lines": [
       "District"
+    ]
+  },
+  {
+    "name": "Beddington Lane",
+    "lat": 51.388108,
+    "lng": -0.141078,
+    "lines": [
+      "Tram"
+    ]
+  },
+  {
+    "name": "Belgrave Walk",
+    "lat": 51.399341,
+    "lng": -0.179524,
+    "lines": [
+      "Tram"
     ]
   },
   {
@@ -236,6 +309,15 @@
     ]
   },
   {
+    "name": "Birkbeck",
+    "lat": 51.403738,
+    "lng": -0.055285,
+    "lines": [
+      "Tram",
+      "rail"
+    ]
+  },
+  {
     "name": "Blackfriars",
     "lat": 51.510348,
     "lng": -0.104243,
@@ -243,6 +325,14 @@
       "Circle",
       "District",
       "National Rail"
+    ]
+  },
+  {
+    "name": "Blackhorse Lane",
+    "lat": 51.385683,
+    "lng": -0.071745,
+    "lines": [
+      "Tram"
     ]
   },
   {
@@ -500,6 +590,14 @@
     ]
   },
   {
+    "name": "Centrale",
+    "lat": 51.375855,
+    "lng": -0.10377,
+    "lines": [
+      "Tram"
+    ]
+  },
+  {
     "name": "Chadwell Heath",
     "lat": 51.568264,
     "lng": 0.129849,
@@ -584,6 +682,14 @@
     ]
   },
   {
+    "name": "Church Street",
+    "lat": 51.374006,
+    "lng": -0.105082,
+    "lines": [
+      "Tram"
+    ]
+  },
+  {
     "name": "City Thameslink",
     "lat": 51.516692,
     "lng": -0.103417,
@@ -646,6 +752,14 @@
     "lng": -0.178086,
     "lines": [
       "Northern"
+    ]
+  },
+  {
+    "name": "Coombe Lane",
+    "lat": 51.359362,
+    "lng": -0.05547,
+    "lines": [
+      "Tram"
     ]
   },
   {
@@ -788,6 +902,14 @@
     ]
   },
   {
+    "name": "Dundonald Road",
+    "lat": 51.417434,
+    "lng": -0.207511,
+    "lines": [
+      "Tram"
+    ]
+  },
+  {
     "name": "Ealing Broadway",
     "lat": 51.515015,
     "lng": -0.301457,
@@ -927,6 +1049,15 @@
     ]
   },
   {
+    "name": "Elmers End",
+    "lat": 51.399291,
+    "lng": -0.050126,
+    "lines": [
+      "National Rail",
+      "Tram"
+    ]
+  },
+  {
     "name": "Elstree & Borehamwood",
     "lat": 51.653266,
     "lng": -0.27951,
@@ -992,6 +1123,14 @@
       "Hammersmith & City",
       "Metropolitan",
       "National Rail"
+    ]
+  },
+  {
+    "name": "Fieldway",
+    "lat": 51.350903,
+    "lng": -0.023932,
+    "lines": [
+      "Tram"
     ]
   },
   {
@@ -1063,6 +1202,14 @@
     ]
   },
   {
+    "name": "George Street",
+    "lat": 51.373975,
+    "lng": -0.098746,
+    "lines": [
+      "Tram"
+    ]
+  },
+  {
     "name": "Gidea Park",
     "lat": 51.581443,
     "lng": 0.206014,
@@ -1127,6 +1274,14 @@
     "lng": 0.092066,
     "lines": [
       "Central"
+    ]
+  },
+  {
+    "name": "Gravel Hill",
+    "lat": 51.352786,
+    "lng": -0.037509,
+    "lines": [
+      "Tram"
     ]
   },
   {
@@ -1286,6 +1441,14 @@
     "lng": 0.233225,
     "lines": [
       "Elizabeth"
+    ]
+  },
+  {
+    "name": "Harrington Road",
+    "lat": 51.399444,
+    "lng": -0.060384,
+    "lines": [
+      "Tram"
     ]
   },
   {
@@ -1652,6 +1815,14 @@
     ]
   },
   {
+    "name": "King Henry's Drive",
+    "lat": 51.345575,
+    "lng": -0.020528,
+    "lines": [
+      "Tram"
+    ]
+  },
+  {
     "name": "King's Cross & St Pancras International",
     "lat": 51.530661,
     "lng": -0.123195,
@@ -1733,6 +1904,14 @@
     ]
   },
   {
+    "name": "Lebanon Road",
+    "lat": 51.375176,
+    "lng": -0.084687,
+    "lines": [
+      "Tram"
+    ]
+  },
+  {
     "name": "Leicester Square",
     "lat": 51.511384,
     "lng": -0.128426,
@@ -1778,6 +1957,14 @@
       "London Overground",
       "Metropolitan",
       "National Rail"
+    ]
+  },
+  {
+    "name": "Lloyd Park",
+    "lat": 51.364238,
+    "lng": -0.081782,
+    "lines": [
+      "Tram"
     ]
   },
   {
@@ -1874,6 +2061,14 @@
     ]
   },
   {
+    "name": "Merton Park",
+    "lat": 51.414795,
+    "lng": -0.201431,
+    "lines": [
+      "Tram"
+    ]
+  },
+  {
     "name": "Mile End",
     "lat": 51.52512,
     "lng": -0.03364,
@@ -1892,11 +2087,28 @@
     ]
   },
   {
+    "name": "Mitcham",
+    "lat": 51.397403,
+    "lng": -0.172888,
+    "lines": [
+      "Tram"
+    ]
+  },
+  {
     "name": "Mitcham Eastfields",
     "lat": 51.408026,
     "lng": -0.154146,
     "lines": [
       "National Rail"
+    ]
+  },
+  {
+    "name": "Mitcham Junction",
+    "lat": 51.392738,
+    "lng": -0.158124,
+    "lines": [
+      "National Rail",
+      "Tram"
     ]
   },
   {
@@ -1937,6 +2149,14 @@
     ]
   },
   {
+    "name": "Morden Road",
+    "lat": 51.409288,
+    "lng": -0.192387,
+    "lines": [
+      "Tram"
+    ]
+  },
+  {
     "name": "Mornington Crescent",
     "lat": 51.534677,
     "lng": -0.138789,
@@ -1950,6 +2170,14 @@
     "lng": -0.249837,
     "lines": [
       "Jubilee"
+    ]
+  },
+  {
+    "name": "New Addington",
+    "lat": 51.343155,
+    "lng": -0.01779,
+    "lines": [
+      "Tram"
     ]
   },
   {
@@ -2187,6 +2415,14 @@
     ]
   },
   {
+    "name": "Phipps Bridge",
+    "lat": 51.40423,
+    "lng": -0.182249,
+    "lines": [
+      "Tram"
+    ]
+  },
+  {
     "name": "Piccadilly Circus",
     "lat": 51.510049,
     "lng": -0.133798,
@@ -2354,6 +2590,14 @@
     ]
   },
   {
+    "name": "Reeves Corner",
+    "lat": 51.374744,
+    "lng": -0.106244,
+    "lines": [
+      "Tram"
+    ]
+  },
+  {
     "name": "Regent's Park",
     "lat": 51.523342,
     "lng": -0.146445,
@@ -2455,6 +2699,14 @@
     "lng": -0.124285,
     "lines": [
       "Piccadilly"
+    ]
+  },
+  {
+    "name": "Sandilands",
+    "lat": 51.375163,
+    "lng": -0.078912,
+    "lines": [
+      "Tram"
     ]
   },
   {
@@ -2836,6 +3088,14 @@
     ]
   },
   {
+    "name": "Therapia Lane",
+    "lat": 51.385535,
+    "lng": -0.128578,
+    "lines": [
+      "Tram"
+    ]
+  },
+  {
     "name": "Theydon Bois",
     "lat": 51.671757,
     "lng": 0.103085,
@@ -3010,12 +3270,28 @@
     ]
   },
   {
+    "name": "Waddon Marsh",
+    "lat": 51.376684,
+    "lng": -0.118349,
+    "lines": [
+      "Tram"
+    ]
+  },
+  {
     "name": "Walthamstow Central",
     "lat": 51.582963,
     "lng": -0.019885,
     "lines": [
       "London Overground",
       "Victoria"
+    ]
+  },
+  {
+    "name": "Wandle Park",
+    "lat": 51.373164,
+    "lng": -0.113105,
+    "lines": [
+      "Tram"
     ]
   },
   {
@@ -3072,6 +3348,14 @@
     ]
   },
   {
+    "name": "Wellesley Road",
+    "lat": 51.375466,
+    "lng": -0.097478,
+    "lines": [
+      "Tram"
+    ]
+  },
+  {
     "name": "Wembley Central",
     "lat": 51.552303,
     "lng": -0.296852,
@@ -3106,6 +3390,16 @@
       "District",
       "London Overground",
       "National Rail"
+    ]
+  },
+  {
+    "name": "West Croydon",
+    "lat": 51.378619,
+    "lng": -0.103397,
+    "lines": [
+      "London Overground",
+      "National Rail",
+      "Tram"
     ]
   },
   {
@@ -3314,6 +3608,14 @@
     "lng": 0.03397,
     "lines": [
       "Central"
+    ]
+  },
+  {
+    "name": "Woodside",
+    "lat": 51.388249,
+    "lng": -0.064839,
+    "lines": [
+      "Tram"
     ]
   },
   {
