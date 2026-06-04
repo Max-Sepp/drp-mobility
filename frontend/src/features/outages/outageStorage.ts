@@ -3,7 +3,7 @@
 // key, mirroring the journey storage in src/features/journey/api/savedJourneys.ts.
 
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import type { OutageReport } from './types'
+import type { OutageReport } from '@/features/outages/types'
 
 const STORAGE_KEY = '@drp/outage-reports'
 

@@ -4,7 +4,7 @@ import {
   findRailcard,
   findTravellerType,
   railcardApplies,
-} from '../railcards'
+} from '@/features/journey/lib/railcards'
 import type { Journey } from '@/features/journey/api/tfl'
 
 // ---------------------------------------------------------------------------

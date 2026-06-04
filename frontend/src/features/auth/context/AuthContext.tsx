@@ -11,8 +11,8 @@ import {
   patchProfile,
   saveToken,
   signup,
-} from '../api/auth'
-import { deregisterPushToken, getActivePushToken, setActivePushToken } from '../api/pushToken'
+} from '@/features/auth/api/auth'
+import { deregisterPushToken, getActivePushToken, setActivePushToken } from '@/features/auth/api/pushToken'
 
 // 'loading' only covers the initial token check on launch; the UI stays usable anonymously and
 // never blocks on it. 'authed'/'unauthed' reflect whether a valid session is currently held.

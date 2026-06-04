@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { fareLabel } from '../legDisplay'
+import { fareLabel } from '@/features/journey/components/legDisplay'
 import type { Journey } from '@/features/journey/api/tfl'
 
 // legDisplay.tsx imports React Native / Tamagui / Expo components for its visual

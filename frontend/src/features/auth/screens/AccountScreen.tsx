@@ -17,7 +17,7 @@ import { FormScreenLayout } from '@/features/reporting/components/FormScreenLayo
 import { TRAVELLER_TYPES } from '@/features/journey/lib/railcards'
 import type { AccountScreenProps } from '@/navigation/types'
 import { Borders, Colors, Opacity, Overlays, Radii, Shadows, Spacing } from '@/theme'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '@/features/auth/context/AuthContext'
 
 const USE_NATIVE_DRIVER = Platform.OS !== 'web'
 

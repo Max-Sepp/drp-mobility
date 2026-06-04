@@ -1,14 +1,14 @@
 import { createContext, type ReactNode, useContext, useEffect, useRef, useState } from 'react'
 import EventSource from 'react-native-sse'
 import { BASE_URL } from '@/api/client'
-import { loadOutages, saveOutages } from './outageStorage'
+import { loadOutages, saveOutages } from '@/features/outages/outageStorage'
 import type {
   DeletedData,
   OutageReport,
   OutageStreamEvent,
   ResolvedData,
   SnapshotData,
-} from './types'
+} from '@/features/outages/types'
 
 type OutageContextValue = {
   /** The current open-outage feed across all stations, newest first. */
