@@ -1,10 +1,12 @@
-import { useEffect, useRef } from 'react'
+import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 import { StyleSheet } from 'react-native'
 import MapView, { PoiClickEvent, Region } from 'react-native-maps'
 import { fuzzyScore } from '@/lib/fuzzy'
 import { useAppHeading, useAppLocation } from '@/lib/LocationContext'
 import stationMarkers from '@/features/map/data/stationMarkers.json'
 import { UserLocationMarker } from '@/features/map/components/UserLocationMarker'
+
+export type StationMapHandle = { recentre: () => void }
 
 const LONDON: Region = {
   latitude: 51.5074,
@@ -55,20 +57,30 @@ function findStation(poiName: string, lat: number, lng: number): string | null {
 
 type Props = { onStationPress: (name: string) => void }
 
-export function StationMap({ onStationPress }: Props) {
+export const StationMap = forwardRef<StationMapHandle, Props>(function StationMap(
+  { onStationPress },
+  ref,
+) {
   const coords = useAppLocation()
   const heading = useAppHeading()
   const mapRef = useRef<MapView>(null)
+
+  function animateToUser() {
+    if (!coords) return
+    mapRef.current?.animateToRegion(
+      { latitude: coords.latitude, longitude: coords.longitude, latitudeDelta: 0.02, longitudeDelta: 0.02 },
+      600,
+    )
+  }
+
+  useImperativeHandle(ref, () => ({ recentre: animateToUser }))
 
   // Animate to user location the first time coords become available.
   const centredRef = useRef(false)
   useEffect(() => {
     if (coords && !centredRef.current) {
       centredRef.current = true
-      mapRef.current?.animateToRegion(
-        { latitude: coords.latitude, longitude: coords.longitude, latitudeDelta: 0.02, longitudeDelta: 0.02 },
-        600,
-      )
+      animateToUser()
     }
   }, [coords])
 
@@ -85,6 +97,7 @@ export function StationMap({ onStationPress }: Props) {
       initialRegion={LONDON}
       onPoiClick={handlePoiClick}
       showsMyLocationButton={false}
+      showsCompass={false}
     >
       {coords && (
         <UserLocationMarker
@@ -95,7 +108,7 @@ export function StationMap({ onStationPress }: Props) {
       )}
     </MapView>
   )
-}
+})
 
 const styles = StyleSheet.create({
   map: {
