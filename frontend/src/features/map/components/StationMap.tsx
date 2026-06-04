@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
-import { StyleSheet } from 'react-native'
+import { Dimensions, StyleSheet } from 'react-native'
 import MapView, { PoiClickEvent, Region } from 'react-native-maps'
 import { fuzzyScore } from '@/lib/fuzzy'
 import { useAppHeading, useAppLocation } from '@/lib/LocationContext'
@@ -7,6 +7,10 @@ import stationMarkers from '@/features/map/data/stationMarkers.json'
 import { UserLocationMarker } from '@/features/map/components/UserLocationMarker'
 
 export type StationMapHandle = { recentre: () => void }
+
+// Bottom padding keeps the camera centre in the visible map area above the sheet.
+// Matches the mid-snap height defined in SearchActionSheet (SCREEN_H * 0.5).
+const SHEET_BOTTOM_INSET = Dimensions.get('window').height * 0.5
 
 const LONDON: Region = {
   latitude: 51.5074,
@@ -95,6 +99,7 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
       ref={mapRef}
       style={styles.map}
       initialRegion={LONDON}
+      mapPadding={{ top: 0, right: 0, left: 0, bottom: SHEET_BOTTOM_INSET }}
       onPoiClick={handlePoiClick}
       showsMyLocationButton={false}
       showsCompass={false}
