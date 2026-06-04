@@ -67,13 +67,18 @@ class OutageReportRepository:
 
     def create(
         self, payload: OutageReportCreate, reporter_role: str = UserRole.UNTRUSTED.value
-    ) -> OutageReport:
+    ) -> tuple["OutageReport", int | None]:
         """Persist a new report, attaching it to the equipment's open Failure
-        (creating one if needed)."""
+        (creating one if needed).
+
+        Returns ``(report, new_failure_id)`` where ``new_failure_id`` is the id of the
+        newly-created Failure when this is the *first* report for this equipment's current
+        incident, or ``None`` when the report was appended to an existing open Failure."""
         if self._db.get(Equipment, payload.equipment_id) is None:
             raise ValueError(f"equipment_id {payload.equipment_id} not found")
 
-        failure = self._find_or_create_failure(payload.equipment_id)
+        failure, is_new_failure = self._find_or_create_failure(payload.equipment_id)
+        new_failure_id: int | None = failure.id if is_new_failure else None
 
         report = OutageReport(
             failure_id=failure.id,
@@ -83,7 +88,7 @@ class OutageReportRepository:
         )
         self._db.add(report)
         self._db.commit()
-        return self.get_active(report.id)
+        return self.get_active(report.id), new_failure_id
 
     def soft_delete(self, report: OutageReport, reason: str | None = None) -> None:
         """Mark a report as deleted by inserting an OutageReportDeletion row; the report
@@ -108,9 +113,12 @@ class OutageReportRepository:
     # Private helpers
     # ------------------------------------------------------------------
 
-    def _find_or_create_failure(self, equipment_id: int) -> Failure:
+    def _find_or_create_failure(self, equipment_id: int) -> tuple[Failure, bool]:
         """Return the equipment's currently-open Failure, creating one if all prior
         failures are resolved.
+
+        Returns ``(failure, is_new)`` — ``is_new`` is True only when *this call* inserted the
+        Failure row (not when it raced and recovered an existing one).
 
         At most one unresolved Failure per equipment is enforced by a partial unique index. Because
         this is a read-then-insert, two concurrent reports for the same equipment can both miss the
@@ -120,19 +128,20 @@ class OutageReportRepository:
         """
         failure = self._find_open_failure(equipment_id)
         if failure is not None:
-            return failure
+            return failure, False
 
         failure = Failure(equipment_id=equipment_id)
         self._db.add(failure)
         try:
             self._db.flush()
+            return failure, True
         except IntegrityError:
             self._db.rollback()
             failure = self._find_open_failure(equipment_id)
             if failure is None:
                 # The conflict was not the open-failure index (e.g. a real error), so re-raise.
                 raise
-        return failure
+            return failure, False
 
     def _find_open_failure(self, equipment_id: int) -> Failure | None:
         """Return the equipment's single unresolved Failure, or None if all are resolved."""
