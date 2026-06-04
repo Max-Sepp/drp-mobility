@@ -31,6 +31,8 @@ import { Borders, Colors, Heights, Opacity, Radii, Typography } from '@/theme'
 type Resolved = { from: ResolvedLocation; to: ResolvedLocation }
 type JourneyResult = { journey: Journey; outages: StationOutage[]; tags: RouteTag[] }
 
+const NAMED_PLACES = new Set(['Home', 'Work'])
+
 const LEVELS: { value: AccessibilityPreference; label: string }[] = [
   { value: 'StepFreeToVehicle', label: 'Step-free to train' },
   { value: 'StepFreeToPlatform', label: 'Step-free to platform' },
@@ -47,6 +49,9 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
   )
   const [fromIsCurrentLocation, setFromIsCurrentLocation] = useState(
     route.params?.initialFrom?.label === 'Current location',
+  )
+  const [toIsNamedPlace, setToIsNamedPlace] = useState(
+    NAMED_PLACES.has(route.params?.initialTo?.label ?? ''),
   )
   const [gettingLocation, setGettingLocation] = useState(false)
   const [level, setLevel] = useState<AccessibilityPreference | null>(null)
@@ -201,9 +206,14 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
           <LocationInput
             label="To"
             value={to}
-            onChangeText={setTo}
+            onChangeText={(text) => {
+              setTo(text)
+              setToIsNamedPlace(false)
+            }}
             onResolved={setToPostcode}
             isResolved={toPostcode !== null}
+            textColor={toIsNamedPlace ? Colors.blue : undefined}
+            textBold={toIsNamedPlace}
           />
 
           <YStack gap="$1.5">
@@ -274,13 +284,25 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
             <YStack flex={1} gap="$1">
               <XStack gap="$2" items="center">
                 <MaterialIcons name="trip-origin" size={14} color={Colors.secondaryText} style={{ width: 18 }} />
-                <Text fontSize={14} color={Colors.text} flex={1} numberOfLines={1}>
+                <Text
+                  fontSize={14}
+                  color={NAMED_PLACES.has(resolved.from.label) ? Colors.blue : Colors.text}
+                  fontWeight={NAMED_PLACES.has(resolved.from.label) ? '700' : '400'}
+                  flex={1}
+                  numberOfLines={1}
+                >
                   {resolved.from.label}
                 </Text>
               </XStack>
               <XStack gap="$2" items="center">
                 <MaterialIcons name="place" size={16} color={Colors.secondaryText} style={{ width: 18 }} />
-                <Text fontSize={14} color={Colors.text} flex={1} numberOfLines={1}>
+                <Text
+                  fontSize={14}
+                  color={NAMED_PLACES.has(resolved.to.label) ? Colors.blue : Colors.text}
+                  fontWeight={NAMED_PLACES.has(resolved.to.label) ? '700' : '400'}
+                  flex={1}
+                  numberOfLines={1}
+                >
                   {resolved.to.label}
                 </Text>
               </XStack>
