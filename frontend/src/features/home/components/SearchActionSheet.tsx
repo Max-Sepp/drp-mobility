@@ -101,7 +101,11 @@ function PlacesRow({
   const contentWidth = tileCount * 64 + (tileCount - 1) * Spacing.md
 
   const scrollable = containerWidth > 0 && contentWidth > containerWidth
-  const thumbWidth = scrollable ? Math.max(24, (containerWidth / contentWidth) * containerWidth) : 0
+  // Cap at 40% so the thumb looks small even with minor overflow, and shrinks
+  // clearly as more tiles are added.
+  const thumbWidth = scrollable
+    ? Math.max(24, Math.min(containerWidth * 0.4, (containerWidth / contentWidth) * containerWidth))
+    : 0
   const thumbLeft = scrollable
     ? (scrollX / (contentWidth - containerWidth)) * (containerWidth - thumbWidth)
     : 0
@@ -176,12 +180,7 @@ function PlacesRow({
       </ScrollView>
       {scrollable && (
         <View style={styles.scrollbarTrack}>
-          <View
-            style={[
-              styles.scrollbarThumb,
-              { width: thumbWidth, transform: [{ translateX: thumbLeft }] },
-            ]}
-          />
+          <View style={[styles.scrollbarThumb, { width: thumbWidth, marginLeft: thumbLeft }]} />
         </View>
       )}
     </View>
@@ -687,12 +686,11 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     backgroundColor: Colors.separator,
     marginTop: Spacing.sm,
-    overflow: 'hidden',
   },
   scrollbarThumb: {
     height: 3,
     borderRadius: 2,
-    backgroundColor: Colors.tertiaryText,
+    backgroundColor: Colors.secondaryText,
   },
 
   // Saved journeys
