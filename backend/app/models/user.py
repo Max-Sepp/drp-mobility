@@ -37,3 +37,6 @@ class User(Base):
     journeys: Mapped[list["SavedJourney"]] = relationship(  # noqa: F821
         "SavedJourney", back_populates="user", cascade="all, delete-orphan"
     )
+    push_tokens: Mapped[list["PushToken"]] = relationship(  # noqa: F821
+        "PushToken", back_populates="user", cascade="all, delete-orphan"
+    )
