@@ -28,6 +28,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
+import type { SavedPlaces } from '@/features/journey/api/savedPlaces'
 
 // useNativeDriver is not available on web (no native animation module).
 const USE_NATIVE_DRIVER = Platform.OS !== 'web'
@@ -70,30 +71,54 @@ export type SearchActionSheetHandle = {
 // Internal sub-components
 // ---------------------------------------------------------------------------
 
-const PLACES = [
-  { key: 'home', icon: 'home' as const, label: 'Home' },
-  { key: 'work', icon: 'work' as const, label: 'Work' },
-  { key: 'add', icon: 'add' as const, label: 'Add' },
+const NAMED_PLACES: { key: 'home' | 'work'; icon: 'home' | 'work'; label: string }[] = [
+  { key: 'home', icon: 'home', label: 'Home' },
+  { key: 'work', icon: 'work', label: 'Work' },
 ]
 
-function PlacesRow() {
+function PlacesRow({
+  savedPlaces,
+  onPress,
+  onLongPress,
+}: {
+  savedPlaces: SavedPlaces
+  onPress: (key: 'home' | 'work') => void
+  onLongPress: (key: 'home' | 'work') => void
+}) {
   return (
     <View style={styles.placesSection}>
       <Text style={styles.sectionLabel}>PLACES</Text>
       <View style={styles.placesRow}>
-        {PLACES.map(({ key, icon, label }) => (
-          <TouchableOpacity
-            key={key}
-            style={styles.placesTile}
-            activeOpacity={0.75}
-            onPress={() => Alert.alert('Coming soon', 'This feature is not yet available.')}
-          >
-            <View style={styles.placesTileIcon}>
-              <MaterialIcons name={icon} size={22} color={Colors.blue} />
-            </View>
-            <Text style={[Typography.label, { color: Colors.text, marginTop: 4 }]}>{label}</Text>
-          </TouchableOpacity>
-        ))}
+        {NAMED_PLACES.map(({ key, icon, label }) => {
+          const saved = Boolean(savedPlaces[key])
+          return (
+            <TouchableOpacity
+              key={key}
+              style={styles.placesTile}
+              activeOpacity={0.75}
+              onPress={() => onPress(key)}
+              onLongPress={() => onLongPress(key)}
+              accessibilityRole="button"
+              accessibilityLabel={saved ? `${label}: ${savedPlaces[key]!.address}` : `Set ${label}`}
+              accessibilityHint={saved ? 'Tap to plan journey. Long press to edit or remove.' : 'Tap to set your address'}
+            >
+              <View style={[styles.placesTileIcon, saved && styles.placesTileIconSaved]}>
+                <MaterialIcons name={icon} size={22} color={saved ? Colors.card : Colors.blue} />
+              </View>
+              <Text style={[Typography.label, { color: Colors.text, marginTop: 4 }]}>{label}</Text>
+            </TouchableOpacity>
+          )
+        })}
+        <TouchableOpacity
+          style={styles.placesTile}
+          activeOpacity={0.75}
+          onPress={() => Alert.alert('Coming soon', 'Custom places are not yet available.')}
+        >
+          <View style={styles.placesTileIcon}>
+            <MaterialIcons name="add" size={22} color={Colors.blue} />
+          </View>
+          <Text style={[Typography.label, { color: Colors.text, marginTop: 4 }]}>Add</Text>
+        </TouchableOpacity>
       </View>
     </View>
   )
@@ -174,14 +199,25 @@ function LocationResultRow({
 
 type Props = {
   savedJourneys: SavedJourney[]
+  savedPlaces: SavedPlaces
   onSavedJourneyPress: (item: SavedJourney) => void
   onStationPress: (stationName: string) => void
   onLocationSelect: (from: ResolvedLocation | undefined, to: ResolvedLocation) => void
+  onPlacePress: (key: 'home' | 'work') => void
+  onPlaceLongPress: (key: 'home' | 'work') => void
 }
 
 export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
   function SearchActionSheet(
-    { savedJourneys, onSavedJourneyPress, onStationPress, onLocationSelect },
+    {
+      savedJourneys,
+      savedPlaces,
+      onSavedJourneyPress,
+      onStationPress,
+      onLocationSelect,
+      onPlacePress,
+      onPlaceLongPress,
+    },
     ref,
   ) {
     const insets = useSafeAreaInsets()
@@ -453,7 +489,11 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
           </ScrollView>
         ) : (
           <>
-            <PlacesRow />
+            <PlacesRow
+              savedPlaces={savedPlaces}
+              onPress={onPlacePress}
+              onLongPress={onPlaceLongPress}
+            />
 
             <View>
               <Text style={styles.sectionLabel}>SAVED JOURNEYS</Text>
@@ -565,6 +605,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.searchBg,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  placesTileIconSaved: {
+    backgroundColor: Colors.blue,
   },
 
   // Saved journeys

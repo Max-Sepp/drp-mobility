@@ -10,6 +10,12 @@ import {
   loadActiveJourney,
   type ActiveJourney,
 } from '@/features/journey/api/activeJourney'
+import {
+  clearPlace,
+  loadSavedPlaces,
+  savePlace,
+  type SavedPlaces,
+} from '@/features/journey/api/savedPlaces'
 import { humanizeSummary } from '@/features/journey/components/legDisplay'
 import { useAuth } from '@/features/auth'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
@@ -20,6 +26,7 @@ import {
   SearchActionSheet,
   type SearchActionSheetHandle,
 } from '@/features/home/components/SearchActionSheet'
+import { SetPlaceModal } from '@/features/home/components/SetPlaceModal'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'MapHome'>
 
@@ -95,6 +102,8 @@ function ActiveJourneyBanner({
 export function MapHomeScreen({ navigation }: Props) {
   const [saved, setSaved] = useState<SavedJourney[]>([])
   const [active, setActive] = useState<ActiveJourney | null>(null)
+  const [savedPlaces, setSavedPlaces] = useState<SavedPlaces>({})
+  const [setPlaceModal, setSetPlaceModal] = useState<{ key: 'home' | 'work' } | null>(null)
   const sheetRef = useRef<SearchActionSheetHandle>(null)
   const { status, user, signOut } = useAuth()
 
@@ -104,8 +113,69 @@ export function MapHomeScreen({ navigation }: Props) {
     useCallback(() => {
       loadSavedJourneys().then(setSaved)
       loadActiveJourney().then(setActive)
-    }, []),
+      if (user) loadSavedPlaces(user.id).then(setSavedPlaces)
+      else setSavedPlaces({})
+    }, [user]),
   )
+
+  function handlePlacePress(key: 'home' | 'work') {
+    if (status === 'loading') return
+    if (status !== 'authed' || !user) {
+      navigation.navigate('Login')
+      return
+    }
+    const place = savedPlaces[key]
+    if (!place) {
+      setSetPlaceModal({ key })
+      return
+    }
+    const label = key === 'home' ? 'Home' : 'Work'
+    navigation.navigate('JourneyPlanner', {
+      initialTo: { postcode: place.postcode, label },
+    })
+  }
+
+  function handlePlaceLongPress(key: 'home' | 'work') {
+    if (status !== 'authed' || !user) return
+    const place = savedPlaces[key]
+    if (!place) {
+      setSetPlaceModal({ key })
+      return
+    }
+    const label = key === 'home' ? 'Home' : 'Work'
+    Alert.alert(`${label}: ${place.address}`, undefined, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: `Change ${label}`,
+        onPress: () => setSetPlaceModal({ key }),
+      },
+      {
+        text: `Remove ${label}`,
+        style: 'destructive',
+        onPress: async () => {
+          await clearPlace(user.id, key)
+          setSavedPlaces((prev) => {
+            const next = { ...prev }
+            delete next[key]
+            return next
+          })
+        },
+      },
+    ])
+  }
+
+  async function handleSavePlace(address: string, postcode: string) {
+    if (!user || !setPlaceModal) return
+    const key = setPlaceModal.key
+    await savePlace(user.id, key, { address, postcode })
+    const updated = await loadSavedPlaces(user.id)
+    setSavedPlaces(updated)
+    setSetPlaceModal(null)
+    const label = key === 'home' ? 'Home' : 'Work'
+    navigation.navigate('JourneyPlanner', {
+      initialTo: { postcode, label },
+    })
+  }
 
   function resumeActive(item: ActiveJourney) {
     navigation.navigate('ActiveJourney', {
@@ -206,10 +276,22 @@ export function MapHomeScreen({ navigation }: Props) {
       <SearchActionSheet
         ref={sheetRef}
         savedJourneys={saved}
+        savedPlaces={savedPlaces}
         onSavedJourneyPress={openSaved}
         onStationPress={openStation}
         onLocationSelect={openJourneyFromTo}
+        onPlacePress={handlePlacePress}
+        onPlaceLongPress={handlePlaceLongPress}
       />
+
+      {setPlaceModal && (
+        <SetPlaceModal
+          visible
+          placeKey={setPlaceModal.key}
+          onSave={handleSavePlace}
+          onDismiss={() => setSetPlaceModal(null)}
+        />
+      )}
     </View>
   )
 }
