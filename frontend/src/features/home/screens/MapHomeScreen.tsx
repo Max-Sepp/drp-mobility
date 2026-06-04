@@ -12,7 +12,7 @@ import { Colors, Shadows, Spacing } from '@/theme'
 import {
   SearchActionSheet,
   type SearchActionSheetHandle,
-} from '../components/SearchActionSheet'
+} from '@/features/home/components/SearchActionSheet'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'MapHome'>
 

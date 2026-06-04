@@ -1,7 +1,7 @@
 import { Text, XStack, YStack } from 'tamagui'
-import type { StationStepFree } from '../stepFree'
-import { LineChips } from './LineChips'
-import { StepFreeBadge } from './StepFreeBadge'
+import type { StationStepFree } from '@/features/stations/stepFree'
+import { LineChips } from '@/features/stations/components/LineChips'
+import { StepFreeBadge } from '@/features/stations/components/StepFreeBadge'
 import { Borders, Colors, Opacity, Radii } from '@/theme'
 
 type StationListItemProps = {

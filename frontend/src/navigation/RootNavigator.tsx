@@ -5,7 +5,7 @@ import { SelectStationScreen } from '@/features/stations'
 import { ReportCustomScreen, ReportFormScreen, SuccessScreen } from '@/features/reporting'
 import { JourneyDetailScreen, JourneyPlannerScreen, SavedJourneysScreen } from '@/features/journey'
 import { SearchScreen } from '@/features/search/screens/SearchScreen'
-import type { RootStackParamList } from './types'
+import type { RootStackParamList } from '@/navigation/types'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 

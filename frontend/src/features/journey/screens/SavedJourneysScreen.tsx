@@ -6,8 +6,8 @@ import { ScreenHeader } from '@/components/ScreenHeader'
 import { FormScreenLayout } from '@/features/reporting/components/FormScreenLayout'
 import { parseUtc } from '@/lib/datetime'
 import type { SavedJourneysScreenProps } from '@/navigation/types'
-import { deleteJourney, loadSavedJourneys, type SavedJourney } from '../api/savedJourneys'
-import { clockTime } from '../components/legDisplay'
+import { deleteJourney, loadSavedJourneys, type SavedJourney } from '@/features/journey/api/savedJourneys'
+import { clockTime } from '@/features/journey/components/legDisplay'
 import { Borders, Colors, Opacity, Radii } from '@/theme'
 
 function savedAtLabel(iso: string): string {

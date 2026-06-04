@@ -5,10 +5,10 @@ import { Input, Separator, Text, YStack } from 'tamagui'
 import { ScreenHeader } from '@/components/ScreenHeader'
 import type { SelectStationScreenProps, Station } from '@/navigation/types'
 import { Borders, Colors } from '@/theme'
-import { StationListItem } from '../components/StationListItem'
-import { stationPicker } from '../stationPicker'
+import { StationListItem } from '@/features/stations/components/StationListItem'
+import { stationPicker } from '@/features/stations/stationPicker'
 import { fuzzyScore } from '@/lib/fuzzy'
-import { stationLines, useStations } from '../useStations'
+import { stationLines, useStations } from '@/features/stations/useStations'
 
 export const SelectStationScreen = ({ navigation, route }: SelectStationScreenProps) => {
   const { currentStation } = route.params

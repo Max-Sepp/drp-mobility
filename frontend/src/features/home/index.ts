@@ -1,1 +1,1 @@
-export { StationScreen } from './screens/StationScreen'
+export { StationScreen } from '@/features/home/screens/StationScreen'

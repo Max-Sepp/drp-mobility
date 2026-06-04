@@ -1,6 +1,6 @@
 import { Spinner, Text, XStack, YStack } from 'tamagui'
 import type { components } from '@/api/schema.d'
-import { FormSection } from './FormSection'
+import { FormSection } from '@/features/reporting/components/FormSection'
 import { Borders, Colors, Opacity, Radii } from '@/theme'
 
 type Equipment = components['schemas']['EquipmentSummary']

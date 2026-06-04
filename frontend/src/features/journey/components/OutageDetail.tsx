@@ -6,7 +6,7 @@ import type {
   OutageAssessment,
   StationRole,
   UnitVerdict,
-} from '../api/outageRelevance'
+} from '@/features/journey/api/outageRelevance'
 import { Borders, Colors, Radii } from '@/theme'
 
 type VerdictStyle = {

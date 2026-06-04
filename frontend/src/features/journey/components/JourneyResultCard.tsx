@@ -1,8 +1,8 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import { Text, XStack, YStack } from 'tamagui'
-import type { StationOutage } from '../api/accessibility'
-import type { ResolvedLocation } from '../api/geocode'
-import type { Journey, RouteTag } from '../api/tfl'
+import type { StationOutage } from '@/features/journey/api/accessibility'
+import type { ResolvedLocation } from '@/features/journey/api/geocode'
+import type { Journey, RouteTag } from '@/features/journey/api/tfl'
 import {
   clockTime,
   fareLabel,
@@ -14,7 +14,7 @@ import {
   type ResolveStation,
   RouteTags,
   type StationPressHandler,
-} from './legDisplay'
+} from '@/features/journey/components/legDisplay'
 import { Borders, Colors, Opacity, Radii } from '@/theme'
 
 type JourneyResultCardProps = {

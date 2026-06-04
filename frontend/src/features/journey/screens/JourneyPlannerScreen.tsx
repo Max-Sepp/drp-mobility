@@ -12,19 +12,19 @@ import {
   matchOutages,
   resolveStationName,
   type StationOutage,
-} from '../api/accessibility'
-import { type ResolvedLocation, resolveToPostcode } from '../api/geocode'
+} from '@/features/journey/api/accessibility'
+import { type ResolvedLocation, resolveToPostcode } from '@/features/journey/api/geocode'
 import { useAppLocation } from '@/lib/LocationContext'
-import { loadSavedJourneys } from '../api/savedJourneys'
+import { loadSavedJourneys } from '@/features/journey/api/savedJourneys'
 import {
   type AccessibilityPreference,
   type Journey,
   planJourneyOptions,
   type RouteTag,
-} from '../api/tfl'
-import { JourneyResultCard } from '../components/JourneyResultCard'
-import { formatDepart, LeaveAtField } from '../components/LeaveAtField'
-import { LocationInput } from '../components/LocationInput'
+} from '@/features/journey/api/tfl'
+import { JourneyResultCard } from '@/features/journey/components/JourneyResultCard'
+import { formatDepart, LeaveAtField } from '@/features/journey/components/LeaveAtField'
+import { LocationInput } from '@/features/journey/components/LocationInput'
 import { Borders, Colors, Heights, Opacity, Radii, Typography } from '@/theme'
 
 type Resolved = { from: ResolvedLocation; to: ResolvedLocation }

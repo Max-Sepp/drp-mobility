@@ -9,9 +9,9 @@
 //      specific platform reliably.
 
 import type { StationDetail } from '@/features/stations'
-import { normaliseStationName, resolveStationName } from './accessibility'
-import type { OutageUnit, StationOutage } from './accessibility'
-import type { Journey } from './tfl'
+import { normaliseStationName, resolveStationName } from '@/features/journey/api/accessibility'
+import type { OutageUnit, StationOutage } from '@/features/journey/api/accessibility'
+import type { Journey } from '@/features/journey/api/tfl'
 
 // Train modes whose legs board/alight at a station we can reason about. Mirrors the set used to
 // make stations tappable; walking/bus/etc. don't put the rider on a platform.

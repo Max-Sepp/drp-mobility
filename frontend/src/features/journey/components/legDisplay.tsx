@@ -1,7 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import { Text, XStack } from 'tamagui'
-import type { ResolvedLocation } from '../api/geocode'
-import type { Journey, RouteTag } from '../api/tfl'
+import type { ResolvedLocation } from '@/features/journey/api/geocode'
+import type { Journey, RouteTag } from '@/features/journey/api/tfl'
 import { Borders, Colors, Opacity, Radii } from '@/theme'
 
 export type ResolveStation = (commonName: string) => string | null

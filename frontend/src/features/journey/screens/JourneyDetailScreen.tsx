@@ -6,10 +6,10 @@ import { ScreenHeader } from '@/components/ScreenHeader'
 import { FormScreenLayout } from '@/features/reporting/components/FormScreenLayout'
 import { useStations } from '@/features/stations'
 import type { JourneyDetailScreenProps } from '@/navigation/types'
-import { resolveStationName } from '../api/accessibility'
-import { assessOutages } from '../api/outageRelevance'
-import type { Leg } from '../api/tfl'
-import { deleteJourney, journeyKey, loadSavedJourneys, saveJourney } from '../api/savedJourneys'
+import { resolveStationName } from '@/features/journey/api/accessibility'
+import { assessOutages } from '@/features/journey/api/outageRelevance'
+import type { Leg } from '@/features/journey/api/tfl'
+import { deleteJourney, journeyKey, loadSavedJourneys, saveJourney } from '@/features/journey/api/savedJourneys'
 import {
   clockTime,
   fareLabel,
@@ -19,8 +19,8 @@ import {
   modeLabel,
   RouteTags,
   stripStationSuffix,
-} from '../components/legDisplay'
-import { OutageDetail } from '../components/OutageDetail'
+} from '@/features/journey/components/legDisplay'
+import { OutageDetail } from '@/features/journey/components/OutageDetail'
 import { Borders, Colors, Heights, Opacity, Radii } from '@/theme'
 
 function lineLabel(leg: Leg): string | null {

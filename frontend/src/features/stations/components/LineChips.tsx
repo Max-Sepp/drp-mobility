@@ -1,5 +1,5 @@
 import { Text, XStack } from 'tamagui'
-import { lineColour } from '../lineColours'
+import { lineColour } from '@/features/stations/lineColours'
 import { Radii } from '@/theme'
 
 type LineChipsProps = {

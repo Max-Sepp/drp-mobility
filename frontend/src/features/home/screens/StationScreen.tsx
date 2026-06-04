@@ -11,10 +11,10 @@ import { resolveToPostcode, type ResolvedLocation } from '@/features/journey/api
 import { useAppLocation } from '@/lib/LocationContext'
 import type { Station, StationScreenProps } from '@/navigation/types'
 import { Colors, Heights, Radii, Spacing } from '@/theme'
-import { PlatformAccessCard } from '../components/PlatformAccessCard'
-import { QuickReportGrid, type QuickReportAction } from '../components/QuickReportGrid'
-import { ReportsStatus } from '../components/ReportsStatus'
-import { StationHeader } from '../components/StationHeader'
+import { PlatformAccessCard } from '@/features/home/components/PlatformAccessCard'
+import { QuickReportGrid, type QuickReportAction } from '@/features/home/components/QuickReportGrid'
+import { ReportsStatus } from '@/features/home/components/ReportsStatus'
+import { StationHeader } from '@/features/home/components/StationHeader'
 
 type OutageReport = components['schemas']['OutageReportSummary']
 

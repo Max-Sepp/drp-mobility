@@ -3,7 +3,7 @@ import { Spinner, Text, YStack } from 'tamagui'
 import type { components } from '@/api/schema.d'
 import { Heading } from '@/components/Heading'
 import { Colors, Radii } from '@/theme'
-import { OutageReportCard } from './OutageReportCard'
+import { OutageReportCard } from '@/features/home/components/OutageReportCard'
 
 type OutageReport = components['schemas']['OutageReportSummary']
 

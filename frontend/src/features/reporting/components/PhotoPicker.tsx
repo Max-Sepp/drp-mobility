@@ -1,7 +1,7 @@
 import * as ImagePicker from 'expo-image-picker'
 import { Alert, Image } from 'react-native'
 import { Text, YStack } from 'tamagui'
-import { FormSection } from './FormSection'
+import { FormSection } from '@/features/reporting/components/FormSection'
 import { Borders, Colors, Opacity, Radii } from '@/theme'
 
 type PhotoPickerProps = {

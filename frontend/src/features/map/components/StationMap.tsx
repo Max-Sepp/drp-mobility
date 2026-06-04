@@ -3,8 +3,8 @@ import { StyleSheet } from 'react-native'
 import MapView, { PoiClickEvent, Region } from 'react-native-maps'
 import { fuzzyScore } from '@/lib/fuzzy'
 import { useAppHeading, useAppLocation } from '@/lib/LocationContext'
-import stationMarkers from '../data/stationMarkers.json'
-import { UserLocationMarker } from './UserLocationMarker'
+import stationMarkers from '@/features/map/data/stationMarkers.json'
+import { UserLocationMarker } from '@/features/map/components/UserLocationMarker'
 
 const LONDON: Region = {
   latitude: 51.5074,

@@ -1,3 +1,3 @@
-export { JourneyDetailScreen } from './screens/JourneyDetailScreen'
-export { JourneyPlannerScreen } from './screens/JourneyPlannerScreen'
-export { SavedJourneysScreen } from './screens/SavedJourneysScreen'
+export { JourneyDetailScreen } from '@/features/journey/screens/JourneyDetailScreen'
+export { JourneyPlannerScreen } from '@/features/journey/screens/JourneyPlannerScreen'
+export { SavedJourneysScreen } from '@/features/journey/screens/SavedJourneysScreen'
