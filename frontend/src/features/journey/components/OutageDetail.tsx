@@ -6,7 +6,8 @@ import type {
   OutageAssessment,
   StationRole,
   UnitVerdict,
-} from '../api/outageRelevance'
+} from '@/features/journey/api/outageRelevance'
+import { Borders, Colors, Radii } from '@/theme'
 
 type VerdictStyle = {
   icon: keyof typeof MaterialIcons.glyphMap
@@ -16,55 +17,47 @@ type VerdictStyle = {
   label: string
 }
 
-// How sure we are the unit affects the route drives both the wording and the colour. We never
-// use colour alone — each verdict carries an icon and a text label too.
 const VERDICTS: Record<UnitVerdict, VerdictStyle> = {
   'on-your-platform': {
     icon: 'error',
-    color: '#b91c1c',
-    background: '#fef2f2',
-    border: '#fecaca',
+    color: Colors.dangerDark,
+    background: Colors.dangerBg,
+    border: Colors.dangerBorder,
     label: 'On your route',
   },
   'shared-route': {
     icon: 'warning',
-    color: '#92400e',
-    background: '#fffbeb',
-    border: '#fcd34d',
+    color: Colors.warningDark,
+    background: Colors.warningBg,
+    border: Colors.warningBorder,
     label: 'On your path here',
   },
   'other-platform': {
     icon: 'info',
-    color: '#374151',
-    background: '#f9fafb',
-    border: '#e5e7eb',
+    color: Colors.text,
+    background: Colors.searchBg,
+    border: Colors.border,
     label: 'Likely a different platform',
   },
   unknown: {
     icon: 'help-outline',
-    color: '#374151',
-    background: '#f9fafb',
-    border: '#e5e7eb',
+    color: Colors.text,
+    background: Colors.searchBg,
+    border: Colors.border,
     label: 'Out of service',
   },
 }
 
-/** A one-line explanation of how the rider uses this station, when we can tell. */
 function roleText(role: StationRole, lines: string[]): string | null {
   const service = lines.length > 0 ? ` (${lines.join(' / ')})` : ''
   switch (role) {
-    case 'board':
-      return `You board here${service}`
-    case 'alight':
-      return `You exit here${service}`
-    case 'interchange':
-      return `You change here${service}`
-    default:
-      return null
+    case 'board': return `You board here${service}`
+    case 'alight': return `You exit here${service}`
+    case 'interchange': return `You change here${service}`
+    default: return null
   }
 }
 
-/** "Reported 3× · last 14:20" / "· last 2 Jun". */
 function reportMeta(unit: AssessedUnit): string {
   const count = `Reported ${unit.reportCount}×`
   if (!unit.lastReported) return count
@@ -75,29 +68,20 @@ function reportMeta(unit: AssessedUnit): string {
   return `${count} · last ${when}`
 }
 
-/** The verdict's plain-language detail, tailored to the connection. */
 function verdictDetail(unit: AssessedUnit): string {
   switch (unit.verdict) {
-    case 'on-your-platform':
-      return 'Serves a platform your service uses here.'
-    case 'shared-route':
-      return 'Connects areas you pass through here.'
-    case 'other-platform':
-      return "Serves a platform your route doesn't appear to use."
-    default:
-      return "Couldn't confirm whether this is on your route."
+    case 'on-your-platform': return 'Serves a platform your service uses here.'
+    case 'shared-route': return 'Connects areas you pass through here.'
+    case 'other-platform': return "Serves a platform your route doesn't appear to use."
+    default: return "Couldn't confirm whether this is on your route."
   }
 }
 
-/**
- * The accessibility-alert section of the journey detail screen: every flagged station, the rider's
- * role there, and each broken unit with a verdict on whether it actually affects this route.
- */
 export const OutageDetail = ({ assessments }: { assessments: OutageAssessment[] }) => {
   if (assessments.length === 0) return null
   return (
     <YStack gap="$3">
-      <Text fontSize={16} fontWeight="700" color="#111827">
+      <Text fontSize={16} fontWeight="700" color={Colors.text}>
         Accessibility alerts on this route
       </Text>
       {assessments.map((station) => {
@@ -107,14 +91,14 @@ export const OutageDetail = ({ assessments }: { assessments: OutageAssessment[] 
             key={station.stationName}
             gap="$2.5"
             p="$3"
-            style={{ borderWidth: 1.5, borderColor: '#e5e7eb', borderRadius: 10 }}
+            style={{ borderWidth: Borders.medium, borderColor: Colors.border, borderRadius: Radii.button }}
           >
             <YStack gap="$0.5">
-              <Text fontSize={15} fontWeight="700" color="#111827">
+              <Text fontSize={15} fontWeight="700" color={Colors.text}>
                 {station.stationName}
               </Text>
               {role && (
-                <Text fontSize={13} color="#6b7280">
+                <Text fontSize={13} color={Colors.secondaryText}>
                   {role}
                 </Text>
               )}
@@ -129,9 +113,9 @@ export const OutageDetail = ({ assessments }: { assessments: OutageAssessment[] 
                   p="$2.5"
                   style={{
                     backgroundColor: v.background,
-                    borderWidth: 1,
+                    borderWidth: Borders.thin,
                     borderColor: v.border,
-                    borderRadius: 8,
+                    borderRadius: Radii.small,
                   }}
                 >
                   <XStack gap="$2" items="center">
@@ -140,13 +124,13 @@ export const OutageDetail = ({ assessments }: { assessments: OutageAssessment[] 
                       {v.label}
                     </Text>
                   </XStack>
-                  <Text fontSize={14} color="#111827">
+                  <Text fontSize={14} color={Colors.text}>
                     {unit.connection}
                   </Text>
                   <Text fontSize={13} style={{ color: v.color }}>
                     {verdictDetail(unit)}
                   </Text>
-                  <Text fontSize={12} color="#6b7280">
+                  <Text fontSize={12} color={Colors.secondaryText}>
                     {reportMeta(unit)}
                     {unit.estimated ? ' · location estimated' : ''}
                   </Text>

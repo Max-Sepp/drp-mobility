@@ -46,12 +46,13 @@ These are app-level building blocks (`FormScreenLayout`, `ScreenHeader`, `Submit
 ## API client (`src/api/`)
 
 - `client.ts` wraps `openapi-fetch` with the types from `schema.d.ts`. Use it via the typed paths — don't construct fetches by hand.
-- **`schema.d.ts` is generated.** Don't edit it by hand. After any backend route/schema change, run `npm run generate:api` against a locally running backend (`uvicorn app.main:app --reload`).
+- **`schema.d.ts` is generated.** Don't edit it by hand. After any backend route/schema change, run `npm run generate:api` against a locally running backend (`DEV=true uvicorn app.main:app --reload`).
 - Base URL comes from `EXPO_PUBLIC_API_URL` and defaults to `http://localhost:8000`. For physical-device testing you'll need to set this to your laptop's LAN IP, since `localhost` on the phone refers to the phone itself.
 
 ## Helpers (`src/lib/`)
 
 - `datetime.ts` centralises the timezone handling: the backend always sends UTC ISO strings, but some don't include a trailing `Z`. `parseUtc` appends `Z` if no timezone designator is present so dates are never reinterpreted as local time. Use these helpers rather than `new Date(iso)` directly when displaying backend timestamps.
+- `LocationContext.tsx` provides a `LocationProvider` (wrap at app root) plus two hooks: `useAppLocation()` → `{ latitude, longitude, ... } | null` and `useAppHeading()` → `number | null` (degrees clockwise from true north). Both return `null` until permission is granted. The provider runs `watchPositionAsync` and `watchHeadingAsync` in a single effect; heading prefers `trueHeading` and falls back to `magHeading`.
 
 ## Constants (`src/constants/`)
 
@@ -72,6 +73,30 @@ There is no web build. The app ships through EAS — slug `drp-mobility`, projec
 - **Production build** — push a `v*` tag (e.g. `v1.0.0`). The `eas-build` workflow (`.github/workflows/eas-build.yml`) builds Android + iOS and creates a GitHub Release with the `.apk`.
 - **Preview build** — trigger `eas-build` manually from the Actions tab with the `preview` profile.
 - **OTA update** — pushes to `main` that touch `frontend/**` trigger `eas-update.yml`, publishing a JS bundle to the `production` channel. Installed production builds pull the latest bundle on app open. **JS changes ship via OTA; native changes (new dependencies, native module config, app permissions, splash/icon) require a fresh build.**
+
+## Map (`src/features/map/`)
+
+- `StationMap.tsx` renders a `react-native-maps` `MapView` (works in Expo Go — no EAS build needed). On Android, tapping a TfL POI fires `onPoiClick`; iOS POI tapping is a known pending issue.
+- Station lookup on POI click uses a combined distance threshold (150 m) + fuzzy name match (score ≥ 0.4) against `src/features/map/data/stationMarkers.json` — a static bundle of all 387 stations (name, lat, lng, lines) committed to the repo. Map markers always work offline; the bundle is the source of truth for the map, not `useStations()`.
+- `UserLocationMarker.tsx` renders a custom `Marker` with a blue dot and a semi-transparent directional cone that rotates with the device heading. The cone is only shown when `useAppHeading()` returns a non-null value.
+- `StationMap.web.tsx` is a stub that renders `MapPlaceholder` — `react-native-maps` is native-only and the web bundler would otherwise fail.
+
+## Theme (`src/theme.ts`)
+
+All design tokens live here — import from `@/theme`, never hardcode values in components. Exports:
+
+| Export | Contents |
+|---|---|
+| `Colors` | Palette + semantic colours |
+| `Radii` | Border radii (`card`, `button`, `input`, `pill`, `small`, `xs`, `handle`, `icon`) |
+| `Shadows` | `card`, `heavy`, `top`, `marker` — hard-offset for neo-brutalist, soft blur for default |
+| `Borders` | `thin`, `medium`, `thick` |
+| `Opacity` | `disabled`, `disabledMid`, `subtle`, `pressed`, `pressedLight` — use for all interactive state opacity instead of hardcoding |
+| `Overlays` | `backdrop` — modal/sheet backdrop colour |
+| `Typography` | Font size + weight presets |
+| `Spacing` | 4 pt grid (`xs` → `section`) |
+| `Heights` | `button`, `touchTarget` |
+| `SharedStyles` | Common `StyleSheet` fragments (`card`, `row`, `screenBackground`) |
 
 ## When working on UI
 

@@ -1,8 +1,8 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import { Text, XStack, YStack } from 'tamagui'
-import type { StationOutage } from '../api/accessibility'
-import type { ResolvedLocation } from '../api/geocode'
-import type { Journey, RouteTag } from '../api/tfl'
+import type { StationOutage } from '@/features/journey/api/accessibility'
+import type { ResolvedLocation } from '@/features/journey/api/geocode'
+import type { Journey, RouteTag } from '@/features/journey/api/tfl'
 import {
   clockTime,
   fareLabel,
@@ -14,31 +14,24 @@ import {
   type ResolveStation,
   RouteTags,
   type StationPressHandler,
-} from './legDisplay'
+} from '@/features/journey/components/legDisplay'
+import { Borders, Colors, Opacity, Radii } from '@/theme'
 
 type JourneyResultCardProps = {
   journey: Journey
-  /** Stations on this journey we know to have broken step-free equipment, if any. */
   outages?: StationOutage[]
-  /** Why this route stands out (fastest / fewest changes / least walking). */
   tags?: RouteTag[]
-  // The resolved start/end the journey was planned between. Used to swap the bare postcodes
-  // TfL echoes in its leg instructions back to the readable places the user chose.
   from?: ResolvedLocation
   to?: ResolvedLocation
-  // Maps a TfL station `commonName` to a station we have a detail screen for (or null), and
-  // opens that screen. Together these make the stations on a leg tappable.
   resolveStation: ResolveStation
   onStationPress: StationPressHandler
-  /** Opens the expanded journey detail screen for this journey. */
   onPress?: () => void
 }
 
 /**
- * One journey option: total duration, depart/arrive times, and the ordered legs, each shown
- * with a mode icon. Per-leg durations cover only time in motion, so any remaining time (the
- * total minus the legs) is interchange and waiting — shown as its own line so the breakdown
- * visibly adds up to the headline duration. Tapping the card opens the expanded detail view.
+ * A single journey option: headline duration/fare/times, a per-leg breakdown, and a banner
+ * for any step-free outages along the route. Passing `onPress` turns the whole card into a
+ * tappable button (with a "View details" affordance); omit it for a static, read-only card.
  */
 export const JourneyResultCard = ({
   journey,
@@ -51,6 +44,8 @@ export const JourneyResultCard = ({
   onPress,
 }: JourneyResultCardProps) => {
   const fare = fareLabel(journey)
+  // TfL's total duration includes interchange/platform waiting that the legs don't account for;
+  // the leftover after summing the legs is the time spent waiting and connecting.
   const legTotal = journey.legs.reduce((sum, leg) => sum + leg.duration, 0)
   const waiting = journey.duration - legTotal
   return (
@@ -59,31 +54,32 @@ export const JourneyResultCard = ({
       mt="$4"
       p="$4"
       gap="$3"
-      pressStyle={onPress ? { opacity: 0.7 } : undefined}
+      pressStyle={onPress ? { opacity: Opacity.pressed } : undefined}
       onPress={onPress}
-      accessibilityRole={onPress ? 'button' : undefined}
-      accessibilityLabel={onPress ? 'View journey details' : undefined}
+      role={onPress ? 'button' : undefined}
+      aria-label={onPress ? 'View journey details' : undefined}
       style={{
-        borderWidth: 1.5,
-        borderColor: '#d1d5db',
-        borderRadius: 10,
-        backgroundColor: 'white',
+        borderWidth: Borders.medium,
+        borderColor: Colors.border,
+        borderRadius: Radii.button,
+        backgroundColor: Colors.card,
       }}
     >
+      {/* Step-free outage warning — surfaced first so riders see access risks before the route. */}
       {outages.length > 0 && (
         <XStack
           gap="$2"
           p="$2.5"
           items="flex-start"
           style={{
-            backgroundColor: '#fffbeb',
-            borderWidth: 1,
-            borderColor: '#fcd34d',
-            borderRadius: 8,
+            backgroundColor: Colors.warningBg,
+            borderWidth: Borders.thin,
+            borderColor: Colors.warningBorder,
+            borderRadius: Radii.small,
           }}
         >
           <Text fontSize={15}>⚠️</Text>
-          <Text fontSize={13} color="#92400e" flex={1}>
+          <Text fontSize={13} color={Colors.warningDark} flex={1}>
             {outageWarning(outages)}
           </Text>
         </XStack>
@@ -93,16 +89,16 @@ export const JourneyResultCard = ({
 
       <XStack items="center" justify="space-between">
         <XStack items="baseline" gap="$2">
-          <Text fontSize={18} fontWeight="700" color="#111827">
+          <Text fontSize={18} fontWeight="700" color={Colors.text}>
             {journey.duration} min
           </Text>
           {fare && (
-            <Text fontSize={15} fontWeight="600" color="#16a34a">
+            <Text fontSize={15} fontWeight="600" color={Colors.success}>
               {fare}
             </Text>
           )}
         </XStack>
-        <Text fontSize={15} color="#374151">
+        <Text fontSize={15} color={Colors.text}>
           {clockTime(journey.startDateTime)} → {clockTime(journey.arrivalDateTime)}
         </Text>
       </XStack>
@@ -113,12 +109,12 @@ export const JourneyResultCard = ({
             <MaterialIcons
               name={modeIcon(leg.mode.name)}
               size={22}
-              color="#2563eb"
-              accessibilityLabel={modeLabel(leg.mode.name)}
+              color={Colors.blue}
+              aria-label={modeLabel(leg.mode.name)}
               style={{ width: 24, marginTop: 1 }}
             />
             <YStack flex={1} gap="$0.5">
-              <Text fontSize={14} color="#111827">
+              <Text fontSize={14} color={Colors.text}>
                 {humanizeSummary(leg.instruction.summary, [from, to])}
               </Text>
               <LegStations
@@ -126,27 +122,28 @@ export const JourneyResultCard = ({
                 resolveStation={resolveStation}
                 onStationPress={onStationPress}
               />
-              <Text fontSize={12} color="#6b7280">
+              <Text fontSize={12} color={Colors.secondaryText}>
                 {leg.duration} min
               </Text>
             </YStack>
           </XStack>
         ))}
 
+        {/* Only show the waiting row when it rounds to at least a minute. */}
         {waiting >= 1 && (
           <XStack gap="$3" items="flex-start">
             <MaterialIcons
               name="schedule"
               size={22}
-              color="#6b7280"
-              accessibilityLabel="Waiting and connections"
+              color={Colors.secondaryText}
+              aria-label="Waiting and connections"
               style={{ width: 24, marginTop: 1 }}
             />
             <YStack flex={1} gap="$0.5">
-              <Text fontSize={14} color="#6b7280">
+              <Text fontSize={14} color={Colors.secondaryText}>
                 Waiting & connections
               </Text>
-              <Text fontSize={12} color="#6b7280">
+              <Text fontSize={12} color={Colors.secondaryText}>
                 {waiting} min
               </Text>
             </YStack>
@@ -156,10 +153,10 @@ export const JourneyResultCard = ({
 
       {onPress && (
         <XStack items="center" justify="flex-end" gap="$1">
-          <Text fontSize={13} fontWeight="600" color="#2563eb">
+          <Text fontSize={13} fontWeight="600" color={Colors.blue}>
             View details
           </Text>
-          <MaterialIcons name="chevron-right" size={18} color="#2563eb" />
+          <MaterialIcons name="chevron-right" size={18} color={Colors.blue} />
         </XStack>
       )}
     </YStack>

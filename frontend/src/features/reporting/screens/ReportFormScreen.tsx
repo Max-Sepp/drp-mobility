@@ -6,11 +6,12 @@ import { apiClient } from '@/api/client'
 import type { components } from '@/api/schema.d'
 import { ScreenHeader } from '@/components/ScreenHeader'
 import type { ReportFormScreenProps, Station } from '@/navigation/types'
-import { EquipmentPicker } from '../components/EquipmentPicker'
-import { FormScreenLayout } from '../components/FormScreenLayout'
-import { FormSection } from '../components/FormSection'
-import { PhotoPicker } from '../components/PhotoPicker'
-import { SubmitBar } from '../components/SubmitBar'
+import { EquipmentPicker } from '@/features/reporting/components/EquipmentPicker'
+import { FormScreenLayout } from '@/features/reporting/components/FormScreenLayout'
+import { FormSection } from '@/features/reporting/components/FormSection'
+import { PhotoPicker } from '@/features/reporting/components/PhotoPicker'
+import { SubmitBar } from '@/features/reporting/components/SubmitBar'
+import { Colors, Typography } from '@/theme'
 
 type Equipment = components['schemas']['EquipmentSummary']
 
@@ -91,7 +92,7 @@ export const ReportFormScreen = ({ navigation, route }: ReportFormScreenProps) =
         })
         if (imgError) throw new Error(`Image upload failed: ${JSON.stringify(imgError)}`)
       }
-      navigation.replace('Success')
+      navigation.replace('Success', { station })
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Something went wrong. Please try again.'
       Alert.alert('Error', msg)
@@ -125,10 +126,10 @@ export const ReportFormScreen = ({ navigation, route }: ReportFormScreenProps) =
           textAlignVertical="top"
           style={{
             minHeight: 80,
-            borderColor: '#d1d5db',
-            backgroundColor: '#f9fafb',
-            color: '#111827',
-            fontSize: 15,
+            borderColor: Colors.border,
+            backgroundColor: Colors.searchBg,
+            color: Colors.text,
+            fontSize: Typography.body.fontSize,
           }}
         />
       </FormSection>
