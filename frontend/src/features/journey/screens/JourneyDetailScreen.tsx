@@ -27,6 +27,7 @@ import {
   RouteTags,
 } from '@/features/journey/components/legDisplay'
 import { OutageDetail } from '@/features/journey/components/OutageDetail'
+import { useAuth } from '@/features/auth'
 import { Borders, Colors, Heights, Opacity, Radii } from '@/theme'
 
 export const JourneyDetailScreen = ({ navigation, route }: JourneyDetailScreenProps) => {
@@ -117,7 +118,8 @@ export const JourneyDetailScreen = ({ navigation, route }: JourneyDetailScreenPr
     }
   }
 
-  const fare = fareLabel(journey)
+  const { user } = useAuth()
+  const fare = fareLabel(journey, user?.traveller_type, user?.railcard)
   const legTotal = journey.legs.reduce((sum, leg) => sum + leg.duration, 0)
   const waiting = journey.duration - legTotal
   const saved = currentSavedId !== null

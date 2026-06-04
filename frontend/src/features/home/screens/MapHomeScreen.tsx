@@ -27,22 +27,24 @@ function TopIconButton({
   icon,
   onPress,
   color = Colors.text,
+  size = 40,
   accessibilityLabel,
 }: {
   icon: keyof typeof MaterialIcons.glyphMap
   onPress: () => void
   color?: string
+  size?: number
   accessibilityLabel?: string
 }) {
   return (
     <TouchableOpacity
       onPress={onPress}
-      style={styles.topButton}
+      style={[styles.topButton, { width: size, height: size, borderRadius: size / 2 }]}
       activeOpacity={0.75}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
     >
-      <MaterialIcons name={icon} size={22} color={color} />
+      <MaterialIcons name={icon} size={size * 0.55} color={color} />
     </TouchableOpacity>
   )
 }
@@ -96,7 +98,7 @@ export function MapHomeScreen({ navigation }: Props) {
   const [saved, setSaved] = useState<SavedJourney[]>([])
   const [active, setActive] = useState<ActiveJourney | null>(null)
   const sheetRef = useRef<SearchActionSheetHandle>(null)
-  const { status, user, signOut } = useAuth()
+  const { status, user } = useAuth()
 
   // Refresh on focus so the banner reflects progress made on the active screen and survives a
   // restart (the record is read from storage each time the map regains focus).
@@ -139,11 +141,8 @@ export function MapHomeScreen({ navigation }: Props) {
   // The person icon doubles as the account affordance: log in when anonymous, or show the current
   // user with a log-out option when authenticated. A confirm step guards against an accidental tap.
   function handleAccountPress() {
-    if (status === 'authed' && user) {
-      Alert.alert(`Logged in as ${user.username}`, undefined, [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Log out', style: 'destructive', onPress: () => void signOut() },
-      ])
+    if (status === 'authed') {
+      navigation.navigate('Account')
     } else {
       navigation.navigate('Login')
     }
@@ -170,7 +169,6 @@ export function MapHomeScreen({ navigation }: Props) {
 
   return (
     <View style={styles.screen}>
-      {/* Map fills the entire screen background */}
       <StationMap onStationPress={openStation} />
 
       {/* Top overlay: icon buttons, then a resume banner when a journey is in progress */}
@@ -178,6 +176,7 @@ export function MapHomeScreen({ navigation }: Props) {
         <View style={styles.topButtons} pointerEvents="box-none">
           <TopIconButton
             icon="accessible"
+            size={50}
             onPress={() =>
               Alert.alert('Coming soon', 'Accessibility settings are not yet available.')
             }
@@ -186,6 +185,7 @@ export function MapHomeScreen({ navigation }: Props) {
             <TopIconButton
               icon={status === 'authed' ? 'account-circle' : 'person'}
               color={status === 'authed' ? Colors.blue : Colors.text}
+              size={50}
               accessibilityLabel={
                 status === 'authed' && user ? `Logged in as ${user.username}` : 'Log in'
               }
@@ -202,7 +202,6 @@ export function MapHomeScreen({ navigation }: Props) {
         )}
       </SafeAreaView>
 
-      {/* Bottom action sheet — slides up in place, no new screen */}
       <SearchActionSheet
         ref={sheetRef}
         savedJourneys={saved}
@@ -233,9 +232,6 @@ const styles = StyleSheet.create({
     paddingRight: Spacing.md,
   },
   topButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
     backgroundColor: Colors.card,
     alignItems: 'center',
     justifyContent: 'center',
