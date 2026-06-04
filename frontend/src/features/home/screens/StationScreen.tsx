@@ -1,12 +1,10 @@
-import { useFocusEffect } from '@react-navigation/native'
 import * as Location from 'expo-location'
-import { useCallback, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { ScrollView } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { apiClient } from '@/api/client'
-import type { components } from '@/api/schema.d'
 import { DEFAULT_STATION, stationPicker, useStations } from '@/features/stations'
+import { useOutages } from '@/features/outages'
 import { resolveToPostcode, type ResolvedLocation } from '@/features/journey/api/geocode'
 import { useAppLocation } from '@/lib/LocationContext'
 import type { Station, StationScreenProps } from '@/navigation/types'
@@ -16,29 +14,20 @@ import { QuickReportGrid, type QuickReportAction } from '@/features/home/compone
 import { ReportsStatus } from '@/features/home/components/ReportsStatus'
 import { StationHeader } from '@/features/home/components/StationHeader'
 
-type OutageReport = components['schemas']['OutageReportSummary']
-
 export const StationScreen = ({ navigation, route }: StationScreenProps) => {
   const [station, setStation] = useState<Station>(route.params?.station ?? DEFAULT_STATION)
-  const [reports, setReports] = useState<OutageReport[]>([])
-  const [loading, setLoading] = useState(false)
   const [goingHere, setGoingHere] = useState(false)
   const { stations } = useStations()
   const stationDetail = useMemo(() => stations.find((s) => s.name === station), [stations, station])
   const insets = useSafeAreaInsets()
   const cachedCoords = useAppLocation()
 
-  const fetchReports = useCallback(async () => {
-    setLoading(true)
-    const { data } = await apiClient.GET('/outage-reports')
-    if (data) setReports(data.filter((r) => r.failure.equipment.station.name === station))
-    setLoading(false)
-  }, [station])
-
-  useFocusEffect(
-    useCallback(() => {
-      fetchReports()
-    }, [fetchReports]),
+  // Live feed of outage reports, filtered to this station. Updates in real time as reports are
+  // created, resolved or deleted — no manual refetch on focus.
+  const { reports: allReports, loading } = useOutages()
+  const reports = useMemo(
+    () => allReports.filter((r) => r.failure.equipment.station.name === station),
+    [allReports, station],
   )
 
   function changeStation() {
@@ -59,7 +48,10 @@ export const StationScreen = ({ navigation, route }: StationScreenProps) => {
     try {
       const toResult = await resolveToPostcode(station)
       if ('error' in toResult) {
-        Alert.alert('Station error', `Couldn't find a postcode for ${station}. Try planning manually.`)
+        Alert.alert(
+          'Station error',
+          `Couldn't find a postcode for ${station}. Try planning manually.`,
+        )
         return
       }
       const to: ResolvedLocation = { postcode: toResult.postcode, label: station }

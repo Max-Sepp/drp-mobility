@@ -1,12 +1,21 @@
 import os
+from collections.abc import AsyncIterator
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile
 from fastapi.responses import Response
+from sse_starlette import EventSourceResponse
 
 from app.dependencies.auth import get_optional_user
+from app.events import broker, sse_event
 from app.models.user import User, UserRole
 from app.repositories.outage_report import OutageReportRepository, get_repo
 from app.schemas.outage_report import OutageReportCreate, OutageReportSummary
+
+
+def _report_payload(report) -> dict:
+    """Serialize a report ORM row to the same JSON shape as the GET endpoints."""
+    return OutageReportSummary.model_validate(report).model_dump(mode="json")
+
 
 router = APIRouter(prefix="/outage-reports", tags=["outage-reports"])
 
@@ -55,11 +64,13 @@ def create_outage_report(
     """
     reporter_role = current_user.role if current_user else UserRole.UNTRUSTED.value
     try:
-        return repo.create(payload, reporter_role=reporter_role)
+        report = repo.create(payload, reporter_role=reporter_role)
     except ValueError as exc:
         # 422 Unprocessable Entity: payload parsed fine, but a referenced row
         # (e.g. equipment_id) doesn't exist — semantically invalid input.
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+    broker.publish(sse_event("created", _report_payload(report)))
+    return report
 
 
 @router.get("", response_model=list[OutageReportSummary])
@@ -68,6 +79,29 @@ def list_outage_reports(
 ) -> list[OutageReportSummary]:
     """Return all outage reports (newest first)."""
     return repo.list_all()
+
+
+@router.get("/stream")
+async def stream_outage_reports(
+    repo: OutageReportRepository = Depends(get_repo),
+) -> EventSourceResponse:
+    """Live feed of outage reports via Server-Sent Events.
+
+    On connect, emits a `snapshot` event carrying the full currently-open feed (active reports under
+    unresolved failures), then streams `created` / `deleted` / `resolved` events as they happen — so
+    every (re)connection is a fresh refresh followed by live deltas. Declared before `/{report_id}`
+    so the literal path isn't captured by the integer path param.
+    """
+
+    async def event_generator() -> AsyncIterator[dict]:
+        # Subscribe before snapshotting so no event is missed in the gap between the two.
+        async with broker.subscription() as queue:
+            snapshot = [_report_payload(report) for report in repo.list_active_open()]
+            yield sse_event("snapshot", {"reports": snapshot})
+            while True:
+                yield await queue.get()
+
+    return EventSourceResponse(event_generator())
 
 
 @router.get("/{report_id}", response_model=OutageReportSummary)
@@ -93,6 +127,7 @@ def delete_outage_report(
     if report is None or repo.is_deleted(report_id):
         raise HTTPException(status_code=404, detail="Outage report not found")
     repo.soft_delete(report, reason=reason)
+    broker.publish(sse_event("deleted", {"id": report_id}))
 
 
 # ---------------------------------------------------------------------------
@@ -122,7 +157,10 @@ async def upload_image(
             f"Allowed: {', '.join(sorted(_ALLOWED_IMAGE_TYPES))}",
         )
 
-    return repo.set_image(report, await file.read(), content_type)
+    report = repo.set_image(report, await file.read(), content_type)
+    # Re-emit the report so live clients upsert it and pick up the new image.
+    broker.publish(sse_event("created", _report_payload(report)))
+    return report
 
 
 @router.get("/{report_id}/image")

@@ -12,6 +12,17 @@ type LocationState = {
 
 const LocationContext = createContext<LocationState>({ coords: null, heading: null })
 
+// Ignore heading changes smaller than this (degrees). The compass sensor jitters
+// by a degree or two while the device is still; without this filter every jitter
+// re-renders the map marker.
+const HEADING_THRESHOLD_DEG = 2
+
+/** Smallest absolute angular difference between two bearings, accounting for wraparound. */
+function headingDelta(a: number, b: number): number {
+  const diff = Math.abs(a - b) % 360
+  return diff > 180 ? 360 - diff : diff
+}
+
 /**
  * Silently requests foreground permission on mount and starts a position + heading watch.
  * Cached values are available instantly to any child via useAppLocation() / useAppHeading().
@@ -33,16 +44,25 @@ export function LocationProvider({ children }: { children: ReactNode }) {
         { accuracy: Location.Accuracy.Balanced, timeInterval: 30_000, distanceInterval: 50 },
         (loc) => setCoords(loc.coords),
       ).then((sub) => {
-        if (cancelled) { sub.remove(); return }
+        if (cancelled) {
+          sub.remove()
+          return
+        }
         posSubRef.current = sub
       })
 
       if (Platform.OS !== 'web') {
         Location.watchHeadingAsync((h) => {
           const deg = h.trueHeading >= 0 ? h.trueHeading : h.magHeading
-          setHeading(deg >= 0 ? deg : null)
+          if (deg < 0) return
+          setHeading((prev) =>
+            prev !== null && headingDelta(prev, deg) < HEADING_THRESHOLD_DEG ? prev : deg,
+          )
         }).then((sub) => {
-          if (cancelled) { sub.remove(); return }
+          if (cancelled) {
+            sub.remove()
+            return
+          }
           headSubRef.current = sub as unknown as Location.LocationSubscription
         })
       }
@@ -57,11 +77,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  return (
-    <LocationContext.Provider value={{ coords, heading }}>
-      {children}
-    </LocationContext.Provider>
-  )
+  return <LocationContext.Provider value={{ coords, heading }}>{children}</LocationContext.Provider>
 }
 
 /** Returns the most recently cached device coordinates, or null if unavailable. */

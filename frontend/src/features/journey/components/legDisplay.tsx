@@ -2,6 +2,7 @@ import { MaterialIcons } from '@expo/vector-icons'
 import { Text, XStack } from 'tamagui'
 import type { ResolvedLocation } from '@/features/journey/api/geocode'
 import type { Journey, Leg, RouteTag } from '@/features/journey/api/tfl'
+import { effectiveDiscount } from '@/features/journey/lib/railcards'
 import { Borders, Colors, Opacity, Radii } from '@/theme'
 
 export type ResolveStation = (commonName: string) => string | null
@@ -173,10 +174,22 @@ export function clockTime(local: string): string {
  * omitted even for ticketed journeys — so we only say "Free" when the journey is genuinely
  * walking-only. A paid journey with missing fare data returns null (we show nothing) rather
  * than a misleading "Free".
+ *
+ * Pass a railcard code to apply the standard 1/3 discount where applicable. Railcards do not
+ * apply to bus-only journeys.
  */
-export function fareLabel(journey: Journey): string | null {
+export function fareLabel(
+  journey: Journey,
+  travellerType?: string | null,
+  railcard?: string | null,
+): string | null {
   const { fare, legs } = journey
-  if (fare && fare.totalCost > 0) return `£${(fare.totalCost / 100).toFixed(2)}`
+  if (fare && fare.totalCost > 0) {
+    const discount = effectiveDiscount(journey, travellerType, railcard)
+    const cost = Math.floor(fare.totalCost * (1 - discount))
+    if (cost === 0) return 'Free'
+    return `£${(cost / 100).toFixed(2)}`
+  }
   const walkingOnly = legs.length > 0 && legs.every((leg) => leg.mode.name === 'walking')
   if (walkingOnly) return 'Free'
   return null

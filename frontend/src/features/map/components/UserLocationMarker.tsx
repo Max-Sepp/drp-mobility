@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { Marker } from 'react-native-maps'
 import { Colors, Shadows } from '@/theme'
@@ -8,12 +9,27 @@ type Props = {
   heading: number | null
 }
 
+// How long to keep redrawing the marker bitmap after its content changes.
+const TRACK_DURATION_MS = 500
+
 export function UserLocationMarker({ latitude, longitude, heading }: Props) {
+  // react-native-maps redraws the marker bitmap on every render while
+  // tracksViewChanges is true, which makes a custom marker flicker. Keep it on
+  // only briefly after the rendered content changes, then switch it off so the
+  // marker stays static between updates.
+  const [tracksViewChanges, setTracksViewChanges] = useState(true)
+
+  useEffect(() => {
+    setTracksViewChanges(true)
+    const timer = setTimeout(() => setTracksViewChanges(false), TRACK_DURATION_MS)
+    return () => clearTimeout(timer)
+  }, [latitude, longitude, heading])
+
   return (
     <Marker
       coordinate={{ latitude, longitude }}
       anchor={{ x: 0.5, y: 0.5 }}
-      tracksViewChanges
+      tracksViewChanges={tracksViewChanges}
       flat
     >
       <View style={styles.container}>
