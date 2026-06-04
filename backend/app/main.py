@@ -1,9 +1,12 @@
+import asyncio
 import os
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import Base, SessionLocal, engine
+from app.events import broker
 
 # Each model module must be imported here so its table is registered on Base.metadata
 # before `create_all` runs. Adding a new model? Import it in this block too.
@@ -26,7 +29,15 @@ Base.metadata.create_all(bind=engine)
 with SessionLocal() as session:
     seed_defaults(session)
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Capture the running loop so the event broker can publish from sync (threadpool) endpoints.
+    broker.bind_loop(asyncio.get_running_loop())
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 if os.getenv("DEV", "false").lower() == "true":
     app.add_middleware(
