@@ -28,7 +28,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
-import type { SavedPlaces } from '@/features/journey/api/savedPlaces'
+import type { CustomPlace, SavedPlaces } from '@/features/journey/api/savedPlaces'
 
 // useNativeDriver is not available on web (no native animation module).
 const USE_NATIVE_DRIVER = Platform.OS !== 'web'
@@ -80,15 +80,25 @@ function PlacesRow({
   savedPlaces,
   onPress,
   onLongPress,
+  onCustomPlacePress,
+  onCustomPlaceLongPress,
+  onAddPress,
 }: {
   savedPlaces: SavedPlaces
   onPress: (key: 'home' | 'work') => void
   onLongPress: (key: 'home' | 'work') => void
+  onCustomPlacePress: (place: CustomPlace) => void
+  onCustomPlaceLongPress: (place: CustomPlace) => void
+  onAddPress: () => void
 }) {
   return (
     <View style={styles.placesSection}>
       <Text style={styles.sectionLabel}>PLACES</Text>
-      <View style={styles.placesRow}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.placesRow}
+      >
         {NAMED_PLACES.map(({ key, icon, label }) => {
           const saved = Boolean(savedPlaces[key])
           return (
@@ -109,17 +119,43 @@ function PlacesRow({
             </TouchableOpacity>
           )
         })}
+        {savedPlaces.custom.map((place) => (
+          <TouchableOpacity
+            key={place.id}
+            style={styles.placesTile}
+            activeOpacity={0.75}
+            onPress={() => onCustomPlacePress(place)}
+            onLongPress={() => onCustomPlaceLongPress(place)}
+            accessibilityRole="button"
+            accessibilityLabel={`${place.name}: ${place.address}`}
+            accessibilityHint="Tap to plan journey. Long press to remove."
+          >
+            <View style={styles.placesTileIconSaved}>
+              <MaterialIcons
+                name={place.icon as keyof typeof MaterialIcons.glyphMap}
+                size={22}
+                color={Colors.card}
+              />
+            </View>
+            <Text
+              style={[Typography.label, { color: Colors.text, marginTop: 4 }]}
+              numberOfLines={1}
+            >
+              {place.name}
+            </Text>
+          </TouchableOpacity>
+        ))}
         <TouchableOpacity
           style={styles.placesTile}
           activeOpacity={0.75}
-          onPress={() => Alert.alert('Coming soon', 'Custom places are not yet available.')}
+          onPress={onAddPress}
         >
           <View style={styles.placesTileIcon}>
             <MaterialIcons name="add" size={22} color={Colors.blue} />
           </View>
           <Text style={[Typography.label, { color: Colors.text, marginTop: 4 }]}>Add</Text>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
     </View>
   )
 }
@@ -205,6 +241,9 @@ type Props = {
   onLocationSelect: (from: ResolvedLocation | undefined, to: ResolvedLocation) => void
   onPlacePress: (key: 'home' | 'work') => void
   onPlaceLongPress: (key: 'home' | 'work') => void
+  onCustomPlacePress: (place: CustomPlace) => void
+  onCustomPlaceLongPress: (place: CustomPlace) => void
+  onAddCustomPlace: () => void
 }
 
 export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
@@ -217,6 +256,9 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
       onLocationSelect,
       onPlacePress,
       onPlaceLongPress,
+      onCustomPlacePress,
+      onCustomPlaceLongPress,
+      onAddCustomPlace,
     },
     ref,
   ) {
@@ -493,6 +535,9 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
               savedPlaces={savedPlaces}
               onPress={onPlacePress}
               onLongPress={onPlaceLongPress}
+              onCustomPlacePress={onCustomPlacePress}
+              onCustomPlaceLongPress={onCustomPlaceLongPress}
+              onAddPress={onAddCustomPlace}
             />
 
             <View>

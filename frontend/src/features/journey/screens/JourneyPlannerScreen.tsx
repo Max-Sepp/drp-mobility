@@ -31,8 +31,6 @@ import { Borders, Colors, Heights, Opacity, Radii, Typography } from '@/theme'
 type Resolved = { from: ResolvedLocation; to: ResolvedLocation }
 type JourneyResult = { journey: Journey; outages: StationOutage[]; tags: RouteTag[] }
 
-const NAMED_PLACES = new Set(['Home', 'Work'])
-
 const LEVELS: { value: AccessibilityPreference; label: string }[] = [
   { value: 'StepFreeToVehicle', label: 'Step-free to train' },
   { value: 'StepFreeToPlatform', label: 'Step-free to platform' },
@@ -51,7 +49,7 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
     route.params?.initialFrom?.label === 'Current location',
   )
   const [toIsNamedPlace, setToIsNamedPlace] = useState(
-    NAMED_PLACES.has(route.params?.initialTo?.label ?? ''),
+    Boolean(route.params?.initialTo?.isNamedPlace),
   )
   const [gettingLocation, setGettingLocation] = useState(false)
   const [level, setLevel] = useState<AccessibilityPreference | null>(null)
@@ -119,14 +117,14 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
     setResults([])
     setResolved(null)
 
-    const resolveField = (text: string, postcode: string | null) =>
+    const resolveField = (text: string, postcode: string | null, isNamedPlace?: boolean) =>
       postcode
-        ? Promise.resolve({ postcode, label: text } as ResolvedLocation)
+        ? Promise.resolve({ postcode, label: text, isNamedPlace } as ResolvedLocation)
         : resolveToPostcode(text)
     const outagesPromise = fetchStationOutages()
     const [fromLoc, toLoc] = await Promise.all([
       resolveField(from, fromPostcode),
-      resolveField(to, toPostcode),
+      resolveField(to, toPostcode, toIsNamedPlace || undefined),
     ])
     if ('error' in fromLoc) {
       setLoading(false)
@@ -286,8 +284,8 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
                 <MaterialIcons name="trip-origin" size={14} color={Colors.secondaryText} style={{ width: 18 }} />
                 <Text
                   fontSize={14}
-                  color={NAMED_PLACES.has(resolved.from.label) ? Colors.blue : Colors.text}
-                  fontWeight={NAMED_PLACES.has(resolved.from.label) ? '700' : '400'}
+                  color={resolved.from.isNamedPlace ? Colors.blue : Colors.text}
+                  fontWeight={resolved.from.isNamedPlace ? '700' : '400'}
                   flex={1}
                   numberOfLines={1}
                 >
@@ -298,8 +296,8 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
                 <MaterialIcons name="place" size={16} color={Colors.secondaryText} style={{ width: 18 }} />
                 <Text
                   fontSize={14}
-                  color={NAMED_PLACES.has(resolved.to.label) ? Colors.blue : Colors.text}
-                  fontWeight={NAMED_PLACES.has(resolved.to.label) ? '700' : '400'}
+                  color={resolved.to.isNamedPlace ? Colors.blue : Colors.text}
+                  fontWeight={resolved.to.isNamedPlace ? '700' : '400'}
                   flex={1}
                   numberOfLines={1}
                 >

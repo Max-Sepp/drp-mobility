@@ -22,7 +22,7 @@ const POSTCODE_RE = /^[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}$/i
 const COORD_RE = /^(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)$/
 
 /** A successfully resolved location: the postcode to query plus a label to show the user. */
-export type ResolvedLocation = { postcode: string; label: string }
+export type ResolvedLocation = { postcode: string; label: string; isNamedPlace?: boolean }
 export type ResolveResult = ResolvedLocation | { error: string }
 
 /** A candidate place for the address autocomplete dropdown. */
