@@ -12,7 +12,13 @@ type StationListItemProps = {
   onPress: () => void
 }
 
-export const StationListItem = ({ name, lines, stepFree, selected, onPress }: StationListItemProps) => {
+export const StationListItem = ({
+  name,
+  lines,
+  stepFree,
+  selected,
+  onPress,
+}: StationListItemProps) => {
   return (
     <XStack
       items="center"

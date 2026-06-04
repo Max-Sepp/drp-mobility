@@ -1,6 +1,6 @@
 import type { SignupScreenProps } from '@/navigation/types'
-import { AuthForm } from '../components/AuthForm'
-import { useAuth } from '../context/AuthContext'
+import { AuthForm } from '@/features/auth/components/AuthForm'
+import { useAuth } from '@/features/auth/context/AuthContext'
 
 export const SignupScreen = ({ navigation }: SignupScreenProps) => {
   const { signUp } = useAuth()

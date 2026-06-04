@@ -29,9 +29,6 @@ import {
   View,
 } from 'react-native'
 import type { CustomPlace, SavedPlaces } from '@/features/journey/api/savedPlaces'
-
-// useNativeDriver is not available on web (no native animation module).
-const USE_NATIVE_DRIVER = Platform.OS !== 'web'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { clockTime } from '@/features/journey/components/legDisplay'
 import type { SavedJourney } from '@/features/journey/api/savedJourneys'
@@ -46,6 +43,9 @@ import { useStations, type StationDetail } from '@/features/stations/useStations
 import { fuzzyScore } from '@/lib/fuzzy'
 import { useAppLocation } from '@/lib/LocationContext'
 import { Colors, Radii, Shadows, Spacing, Typography } from '@/theme'
+
+// useNativeDriver is not available on web (no native animation module).
+const USE_NATIVE_DRIVER = Platform.OS !== 'web'
 
 // ---------------------------------------------------------------------------
 // Geometry
@@ -132,7 +132,11 @@ function PlacesRow({
               onLongPress={() => onLongPress(key)}
               accessibilityRole="button"
               accessibilityLabel={saved ? `${label}: ${savedPlaces[key]!.address}` : `Set ${label}`}
-              accessibilityHint={saved ? 'Tap to plan journey. Long press to edit or remove.' : 'Tap to set your address'}
+              accessibilityHint={
+                saved
+                  ? 'Tap to plan journey. Long press to edit or remove.'
+                  : 'Tap to set your address'
+              }
             >
               <View style={[styles.placesTileIcon, saved && styles.placesTileIconSaved]}>
                 <MaterialIcons name={icon} size={22} color={saved ? Colors.card : Colors.blue} />
@@ -167,11 +171,7 @@ function PlacesRow({
             </Text>
           </TouchableOpacity>
         ))}
-        <TouchableOpacity
-          style={styles.placesTile}
-          activeOpacity={0.75}
-          onPress={onAddPress}
-        >
+        <TouchableOpacity style={styles.placesTile} activeOpacity={0.75} onPress={onAddPress}>
           <View style={styles.placesTileIcon}>
             <MaterialIcons name="add" size={22} color={Colors.blue} />
           </View>

@@ -180,9 +180,11 @@ def test_find_or_create_failure_recovers_from_a_concurrent_insert(
 
     monkeypatch.setattr(repo, "_find_open_failure", fake_find_open)
 
-    failure = repo._find_or_create_failure(equipment_id)
+    failure, is_new = repo._find_or_create_failure(equipment_id)
 
     assert failure.id == winner_id
+    # The insert lost the race and recovered the winner's row, so it's not a newly-created failure.
+    assert is_new is False
 
 
 # ---------------------------------------------------------------------------
