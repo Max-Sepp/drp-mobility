@@ -1,4 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons'
+import * as Location from 'expo-location'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Alert } from 'react-native'
 import { Text, XStack, YStack } from 'tamagui'
@@ -12,22 +13,22 @@ import {
   matchOutages,
   resolveStationName,
   type StationOutage,
-} from '../api/accessibility'
-import { type ResolvedLocation, resolveToPostcode } from '../api/geocode'
-import { loadSavedJourneys } from '../api/savedJourneys'
+} from '@/features/journey/api/accessibility'
+import { type ResolvedLocation, resolveToPostcode } from '@/features/journey/api/geocode'
+import { useAppLocation } from '@/lib/LocationContext'
+import { loadSavedJourneys } from '@/features/journey/api/savedJourneys'
 import {
   type AccessibilityPreference,
   type Journey,
   planJourneyOptions,
   type RouteTag,
-} from '../api/tfl'
-import { JourneyResultCard } from '../components/JourneyResultCard'
-import { formatDepart, LeaveAtField } from '../components/LeaveAtField'
-import { LocationInput } from '../components/LocationInput'
+} from '@/features/journey/api/tfl'
+import { JourneyResultCard } from '@/features/journey/components/JourneyResultCard'
+import { formatDepart, LeaveAtField } from '@/features/journey/components/LeaveAtField'
+import { LocationInput } from '@/features/journey/components/LocationInput'
+import { Borders, Colors, Heights, Opacity, Radii, Typography } from '@/theme'
 
 type Resolved = { from: ResolvedLocation; to: ResolvedLocation }
-// A journey paired with the live outages (from our data) affecting the stations it touches, and
-// the optimisation tags (fastest / fewest changes / …) that surfaced it.
 type JourneyResult = { journey: Journey; outages: StationOutage[]; tags: RouteTag[] }
 
 const LEVELS: { value: AccessibilityPreference; label: string }[] = [
@@ -35,44 +36,74 @@ const LEVELS: { value: AccessibilityPreference; label: string }[] = [
   { value: 'StepFreeToPlatform', label: 'Step-free to platform' },
 ]
 
-export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) => {
-  const [from, setFrom] = useState('')
-  const [to, setTo] = useState('')
-  // Postcode resolved from a chosen suggestion, used behind the scenes so the box can keep
-  // showing the readable address. Null when the user typed a value we resolve at submit.
-  const [fromPostcode, setFromPostcode] = useState<string | null>(null)
-  const [toPostcode, setToPostcode] = useState<string | null>(null)
-  // Null means no accessibility filtering at all — TfL then returns every mode (tube, rail, …)
-  // rather than only step-free routes. Each button toggles, so the user can deselect both.
+export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreenProps) => {
+  const [from, setFrom] = useState(route.params?.initialFrom?.label ?? '')
+  const [to, setTo] = useState(route.params?.initialTo?.label ?? '')
+  const [fromPostcode, setFromPostcode] = useState<string | null>(
+    route.params?.initialFrom?.postcode ?? null,
+  )
+  const [toPostcode, setToPostcode] = useState<string | null>(
+    route.params?.initialTo?.postcode ?? null,
+  )
+  const [fromIsCurrentLocation, setFromIsCurrentLocation] = useState(
+    route.params?.initialFrom?.label === 'Current location',
+  )
+  const [gettingLocation, setGettingLocation] = useState(false)
   const [level, setLevel] = useState<AccessibilityPreference | null>(null)
-  // Null means leave now; a Date plans for departing at that time.
   const [departAt, setDepartAt] = useState<Date | null>(null)
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState<JourneyResult[]>([])
   const [resolved, setResolved] = useState<Resolved | null>(null)
-  // Once a journey is shown the bulky inputs collapse to a compact summary; "Edit" reopens
-  // them. Editing stays true until the next successful plan so the user can change and re-run.
   const [editing, setEditing] = useState(false)
   const showInputs = results.length === 0 || editing
 
-  // Resolve the TfL station names on a journey to our own station list so each can link through
-  // to its detail screen (platform access, quick reports). Unknown stations stay non-tappable.
   const { stations } = useStations()
   const stationNames = useMemo(() => stations.map((s) => s.name), [stations])
+  const cachedCoords = useAppLocation()
   const resolveStation = useCallback(
     (commonName: string) => resolveStationName(commonName, stationNames),
     [stationNames],
   )
   const openStation = (station: string) => navigation.navigate('Station', { station })
 
-  // Count of saved journeys for the header badge, refreshed whenever the screen regains focus
-  // (a journey may have been saved or removed on the detail screen).
   const [savedCount, setSavedCount] = useState(0)
   useEffect(() => {
     const reload = () => loadSavedJourneys().then((s) => setSavedCount(s.length))
     reload()
     return navigation.addListener('focus', reload)
   }, [navigation])
+
+  const handleCurrentLocation = useCallback(async (silent = false) => {
+    setGettingLocation(true)
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync()
+      if (status !== 'granted') {
+        if (!silent) {
+          Alert.alert('Location required', 'Enable location access in Settings to use this feature.')
+        }
+        return
+      }
+      const pos =
+        cachedCoords ??
+        (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })).coords
+      const result = await resolveToPostcode(`${pos.latitude},${pos.longitude}`)
+      if ('error' in result) {
+        if (!silent) Alert.alert('Location error', result.error)
+        return
+      }
+      setFrom('Current location')
+      setFromPostcode(result.postcode)
+      setFromIsCurrentLocation(true)
+    } finally {
+      setGettingLocation(false)
+    }
+  }, [cachedCoords])
+
+  useEffect(() => {
+    if (!route.params?.initialFrom) {
+      handleCurrentLocation(true).catch(() => {})
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function run() {
     if (!from.trim() || !to.trim()) {
@@ -83,13 +114,10 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
     setResults([])
     setResolved(null)
 
-    // Use the postcode already resolved from a dropdown selection; otherwise convert the
-    // typed text (a postcode or coordinates) now. Either way we query postcode-to-postcode.
     const resolveField = (text: string, postcode: string | null) =>
       postcode
         ? Promise.resolve({ postcode, label: text } as ResolvedLocation)
         : resolveToPostcode(text)
-    // Fetch our live outage data in parallel with resolving the locations.
     const outagesPromise = fetchStationOutages()
     const [fromLoc, toLoc] = await Promise.all([
       resolveField(from, fromPostcode),
@@ -114,8 +142,6 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
       return
     }
 
-    // Flag journeys against our live outage data, then sort flagged ones to the bottom
-    // (stable: TfL's ordering is preserved within the clean and flagged groups).
     const outages = await outagesPromise
     const flagged = result.journeys.map(({ journey, tags }) => ({
       journey,
@@ -133,18 +159,19 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
       header={
         <ScreenHeader
           title="Plan a journey"
+          onBack={() => navigation.goBack()}
           right={
             <XStack items="center" gap="$3">
               <XStack
                 items="center"
                 gap="$1"
-                pressStyle={{ opacity: 0.6 }}
+                pressStyle={{ opacity: Opacity.disabledMid }}
                 onPress={() => navigation.navigate('SavedJourneys')}
-                accessibilityRole="button"
+                role="button"
                 accessibilityLabel={`Saved journeys${savedCount > 0 ? `, ${savedCount}` : ''}`}
               >
-                <MaterialIcons name="bookmark" size={18} color="#2563eb" />
-                <Text fontSize={14} fontWeight="600" color="#2563eb">
+                <MaterialIcons name="bookmark" size={18} color={Colors.blue} />
+                <Text fontSize={14} fontWeight="600" color={Colors.blue}>
                   Saved{savedCount > 0 ? ` (${savedCount})` : ''}
                 </Text>
               </XStack>
@@ -160,13 +187,27 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
           <LocationInput
             label="From"
             value={from}
-            onChangeText={setFrom}
+            onChangeText={(text) => {
+              setFrom(text)
+              setFromIsCurrentLocation(false)
+            }}
             onResolved={setFromPostcode}
+            isResolved={fromPostcode !== null}
+            textColor={fromIsCurrentLocation ? Colors.blue : undefined}
+            textBold={fromIsCurrentLocation}
+            onCurrentLocation={handleCurrentLocation}
+            currentLocationLoading={gettingLocation}
           />
-          <LocationInput label="To" value={to} onChangeText={setTo} onResolved={setToPostcode} />
+          <LocationInput
+            label="To"
+            value={to}
+            onChangeText={setTo}
+            onResolved={setToPostcode}
+            isResolved={toPostcode !== null}
+          />
 
           <YStack gap="$1.5">
-            <Text fontSize={14} fontWeight="600" color="#6b7280">
+            <Text fontSize={Typography.body.fontSize} fontWeight="600" color={Colors.secondaryText}>
               Accessibility (optional)
             </Text>
             <XStack gap="$2">
@@ -178,17 +219,17 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
                     flex={1}
                     items="center"
                     justify="center"
-                    pressStyle={{ opacity: 0.8 }}
+                    pressStyle={{ opacity: Opacity.pressedLight }}
                     onPress={() => setLevel((prev) => (prev === value ? null : value))}
                     style={{
-                      minHeight: 48,
-                      borderRadius: 10,
-                      borderWidth: 1.5,
-                      borderColor: selected ? '#111827' : '#d1d5db',
-                      backgroundColor: selected ? '#111827' : '#f9fafb',
+                      minHeight: Heights.touchTarget,
+                      borderRadius: Radii.button,
+                      borderWidth: Borders.medium,
+                      borderColor: selected ? Colors.text : Colors.border,
+                      backgroundColor: selected ? Colors.text : Colors.searchBg,
                     }}
                   >
-                    <Text fontSize={14} fontWeight="600" color={selected ? 'white' : '#374151'}>
+                    <Text fontSize={14} fontWeight="600" color={selected ? Colors.card : Colors.text}>
                       {label}
                     </Text>
                   </YStack>
@@ -203,12 +244,12 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
             mt="$2"
             items="center"
             justify="center"
-            pressStyle={{ opacity: 0.8 }}
+            pressStyle={{ opacity: Opacity.pressedLight }}
             onPress={loading ? undefined : run}
-            opacity={loading ? 0.6 : 1}
-            style={{ backgroundColor: '#111827', borderRadius: 10, height: 52 }}
+            opacity={loading ? Opacity.disabledMid : 1}
+            style={{ backgroundColor: Colors.text, borderRadius: Radii.button, height: Heights.button }}
           >
-            <Text color="white" fontSize={16} fontWeight="700">
+            <Text color={Colors.card} fontSize={16} fontWeight="700">
               {loading ? 'Planning…' : 'Plan journey'}
             </Text>
           </YStack>
@@ -221,40 +262,40 @@ export const JourneyPlannerScreen = ({ navigation }: JourneyPlannerScreenProps) 
             p="$3"
             items="center"
             gap="$3"
-            pressStyle={{ opacity: 0.7 }}
+            pressStyle={{ opacity: Opacity.pressed }}
             onPress={() => setEditing(true)}
             style={{
-              borderWidth: 1.5,
-              borderColor: '#d1d5db',
-              borderRadius: 10,
-              backgroundColor: '#f9fafb',
+              borderWidth: Borders.medium,
+              borderColor: Colors.border,
+              borderRadius: Radii.button,
+              backgroundColor: Colors.searchBg,
             }}
           >
             <YStack flex={1} gap="$1">
               <XStack gap="$2" items="center">
-                <MaterialIcons name="trip-origin" size={14} color="#6b7280" style={{ width: 18 }} />
-                <Text fontSize={14} color="#111827" flex={1} numberOfLines={1}>
+                <MaterialIcons name="trip-origin" size={14} color={Colors.secondaryText} style={{ width: 18 }} />
+                <Text fontSize={14} color={Colors.text} flex={1} numberOfLines={1}>
                   {resolved.from.label}
                 </Text>
               </XStack>
               <XStack gap="$2" items="center">
-                <MaterialIcons name="place" size={16} color="#6b7280" style={{ width: 18 }} />
-                <Text fontSize={14} color="#111827" flex={1} numberOfLines={1}>
+                <MaterialIcons name="place" size={16} color={Colors.secondaryText} style={{ width: 18 }} />
+                <Text fontSize={14} color={Colors.text} flex={1} numberOfLines={1}>
                   {resolved.to.label}
                 </Text>
               </XStack>
               {departAt && (
                 <XStack gap="$2" items="center">
-                  <MaterialIcons name="schedule" size={14} color="#6b7280" style={{ width: 18 }} />
-                  <Text fontSize={14} color="#6b7280" flex={1} numberOfLines={1}>
+                  <MaterialIcons name="schedule" size={14} color={Colors.secondaryText} style={{ width: 18 }} />
+                  <Text fontSize={14} color={Colors.secondaryText} flex={1} numberOfLines={1}>
                     Leaving {formatDepart(departAt)}
                   </Text>
                 </XStack>
               )}
             </YStack>
             <XStack items="center" gap="$1">
-              <MaterialIcons name="edit" size={16} color="#2563eb" />
-              <Text fontSize={14} fontWeight="600" color="#2563eb">
+              <MaterialIcons name="edit" size={16} color={Colors.blue} />
+              <Text fontSize={14} fontWeight="600" color={Colors.blue}>
                 Edit
               </Text>
             </XStack>

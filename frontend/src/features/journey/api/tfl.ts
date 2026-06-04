@@ -31,6 +31,9 @@ export type Leg = {
   routeOptions?: RouteOption[]
   // The intermediate stops along the leg's path.
   path?: { stopPoints?: { name?: string }[] }
+  // Disruption data returned by TfL when a leg is affected by a service disruption.
+  isDisrupted?: boolean
+  disruptions?: { description?: string }[]
 }
 
 /**

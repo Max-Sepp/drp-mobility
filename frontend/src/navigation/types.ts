@@ -10,7 +10,9 @@ export type Station = string
 export type EquipmentType = 'lift' | 'escalator'
 
 export type RootStackParamList = {
-  JourneyPlanner: undefined
+  MapHome: undefined
+  Search: undefined
+  JourneyPlanner: { initialFrom?: ResolvedLocation; initialTo?: ResolvedLocation } | undefined
   // The expanded view of a single journey. `savedId` is set when opened from the saved list, so
   // the screen can show Remove instead of Save. The journey and its context are plain JSON.
   JourneyDetail: {
@@ -30,13 +32,15 @@ export type RootStackParamList = {
   SelectStation: { currentStation: Station }
   ReportForm: { equipmentType: EquipmentType; station: Station }
   ReportCustom: { station: Station }
-  Success: undefined
+  Success: { station: Station }
   // Auth is optional: these are pushed on top of the normal stack (e.g. from the header) and
   // dismissed with goBack on success or cancel — there is no login wall.
   Login: undefined
   Signup: undefined
 }
 
+export type MapHomeScreenProps = NativeStackScreenProps<RootStackParamList, 'MapHome'>
+export type SearchScreenProps = NativeStackScreenProps<RootStackParamList, 'Search'>
 export type JourneyPlannerScreenProps = NativeStackScreenProps<RootStackParamList, 'JourneyPlanner'>
 export type JourneyDetailScreenProps = NativeStackScreenProps<RootStackParamList, 'JourneyDetail'>
 export type SavedJourneysScreenProps = NativeStackScreenProps<RootStackParamList, 'SavedJourneys'>

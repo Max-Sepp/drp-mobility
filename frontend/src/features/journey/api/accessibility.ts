@@ -4,7 +4,7 @@
 // station we currently know to be impaired. All of this runs on the client.
 
 import { apiClient } from '@/api/client'
-import type { Journey } from './tfl'
+import type { Journey } from '@/features/journey/api/tfl'
 
 /** One specific broken piece of equipment at a station, with its reported detail. */
 export type OutageUnit = {

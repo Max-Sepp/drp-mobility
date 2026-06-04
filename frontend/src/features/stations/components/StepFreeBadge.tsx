@@ -1,6 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import { Text, XStack } from 'tamagui'
-import { stepFreePresentation, type PlatformStepFree, type StationStepFree } from '../stepFree'
+import { stepFreePresentation, type PlatformStepFree, type StationStepFree } from '@/features/stations/stepFree'
 
 type StepFreeBadgeProps = {
   value: StationStepFree | PlatformStepFree

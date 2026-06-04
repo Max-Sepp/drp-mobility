@@ -1,7 +1,8 @@
 import * as ImagePicker from 'expo-image-picker'
 import { Alert, Image } from 'react-native'
 import { Text, YStack } from 'tamagui'
-import { FormSection } from './FormSection'
+import { FormSection } from '@/features/reporting/components/FormSection'
+import { Borders, Colors, Opacity, Radii } from '@/theme'
 
 type PhotoPickerProps = {
   photo: ImagePicker.ImagePickerAsset | null
@@ -9,7 +10,6 @@ type PhotoPickerProps = {
   label?: string
 }
 
-/** Labelled image upload box that prompts for camera or library and reports the chosen asset. */
 export const PhotoPicker = ({
   photo,
   onPicked,
@@ -25,20 +25,14 @@ export const PhotoPicker = ({
             Alert.alert('Permission required', 'Camera access is needed to take a photo.')
             return
           }
-          const result = await ImagePicker.launchCameraAsync({
-            mediaTypes: ['images'],
-            quality: 0.8,
-          })
+          const result = await ImagePicker.launchCameraAsync({ mediaTypes: ['images'], quality: 0.8 })
           if (!result.canceled) onPicked(result.assets[0])
         },
       },
       {
         text: 'Choose from library',
         onPress: async () => {
-          const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ['images'],
-            quality: 0.8,
-          })
+          const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.8 })
           if (!result.canceled) onPicked(result.assets[0])
         },
       },
@@ -51,24 +45,21 @@ export const PhotoPicker = ({
       <YStack
         items="center"
         justify="center"
-        pressStyle={{ opacity: 0.7 }}
+        pressStyle={{ opacity: Opacity.pressed }}
         onPress={pick}
         style={{
-          borderWidth: 2,
-          borderColor: '#9ca3af',
+          borderWidth: Borders.thick,
+          borderColor: Colors.placeholderText,
           borderStyle: 'dashed',
-          borderRadius: 8,
+          borderRadius: Radii.small,
           height: 100,
           overflow: 'hidden',
         }}
       >
         {photo ? (
-          <Image
-            source={{ uri: photo.uri }}
-            style={{ width: '100%', height: '100%', resizeMode: 'cover' }}
-          />
+          <Image source={{ uri: photo.uri }} style={{ width: '100%', height: '100%', resizeMode: 'cover' }} />
         ) : (
-          <Text fontSize={14} color="#9ca3af">
+          <Text fontSize={14} color={Colors.placeholderText}>
             [ + ] tap to upload image
           </Text>
         )}

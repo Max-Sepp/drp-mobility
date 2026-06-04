@@ -1,5 +1,7 @@
 import enum
+from typing import Optional
 
+from sqlalchemy import Float
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -41,6 +43,8 @@ class Station(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(unique=True)
+    latitude: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    longitude: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
 
     platforms: Mapped[list[Platform]] = relationship(Platform, back_populates="station")
 
