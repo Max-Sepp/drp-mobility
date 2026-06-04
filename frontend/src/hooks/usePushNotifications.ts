@@ -9,7 +9,6 @@ import { navigationRef } from '@/navigation/navigationRef'
 // Show notifications even when the app is in the foreground.
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
-    shouldShowAlert: true,
     shouldShowBanner: true,
     shouldShowList: true,
     shouldPlaySound: true,
@@ -66,8 +65,8 @@ export function usePushNotifications(): void {
       await registerPushToken(token)
     }
 
-    register().catch(() => {
-      // Best-effort: push notifications are additive and must never block the app.
+    register().catch((err) => {
+      console.error('[usePushNotifications] registration failed:', err)
     })
 
     return () => {

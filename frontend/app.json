@@ -13,7 +13,8 @@
       }
     },
     "android": {
-      "package": "com.drpmobility.app"
+      "package": "com.drpmobility.app",
+      "googleServicesFile": "./google-services.json"
     },
     "updates": {
       "url": "https://u.expo.dev/fa941353-94dc-490c-a5b0-209e52e4ee56"

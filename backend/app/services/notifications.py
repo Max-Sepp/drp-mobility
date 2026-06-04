@@ -77,6 +77,7 @@ def notify_affected_users(failure_id: int) -> None:
     """Background task: send Expo push notifications for a newly-created Failure.
 
     Opens its own DB session so it can safely run after the request session closes."""
+    _log.info("notify_affected_users: starting for failure_id=%d", failure_id)
     with SessionLocal() as db:
         failure = (
             db.query(Failure)
@@ -90,10 +91,12 @@ def notify_affected_users(failure_id: int) -> None:
             .one_or_none()
         )
         if failure is None:
+            _log.warning("notify_affected_users: failure_id=%d not found", failure_id)
             return
 
         station_name: str = failure.equipment.station.name
         equipment_type: str = failure.equipment.equipment_type.name
+        _log.info("notify_affected_users: station=%r equipment_type=%r", station_name, equipment_type)
 
         # Collect push tokens and journey payloads grouped by user.
         rows = (
@@ -101,6 +104,7 @@ def notify_affected_users(failure_id: int) -> None:
             .join(SavedJourney, SavedJourney.user_id == PushToken.user_id)
             .all()
         )
+        _log.info("notify_affected_users: %d (token, journey) rows found", len(rows))
 
         # user_id → {"tokens": {str, ...}, "payloads": [str, ...]}
         by_user: dict[int, dict] = defaultdict(lambda: {"tokens": set(), "payloads": []})
@@ -113,6 +117,7 @@ def notify_affected_users(failure_id: int) -> None:
             if any(_journey_touches_station(p, station_name) for p in data["payloads"]):
                 tokens_to_notify.update(data["tokens"])
 
+        _log.info("notify_affected_users: %d token(s) to notify", len(tokens_to_notify))
         if not tokens_to_notify:
             return
 
@@ -140,7 +145,14 @@ def notify_affected_users(failure_id: int) -> None:
                     },
                 )
             if resp.status_code == 200:
+                _log.info("notify_affected_users: Expo accepted %d message(s)", len(messages))
                 _prune_stale_tokens(db, resp.json(), list(tokens_to_notify))
+            else:
+                _log.error(
+                    "notify_affected_users: Expo push API returned %d: %s",
+                    resp.status_code,
+                    resp.text,
+                )
         except Exception:
             _log.exception("Failed to dispatch push notifications for failure %d", failure_id)
 

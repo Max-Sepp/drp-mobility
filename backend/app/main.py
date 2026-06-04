@@ -1,6 +1,16 @@
+import logging
+import os
+
 from fastapi import FastAPI
 
 from app.database import Base, SessionLocal, engine
+
+# Surface our app's INFO logs (uvicorn configures its own loggers, but not the root logger
+# our app modules log through). Honour an optional LOG_LEVEL env var, defaulting to INFO.
+logging.basicConfig(
+    level=os.getenv("LOG_LEVEL", "INFO"),
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+)
 
 # Each model module must be imported here so its table is registered on Base.metadata
 # before `create_all` runs. Adding a new model? Import it in this block too.
