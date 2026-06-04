@@ -1,4 +1,5 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import { LoginScreen, SignupScreen } from '@/features/auth'
 import { StationScreen } from '@/features/home'
 import { MapHomeScreen } from '@/features/home/screens/MapHomeScreen'
 import { SelectStationScreen } from '@/features/stations'
@@ -22,6 +23,8 @@ export default function RootNavigator() {
       <Stack.Screen name="ReportForm" component={ReportFormScreen} />
       <Stack.Screen name="ReportCustom" component={ReportCustomScreen} />
       <Stack.Screen name="Success" component={SuccessScreen} />
+      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="Signup" component={SignupScreen} />
     </Stack.Navigator>
   )
 }

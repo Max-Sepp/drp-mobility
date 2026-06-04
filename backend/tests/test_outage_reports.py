@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from datetime import datetime, timezone
 
 import pytest
@@ -10,6 +11,7 @@ from app.models.failure import Failure
 from app.models.outage_report import OutageReport
 from app.models.outage_report_deletion import OutageReportDeletion
 from app.models.station import Station
+from app.models.user import UserRole
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -115,6 +117,42 @@ def test_create_outage_report_missing_required_field_returns_422(
     response = client.post("/outage-reports", json=payload)
 
     assert response.status_code == 422
+
+
+def test_create_outage_report_anonymous_is_untrusted(
+    client: TestClient, db_session: Session
+) -> None:
+    # Reporting is never gated: an anonymous submission still succeeds and is tagged untrusted.
+    response = client.post("/outage-reports", json=_valid_payload(db_session))
+
+    assert response.status_code == 201
+    assert response.json()["reporter_role"] == "untrusted"
+
+
+def test_create_outage_report_uses_authenticated_user_role(
+    client: TestClient,
+    db_session: Session,
+    auth_headers_factory: Callable[..., dict[str, str]],
+) -> None:
+    headers = auth_headers_factory(UserRole.TRUSTED)
+
+    response = client.post("/outage-reports", json=_valid_payload(db_session), headers=headers)
+
+    assert response.status_code == 201
+    assert response.json()["reporter_role"] == "trusted"
+
+
+def test_create_outage_report_untrusted_user_is_untrusted(
+    client: TestClient,
+    db_session: Session,
+    auth_headers_factory: Callable[..., dict[str, str]],
+) -> None:
+    headers = auth_headers_factory(UserRole.UNTRUSTED)
+
+    response = client.post("/outage-reports", json=_valid_payload(db_session), headers=headers)
+
+    assert response.status_code == 201
+    assert response.json()["reporter_role"] == "untrusted"
 
 
 # ---------------------------------------------------------------------------

@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons'
 import { Image, Pressable } from 'react-native'
 import { Text, XStack, YStack } from 'tamagui'
 import { BASE_URL } from '@/api/client'
@@ -48,6 +49,14 @@ export const OutageReportCard = ({ report, expanded, onToggle }: OutageReportCar
           reported at {formatTime(report.breakdown_time)}
           {isToday(report.breakdown_time) ? ' today' : ''}
         </Text>
+        {report.reporter_role === 'trusted' && (
+          <XStack items="center" gap="$1" mt="$1">
+            <Ionicons name="shield-checkmark" size={12} color="#15803d" />
+            <Text fontSize={12} fontWeight="600" color="#15803d">
+              Trusted reporter
+            </Text>
+          </XStack>
+        )}
       </YStack>
       {hasPhoto && (
         <Text fontSize={12} color={Colors.dangerDark}>

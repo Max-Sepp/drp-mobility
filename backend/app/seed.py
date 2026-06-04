@@ -8,6 +8,8 @@ from app.models.equipment_type import EquipmentType
 from app.models.line import Line
 from app.models.platform import Platform, PlatformStepFree
 from app.models.station import Station
+from app.models.user import UserRole
+from app.repositories.user import UserRepository
 
 # Reference data inserted on every startup. Idempotent (skips rows that already exist),
 # so editing the dataset adds new entries to existing databases but never removes or renames.
@@ -173,3 +175,16 @@ def seed_defaults(db: Session) -> None:
                     platform.id if platform else None,
                 )
     db.commit()
+
+    # Demo trusted account ---------------------------------------------------
+    # Signup always yields an untrusted user and there is no in-app promotion flow yet, so seed one
+    # trusted account (password "password123") to demonstrate trusted-reporter behaviour.
+    # IMPORTANT: only seed demo credentials when explicitly enabled.
+    import os
+
+    if os.environ.get("DRP_SEED_DEMO_USERS") == "1":
+        user_repo = UserRepository(db)
+        if user_repo.get_by_username("trusted_demo") is None:
+            demo = user_repo.create("trusted_demo", "password123")
+            demo.role = UserRole.TRUSTED.value
+            db.commit()

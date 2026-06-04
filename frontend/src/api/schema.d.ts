@@ -4,6 +4,86 @@
  */
 
 export interface paths {
+    "/auth/signup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Signup
+         * @description Create a new (untrusted) account and return a session token.
+         */
+        post: operations["signup_auth_signup_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Login
+         * @description Verify credentials and return a fresh session token.
+         */
+        post: operations["login_auth_login_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Logout
+         * @description Invalidate the caller's session token.
+         */
+        post: operations["logout_auth_logout_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Me
+         * @description Return the currently authenticated user (used to validate a stored token on app launch).
+         */
+        get: operations["me_auth_me_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/outage-reports": {
         parameters: {
             query?: never;
@@ -21,7 +101,9 @@ export interface paths {
          * Create Outage Report
          * @description Submit a new outage report (without an image).
          *
-         *     To attach an image, follow up with POST /outage-reports/{id}/image.
+         *     Open to anonymous callers: the report is tagged with the authenticated user's role, or
+         *     `untrusted` when submitted without a valid token. To attach an image, follow up with
+         *     POST /outage-reports/{id}/image.
          */
         post: operations["create_outage_report_outage_reports_post"];
         delete?: never;
@@ -204,6 +286,15 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * AuthResponse
+         * @description Returned by signup and login: the session token plus the authenticated user.
+         */
+        AuthResponse: {
+            /** Token */
+            token: string;
+            user: components["schemas"]["UserPublic"];
+        };
         /** Body_upload_image_outage_reports__report_id__image_post */
         Body_upload_image_outage_reports__report_id__image_post: {
             /** File */
@@ -314,6 +405,8 @@ export interface components {
             description?: string | null;
             /** Image Content Type */
             image_content_type?: string | null;
+            /** Reporter Role */
+            reporter_role: string;
         };
         /**
          * PlatformSchema
@@ -375,6 +468,28 @@ export interface components {
          * @enum {string}
          */
         StepFree: "none" | "to_platform" | "to_vehicle";
+        /**
+         * UserCreate
+         * @description Request body for POST /auth/signup and POST /auth/login.
+         */
+        UserCreate: {
+            /** Username */
+            username: string;
+            /** Password */
+            password: string;
+        };
+        /**
+         * UserPublic
+         * @description A user as exposed to clients — never includes the password hash.
+         */
+        UserPublic: {
+            /** Id */
+            id: number;
+            /** Username */
+            username: string;
+            /** Role */
+            role: string;
+        };
         /** ValidationError */
         ValidationError: {
             /** Location */
@@ -397,6 +512,110 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    signup_auth_signup_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuthResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    login_auth_login_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuthResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    logout_auth_logout_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    me_auth_me_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserPublic"];
+                };
+            };
+        };
+    };
     list_outage_reports_outage_reports_get: {
         parameters: {
             query?: never;

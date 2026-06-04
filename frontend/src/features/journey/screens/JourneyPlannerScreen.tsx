@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Alert } from 'react-native'
 import { Text, XStack, YStack } from 'tamagui'
 import { ScreenHeader } from '@/components/ScreenHeader'
+import { AccountButton } from '@/features/auth'
 import { useStations } from '@/features/stations'
 import { FormScreenLayout } from '@/features/reporting/components/FormScreenLayout'
 import type { JourneyPlannerScreenProps } from '@/navigation/types'
@@ -160,17 +161,21 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
           title="Plan a journey"
           onBack={() => navigation.goBack()}
           right={
-            <XStack
-              items="center"
-              gap="$1"
-              pressStyle={{ opacity: Opacity.disabledMid }}
-              onPress={() => navigation.navigate('SavedJourneys')}
-              role="button"
-            >
-              <MaterialIcons name="bookmark" size={18} color={Colors.blue} />
-              <Text fontSize={14} fontWeight="600" color={Colors.blue}>
-                Saved{savedCount > 0 ? ` (${savedCount})` : ''}
-              </Text>
+            <XStack items="center" gap="$3">
+              <XStack
+                items="center"
+                gap="$1"
+                pressStyle={{ opacity: Opacity.disabledMid }}
+                onPress={() => navigation.navigate('SavedJourneys')}
+                role="button"
+                accessibilityLabel={`Saved journeys${savedCount > 0 ? `, ${savedCount}` : ''}`}
+              >
+                <MaterialIcons name="bookmark" size={18} color={Colors.blue} />
+                <Text fontSize={14} fontWeight="600" color={Colors.blue}>
+                  Saved{savedCount > 0 ? ` (${savedCount})` : ''}
+                </Text>
+              </XStack>
+              <AccountButton />
             </XStack>
           }
         />

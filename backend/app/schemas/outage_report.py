@@ -25,6 +25,7 @@ class OutageReportSummary(BaseModel):
     breakdown_time: datetime
     description: str | None = None
     image_content_type: str | None = None
+    reporter_role: str
 
 
 # FailureDetail.reports references OutageReportSummary by string; resolve it now.
