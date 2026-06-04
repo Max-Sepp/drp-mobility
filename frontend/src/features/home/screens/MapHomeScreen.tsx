@@ -5,6 +5,7 @@ import { Alert, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { StationMap } from '@/features/map/components/StationMap'
 import { loadSavedJourneys, type SavedJourney } from '@/features/journey/api/savedJourneys'
+import { useAuth } from '@/features/auth'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import type { RootStackParamList } from '@/navigation/types'
 import type { ResolvedLocation } from '@/features/journey/api/geocode'
@@ -19,13 +20,23 @@ type Props = NativeStackScreenProps<RootStackParamList, 'MapHome'>
 function TopIconButton({
   icon,
   onPress,
+  color = Colors.text,
+  accessibilityLabel,
 }: {
   icon: keyof typeof MaterialIcons.glyphMap
   onPress: () => void
+  color?: string
+  accessibilityLabel?: string
 }) {
   return (
-    <TouchableOpacity onPress={onPress} style={styles.topButton} activeOpacity={0.75}>
-      <MaterialIcons name={icon} size={22} color={Colors.text} />
+    <TouchableOpacity
+      onPress={onPress}
+      style={styles.topButton}
+      activeOpacity={0.75}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+    >
+      <MaterialIcons name={icon} size={22} color={color} />
     </TouchableOpacity>
   )
 }
@@ -33,12 +44,26 @@ function TopIconButton({
 export function MapHomeScreen({ navigation }: Props) {
   const [saved, setSaved] = useState<SavedJourney[]>([])
   const sheetRef = useRef<SearchActionSheetHandle>(null)
+  const { status, user, signOut } = useAuth()
 
   useFocusEffect(
     useCallback(() => {
       loadSavedJourneys().then(setSaved)
     }, []),
   )
+
+  // The person icon doubles as the account affordance: log in when anonymous, or show the current
+  // user with a log-out option when authenticated. A confirm step guards against an accidental tap.
+  function handleAccountPress() {
+    if (status === 'authed' && user) {
+      Alert.alert(`Logged in as ${user.username}`, undefined, [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Log out', style: 'destructive', onPress: () => void signOut() },
+      ])
+    } else {
+      navigation.navigate('Login')
+    }
+  }
 
   function openSaved(item: SavedJourney) {
     navigation.navigate('JourneyDetail', {
@@ -71,10 +96,16 @@ export function MapHomeScreen({ navigation }: Props) {
             icon="accessible"
             onPress={() => Alert.alert('Coming soon', 'Accessibility settings are not yet available.')}
           />
-          <TopIconButton
-            icon="person"
-            onPress={() => Alert.alert('Coming soon', 'Profile is not yet available.')}
-          />
+          {status !== 'loading' && (
+            <TopIconButton
+              icon={status === 'authed' ? 'account-circle' : 'person'}
+              color={status === 'authed' ? Colors.blue : Colors.text}
+              accessibilityLabel={
+                status === 'authed' && user ? `Logged in as ${user.username}` : 'Log in'
+              }
+              onPress={handleAccountPress}
+            />
+          )}
         </View>
       </SafeAreaView>
 
