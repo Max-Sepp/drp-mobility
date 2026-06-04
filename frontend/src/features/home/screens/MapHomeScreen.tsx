@@ -284,13 +284,6 @@ export function MapHomeScreen({ navigation }: Props) {
       {/* Top overlay: icon buttons, then a resume banner when a journey is in progress */}
       <SafeAreaView edges={['top']} style={[styles.topSafe, { pointerEvents: 'box-none' }]}>
         <View style={[styles.topButtons, { pointerEvents: 'box-none' }]}>
-          <TopIconButton
-            icon="accessible"
-            size={50}
-            onPress={() =>
-              Alert.alert('Coming soon', 'Accessibility settings are not yet available.')
-            }
-          />
           {status !== 'loading' && (
             <TopIconButton
               icon={status === 'authed' ? 'account-circle' : 'person'}
