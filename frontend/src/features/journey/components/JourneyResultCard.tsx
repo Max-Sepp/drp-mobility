@@ -28,6 +28,11 @@ type JourneyResultCardProps = {
   onPress?: () => void
 }
 
+/**
+ * A single journey option: headline duration/fare/times, a per-leg breakdown, and a banner
+ * for any step-free outages along the route. Passing `onPress` turns the whole card into a
+ * tappable button (with a "View details" affordance); omit it for a static, read-only card.
+ */
 export const JourneyResultCard = ({
   journey,
   outages = [],
@@ -39,6 +44,8 @@ export const JourneyResultCard = ({
   onPress,
 }: JourneyResultCardProps) => {
   const fare = fareLabel(journey)
+  // TfL's total duration includes interchange/platform waiting that the legs don't account for;
+  // the leftover after summing the legs is the time spent waiting and connecting.
   const legTotal = journey.legs.reduce((sum, leg) => sum + leg.duration, 0)
   const waiting = journey.duration - legTotal
   return (
@@ -58,6 +65,7 @@ export const JourneyResultCard = ({
         backgroundColor: Colors.card,
       }}
     >
+      {/* Step-free outage warning — surfaced first so riders see access risks before the route. */}
       {outages.length > 0 && (
         <XStack
           gap="$2"
@@ -121,6 +129,7 @@ export const JourneyResultCard = ({
           </XStack>
         ))}
 
+        {/* Only show the waiting row when it rounds to at least a minute. */}
         {waiting >= 1 && (
           <XStack gap="$3" items="flex-start">
             <MaterialIcons
