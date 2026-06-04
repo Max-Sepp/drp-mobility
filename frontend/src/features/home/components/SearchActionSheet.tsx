@@ -136,6 +136,9 @@ function PlacesRow({
                 <MaterialIcons name={icon} size={22} color={saved ? Colors.card : Colors.blue} />
               </View>
               <Text style={[Typography.label, { color: Colors.text, marginTop: 4 }]}>{label}</Text>
+              {!saved && (
+                <Text style={[Typography.label, { color: Colors.blue, marginTop: 1 }]}>Add</Text>
+              )}
             </TouchableOpacity>
           )
         })}

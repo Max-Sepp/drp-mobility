@@ -191,7 +191,13 @@ export function MapHomeScreen({ navigation }: Props) {
 
   async function handleSaveCustomPlace(place: Omit<CustomPlace, 'id'>) {
     if (!user) return
-    await addCustomPlace(user.id, place)
+    const lowerName = place.name.toLowerCase()
+    if (lowerName === 'home' || lowerName === 'work') {
+      const key = lowerName as 'home' | 'work'
+      await savePlace(user.id, key, { address: place.address, postcode: place.postcode })
+    } else {
+      await addCustomPlace(user.id, place)
+    }
     const updated = await loadSavedPlaces(user.id)
     setSavedPlaces(updated)
     setAddCustomPlaceVisible(false)
@@ -330,6 +336,11 @@ export function MapHomeScreen({ navigation }: Props) {
 
       <AddCustomPlaceModal
         visible={addCustomPlaceVisible}
+        existingNames={[
+          ...(savedPlaces.home ? ['Home'] : []),
+          ...(savedPlaces.work ? ['Work'] : []),
+          ...savedPlaces.custom.map((p) => p.name),
+        ]}
         onSave={handleSaveCustomPlace}
         onDismiss={() => setAddCustomPlaceVisible(false)}
       />
