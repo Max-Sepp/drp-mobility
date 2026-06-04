@@ -1,4 +1,5 @@
 import * as SecureStore from 'expo-secure-store'
+import { Platform } from 'react-native'
 import { apiClient } from '@/api/client'
 import type { components } from '@/api/schema.d'
 
@@ -53,16 +54,29 @@ export async function fetchMe(): Promise<AuthUser | null> {
 // Token persistence (encrypted device storage)
 // ---------------------------------------------------------------------------
 
+async function setStoredItem(key: string, value: string): Promise<void> {
+  if (Platform.OS === 'web') {
+    localStorage.setItem(key, value)
+  } else {
+    await SecureStore.setItemAsync(key, value)
+  }
+}
+
 export async function saveToken(token: string): Promise<void> {
-  await SecureStore.setItemAsync(TOKEN_KEY, token)
+  await setStoredItem(TOKEN_KEY, token)
 }
 
 export async function loadToken(): Promise<string | null> {
+  if (Platform.OS === 'web') return localStorage.getItem(TOKEN_KEY)
   return SecureStore.getItemAsync(TOKEN_KEY)
 }
 
 export async function deleteToken(): Promise<void> {
-  await SecureStore.deleteItemAsync(TOKEN_KEY)
+  if (Platform.OS === 'web') {
+    localStorage.removeItem(TOKEN_KEY)
+  } else {
+    await SecureStore.deleteItemAsync(TOKEN_KEY)
+  }
 }
 
 export function isAuthError(result: AuthResponse | AuthError): result is AuthError {
