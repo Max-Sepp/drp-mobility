@@ -81,7 +81,8 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        /** Update Me - Update mutable profile fields for the currently authenticated user. */
+        patch: operations["update_me_auth_me_patch"];
         trace?: never;
     };
     "/outage-reports": {
@@ -489,6 +490,8 @@ export interface components {
             username: string;
             /** Role */
             role: string;
+            /** Railcard */
+            railcard?: string | null;
         };
         /** ValidationError */
         ValidationError: {
@@ -604,6 +607,33 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserPublic"];
+                };
+            };
+        };
+    };
+    update_me_auth_me_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Railcard */
+                    railcard?: string | null;
+                };
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {

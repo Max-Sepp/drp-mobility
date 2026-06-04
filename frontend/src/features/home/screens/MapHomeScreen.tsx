@@ -21,22 +21,24 @@ function TopIconButton({
   icon,
   onPress,
   color = Colors.text,
+  size = 40,
   accessibilityLabel,
 }: {
   icon: keyof typeof MaterialIcons.glyphMap
   onPress: () => void
   color?: string
+  size?: number
   accessibilityLabel?: string
 }) {
   return (
     <TouchableOpacity
       onPress={onPress}
-      style={styles.topButton}
+      style={[styles.topButton, { width: size, height: size, borderRadius: size / 2 }]}
       activeOpacity={0.75}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
     >
-      <MaterialIcons name={icon} size={22} color={color} />
+      <MaterialIcons name={icon} size={size * 0.55} color={color} />
     </TouchableOpacity>
   )
 }
@@ -44,7 +46,7 @@ function TopIconButton({
 export function MapHomeScreen({ navigation }: Props) {
   const [saved, setSaved] = useState<SavedJourney[]>([])
   const sheetRef = useRef<SearchActionSheetHandle>(null)
-  const { status, user, signOut } = useAuth()
+  const { status, user } = useAuth()
 
   useFocusEffect(
     useCallback(() => {
@@ -52,14 +54,9 @@ export function MapHomeScreen({ navigation }: Props) {
     }, []),
   )
 
-  // The person icon doubles as the account affordance: log in when anonymous, or show the current
-  // user with a log-out option when authenticated. A confirm step guards against an accidental tap.
   function handleAccountPress() {
-    if (status === 'authed' && user) {
-      Alert.alert(`Logged in as ${user.username}`, undefined, [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Log out', style: 'destructive', onPress: () => void signOut() },
-      ])
+    if (status === 'authed') {
+      navigation.navigate('Account')
     } else {
       navigation.navigate('Login')
     }
@@ -86,20 +83,21 @@ export function MapHomeScreen({ navigation }: Props) {
 
   return (
     <View style={styles.screen}>
-      {/* Map fills the entire screen background */}
       <StationMap onStationPress={openStation} />
 
-      {/* Top-right icon buttons, safe-area aware */}
       <SafeAreaView edges={['top']} style={[styles.topSafe, { pointerEvents: 'box-none' }]}>
         <View style={styles.topButtons}>
           <TopIconButton
             icon="accessible"
-            onPress={() => Alert.alert('Coming soon', 'Accessibility settings are not yet available.')}
+            onPress={() =>
+              Alert.alert('Coming soon', 'Accessibility settings are not yet available.')
+            }
           />
           {status !== 'loading' && (
             <TopIconButton
               icon={status === 'authed' ? 'account-circle' : 'person'}
               color={status === 'authed' ? Colors.blue : Colors.text}
+              size={50}
               accessibilityLabel={
                 status === 'authed' && user ? `Logged in as ${user.username}` : 'Log in'
               }
@@ -109,7 +107,6 @@ export function MapHomeScreen({ navigation }: Props) {
         </View>
       </SafeAreaView>
 
-      {/* Bottom action sheet — slides up in place, no new screen */}
       <SearchActionSheet
         ref={sheetRef}
         savedJourneys={saved}
@@ -138,9 +135,6 @@ const styles = StyleSheet.create({
     paddingRight: Spacing.md,
   },
   topButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
     backgroundColor: Colors.card,
     alignItems: 'center',
     justifyContent: 'center',

@@ -8,6 +8,7 @@ import {
   loadToken,
   login,
   logout,
+  patchRailcard,
   saveToken,
   signup,
 } from '../api/auth'
@@ -24,6 +25,7 @@ type AuthContextValue = {
   signIn: (username: string, password: string) => Promise<AuthResult>
   signUp: (username: string, password: string) => Promise<AuthResult>
   signOut: () => Promise<void>
+  updateRailcard: (railcard: string | null) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -80,6 +82,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { ok: true }
   }
 
+  async function updateRailcard(railcard: string | null): Promise<void> {
+    const updated = await patchRailcard(railcard)
+    if (updated) setUser(updated)
+  }
+
   async function signOut(): Promise<void> {
     // Hit the server while the token is still attached, then clear local state.
     if (getAuthToken()) await logout()
@@ -90,7 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ status, user, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ status, user, signIn, signUp, signOut, updateRailcard }}>
       {children}
     </AuthContext.Provider>
   )

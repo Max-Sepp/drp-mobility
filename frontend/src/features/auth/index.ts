@@ -1,4 +1,5 @@
 export { AccountButton } from './components/AccountButton'
 export { AuthProvider, useAuth } from './context/AuthContext'
+export { AccountScreen } from './screens/AccountScreen'
 export { LoginScreen } from './screens/LoginScreen'
 export { SignupScreen } from './screens/SignupScreen'

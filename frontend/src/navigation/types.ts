@@ -37,6 +37,7 @@ export type RootStackParamList = {
   // dismissed with goBack on success or cancel — there is no login wall.
   Login: undefined
   Signup: undefined
+  Account: undefined
 }
 
 export type MapHomeScreenProps = NativeStackScreenProps<RootStackParamList, 'MapHome'>
@@ -51,3 +52,4 @@ export type ReportCustomScreenProps = NativeStackScreenProps<RootStackParamList,
 export type SuccessScreenProps = NativeStackScreenProps<RootStackParamList, 'Success'>
 export type LoginScreenProps = NativeStackScreenProps<RootStackParamList, 'Login'>
 export type SignupScreenProps = NativeStackScreenProps<RootStackParamList, 'Signup'>
+export type AccountScreenProps = NativeStackScreenProps<RootStackParamList, 'Account'>

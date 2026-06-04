@@ -21,6 +21,7 @@ import {
   stripStationSuffix,
 } from '@/features/journey/components/legDisplay'
 import { OutageDetail } from '@/features/journey/components/OutageDetail'
+import { useAuth } from '@/features/auth'
 import { Borders, Colors, Heights, Opacity, Radii } from '@/theme'
 
 function lineLabel(leg: Leg): string | null {
@@ -80,7 +81,8 @@ export const JourneyDetailScreen = ({ navigation, route }: JourneyDetailScreenPr
     }
   }
 
-  const fare = fareLabel(journey)
+  const { user } = useAuth()
+  const fare = fareLabel(journey, user?.railcard)
   const legTotal = journey.legs.reduce((sum, leg) => sum + leg.duration, 0)
   const waiting = journey.duration - legTotal
   const saved = currentSavedId !== null
