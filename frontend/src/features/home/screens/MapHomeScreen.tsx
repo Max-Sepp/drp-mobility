@@ -1,7 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import { useFocusEffect } from '@react-navigation/native'
 import { useCallback, useRef, useState } from 'react'
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { StationMap, type StationMapHandle } from '@/features/map/components/StationMap'
 import { useAppLocation } from '@/lib/LocationContext'
@@ -116,6 +116,10 @@ export function MapHomeScreen({ navigation }: Props) {
   const mapRef = useRef<StationMapHandle>(null)
   const { status, user } = useAuth()
   const coords = useAppLocation()
+  // Tracks the visible height of the sheet so the map can pad its camera correctly.
+  const [sheetVisibleHeight, setSheetVisibleHeight] = useState(
+    Dimensions.get('window').height * 0.5,
+  )
 
   // Refresh on focus so the banner reflects progress made on the active screen and survives a
   // restart (the record is read from storage each time the map regains focus).
@@ -288,7 +292,7 @@ export function MapHomeScreen({ navigation }: Props) {
 
   return (
     <View style={styles.screen}>
-      <StationMap ref={mapRef} onStationPress={openStation} />
+      <StationMap ref={mapRef} onStationPress={openStation} bottomInset={sheetVisibleHeight} />
 
       {/* Top overlay: icon buttons, then a resume banner when a journey is in progress */}
       <SafeAreaView edges={['top']} style={[styles.topSafe, { pointerEvents: 'box-none' }]}>
@@ -333,6 +337,7 @@ export function MapHomeScreen({ navigation }: Props) {
         onCustomPlacePress={handleCustomPlacePress}
         onCustomPlaceLongPress={handleCustomPlaceLongPress}
         onAddCustomPlace={handleAddCustomPlacePress}
+        onSnapChange={setSheetVisibleHeight}
       />
 
       {setPlaceModal && (

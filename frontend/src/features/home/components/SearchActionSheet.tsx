@@ -295,6 +295,8 @@ type Props = {
   onCustomPlacePress: (place: CustomPlace) => void
   onCustomPlaceLongPress: (place: CustomPlace) => void
   onAddCustomPlace: () => void
+  /** Called whenever the sheet snaps, with the visible height in pixels. */
+  onSnapChange?: (visibleHeight: number) => void
 }
 
 export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
@@ -310,10 +312,14 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
       onCustomPlacePress,
       onCustomPlaceLongPress,
       onAddCustomPlace,
+      onSnapChange,
     },
     ref,
   ) {
     const insets = useSafeAreaInsets()
+    // Stable ref so snapTo's useCallback doesn't need onSnapChange as a dep.
+    const onSnapChangeRef = useRef(onSnapChange)
+    onSnapChangeRef.current = onSnapChange
 
     // Collapsed: just handle zone + search bar + bottom safe area.
     // ~88px of content + bottom inset.
@@ -425,6 +431,12 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
           setTimeout(() => inputRef.current?.focus(), 50)
         }
 
+        const visibleHeight =
+          target === 'full' ? SHEET_H :
+          target === 'mid' ? MID_H :
+          88 + insets.bottom
+        onSnapChangeRef.current?.(visibleHeight)
+
         Animated.spring(translateY, {
           toValue: snapPointsRef.current[target],
           stiffness: 160,
@@ -433,7 +445,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
           useNativeDriver: USE_NATIVE_DRIVER,
         }).start()
       },
-      [translateY],
+      [translateY, insets.bottom],
     )
 
     snapToRef.current = snapTo
