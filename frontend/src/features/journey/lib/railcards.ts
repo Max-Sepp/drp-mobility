@@ -6,6 +6,7 @@ import type { Journey } from '@/features/journey/api/tfl'
 
 export type TravellerTypeCode =
   | 'adult'
+  | 'railcard_holder'
   | 'apprentice'
   | 'student_18plus'
   | '16plus'
@@ -20,18 +21,20 @@ export type TravellerType = {
   name: string
   description: string
   discount: number // fraction off total PAYG fare (0 = no discount, 0.5 = half price)
+  railcardOnly?: boolean // true = discount only applies when railcardApplies(journey) is true
 }
 
 export const TRAVELLER_TYPES: TravellerType[] = [
-  { code: 'adult',        name: 'Adult',                      description: 'Standard adult fare',                             discount: 0     },
-  { code: 'apprentice',   name: 'Apprentice',                 description: '50% off adult pay-as-you-go fares',               discount: 0.5   },
-  { code: 'student_18plus', name: '18+ Student',              description: 'No discount on pay-as-you-go fares',              discount: 0     },
-  { code: '16plus',       name: '16+',                        description: '50% off Tube & rail, free bus & tram',            discount: 0.5   },
-  { code: '11_15',        name: '11–15',                      description: '50% off Tube & rail, free bus & tram',            discount: 0.5   },
-  { code: '5_10',         name: '5–10',                       description: 'Free travel on all TfL services',                 discount: 1     },
-  { code: 'jobcentre',    name: 'Jobcentre Plus',             description: '50% off adult pay-as-you-go fares',               discount: 0.5   },
-  { code: 'disabled',     name: 'Disabled Persons Railcard',  description: '1/3 off fares (Oyster registered)',               discount: 1 / 3 },
-  { code: 'veterans',     name: 'Veterans',                   description: 'Free travel on all TfL services',                 discount: 1     },
+  { code: 'adult',          name: 'Adult',                     description: 'Standard adult fare',                                                                                        discount: 0,     },
+  { code: 'railcard_holder', name: 'Railcard Holder',          description: '1/3 off Tube, Overground, National Rail, DLR & Elizabeth line fares. Requires a valid railcard (e.g. 16-25, Senior) linked to your Oyster card. Does not apply to buses or trams.', discount: 1 / 3, railcardOnly: true },
+  { code: 'apprentice',     name: 'Apprentice',                description: '50% off adult pay-as-you-go fares',                                                                          discount: 0.5,   },
+  { code: 'student_18plus', name: '18+ Student',               description: 'No discount on pay-as-you-go fares',                                                                         discount: 0,     },
+  { code: '16plus',         name: '16+',                       description: '50% off Tube & rail, free bus & tram',                                                                        discount: 0.5,   },
+  { code: '11_15',          name: '11–15',                     description: '50% off Tube & rail, free bus & tram',                                                                        discount: 0.5,   },
+  { code: '5_10',           name: '5–10',                      description: 'Free travel on all TfL services',                                                                             discount: 1,     },
+  { code: 'jobcentre',      name: 'Jobcentre Plus',            description: '50% off adult pay-as-you-go fares',                                                                           discount: 0.5,   },
+  { code: 'disabled',       name: 'Disabled Persons Railcard', description: '1/3 off fares (Oyster registered)',                                                                           discount: 1 / 3, },
+  { code: 'veterans',       name: 'Veterans',                  description: 'Free travel on all TfL services',                                                                             discount: 1,     },
 ]
 
 // ---------------------------------------------------------------------------
@@ -95,7 +98,9 @@ export function effectiveDiscount(
   travellerType: string | null | undefined,
   railcard: string | null | undefined,
 ): number {
-  const td = TRAVELLER_TYPES.find((t) => t.code === travellerType)?.discount ?? 0
+  const tt = TRAVELLER_TYPES.find((t) => t.code === travellerType)
+  const rawTd = tt?.discount ?? 0
+  const td = tt?.railcardOnly ? (railcardApplies(journey) ? rawTd : 0) : rawTd
   const hasRailcard = railcard ? RAILCARDS.some((r) => r.code === railcard) : false
   const rd = hasRailcard && railcardApplies(journey) ? RAILCARD_DISCOUNT : 0
   return Math.max(td, rd)

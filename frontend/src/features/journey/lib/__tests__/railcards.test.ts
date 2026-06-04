@@ -165,6 +165,26 @@ describe('effectiveDiscount', () => {
   it('null traveller type and null railcard → 0', () => {
     expect(effectiveDiscount(railJourney, null, null)).toBe(0)
   })
+
+  it('railcard_holder on a rail journey → 1/3', () => {
+    expect(effectiveDiscount(railJourney, 'railcard_holder', null)).toBeCloseTo(1 / 3)
+  })
+
+  it('railcard_holder on a bus-only journey → 0 (railcardOnly flag)', () => {
+    expect(effectiveDiscount(busJourney, 'railcard_holder', null)).toBe(0)
+  })
+
+  it('railcard_holder on a tram-only journey → 0 (railcardOnly flag)', () => {
+    expect(effectiveDiscount(tramJourney, 'railcard_holder', null)).toBe(0)
+  })
+
+  it('railcard_holder on a mixed tram+rail journey → 1/3 (rail leg present)', () => {
+    expect(effectiveDiscount(mixedTramRail, 'railcard_holder', null)).toBeCloseTo(1 / 3)
+  })
+
+  it('railcard_holder on a mixed tube+bus journey → 1/3 (rail leg present)', () => {
+    expect(effectiveDiscount(mixedRailBus, 'railcard_holder', null)).toBeCloseTo(1 / 3)
+  })
 })
 
 // ---------------------------------------------------------------------------
