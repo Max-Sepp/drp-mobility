@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Alert } from 'react-native'
 import { Text, XStack, YStack } from 'tamagui'
 import { ScreenHeader } from '@/components/ScreenHeader'
-import { AccountButton } from '@/features/auth'
+import { AccountButton, useAuth } from '@/features/auth'
 import { useStations } from '@/features/stations'
 import { FormScreenLayout } from '@/features/reporting/components/FormScreenLayout'
 import type { JourneyPlannerScreenProps } from '@/navigation/types'
@@ -69,12 +69,14 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
   )
   const openStation = (station: string) => navigation.navigate('Station', { station })
 
+  // Count of saved journeys for the header badge, refreshed on focus and on auth status change.
+  const { status } = useAuth()
   const [savedCount, setSavedCount] = useState(0)
   useEffect(() => {
     const reload = () => loadSavedJourneys().then((s) => setSavedCount(s.length))
     reload()
     return navigation.addListener('focus', reload)
-  }, [navigation])
+  }, [navigation, status])
 
   const handleCurrentLocation = useCallback(async (silent = false) => {
     setGettingLocation(true)

@@ -5,23 +5,33 @@ import { TamaguiProvider } from 'tamagui'
 import { tamaguiConfig } from './tamagui.config'
 import { AuthProvider } from './src/features/auth'
 import { OutageProvider } from './src/features/outages'
+import { usePushNotifications } from './src/hooks/usePushNotifications'
 import { LocationProvider } from './src/lib/LocationContext'
+import { navigationRef } from './src/navigation/navigationRef'
 import RootNavigator from './src/navigation/RootNavigator'
+
+// Separate component so usePushNotifications can access AuthContext via useAuth().
+function AppContent() {
+  usePushNotifications()
+  return (
+    <OutageProvider>
+      <SafeAreaProvider>
+        <LocationProvider>
+          <NavigationContainer ref={navigationRef}>
+            <RootNavigator />
+            <StatusBar style="auto" />
+          </NavigationContainer>
+        </LocationProvider>
+      </SafeAreaProvider>
+    </OutageProvider>
+  )
+}
 
 export default function App() {
   return (
     <TamaguiProvider config={tamaguiConfig} defaultTheme="light">
       <AuthProvider>
-        <OutageProvider>
-          <SafeAreaProvider>
-            <LocationProvider>
-              <NavigationContainer>
-                <RootNavigator />
-                <StatusBar style="auto" />
-              </NavigationContainer>
-            </LocationProvider>
-          </SafeAreaProvider>
-        </OutageProvider>
+        <AppContent />
       </AuthProvider>
     </TamaguiProvider>
   )

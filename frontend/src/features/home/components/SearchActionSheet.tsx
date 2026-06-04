@@ -29,9 +29,6 @@ import {
   View,
 } from 'react-native'
 import type { CustomPlace, SavedPlaces } from '@/features/journey/api/savedPlaces'
-
-// useNativeDriver is not available on web (no native animation module).
-const USE_NATIVE_DRIVER = Platform.OS !== 'web'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { clockTime } from '@/features/journey/components/legDisplay'
 import type { SavedJourney } from '@/features/journey/api/savedJourneys'
@@ -46,6 +43,9 @@ import { useStations, type StationDetail } from '@/features/stations/useStations
 import { fuzzyScore } from '@/lib/fuzzy'
 import { useAppLocation } from '@/lib/LocationContext'
 import { Colors, Radii, Shadows, Spacing, Typography } from '@/theme'
+
+// useNativeDriver is not available on web (no native animation module).
+const USE_NATIVE_DRIVER = Platform.OS !== 'web'
 
 // ---------------------------------------------------------------------------
 // Geometry

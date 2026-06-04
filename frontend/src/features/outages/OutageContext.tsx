@@ -1,14 +1,14 @@
 import { createContext, type ReactNode, useContext, useEffect, useRef, useState } from 'react'
 import EventSource from 'react-native-sse'
 import { BASE_URL } from '@/api/client'
-import { loadOutages, saveOutages } from './outageStorage'
+import { loadOutages, saveOutages } from '@/features/outages/outageStorage'
 import type {
   DeletedData,
   OutageReport,
   OutageStreamEvent,
   ResolvedData,
   SnapshotData,
-} from './types'
+} from '@/features/outages/types'
 
 type OutageContextValue = {
   /** The current open-outage feed across all stations, newest first. */
@@ -70,10 +70,15 @@ export function OutageProvider({ children }: { children: ReactNode }) {
   }, [reports])
 
   useEffect(() => {
+    console.log('[outages] opening SSE to', STREAM_URL)
     const es = new EventSource<OutageStreamEvent>(STREAM_URL)
 
-    es.addEventListener('open', () => setConnected(true))
-    es.addEventListener('error', () => {
+    es.addEventListener('open', () => {
+      console.log('[outages] SSE open')
+      setConnected(true)
+    })
+    es.addEventListener('error', (event) => {
+      console.log('[outages] SSE error', JSON.stringify(event))
       setConnected(false)
       // Don't spin forever if the server is unreachable — fall back to whatever is cached.
       setLoading(false)
@@ -82,6 +87,7 @@ export function OutageProvider({ children }: { children: ReactNode }) {
     es.addEventListener('snapshot', (event) => {
       receivedSnapshot.current = true
       const { reports: next } = JSON.parse(event.data ?? '{"reports":[]}') as SnapshotData
+      console.log('[outages] snapshot:', next.length, 'reports')
       setReports([...next].sort(byBreakdownDesc))
       setLoading(false)
     })

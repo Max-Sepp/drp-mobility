@@ -3,7 +3,7 @@ import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Text, XStack } from 'tamagui'
 import type { RootStackParamList } from '@/navigation/types'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '@/features/auth/context/AuthContext'
 
 /** Header affordance: "Log in" when anonymous, the username + "Log out" when authenticated. */
 export const AccountButton = () => {

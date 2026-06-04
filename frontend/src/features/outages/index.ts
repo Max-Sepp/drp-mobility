@@ -1,2 +1,2 @@
-export { OutageProvider, useOutages } from './OutageContext'
-export type { OutageReport } from './types'
+export { OutageProvider, useOutages } from '@/features/outages/OutageContext'
+export type { OutageReport } from '@/features/outages/types'
