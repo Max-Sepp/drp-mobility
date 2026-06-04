@@ -175,7 +175,7 @@ export function MapHomeScreen({ navigation }: Props) {
 
       {/* Top overlay: icon buttons, then a resume banner when a journey is in progress */}
       <SafeAreaView edges={['top']} style={[styles.topSafe, { pointerEvents: 'box-none' }]}>
-        <View style={styles.topButtons}>
+        <View style={styles.topButtons} pointerEvents="box-none">
           <TopIconButton
             icon="accessible"
             onPress={() =>

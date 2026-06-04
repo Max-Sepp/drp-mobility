@@ -6,7 +6,7 @@
 // Dismiss mirrors this in reverse before calling navigation.goBack().
 
 import { MaterialIcons } from '@expo/vector-icons'
-import { useEffect, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Animated,
   Dimensions,
@@ -35,8 +35,8 @@ const CARD_HEIGHT = SCREEN_H * 0.78
 
 function useSlideUp() {
   // 0 = card fully visible; CARD_HEIGHT = card fully off-screen at bottom
-  const slideY = useRef(new Animated.Value(CARD_HEIGHT)).current
-  const backdropOpacity = useRef(new Animated.Value(0)).current
+  const [slideY] = useState(() => new Animated.Value(CARD_HEIGHT))
+  const [backdropOpacity] = useState(() => new Animated.Value(0))
 
   function enter() {
     // Two-phase spring for extra frames:

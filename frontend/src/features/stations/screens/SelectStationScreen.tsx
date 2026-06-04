@@ -54,7 +54,7 @@ export const SelectStationScreen = ({ navigation, route }: SelectStationScreenPr
       ) : error ? (
         <YStack flex={1} items="center" justify="center" px="$6">
           <Text color={Colors.dangerDark} fontSize={15} style={{ textAlign: 'center' }}>
-            Couldn't load stations. Check your connection and try again.
+            Couldn&apos;t load stations. Check your connection and try again.
           </Text>
         </YStack>
       ) : (
