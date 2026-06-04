@@ -1,6 +1,7 @@
 import * as Location from 'expo-location'
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
+import { Platform } from 'react-native'
 
 type Coords = Location.LocationObject['coords']
 
@@ -36,13 +37,15 @@ export function LocationProvider({ children }: { children: ReactNode }) {
         posSubRef.current = sub
       })
 
-      Location.watchHeadingAsync((h) => {
-        const deg = h.trueHeading >= 0 ? h.trueHeading : h.magHeading
-        setHeading(deg >= 0 ? deg : null)
-      }).then((sub) => {
-        if (cancelled) { sub.remove(); return }
-        headSubRef.current = sub as unknown as Location.LocationSubscription
-      })
+      if (Platform.OS !== 'web') {
+        Location.watchHeadingAsync((h) => {
+          const deg = h.trueHeading >= 0 ? h.trueHeading : h.magHeading
+          setHeading(deg >= 0 ? deg : null)
+        }).then((sub) => {
+          if (cancelled) { sub.remove(); return }
+          headSubRef.current = sub as unknown as Location.LocationSubscription
+        })
+      }
     })
 
     return () => {
