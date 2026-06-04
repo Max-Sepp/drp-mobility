@@ -22,8 +22,8 @@ export const AccountButton = () => {
         onPress={() => {
           void signOut()
         }}
-        accessibilityRole="button"
-        accessibilityLabel={`Logged in as ${user.username}, log out`}
+        role="button"
+        aria-label={`Logged in as ${user.username}, log out`}
       >
         <Ionicons name="log-out-outline" size={18} color="#2563eb" />
         <Text fontSize={14} fontWeight="600" color="#2563eb" numberOfLines={1}>
@@ -39,8 +39,8 @@ export const AccountButton = () => {
       gap="$1"
       pressStyle={{ opacity: 0.6 }}
       onPress={() => navigation.navigate('Login')}
-      accessibilityRole="button"
-      accessibilityLabel="Log in"
+      role="button"
+      aria-label="Log in"
     >
       <Ionicons name="person-circle-outline" size={18} color="#2563eb" />
       <Text fontSize={14} fontWeight="600" color="#2563eb">
