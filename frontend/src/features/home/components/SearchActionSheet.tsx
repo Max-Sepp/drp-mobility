@@ -28,6 +28,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
+import type { CustomPlace, SavedPlaces } from '@/features/journey/api/savedPlaces'
 
 // useNativeDriver is not available on web (no native animation module).
 const USE_NATIVE_DRIVER = Platform.OS !== 'web'
@@ -70,31 +71,116 @@ export type SearchActionSheetHandle = {
 // Internal sub-components
 // ---------------------------------------------------------------------------
 
-const PLACES = [
-  { key: 'home', icon: 'home' as const, label: 'Home' },
-  { key: 'work', icon: 'work' as const, label: 'Work' },
-  { key: 'add', icon: 'add' as const, label: 'Add' },
+const NAMED_PLACES: { key: 'home' | 'work'; icon: 'home' | 'work'; label: string }[] = [
+  { key: 'home', icon: 'home', label: 'Home' },
+  { key: 'work', icon: 'work', label: 'Work' },
 ]
 
-function PlacesRow() {
+function PlacesRow({
+  savedPlaces,
+  onPress,
+  onLongPress,
+  onCustomPlacePress,
+  onCustomPlaceLongPress,
+  onAddPress,
+}: {
+  savedPlaces: SavedPlaces
+  onPress: (key: 'home' | 'work') => void
+  onLongPress: (key: 'home' | 'work') => void
+  onCustomPlacePress: (place: CustomPlace) => void
+  onCustomPlaceLongPress: (place: CustomPlace) => void
+  onAddPress: () => void
+}) {
+  const [scrollX, setScrollX] = useState(0)
+  const [containerWidth, setContainerWidth] = useState(0)
+
+  // Compute content width directly from tile count — avoids onContentSizeChange
+  // being unreliable on web (it reports scrollWidth = clientWidth).
+  // Tile width is from styles.placesTile (64px), gap is Spacing.md (12px).
+  const tileCount = NAMED_PLACES.length + savedPlaces.custom.length + 1 // +1 for Add
+  const contentWidth = tileCount * 64 + (tileCount - 1) * Spacing.md
+
+  const scrollable = containerWidth > 0 && contentWidth > containerWidth
+  const thumbWidth = scrollable
+    ? Math.max(24, (containerWidth / contentWidth) * containerWidth)
+    : 0
+  const thumbLeft = scrollable
+    ? (scrollX / (contentWidth - containerWidth)) * (containerWidth - thumbWidth)
+    : 0
+
   return (
     <View style={styles.placesSection}>
       <Text style={styles.sectionLabel}>PLACES</Text>
-      <View style={styles.placesRow}>
-        {PLACES.map(({ key, icon, label }) => (
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.placesRow}
+        onScroll={(e) => setScrollX(e.nativeEvent.contentOffset.x)}
+        onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}
+        scrollEventThrottle={16}
+      >
+        {NAMED_PLACES.map(({ key, icon, label }) => {
+          const saved = Boolean(savedPlaces[key])
+          return (
+            <TouchableOpacity
+              key={key}
+              style={styles.placesTile}
+              activeOpacity={0.75}
+              onPress={() => onPress(key)}
+              onLongPress={() => onLongPress(key)}
+              accessibilityRole="button"
+              accessibilityLabel={saved ? `${label}: ${savedPlaces[key]!.address}` : `Set ${label}`}
+              accessibilityHint={saved ? 'Tap to plan journey. Long press to edit or remove.' : 'Tap to set your address'}
+            >
+              <View style={[styles.placesTileIcon, saved && styles.placesTileIconSaved]}>
+                <MaterialIcons name={icon} size={22} color={saved ? Colors.card : Colors.blue} />
+              </View>
+              <Text style={[Typography.label, { color: Colors.text, marginTop: 4 }]}>{label}</Text>
+            </TouchableOpacity>
+          )
+        })}
+        {savedPlaces.custom.map((place) => (
           <TouchableOpacity
-            key={key}
+            key={place.id}
             style={styles.placesTile}
             activeOpacity={0.75}
-            onPress={() => Alert.alert('Coming soon', 'This feature is not yet available.')}
+            onPress={() => onCustomPlacePress(place)}
+            onLongPress={() => onCustomPlaceLongPress(place)}
+            accessibilityRole="button"
+            accessibilityLabel={`${place.name}: ${place.address}`}
+            accessibilityHint="Tap to plan journey. Long press to remove."
           >
-            <View style={styles.placesTileIcon}>
-              <MaterialIcons name={icon} size={22} color={Colors.blue} />
+            <View style={[styles.placesTileIcon, styles.placesTileIconSaved]}>
+              <MaterialIcons
+                name={place.icon as keyof typeof MaterialIcons.glyphMap}
+                size={22}
+                color={Colors.card}
+              />
             </View>
-            <Text style={[Typography.label, { color: Colors.text, marginTop: 4 }]}>{label}</Text>
+            <Text
+              style={[Typography.label, { color: Colors.text, marginTop: 4 }]}
+              numberOfLines={1}
+            >
+              {place.name}
+            </Text>
           </TouchableOpacity>
         ))}
-      </View>
+        <TouchableOpacity
+          style={styles.placesTile}
+          activeOpacity={0.75}
+          onPress={onAddPress}
+        >
+          <View style={styles.placesTileIcon}>
+            <MaterialIcons name="add" size={22} color={Colors.blue} />
+          </View>
+          <Text style={[Typography.label, { color: Colors.text, marginTop: 4 }]}>Add</Text>
+        </TouchableOpacity>
+      </ScrollView>
+      {scrollable && (
+        <View style={styles.scrollbarTrack}>
+          <View style={[styles.scrollbarThumb, { width: thumbWidth, transform: [{ translateX: thumbLeft }] }]} />
+        </View>
+      )}
     </View>
   )
 }
@@ -174,14 +260,31 @@ function LocationResultRow({
 
 type Props = {
   savedJourneys: SavedJourney[]
+  savedPlaces: SavedPlaces
   onSavedJourneyPress: (item: SavedJourney) => void
   onStationPress: (stationName: string) => void
   onLocationSelect: (from: ResolvedLocation | undefined, to: ResolvedLocation) => void
+  onPlacePress: (key: 'home' | 'work') => void
+  onPlaceLongPress: (key: 'home' | 'work') => void
+  onCustomPlacePress: (place: CustomPlace) => void
+  onCustomPlaceLongPress: (place: CustomPlace) => void
+  onAddCustomPlace: () => void
 }
 
 export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
   function SearchActionSheet(
-    { savedJourneys, onSavedJourneyPress, onStationPress, onLocationSelect },
+    {
+      savedJourneys,
+      savedPlaces,
+      onSavedJourneyPress,
+      onStationPress,
+      onLocationSelect,
+      onPlacePress,
+      onPlaceLongPress,
+      onCustomPlacePress,
+      onCustomPlaceLongPress,
+      onAddCustomPlace,
+    },
     ref,
   ) {
     const insets = useSafeAreaInsets()
@@ -453,7 +556,14 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
           </ScrollView>
         ) : (
           <>
-            <PlacesRow />
+            <PlacesRow
+              savedPlaces={savedPlaces}
+              onPress={onPlacePress}
+              onLongPress={onPlaceLongPress}
+              onCustomPlacePress={onCustomPlacePress}
+              onCustomPlaceLongPress={onCustomPlaceLongPress}
+              onAddPress={onAddCustomPlace}
+            />
 
             <View>
               <Text style={styles.sectionLabel}>SAVED JOURNEYS</Text>
@@ -565,6 +675,21 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.searchBg,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  placesTileIconSaved: {
+    backgroundColor: Colors.blue,
+  },
+  scrollbarTrack: {
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: Colors.separator,
+    marginTop: Spacing.sm,
+    overflow: 'hidden',
+  },
+  scrollbarThumb: {
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: Colors.tertiaryText,
   },
 
   // Saved journeys

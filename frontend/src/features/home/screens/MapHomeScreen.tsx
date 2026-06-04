@@ -10,6 +10,15 @@ import {
   loadActiveJourney,
   type ActiveJourney,
 } from '@/features/journey/api/activeJourney'
+import {
+  addCustomPlace,
+  clearPlace,
+  loadSavedPlaces,
+  removeCustomPlace,
+  savePlace,
+  type CustomPlace,
+  type SavedPlaces,
+} from '@/features/journey/api/savedPlaces'
 import { humanizeSummary } from '@/features/journey/components/legDisplay'
 import { useAuth } from '@/features/auth'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
@@ -20,6 +29,8 @@ import {
   SearchActionSheet,
   type SearchActionSheetHandle,
 } from '@/features/home/components/SearchActionSheet'
+import { SetPlaceModal } from '@/features/home/components/SetPlaceModal'
+import { AddCustomPlaceModal } from '@/features/home/components/AddCustomPlaceModal'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'MapHome'>
 
@@ -97,6 +108,9 @@ function ActiveJourneyBanner({
 export function MapHomeScreen({ navigation }: Props) {
   const [saved, setSaved] = useState<SavedJourney[]>([])
   const [active, setActive] = useState<ActiveJourney | null>(null)
+  const [savedPlaces, setSavedPlaces] = useState<SavedPlaces>({ custom: [] })
+  const [setPlaceModal, setSetPlaceModal] = useState<{ key: 'home' | 'work' } | null>(null)
+  const [addCustomPlaceVisible, setAddCustomPlaceVisible] = useState(false)
   const sheetRef = useRef<SearchActionSheetHandle>(null)
   const { status, user } = useAuth()
 
@@ -106,8 +120,104 @@ export function MapHomeScreen({ navigation }: Props) {
     useCallback(() => {
       loadSavedJourneys().then(setSaved)
       loadActiveJourney().then(setActive)
-    }, []),
+      if (user) loadSavedPlaces(user.id).then(setSavedPlaces)
+      else setSavedPlaces({ custom: [] })
+    }, [user]),
   )
+
+  function handlePlacePress(key: 'home' | 'work') {
+    if (status === 'loading') return
+    if (status !== 'authed' || !user) {
+      navigation.navigate('Login')
+      return
+    }
+    const place = savedPlaces[key]
+    if (!place) {
+      setSetPlaceModal({ key })
+      return
+    }
+    const label = key === 'home' ? 'Home' : 'Work'
+    navigation.navigate('JourneyPlanner', {
+      initialTo: { postcode: place.postcode, label, isNamedPlace: true },
+    })
+  }
+
+  function handlePlaceLongPress(key: 'home' | 'work') {
+    if (status !== 'authed' || !user) return
+    const place = savedPlaces[key]
+    if (!place) {
+      setSetPlaceModal({ key })
+      return
+    }
+    const label = key === 'home' ? 'Home' : 'Work'
+    Alert.alert(`${label}: ${place.address}`, undefined, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: `Change ${label}`,
+        onPress: () => setSetPlaceModal({ key }),
+      },
+      {
+        text: `Remove ${label}`,
+        style: 'destructive',
+        onPress: async () => {
+          await clearPlace(user.id, key)
+          setSavedPlaces((prev) => {
+            const next = { ...prev }
+            delete next[key]
+            return next
+          })
+        },
+      },
+    ])
+  }
+
+  async function handleSavePlace(address: string, postcode: string) {
+    if (!user || !setPlaceModal) return
+    const key = setPlaceModal.key
+    await savePlace(user.id, key, { address, postcode })
+    const updated = await loadSavedPlaces(user.id)
+    setSavedPlaces(updated)
+    setSetPlaceModal(null)
+  }
+
+  function handleAddCustomPlacePress() {
+    if (status === 'loading') return
+    if (status !== 'authed' || !user) {
+      navigation.navigate('Login')
+      return
+    }
+    setAddCustomPlaceVisible(true)
+  }
+
+  async function handleSaveCustomPlace(place: Omit<CustomPlace, 'id'>) {
+    if (!user) return
+    await addCustomPlace(user.id, place)
+    const updated = await loadSavedPlaces(user.id)
+    setSavedPlaces(updated)
+    setAddCustomPlaceVisible(false)
+  }
+
+  function handleCustomPlacePress(place: CustomPlace) {
+    navigation.navigate('JourneyPlanner', {
+      initialTo: { postcode: place.postcode, label: place.name, isNamedPlace: true },
+    })
+  }
+
+  function handleCustomPlaceLongPress(place: CustomPlace) {
+    if (!user) return
+    Alert.alert(place.name, place.address, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Remove',
+        style: 'destructive',
+        onPress: async () => {
+          await removeCustomPlace(user.id, place.id)
+          const updated = await loadSavedPlaces(user.id)
+          setSavedPlaces(updated)
+        },
+      },
+    ])
+  }
 
   function resumeActive(item: ActiveJourney) {
     navigation.navigate('ActiveJourney', {
@@ -173,7 +283,7 @@ export function MapHomeScreen({ navigation }: Props) {
 
       {/* Top overlay: icon buttons, then a resume banner when a journey is in progress */}
       <SafeAreaView edges={['top']} style={[styles.topSafe, { pointerEvents: 'box-none' }]}>
-        <View style={styles.topButtons} pointerEvents="box-none">
+        <View style={[styles.topButtons, { pointerEvents: 'box-none' }]}>
           <TopIconButton
             icon="accessible"
             size={50}
@@ -205,9 +315,30 @@ export function MapHomeScreen({ navigation }: Props) {
       <SearchActionSheet
         ref={sheetRef}
         savedJourneys={saved}
+        savedPlaces={savedPlaces}
         onSavedJourneyPress={openSaved}
         onStationPress={openStation}
         onLocationSelect={openJourneyFromTo}
+        onPlacePress={handlePlacePress}
+        onPlaceLongPress={handlePlaceLongPress}
+        onCustomPlacePress={handleCustomPlacePress}
+        onCustomPlaceLongPress={handleCustomPlaceLongPress}
+        onAddCustomPlace={handleAddCustomPlacePress}
+      />
+
+      {setPlaceModal && (
+        <SetPlaceModal
+          visible
+          placeKey={setPlaceModal.key}
+          onSave={handleSavePlace}
+          onDismiss={() => setSetPlaceModal(null)}
+        />
+      )}
+
+      <AddCustomPlaceModal
+        visible={addCustomPlaceVisible}
+        onSave={handleSaveCustomPlace}
+        onDismiss={() => setAddCustomPlaceVisible(false)}
       />
     </View>
   )

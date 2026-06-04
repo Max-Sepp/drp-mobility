@@ -48,6 +48,9 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
   const [fromIsCurrentLocation, setFromIsCurrentLocation] = useState(
     route.params?.initialFrom?.label === 'Current location',
   )
+  const [toIsNamedPlace, setToIsNamedPlace] = useState(
+    Boolean(route.params?.initialTo?.isNamedPlace),
+  )
   const [gettingLocation, setGettingLocation] = useState(false)
   const [level, setLevel] = useState<AccessibilityPreference | null>(null)
   const [departAt, setDepartAt] = useState<Date | null>(null)
@@ -114,14 +117,14 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
     setResults([])
     setResolved(null)
 
-    const resolveField = (text: string, postcode: string | null) =>
+    const resolveField = (text: string, postcode: string | null, isNamedPlace?: boolean) =>
       postcode
-        ? Promise.resolve({ postcode, label: text } as ResolvedLocation)
+        ? Promise.resolve({ postcode, label: text, isNamedPlace } as ResolvedLocation)
         : resolveToPostcode(text)
     const outagesPromise = fetchStationOutages()
     const [fromLoc, toLoc] = await Promise.all([
       resolveField(from, fromPostcode),
-      resolveField(to, toPostcode),
+      resolveField(to, toPostcode, toIsNamedPlace || undefined),
     ])
     if ('error' in fromLoc) {
       setLoading(false)
@@ -201,9 +204,14 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
           <LocationInput
             label="To"
             value={to}
-            onChangeText={setTo}
+            onChangeText={(text) => {
+              setTo(text)
+              setToIsNamedPlace(false)
+            }}
             onResolved={setToPostcode}
             isResolved={toPostcode !== null}
+            textColor={toIsNamedPlace ? Colors.blue : undefined}
+            textBold={toIsNamedPlace}
           />
 
           <YStack gap="$1.5">
@@ -274,13 +282,25 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
             <YStack flex={1} gap="$1">
               <XStack gap="$2" items="center">
                 <MaterialIcons name="trip-origin" size={14} color={Colors.secondaryText} style={{ width: 18 }} />
-                <Text fontSize={14} color={Colors.text} flex={1} numberOfLines={1}>
+                <Text
+                  fontSize={14}
+                  color={resolved.from.isNamedPlace ? Colors.blue : Colors.text}
+                  fontWeight={resolved.from.isNamedPlace ? '700' : '400'}
+                  flex={1}
+                  numberOfLines={1}
+                >
                   {resolved.from.label}
                 </Text>
               </XStack>
               <XStack gap="$2" items="center">
                 <MaterialIcons name="place" size={16} color={Colors.secondaryText} style={{ width: 18 }} />
-                <Text fontSize={14} color={Colors.text} flex={1} numberOfLines={1}>
+                <Text
+                  fontSize={14}
+                  color={resolved.to.isNamedPlace ? Colors.blue : Colors.text}
+                  fontWeight={resolved.to.isNamedPlace ? '700' : '400'}
+                  flex={1}
+                  numberOfLines={1}
+                >
                   {resolved.to.label}
                 </Text>
               </XStack>
