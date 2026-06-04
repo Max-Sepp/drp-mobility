@@ -17,12 +17,14 @@ class UserPublic(BaseModel):
     username: str
     role: str
     railcard: str | None = None
+    traveller_type: str | None = None
 
 
 class UserUpdate(BaseModel):
     """Request body for PATCH /auth/me — all fields optional."""
 
     railcard: str | None = None
+    traveller_type: str | None = None
 
 
 class AuthResponse(BaseModel):

@@ -61,5 +61,5 @@ def update_me(
     repo: UserRepository = Depends(get_user_repo),
 ) -> UserPublic:
     """Update mutable profile fields for the currently authenticated user."""
-    updated = repo.update_railcard(user, payload.railcard)
+    updated = repo.update_profile(user, payload.railcard, payload.traveller_type)
     return UserPublic.model_validate(updated)

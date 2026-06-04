@@ -50,9 +50,14 @@ export async function fetchMe(): Promise<AuthUser | null> {
   return data ?? null
 }
 
-/** Update the authenticated user's railcard preference. Returns the updated user or null on error. */
-export async function patchRailcard(railcard: string | null): Promise<AuthUser | null> {
-  const { data } = await apiClient.PATCH('/auth/me', { body: { railcard } })
+/** Update the authenticated user's traveller type and railcard. Returns the updated user or null on error. */
+export async function patchProfile(
+  travellerType: string | null,
+  railcard: string | null,
+): Promise<AuthUser | null> {
+  const { data } = await apiClient.PATCH('/auth/me', {
+    body: { traveller_type: travellerType, railcard },
+  })
   return data ?? null
 }
 

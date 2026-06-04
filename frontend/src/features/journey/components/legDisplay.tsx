@@ -2,7 +2,7 @@ import { MaterialIcons } from '@expo/vector-icons'
 import { Text, XStack } from 'tamagui'
 import type { ResolvedLocation } from '@/features/journey/api/geocode'
 import type { Journey, RouteTag } from '@/features/journey/api/tfl'
-import { applyRailcardDiscount, railcardApplies } from '@/features/journey/lib/railcards'
+import { effectiveDiscount } from '@/features/journey/lib/railcards'
 import { Borders, Colors, Opacity, Radii } from '@/theme'
 
 export type ResolveStation = (commonName: string) => string | null
@@ -170,13 +170,16 @@ export function clockTime(local: string): string {
  * Pass a railcard code to apply the standard 1/3 discount where applicable. Railcards do not
  * apply to bus-only journeys.
  */
-export function fareLabel(journey: Journey, railcard?: string | null): string | null {
+export function fareLabel(
+  journey: Journey,
+  travellerType?: string | null,
+  railcard?: string | null,
+): string | null {
   const { fare, legs } = journey
   if (fare && fare.totalCost > 0) {
-    const cost =
-      railcard && railcardApplies(journey)
-        ? applyRailcardDiscount(fare.totalCost)
-        : fare.totalCost
+    const discount = effectiveDiscount(journey, travellerType, railcard)
+    const cost = Math.floor(fare.totalCost * (1 - discount))
+    if (cost === 0) return 'Free'
     return `£${(cost / 100).toFixed(2)}`
   }
   const walkingOnly = legs.length > 0 && legs.every((leg) => leg.mode.name === 'walking')

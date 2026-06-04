@@ -8,7 +8,7 @@ import {
   loadToken,
   login,
   logout,
-  patchRailcard,
+  patchProfile,
   saveToken,
   signup,
 } from '../api/auth'
@@ -25,7 +25,7 @@ type AuthContextValue = {
   signIn: (username: string, password: string) => Promise<AuthResult>
   signUp: (username: string, password: string) => Promise<AuthResult>
   signOut: () => Promise<void>
-  updateRailcard: (railcard: string | null) => Promise<void>
+  updateProfile: (travellerType: string | null, railcard: string | null) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -82,8 +82,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { ok: true }
   }
 
-  async function updateRailcard(railcard: string | null): Promise<void> {
-    const updated = await patchRailcard(railcard)
+  async function updateProfile(travellerType: string | null, railcard: string | null): Promise<void> {
+    const updated = await patchProfile(travellerType, railcard)
     if (updated) setUser(updated)
   }
 
@@ -97,7 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ status, user, signIn, signUp, signOut, updateRailcard }}>
+    <AuthContext.Provider value={{ status, user, signIn, signUp, signOut, updateProfile }}>
       {children}
     </AuthContext.Provider>
   )

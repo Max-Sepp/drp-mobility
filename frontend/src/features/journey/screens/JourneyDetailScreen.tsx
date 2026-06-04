@@ -82,7 +82,7 @@ export const JourneyDetailScreen = ({ navigation, route }: JourneyDetailScreenPr
   }
 
   const { user } = useAuth()
-  const fare = fareLabel(journey, user?.railcard)
+  const fare = fareLabel(journey, user?.traveller_type, user?.railcard)
   const legTotal = journey.legs.reduce((sum, leg) => sum + leg.duration, 0)
   const waiting = journey.duration - legTotal
   const saved = currentSavedId !== null

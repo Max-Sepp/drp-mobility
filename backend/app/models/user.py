@@ -30,6 +30,7 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column()
     role: Mapped[str] = mapped_column(default=UserRole.UNTRUSTED.value)
     railcard: Mapped[str | None] = mapped_column(nullable=True, default=None)
+    traveller_type: Mapped[str | None] = mapped_column(nullable=True, default=None)
     created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(tz=timezone.utc))
 
     sessions: Mapped[list["AuthSession"]] = relationship(

@@ -47,8 +47,9 @@ class UserRepository:
     def verify_password(self, user: User, password: str) -> bool:
         return bcrypt.checkpw(password.encode("utf-8"), user.password_hash.encode("utf-8"))
 
-    def update_railcard(self, user: User, railcard: str | None) -> User:
+    def update_profile(self, user: User, railcard: str | None, traveller_type: str | None) -> User:
         user.railcard = railcard
+        user.traveller_type = traveller_type
         self._db.commit()
         self._db.refresh(user)
         return user

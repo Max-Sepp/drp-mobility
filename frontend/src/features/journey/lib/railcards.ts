@@ -1,5 +1,43 @@
 import type { Journey } from '@/features/journey/api/tfl'
 
+// ---------------------------------------------------------------------------
+// Traveller types (TfL Oyster card concession categories)
+// ---------------------------------------------------------------------------
+
+export type TravellerTypeCode =
+  | 'adult'
+  | 'apprentice'
+  | 'student_18plus'
+  | '16plus'
+  | '11_15'
+  | '5_10'
+  | 'jobcentre'
+  | 'disabled'
+  | 'veterans'
+
+export type TravellerType = {
+  code: TravellerTypeCode
+  name: string
+  description: string
+  discount: number // fraction off total PAYG fare (0 = no discount, 0.5 = half price)
+}
+
+export const TRAVELLER_TYPES: TravellerType[] = [
+  { code: 'adult',        name: 'Adult',                      description: 'Standard adult fare',                             discount: 0     },
+  { code: 'apprentice',   name: 'Apprentice',                 description: '50% off adult pay-as-you-go fares',               discount: 0.5   },
+  { code: 'student_18plus', name: '18+ Student',              description: 'No discount on pay-as-you-go fares',              discount: 0     },
+  { code: '16plus',       name: '16+',                        description: '50% off Tube & rail, free bus & tram',            discount: 0.5   },
+  { code: '11_15',        name: '11–15',                      description: '50% off Tube & rail, free bus & tram',            discount: 0.5   },
+  { code: '5_10',         name: '5–10',                       description: 'Free travel on all TfL services',                 discount: 1     },
+  { code: 'jobcentre',    name: 'Jobcentre Plus',             description: '50% off adult pay-as-you-go fares',               discount: 0.5   },
+  { code: 'disabled',     name: 'Disabled Persons Railcard',  description: '1/3 off fares (Oyster registered)',               discount: 1 / 3 },
+  { code: 'veterans',     name: 'Veterans',                   description: 'Free travel on all TfL services',                 discount: 1     },
+]
+
+// ---------------------------------------------------------------------------
+// National Rail railcards
+// ---------------------------------------------------------------------------
+
 export type RailcardCode =
   | 'YNG' // 16-25 Railcard
   | 'Y30' // 26-30 Railcard
@@ -16,39 +54,56 @@ export type Railcard = {
   description: string
 }
 
+// All National Rail railcards give 1/3 off eligible rail fares.
+const RAILCARD_DISCOUNT = 1 / 3
+
 export const RAILCARDS: Railcard[] = [
-  { code: 'YNG', name: '16-25 Railcard', description: '1/3 off rail fares' },
-  { code: 'Y30', name: '26-30 Railcard', description: '1/3 off rail fares' },
-  { code: 'SRN', name: 'Senior Railcard', description: '1/3 off rail fares (60+)' },
-  { code: '2TR', name: 'Two Together Railcard', description: '1/3 off when travelling with one other' },
-  { code: 'FAM', name: 'Family & Friends Railcard', description: '1/3 off adult rail fares' },
-  { code: 'DIS', name: 'Disabled Persons Railcard', description: '1/3 off rail fares' },
-  { code: 'HMF', name: 'HM Forces Railcard', description: '1/3 off rail fares' },
-  { code: 'NGC', name: 'Network Railcard', description: '1/3 off off-peak rail fares in Network SE' },
+  { code: 'YNG', name: '16-25 Railcard',              description: '1/3 off rail fares' },
+  { code: 'Y30', name: '26-30 Railcard',              description: '1/3 off rail fares' },
+  { code: 'SRN', name: 'Senior Railcard (60+)',        description: '1/3 off rail fares' },
+  { code: '2TR', name: 'Two Together Railcard',        description: '1/3 off when travelling with one other' },
+  { code: 'FAM', name: 'Family & Friends Railcard',   description: '1/3 off adult rail fares' },
+  { code: 'DIS', name: 'Disabled Persons Railcard',   description: '1/3 off rail fares' },
+  { code: 'HMF', name: 'HM Forces Railcard',          description: '1/3 off rail fares' },
+  { code: 'NGC', name: 'Network Railcard',             description: '1/3 off off-peak rail fares in Network SE' },
 ]
 
-const DISCOUNT = 1 / 3
+// ---------------------------------------------------------------------------
+// Discount calculation
+// ---------------------------------------------------------------------------
 
-// Modes where a railcard gives no discount. Bus and tram are pay-as-you-go Oyster/contactless
-// only; railcards apply to rail-based services.
-const NO_DISCOUNT_MODES = new Set(['bus', 'tram'])
+// Modes where railcards give no discount (bus and tram are Oyster/contactless only).
+const NO_RAILCARD_MODES = new Set(['bus', 'tram'])
 
 /**
- * Returns true if the railcard discount is applicable to this journey. Railcards do not apply
- * to bus-only journeys (every ticketed non-walking leg is a bus or tram).
+ * Returns true if a railcard discount is applicable to this journey — i.e. at least one
+ * ticketed, non-walking leg is not a bus or tram.
  */
 export function railcardApplies(journey: Journey): boolean {
   const ticketed = journey.legs.filter((l) => l.mode.name !== 'walking')
   if (ticketed.length === 0) return false
-  return ticketed.some((l) => !NO_DISCOUNT_MODES.has(l.mode.name))
+  return ticketed.some((l) => !NO_RAILCARD_MODES.has(l.mode.name))
 }
 
 /**
- * Apply a railcard discount to a fare in pence. Returns the discounted amount rounded down to
- * the nearest penny — consistent with how Oyster rounds discounts.
+ * The effective discount fraction for a journey, given the user's traveller type and railcard.
+ * We take the greater of the two discounts — they cannot be stacked.
+ * Railcard discount is only considered when the journey has eligible (non-bus) rail legs.
  */
-export function applyRailcardDiscount(pence: number): number {
-  return Math.floor(pence * (1 - DISCOUNT))
+export function effectiveDiscount(
+  journey: Journey,
+  travellerType: string | null | undefined,
+  railcard: string | null | undefined,
+): number {
+  const td = TRAVELLER_TYPES.find((t) => t.code === travellerType)?.discount ?? 0
+  const hasRailcard = railcard ? RAILCARDS.some((r) => r.code === railcard) : false
+  const rd = hasRailcard && railcardApplies(journey) ? RAILCARD_DISCOUNT : 0
+  return Math.max(td, rd)
+}
+
+export function findTravellerType(code: string | null | undefined): TravellerType | null {
+  if (!code) return null
+  return TRAVELLER_TYPES.find((t) => t.code === code) ?? null
 }
 
 export function findRailcard(code: string | null | undefined): Railcard | null {

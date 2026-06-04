@@ -45,7 +45,7 @@ export const JourneyResultCard = ({
   onPress,
 }: JourneyResultCardProps) => {
   const { user } = useAuth()
-  const fare = fareLabel(journey, user?.railcard)
+  const fare = fareLabel(journey, user?.traveller_type, user?.railcard)
   // TfL's total duration includes interchange/platform waiting that the legs don't account for;
   // the leftover after summing the legs is the time spent waiting and connecting.
   const legTotal = journey.legs.reduce((sum, leg) => sum + leg.duration, 0)

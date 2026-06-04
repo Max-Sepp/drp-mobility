@@ -4,13 +4,13 @@ import { Alert, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { Text, XStack, YStack } from 'tamagui'
 import { ScreenHeader } from '@/components/ScreenHeader'
 import { FormScreenLayout } from '@/features/reporting/components/FormScreenLayout'
-import { RAILCARDS, findRailcard } from '@/features/journey/lib/railcards'
+import { RAILCARDS, TRAVELLER_TYPES } from '@/features/journey/lib/railcards'
 import type { AccountScreenProps } from '@/navigation/types'
 import { Borders, Colors, Radii, Shadows, Spacing, Typography } from '@/theme'
 import { useAuth } from '../context/AuthContext'
 
 export const AccountScreen = ({ navigation }: AccountScreenProps) => {
-  const { user, signOut, updateRailcard } = useAuth()
+  const { user, signOut, updateProfile } = useAuth()
   const [saving, setSaving] = useState(false)
 
   if (!user) {
@@ -18,14 +18,12 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
     return null
   }
 
-  const current = findRailcard(user.railcard)
-
-  async function handleSelect(code: string | null) {
+  async function handleSelect(travellerType: string | null, railcard: string | null) {
     setSaving(true)
     try {
-      await updateRailcard(code)
+      await updateProfile(travellerType, railcard)
     } catch {
-      Alert.alert('Error', 'Could not save your railcard. Please try again.')
+      Alert.alert('Error', 'Could not save your preferences. Please try again.')
     } finally {
       setSaving(false)
     }
@@ -45,14 +43,18 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
     ])
   }
 
+  const currentTravellerType = user.traveller_type ?? 'adult'
+  const currentRailcard = user.railcard ?? null
+
   return (
     <FormScreenLayout
       header={<ScreenHeader title="Account" onBack={() => navigation.goBack()} />}
       footer={null}
     >
       <YStack px="$5" mt="$5" gap="$6">
+
         {/* Username */}
-        <YStack gap="$1">
+        <YStack gap="$2">
           <Text style={styles.sectionLabel}>SIGNED IN AS</Text>
           <View style={styles.card}>
             <XStack items="center" gap="$3">
@@ -62,40 +64,23 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
           </View>
         </YStack>
 
-        {/* Railcard picker */}
+        {/* Traveller type */}
         <YStack gap="$2">
-          <Text style={styles.sectionLabel}>RAILCARD</Text>
-          <Text style={styles.sectionHint}>
-            Your 1/3 discount is applied to rail fares in journey results. Railcards do not apply
-            to bus-only journeys.
-          </Text>
-
-          {/* None option */}
-          <TouchableOpacity
-            style={[styles.railcardRow, !current && styles.railcardRowSelected]}
-            onPress={() => !saving && handleSelect(null)}
-            activeOpacity={0.7}
-          >
-            <Text style={[styles.railcardName, !current && styles.railcardNameSelected]}>
-              No railcard
-            </Text>
-            {!current && <Ionicons name="checkmark" size={20} color={Colors.blue} />}
-          </TouchableOpacity>
-
-          {RAILCARDS.map((rc) => {
-            const selected = user.railcard === rc.code
+          <Text style={styles.sectionLabel}>TRAVELLER TYPE</Text>
+          {TRAVELLER_TYPES.map((tt) => {
+            const selected = currentTravellerType === tt.code
             return (
               <TouchableOpacity
-                key={rc.code}
-                style={[styles.railcardRow, selected && styles.railcardRowSelected]}
-                onPress={() => !saving && handleSelect(rc.code)}
+                key={tt.code}
+                style={[styles.row, selected && styles.rowSelected]}
+                onPress={() => !saving && handleSelect(tt.code, currentRailcard)}
                 activeOpacity={0.7}
               >
                 <YStack flex={1} gap="$0.5">
-                  <Text style={[styles.railcardName, selected && styles.railcardNameSelected]}>
-                    {rc.name}
+                  <Text style={[styles.rowName, selected && styles.rowNameSelected]}>
+                    {tt.name}
                   </Text>
-                  <Text style={styles.railcardDesc}>{rc.description}</Text>
+                  <Text style={styles.rowDesc}>{tt.description}</Text>
                 </YStack>
                 {selected && <Ionicons name="checkmark" size={20} color={Colors.blue} />}
               </TouchableOpacity>
@@ -103,11 +88,56 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
           })}
         </YStack>
 
+        {/* Railcard */}
+        <YStack gap="$2">
+          <Text style={styles.sectionLabel}>RAILCARD</Text>
+
+          {/* None */}
+          <TouchableOpacity
+            style={[styles.row, !currentRailcard && styles.rowSelected]}
+            onPress={() => !saving && handleSelect(currentTravellerType, null)}
+            activeOpacity={0.7}
+          >
+            <Text style={[styles.rowName, !currentRailcard && styles.rowNameSelected]}>
+              None
+            </Text>
+            {!currentRailcard && <Ionicons name="checkmark" size={20} color={Colors.blue} />}
+          </TouchableOpacity>
+
+          {RAILCARDS.map((rc) => {
+            const selected = currentRailcard === rc.code
+            return (
+              <TouchableOpacity
+                key={rc.code}
+                style={[styles.row, selected && styles.rowSelected]}
+                onPress={() => !saving && handleSelect(currentTravellerType, rc.code)}
+                activeOpacity={0.7}
+              >
+                <YStack flex={1} gap="$0.5">
+                  <Text style={[styles.rowName, selected && styles.rowNameSelected]}>
+                    {rc.name}
+                  </Text>
+                  <Text style={styles.rowDesc}>{rc.description}</Text>
+                </YStack>
+                {selected && <Ionicons name="checkmark" size={20} color={Colors.blue} />}
+              </TouchableOpacity>
+            )
+          })}
+
+          <XStack gap="$2" items="flex-start" mt="$1">
+            <Ionicons name="information-circle-outline" size={15} color={Colors.secondaryText} style={{ marginTop: 1 }} />
+            <Text style={styles.notice}>
+              Railcard discounts only apply when your railcard is registered with your Oyster card.
+            </Text>
+          </XStack>
+        </YStack>
+
         {/* Sign out */}
         <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut} activeOpacity={0.7}>
           <Ionicons name="log-out-outline" size={20} color={Colors.danger} />
           <Text style={styles.signOutLabel}>Log out</Text>
         </TouchableOpacity>
+
       </YStack>
     </FormScreenLayout>
   )
@@ -119,13 +149,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: Colors.secondaryText,
     letterSpacing: 0.8,
-    marginBottom: Spacing.xs,
-  },
-  sectionHint: {
-    fontSize: 13,
-    color: Colors.secondaryText,
-    lineHeight: 18,
-    marginBottom: Spacing.xs,
   },
   card: {
     backgroundColor: Colors.card,
@@ -136,11 +159,11 @@ const styles = StyleSheet.create({
     ...Shadows.card,
   },
   username: {
-    fontSize: Typography.body.fontSize,
+    ...Typography.body,
     fontWeight: '600',
     color: Colors.text,
   },
-  railcardRow: {
+  row: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -151,22 +174,28 @@ const styles = StyleSheet.create({
     padding: Spacing.md,
     ...Shadows.card,
   },
-  railcardRowSelected: {
+  rowSelected: {
     borderColor: Colors.blue,
     backgroundColor: Colors.blueBg,
   },
-  railcardName: {
+  rowName: {
     fontSize: 15,
     fontWeight: '500',
     color: Colors.text,
   },
-  railcardNameSelected: {
+  rowNameSelected: {
     color: Colors.blue,
     fontWeight: '600',
   },
-  railcardDesc: {
+  rowDesc: {
     fontSize: 13,
     color: Colors.secondaryText,
+  },
+  notice: {
+    fontSize: 13,
+    color: Colors.secondaryText,
+    flex: 1,
+    lineHeight: 18,
   },
   signOutButton: {
     flexDirection: 'row',

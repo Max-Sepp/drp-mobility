@@ -492,6 +492,8 @@ export interface components {
             role: string;
             /** Railcard */
             railcard?: string | null;
+            /** Traveller Type */
+            traveller_type?: string | null;
         };
         /** ValidationError */
         ValidationError: {
@@ -631,6 +633,8 @@ export interface operations {
                 "application/json": {
                     /** Railcard */
                     railcard?: string | null;
+                    /** Traveller Type */
+                    traveller_type?: string | null;
                 };
             };
         };
