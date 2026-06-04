@@ -89,6 +89,7 @@ export function MapHomeScreen({ navigation }: Props) {
         <View style={styles.topButtons}>
           <TopIconButton
             icon="accessible"
+            size={50}
             onPress={() =>
               Alert.alert('Coming soon', 'Accessibility settings are not yet available.')
             }
