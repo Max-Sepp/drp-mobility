@@ -91,6 +91,23 @@ function PlacesRow({
   onCustomPlaceLongPress: (place: CustomPlace) => void
   onAddPress: () => void
 }) {
+  const [scrollX, setScrollX] = useState(0)
+  const [containerWidth, setContainerWidth] = useState(0)
+
+  // Compute content width directly from tile count — avoids onContentSizeChange
+  // being unreliable on web (it reports scrollWidth = clientWidth).
+  // Tile width is from styles.placesTile (64px), gap is Spacing.md (12px).
+  const tileCount = NAMED_PLACES.length + savedPlaces.custom.length + 1 // +1 for Add
+  const contentWidth = tileCount * 64 + (tileCount - 1) * Spacing.md
+
+  const scrollable = containerWidth > 0 && contentWidth > containerWidth
+  const thumbWidth = scrollable
+    ? Math.max(24, (containerWidth / contentWidth) * containerWidth)
+    : 0
+  const thumbLeft = scrollable
+    ? (scrollX / (contentWidth - containerWidth)) * (containerWidth - thumbWidth)
+    : 0
+
   return (
     <View style={styles.placesSection}>
       <Text style={styles.sectionLabel}>PLACES</Text>
@@ -98,6 +115,9 @@ function PlacesRow({
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.placesRow}
+        onScroll={(e) => setScrollX(e.nativeEvent.contentOffset.x)}
+        onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}
+        scrollEventThrottle={16}
       >
         {NAMED_PLACES.map(({ key, icon, label }) => {
           const saved = Boolean(savedPlaces[key])
@@ -130,7 +150,7 @@ function PlacesRow({
             accessibilityLabel={`${place.name}: ${place.address}`}
             accessibilityHint="Tap to plan journey. Long press to remove."
           >
-            <View style={styles.placesTileIconSaved}>
+            <View style={[styles.placesTileIcon, styles.placesTileIconSaved]}>
               <MaterialIcons
                 name={place.icon as keyof typeof MaterialIcons.glyphMap}
                 size={22}
@@ -156,6 +176,11 @@ function PlacesRow({
           <Text style={[Typography.label, { color: Colors.text, marginTop: 4 }]}>Add</Text>
         </TouchableOpacity>
       </ScrollView>
+      {scrollable && (
+        <View style={styles.scrollbarTrack}>
+          <View style={[styles.scrollbarThumb, { width: thumbWidth, transform: [{ translateX: thumbLeft }] }]} />
+        </View>
+      )}
     </View>
   )
 }
@@ -653,6 +678,18 @@ const styles = StyleSheet.create({
   },
   placesTileIconSaved: {
     backgroundColor: Colors.blue,
+  },
+  scrollbarTrack: {
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: Colors.separator,
+    marginTop: Spacing.sm,
+    overflow: 'hidden',
+  },
+  scrollbarThumb: {
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: Colors.tertiaryText,
   },
 
   // Saved journeys
