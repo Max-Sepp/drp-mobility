@@ -1,6 +1,16 @@
 import { Ionicons } from '@expo/vector-icons'
-import { useState } from 'react'
-import { Alert, Modal, ScrollView, StyleSheet, Text as RNText, TouchableOpacity, View } from 'react-native'
+import { useRef, useState } from 'react'
+import {
+  Alert,
+  Animated,
+  Modal,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text as RNText,
+  TouchableOpacity,
+  View,
+} from 'react-native'
 import { Text, XStack, YStack } from 'tamagui'
 import { ScreenHeader } from '@/components/ScreenHeader'
 import { FormScreenLayout } from '@/features/reporting/components/FormScreenLayout'
@@ -9,10 +19,14 @@ import type { AccountScreenProps } from '@/navigation/types'
 import { Borders, Colors, Opacity, Overlays, Radii, Shadows, Spacing } from '@/theme'
 import { useAuth } from '../context/AuthContext'
 
+const USE_NATIVE_DRIVER = Platform.OS !== 'web'
+
 export const AccountScreen = ({ navigation }: AccountScreenProps) => {
   const { user, signOut, updateProfile } = useAuth()
   const [saving, setSaving] = useState(false)
-  const [pickerOpen, setPickerOpen] = useState(false)
+  const [modalVisible, setModalVisible] = useState(false)
+  const backdropAnim = useRef(new Animated.Value(0)).current
+  const sheetAnim = useRef(new Animated.Value(500)).current
 
   if (!user) {
     navigation.goBack()
@@ -22,8 +36,24 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
   const currentTravellerType = user.traveller_type ?? 'adult'
   const currentTT = TRAVELLER_TYPES.find((t) => t.code === currentTravellerType) ?? TRAVELLER_TYPES[0]
 
+  function openPicker() {
+    if (saving) return
+    setModalVisible(true)
+    Animated.parallel([
+      Animated.timing(backdropAnim, { toValue: 1, duration: 220, useNativeDriver: USE_NATIVE_DRIVER }),
+      Animated.spring(sheetAnim, { toValue: 0, stiffness: 130, damping: 22, mass: 1, useNativeDriver: USE_NATIVE_DRIVER }),
+    ]).start()
+  }
+
+  function closePicker() {
+    Animated.parallel([
+      Animated.timing(backdropAnim, { toValue: 0, duration: 180, useNativeDriver: USE_NATIVE_DRIVER }),
+      Animated.timing(sheetAnim, { toValue: 500, duration: 220, useNativeDriver: USE_NATIVE_DRIVER }),
+    ]).start(() => setModalVisible(false))
+  }
+
   async function handleSelect(code: string) {
-    setPickerOpen(false)
+    closePicker()
     if (code === currentTravellerType) return
     setSaving(true)
     try {
@@ -75,7 +105,7 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
           <TouchableOpacity
             style={[styles.card, styles.triggerRow, saving && { opacity: Opacity.disabledMid }]}
             activeOpacity={Opacity.pressed}
-            onPress={() => !saving && setPickerOpen(true)}
+            onPress={openPicker}
           >
             <YStack flex={1} gap={2}>
               <Text fontSize={15} fontWeight="500" color={Colors.text}>{currentTT.name}</Text>
@@ -101,26 +131,28 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
 
       </YStack>
 
-      {/* Picker sheet */}
       <Modal
-        visible={pickerOpen}
+        visible={modalVisible}
         transparent
-        animationType="slide"
-        onRequestClose={() => setPickerOpen(false)}
+        animationType="none"
+        onRequestClose={closePicker}
       >
-        {/* flex column: backdrop fills space above the sheet, sheet pins to bottom */}
-        <View style={styles.modalContainer}>
+        <View style={styles.modalRoot}>
+          {/* Backdrop fades in independently of the sheet */}
+          <Animated.View
+            style={[StyleSheet.absoluteFillObject, styles.backdrop, { opacity: backdropAnim }]}
+            pointerEvents="none"
+          />
+          {/* Tap outside sheet to dismiss */}
           <TouchableOpacity
-            style={styles.modalBackdrop}
-            onPress={() => setPickerOpen(false)}
+            style={StyleSheet.absoluteFillObject}
+            onPress={closePicker}
             activeOpacity={1}
           />
-
-          <View style={styles.sheet}>
+          {/* Sheet slides up */}
+          <Animated.View style={[styles.sheet, { transform: [{ translateY: sheetAnim }] }]}>
             <View style={styles.handle} />
-
             <RNText style={styles.sheetTitle}>TRAVELLER TYPE</RNText>
-
             <ScrollView showsVerticalScrollIndicator={false} bounces={false} style={styles.optionList}>
               {TRAVELLER_TYPES.map((tt, i) => {
                 const selected = currentTravellerType === tt.code
@@ -145,7 +177,7 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
                 )
               })}
             </ScrollView>
-          </View>
+          </Animated.View>
         </View>
       </Modal>
     </FormScreenLayout>
@@ -166,11 +198,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.md,
   },
-  modalContainer: {
+  modalRoot: {
     flex: 1,
+    justifyContent: 'flex-end',
   },
-  modalBackdrop: {
-    flex: 1,
+  backdrop: {
     backgroundColor: Overlays.backdrop,
   },
   sheet: {
@@ -178,6 +210,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: Radii.card + 4,
     borderTopRightRadius: Radii.card + 4,
     paddingBottom: Spacing.xl,
+    overflow: 'hidden',
     ...Shadows.top,
   },
   handle: {
