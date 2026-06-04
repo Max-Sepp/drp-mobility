@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import {
   Alert,
   Animated,
@@ -25,8 +25,10 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
   const { user, signOut, updateProfile } = useAuth()
   const [saving, setSaving] = useState(false)
   const [modalVisible, setModalVisible] = useState(false)
-  const backdropAnim = useRef(new Animated.Value(0)).current
-  const sheetAnim = useRef(new Animated.Value(500)).current
+  // Lazily create the Animated.Values once (stable across renders) without reading a ref
+  // during render, which react-hooks/refs forbids.
+  const [backdropAnim] = useState(() => new Animated.Value(0))
+  const [sheetAnim] = useState(() => new Animated.Value(500))
 
   if (!user) {
     navigation.goBack()
