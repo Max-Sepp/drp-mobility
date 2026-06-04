@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Spinner, Text, YStack } from 'tamagui'
 import type { components } from '@/api/schema.d'
 import { Heading } from '@/components/Heading'
-import { OutageReportCard } from './OutageReportCard'
+import { Colors, Radii } from '@/theme'
+import { OutageReportCard } from '@/features/home/components/OutageReportCard'
 
 type OutageReport = components['schemas']['OutageReportSummary']
 
@@ -11,7 +12,6 @@ type ReportsStatusProps = {
   reports: OutageReport[]
 }
 
-/** Station status block: a spinner while loading, an "all clear" card when empty, or the list of outages. */
 export const ReportsStatus = ({ loading, reports }: ReportsStatusProps) => {
   const [expandedId, setExpandedId] = useState<number | null>(null)
 
@@ -22,9 +22,9 @@ export const ReportsStatus = ({ loading, reports }: ReportsStatusProps) => {
         mt="$4"
         p="$5"
         items="center"
-        style={{ backgroundColor: '#f3f4f6', borderRadius: 10 }}
+        style={{ backgroundColor: Colors.searchBg, borderRadius: Radii.button }}
       >
-        <Spinner color="#9ca3af" />
+        <Spinner color={Colors.secondaryText} />
       </YStack>
     )
   }
@@ -37,23 +37,23 @@ export const ReportsStatus = ({ loading, reports }: ReportsStatusProps) => {
         p="$5"
         items="center"
         gap="$3"
-        style={{ backgroundColor: '#d8f3dc', borderRadius: 10 }}
+        style={{ backgroundColor: Colors.successBg, borderRadius: Radii.button }}
       >
         <YStack
           style={{
             width: 48,
             height: 48,
-            borderRadius: 24,
-            backgroundColor: '#2d6a4f',
+            borderRadius: Radii.pill,
+            backgroundColor: Colors.successDark,
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
-          <Text color="white" fontSize={24} fontWeight="700">
+          <Text color={Colors.card} fontSize={24} fontWeight="700">
             ✓
           </Text>
         </YStack>
-        <Heading fontSize={18} color="#1a3c2a">
+        <Heading fontSize={18} color={Colors.successDark}>
           No known issues
         </Heading>
       </YStack>

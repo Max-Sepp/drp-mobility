@@ -4,7 +4,9 @@ import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { TamaguiProvider } from 'tamagui'
 import { tamaguiConfig } from './tamagui.config'
 import { AuthProvider } from './src/features/auth'
+import { OutageProvider } from './src/features/outages'
 import { usePushNotifications } from './src/hooks/usePushNotifications'
+import { LocationProvider } from './src/lib/LocationContext'
 import { navigationRef } from './src/navigation/navigationRef'
 import RootNavigator from './src/navigation/RootNavigator'
 
@@ -12,12 +14,16 @@ import RootNavigator from './src/navigation/RootNavigator'
 function AppContent() {
   usePushNotifications()
   return (
-    <SafeAreaProvider>
-      <NavigationContainer ref={navigationRef}>
-        <RootNavigator />
-        <StatusBar style="auto" />
-      </NavigationContainer>
-    </SafeAreaProvider>
+    <OutageProvider>
+      <SafeAreaProvider>
+        <LocationProvider>
+          <NavigationContainer ref={navigationRef}>
+            <RootNavigator />
+            <StatusBar style="auto" />
+          </NavigationContainer>
+        </LocationProvider>
+      </SafeAreaProvider>
+    </OutageProvider>
   )
 }
 

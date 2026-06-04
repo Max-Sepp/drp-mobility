@@ -8,8 +8,13 @@ const TFL_BASE = 'https://api.tfl.gov.uk'
 /** A single transit mode used on a leg, e.g. `walking`, `tube`, `bus`. */
 type Mode = { name: string }
 
-/** A point a leg departs from or arrives at, e.g. a station. */
-type Point = { commonName?: string }
+/**
+ * A point a leg departs from or arrives at, e.g. a station. `lat`/`lon` are passed through
+ * untyped from TfL's raw response and are present at runtime on real legs (including walking
+ * endpoints); they're optional because the type is also reused for persisted journey snapshots,
+ * so consumers (e.g. GPS proximity in the active-journey screen) must treat them defensively.
+ */
+type Point = { commonName?: string; lat?: number; lon?: number }
 
 /** A line/route a leg runs on, e.g. `name: "Victoria"`, `directions: ["Brixton"]`. */
 type RouteOption = { name?: string; directions?: string[] }
@@ -31,6 +36,9 @@ export type Leg = {
   routeOptions?: RouteOption[]
   // The intermediate stops along the leg's path.
   path?: { stopPoints?: { name?: string }[] }
+  // Disruption data returned by TfL when a leg is affected by a service disruption.
+  isDisrupted?: boolean
+  disruptions?: { description?: string }[]
 }
 
 /**

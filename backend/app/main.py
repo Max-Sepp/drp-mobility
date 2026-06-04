@@ -1,9 +1,13 @@
+import asyncio
 import logging
 import os
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import Base, SessionLocal, engine
+from app.events import broker
 
 # Surface our app's INFO logs (uvicorn configures its own loggers, but not the root logger
 # our app modules log through). Honour an optional LOG_LEVEL env var, defaulting to INFO.
@@ -35,7 +39,30 @@ Base.metadata.create_all(bind=engine)
 with SessionLocal() as session:
     seed_defaults(session)
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Capture the running loop so the event broker can publish from sync (threadpool) endpoints.
+    broker.bind_loop(asyncio.get_running_loop())
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
+
+if os.getenv("DEV", "false").lower() == "true":
+    app.add_middleware(
+        CORSMiddleware,
+        # Allow Expo web dev server (8081) and any LAN IP the dev may use.
+        # In production (EAS native build) the app hits the API directly — no browser CORS applies.
+        allow_origins=[
+            "http://localhost:8081",
+            "http://localhost:19006",
+            "http://127.0.0.1:8081",
+        ],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 app.include_router(auth.router)
 app.include_router(users.router)

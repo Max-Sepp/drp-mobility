@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 
+from app.events import broker, sse_event
 from app.repositories.failure import FailureRepository, get_failure_repo
 from app.schemas.failure import FailureDetail, FailureSummary
 from app.schemas.outage_report import OutageReportSummary
@@ -53,6 +54,8 @@ def resolve_failure(
     if failure is None:
         raise HTTPException(status_code=404, detail="Failure not found")
     failure = repo.resolve(failure)
+    # Tell live clients to drop this failure's reports from the open feed.
+    broker.publish(sse_event("resolved", {"failure_id": failure_id}))
     reports = repo.list_active_reports(failure_id)
     times = [r.breakdown_time for r in reports]
     first_reported = min(times, default=None)

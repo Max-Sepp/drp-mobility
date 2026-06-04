@@ -81,6 +81,40 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
+        /**
+         * Update Me
+         * @description Update mutable profile fields for the currently authenticated user.
+         */
+        patch: operations["update_me_auth_me_patch"];
+        trace?: never;
+    };
+    "/users/me/push-token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Register Push Token
+         * @description Register an Expo push token for the authenticated user.
+         *
+         *     Idempotent: calling again with the same token value is a no-op. If the token is already
+         *     registered to a different user (e.g. after an account switch on the same device), it is
+         *     re-assigned to the current user.
+         */
+        put: operations["register_push_token_users_me_push_token_put"];
+        post?: never;
+        /**
+         * Deregister Push Token
+         * @description Remove a specific push token for the current user (called on logout from a device).
+         *
+         *     No-op if the token is not found or belongs to a different user.
+         */
+        delete: operations["deregister_push_token_users_me_push_token_delete"];
+        options?: never;
+        head?: never;
         patch?: never;
         trace?: never;
     };
@@ -148,8 +182,37 @@ export interface paths {
          *     Open to anonymous callers: the report is tagged with the authenticated user's role, or
          *     `untrusted` when submitted without a valid token. To attach an image, follow up with
          *     POST /outage-reports/{id}/image.
+         *
+         *     When this report opens a brand-new Failure (first report for the equipment's current
+         *     incident), a background task fires Expo push notifications to all authenticated users
+         *     whose saved journeys pass through the affected station.
          */
         post: operations["create_outage_report_outage_reports_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/outage-reports/stream": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Stream Outage Reports
+         * @description Live feed of outage reports via Server-Sent Events.
+         *
+         *     On connect, emits a `snapshot` event carrying the full currently-open feed (active reports under
+         *     unresolved failures), then streams `created` / `deleted` / `resolved` events as they happen — so
+         *     every (re)connection is a fresh refresh followed by live deltas. Declared before `/{report_id}`
+         *     so the literal path isn't captured by the integer path param.
+         */
+        get: operations["stream_outage_reports_outage_reports_stream_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -472,6 +535,11 @@ export interface components {
          * @enum {string}
          */
         PlatformStepFree: "none" | "to_platform" | "to_train" | "full";
+        /** PushTokenBody */
+        PushTokenBody: {
+            /** Token */
+            token: string;
+        };
         /**
          * SavedJourneyCreate
          * @description Request body for POST /journeys.
@@ -514,6 +582,10 @@ export interface components {
             /** Name */
             name: string;
             step_free: components["schemas"]["StepFree"];
+            /** Latitude */
+            latitude?: number | null;
+            /** Longitude */
+            longitude?: number | null;
             /** Platforms */
             platforms: components["schemas"]["PlatformSchema"][];
         };
@@ -559,6 +631,20 @@ export interface components {
             username: string;
             /** Role */
             role: string;
+            /** Railcard */
+            railcard?: string | null;
+            /** Traveller Type */
+            traveller_type?: string | null;
+        };
+        /**
+         * UserUpdate
+         * @description Request body for PATCH /auth/me — all fields optional.
+         */
+        UserUpdate: {
+            /** Railcard */
+            railcard?: string | null;
+            /** Traveller Type */
+            traveller_type?: string | null;
         };
         /** ValidationError */
         ValidationError: {
@@ -682,6 +768,101 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UserPublic"];
+                };
+            };
+        };
+    };
+    update_me_auth_me_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserPublic"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    register_push_token_users_me_push_token_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PushTokenBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deregister_push_token_users_me_push_token_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PushTokenBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -817,6 +998,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    stream_outage_reports_outage_reports_stream_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
         };

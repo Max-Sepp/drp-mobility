@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { KeyboardAvoidingView, Platform } from 'react-native'
 import { ScrollView } from 'tamagui'
+import { Colors } from '@/theme'
 
 type FormScreenLayoutProps = {
   header: ReactNode
@@ -15,12 +16,12 @@ export const FormScreenLayout = ({ header, footer, children }: FormScreenLayoutP
   // we only set a behavior on iOS.
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: 'white' }}
+      style={{ flex: 1, backgroundColor: Colors.card }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollView
         flex={1}
-        style={{ backgroundColor: 'white' }}
+        style={{ backgroundColor: Colors.card }}
         contentContainerStyle={{ paddingBottom: 16 } as any}
         keyboardShouldPersistTaps="handled"
       >

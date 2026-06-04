@@ -7,10 +7,10 @@ import { FormScreenLayout } from '@/features/reporting/components/FormScreenLayo
 import { parseUtc } from '@/lib/datetime'
 import type { SavedJourneysScreenProps } from '@/navigation/types'
 import { useAuth } from '@/features/auth'
-import { deleteJourney, loadSavedJourneys, type SavedJourney } from '../api/savedJourneys'
-import { clockTime } from '../components/legDisplay'
+import { deleteJourney, loadSavedJourneys, type SavedJourney } from '@/features/journey/api/savedJourneys'
+import { clockTime } from '@/features/journey/components/legDisplay'
+import { Borders, Colors, Opacity, Radii } from '@/theme'
 
-/** "3 Jun, 09:12" for the time a journey was saved. `savedAt` is a real UTC ISO string. */
 function savedAtLabel(iso: string): string {
   const d = parseUtc(iso)
   return d.toLocaleDateString('en-GB', {
@@ -60,11 +60,11 @@ export const SavedJourneysScreen = ({ navigation }: SavedJourneysScreenProps) =>
     >
       {!loading && saved.length === 0 && (
         <YStack px="$5" mt="$8" items="center" gap="$2">
-          <MaterialIcons name="bookmark-border" size={40} color="#9ca3af" />
-          <Text fontSize={16} fontWeight="600" color="#374151">
+          <MaterialIcons name="bookmark-border" size={40} color={Colors.tertiaryText} />
+          <Text fontSize={16} fontWeight="600" color={Colors.text}>
             No saved journeys yet
           </Text>
-          <Text fontSize={14} color="#6b7280" style={{ textAlign: 'center' }}>
+          <Text fontSize={14} color={Colors.secondaryText} style={{ textAlign: 'center' }}>
             Plan a journey, open it, and tap Save to keep it here.
           </Text>
         </YStack>
@@ -78,7 +78,7 @@ export const SavedJourneysScreen = ({ navigation }: SavedJourneysScreenProps) =>
           p="$4"
           gap="$3"
           items="center"
-          pressStyle={{ opacity: 0.7 }}
+          pressStyle={{ opacity: Opacity.pressed }}
           onPress={() =>
             navigation.navigate('JourneyDetail', {
               journey: item.journey,
@@ -89,33 +89,33 @@ export const SavedJourneysScreen = ({ navigation }: SavedJourneysScreenProps) =>
               savedId: item.id,
             })
           }
-          accessibilityRole="button"
-          accessibilityLabel={`Open saved journey ${item.from?.label ?? ''} to ${item.to?.label ?? ''}`}
+          role="button"
+          aria-label={`Open saved journey ${item.from?.label ?? ''} to ${item.to?.label ?? ''}`}
           style={{
-            borderWidth: 1.5,
-            borderColor: '#d1d5db',
-            borderRadius: 10,
-            backgroundColor: 'white',
+            borderWidth: Borders.medium,
+            borderColor: Colors.border,
+            borderRadius: Radii.button,
+            backgroundColor: Colors.card,
           }}
         >
           <YStack flex={1} gap="$1">
-            <Text fontSize={15} fontWeight="600" color="#111827" numberOfLines={1}>
+            <Text fontSize={15} fontWeight="600" color={Colors.text} numberOfLines={1}>
               {item.from?.label ?? 'Start'}
             </Text>
             <XStack items="center" gap="$1">
-              <MaterialIcons name="arrow-downward" size={14} color="#9ca3af" />
-              <Text fontSize={15} fontWeight="600" color="#111827" numberOfLines={1} flex={1}>
+              <MaterialIcons name="arrow-downward" size={14} color={Colors.tertiaryText} />
+              <Text fontSize={15} fontWeight="600" color={Colors.text} numberOfLines={1} flex={1}>
                 {item.to?.label ?? 'Destination'}
               </Text>
             </XStack>
             <XStack items="center" gap="$2" mt="$1">
-              <Text fontSize={13} color="#374151">
+              <Text fontSize={13} color={Colors.text}>
                 {item.journey.duration} min · {clockTime(item.journey.startDateTime)} →{' '}
                 {clockTime(item.journey.arrivalDateTime)}
               </Text>
               {item.outages.length > 0 && <Text fontSize={13}>⚠️</Text>}
             </XStack>
-            <Text fontSize={12} color="#9ca3af">
+            <Text fontSize={12} color={Colors.tertiaryText}>
               Saved {savedAtLabel(item.savedAt)}
             </Text>
           </YStack>
@@ -123,9 +123,9 @@ export const SavedJourneysScreen = ({ navigation }: SavedJourneysScreenProps) =>
           <MaterialIcons
             name="delete-outline"
             size={22}
-            color="#9ca3af"
-            accessibilityRole="button"
-            accessibilityLabel="Remove saved journey"
+            color={Colors.tertiaryText}
+            role="button"
+            aria-label="Remove saved journey"
             onPress={() => confirmDelete(item)}
             style={{ padding: 4 }}
           />

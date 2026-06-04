@@ -3,12 +3,18 @@
 // postcode-to-postcode. Postcodes resolve uniquely on TfL, which avoids the "did you
 // mean?" disambiguation that free text triggers.
 //
-// Pipeline for free text: Nominatim (address -> lat/lon) then postcodes.io
-// (lat/lon -> nearest valid postcode). Both are key-less and called straight from the
-// client. Coordinates skip Nominatim; an already-typed postcode skips both.
+// Pipeline for free text: Mapbox Geocoding v5 (address -> lat/lon) then postcodes.io
+// (lat/lon -> nearest valid postcode). Coordinates skip Mapbox; an already-typed
+// postcode skips both.
 
-const NOMINATIM_BASE = 'https://nominatim.openstreetmap.org'
+const MAPBOX_BASE = 'https://api.mapbox.com/geocoding/v5/mapbox.places'
 const POSTCODES_BASE = 'https://api.postcodes.io'
+const MAPBOX_TOKEN = process.env.EXPO_PUBLIC_MAPBOX_TOKEN ?? ''
+
+// London bounding box [west, south, east, north] — used for autocomplete only.
+const LONDON_BBOX = '-0.510375,51.286760,0.334015,51.691874'
+// Central London proximity bias [lon, lat].
+const LONDON_CENTRE = '-0.1278,51.5074'
 
 // UK postcode, with or without the internal space (e.g. "SW1A1AA" / "sw1a 1aa").
 const POSTCODE_RE = /^[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}$/i
@@ -16,11 +22,19 @@ const POSTCODE_RE = /^[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}$/i
 const COORD_RE = /^(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)$/
 
 /** A successfully resolved location: the postcode to query plus a label to show the user. */
-export type ResolvedLocation = { postcode: string; label: string }
+export type ResolvedLocation = { postcode: string; label: string; isNamedPlace?: boolean }
 export type ResolveResult = ResolvedLocation | { error: string }
 
 /** A candidate place for the address autocomplete dropdown. */
-export type LocationSuggestion = { label: string; lat: number; lon: number; postcode?: string }
+export type LocationSuggestion = {
+  /** Main name — used as the input-box value when selected and as the journey destination label. */
+  label: string
+  /** Cleaned location context shown below the main name in the dropdown (may be empty). */
+  subtitle: string
+  lat: number
+  lon: number
+  postcode?: string
+}
 
 /** Normalise a postcode to upper-case with a single space before the final three chars. */
 function normalisePostcode(raw: string): string {
@@ -40,56 +54,93 @@ async function postcodeFromCoords(lat: number, lon: number): Promise<string | nu
   return body?.result?.[0]?.postcode ?? null
 }
 
-/** Geocode a free-text address to a coordinate, restricted to Great Britain. */
+type MapboxContext = { id: string; text: string }
+
+/** Extract a UK postcode from a Mapbox feature's context array, if present. */
+function postcodeFromContext(context: MapboxContext[] = []): string | undefined {
+  return context.find((c) => c.id.startsWith('postcode.'))?.text
+}
+
+/**
+ * Build the subtitle string from a Mapbox context chain.
+ * Drops: postcode entries, region ("England" etc.).
+ * Drops "Greater London" district when the place "London" is already present (redundant).
+ * Replaces the country entry with "UK".
+ * Result is the remaining parts joined with ", " (may be empty).
+ */
+function buildSubtitle(context: MapboxContext[]): string {
+  const placeText = context.find((c) => c.id.startsWith('place.'))?.text?.toLowerCase()
+  const parts = context
+    .filter((c) => {
+      if (c.id.startsWith('postcode.') || c.id.startsWith('region.')) return false
+      if (c.id.startsWith('district.') && placeText === 'london' && c.text === 'Greater London')
+        return false
+      return true
+    })
+    .map((c) => (c.id.startsWith('country.') ? 'UK' : c.text))
+  return parts.join(', ')
+}
+
+/**
+ * Geocode a free-text address to a coordinate via Mapbox.
+ * No bbox restriction here so addresses outside London (Surrey, Essex, etc.) still resolve
+ * when the user types them manually into the journey planner and hits Plan.
+ */
 async function coordsFromAddress(query: string): Promise<{ lat: number; lon: number } | null> {
-  const url = `${NOMINATIM_BASE}/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&countrycodes=gb&limit=1`
-  // Nominatim's usage policy requires an identifying User-Agent.
-  const res = await fetch(url, { headers: { 'User-Agent': 'drp-mobility-app/1.0' } })
+  const url =
+    `${MAPBOX_BASE}/${encodeURIComponent(query)}.json` +
+    `?access_token=${MAPBOX_TOKEN}&country=gb&limit=1`
+  const res = await fetch(url)
   if (!res.ok) return null
   const body = await res.json().catch(() => null)
-  const first = Array.isArray(body) ? body[0] : null
-  if (!first) return null
-  return { lat: Number(first.lat), lon: Number(first.lon) }
+  const feature = body?.features?.[0]
+  if (!feature) return null
+  const [lon, lat] = feature.center as [number, number]
+  return { lat, lon }
 }
 
 /**
- * Shorten Nominatim's verbose `display_name` to its most useful leading parts (e.g.
- * "14, Leinster Gardens, Westbourne Green") — Nominatim orders parts specific-to-general,
- * so the front is the building/street/area and the tail is county/region/country/postcode.
- */
-function conciseAddress(displayName: string): string {
-  return displayName
-    .split(',')
-    .map((part) => part.trim())
-    .filter(Boolean)
-    .slice(0, 3)
-    .join(', ')
-}
-
-/**
- * Address autocomplete: up to five candidate places (Great Britain only) for a free-text
- * query, to populate a selection dropdown. Labels are shortened for display. Returns
- * nothing for very short queries or for input that is already a postcode/coordinate
- * (those need no lookup).
+ * Address autocomplete: up to five candidate places biased to Greater London, for a
+ * free-text query to populate a selection dropdown. Returns nothing for very short queries
+ * or coordinate input (those need no lookup). Postcodes are passed through to Mapbox so
+ * the user gets a proper suggestion rather than no results.
  */
 export async function searchLocations(query: string): Promise<LocationSuggestion[]> {
   const q = query.trim()
-  if (q.length < 3 || POSTCODE_RE.test(q) || COORD_RE.test(q)) return []
-  const url = `${NOMINATIM_BASE}/search?q=${encodeURIComponent(q)}&format=json&addressdetails=1&countrycodes=gb&limit=5`
-  const res = await fetch(url, { headers: { 'User-Agent': 'drp-mobility-app/1.0' } })
+  if (q.length < 3 || COORD_RE.test(q)) return []
+  const url =
+    `${MAPBOX_BASE}/${encodeURIComponent(q)}.json` +
+    `?access_token=${MAPBOX_TOKEN}&country=gb` +
+    `&bbox=${LONDON_BBOX}&proximity=${LONDON_CENTRE}&autocomplete=true&limit=5`
+  const res = await fetch(url)
   if (!res.ok) return []
   const body = await res.json().catch(() => null)
-  if (!Array.isArray(body)) return []
-  return body.map((r) => ({
-    label: conciseAddress(String(r.display_name)),
-    lat: Number(r.lat),
-    lon: Number(r.lon),
-    postcode: r.address?.postcode,
-  }))
+  if (!Array.isArray(body?.features)) return []
+  return body.features.map(
+    (f: {
+      text: string
+      address?: string
+      center: [number, number]
+      context?: MapboxContext[]
+    }) => {
+      const context = f.context ?? []
+      // For address features Mapbox puts the house number in `address` and the street in `text`.
+      const label = f.address ? `${f.address} ${f.text}` : f.text
+      // For postcode-type results the postcode is the feature itself, not in context.
+      const postcode = postcodeFromContext(context) ?? (POSTCODE_RE.test(label) ? label : undefined)
+      return {
+        label,
+        subtitle: buildSubtitle(context),
+        lat: f.center[1],
+        lon: f.center[0],
+        postcode,
+      }
+    },
+  )
 }
 
 /**
- * The postcode for a chosen suggestion: use Nominatim's own postcode when it gave one,
+ * The postcode for a chosen suggestion: use Mapbox's own postcode when it gave one,
  * otherwise reverse-geocode its coordinates.
  */
 export async function postcodeForSuggestion(
@@ -105,7 +156,7 @@ export async function postcodeForSuggestion(
  * Resolve user input to a single UK postcode.
  * - A postcode is normalised and returned as-is.
  * - Coordinates are reverse-geocoded to the nearest postcode.
- * - Free text is geocoded (Nominatim) then reverse-geocoded (postcodes.io).
+ * - Free text is geocoded (Mapbox) then reverse-geocoded (postcodes.io).
  */
 export async function resolveToPostcode(input: string): Promise<ResolveResult> {
   const trimmed = input.trim()
@@ -125,7 +176,7 @@ export async function resolveToPostcode(input: string): Promise<ResolveResult> {
   } else {
     const coords = await coordsFromAddress(trimmed)
     if (!coords) {
-      return { error: `Couldn’t find “${trimmed}”. Try a more specific address or a postcode.` }
+      return { error: `Couldn't find "${trimmed}". Try a more specific address or a postcode.` }
     }
     lat = coords.lat
     lon = coords.lon
@@ -133,7 +184,7 @@ export async function resolveToPostcode(input: string): Promise<ResolveResult> {
 
   const postcode = await postcodeFromCoords(lat, lon)
   if (!postcode) {
-    return { error: `Couldn’t find a UK postcode near “${trimmed}”. Try a postcode directly.` }
+    return { error: `Couldn't find a UK postcode near "${trimmed}". Try a postcode directly.` }
   }
   // Keep the readable place the user typed as the label (the postcode is used only to query
   // TfL); coordinates have no readable form, so fall back to the postcode there.

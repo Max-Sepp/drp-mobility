@@ -1,7 +1,9 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import { Text, XStack } from 'tamagui'
-import type { ResolvedLocation } from '../api/geocode'
-import type { Journey, RouteTag } from '../api/tfl'
+import type { ResolvedLocation } from '@/features/journey/api/geocode'
+import type { Journey, Leg, RouteTag } from '@/features/journey/api/tfl'
+import { effectiveDiscount } from '@/features/journey/lib/railcards'
+import { Borders, Colors, Opacity, Radii } from '@/theme'
 
 export type ResolveStation = (commonName: string) => string | null
 export type StationPressHandler = (stationName: string) => void
@@ -23,13 +25,13 @@ export function RouteTags({ tags }: { tags?: RouteTag[] }) {
           px="$2"
           py="$1"
           style={{
-            backgroundColor: '#eff6ff',
-            borderColor: '#bfdbfe',
-            borderWidth: 1,
-            borderRadius: 999,
+            backgroundColor: Colors.blueBg,
+            borderColor: Colors.border,
+            borderWidth: Borders.thin,
+            borderRadius: Radii.pill,
           }}
         >
-          <Text fontSize={11} fontWeight="700" color="#1d4ed8">
+          <Text fontSize={11} fontWeight="700" color={Colors.blue}>
             {TAG_LABELS[tag]}
           </Text>
         </XStack>
@@ -41,6 +43,14 @@ export function RouteTags({ tags }: { tags?: RouteTag[] }) {
 /** Drop the "… Underground/Rail/DLR/Bus Station" suffix TfL appends, preserving case for display. */
 export function stripStationSuffix(name: string): string {
   return name.replace(/\s+(?:underground|rail|dlr|bus)?\s*station$/i, '').trim()
+}
+
+/** The line a leg runs on with its direction, e.g. "Victoria towards Brixton", or null. */
+export function lineLabel(leg: Leg): string | null {
+  const option = leg.routeOptions?.[0]
+  if (!option?.name) return null
+  const direction = option.directions?.find(Boolean)
+  return direction ? `${option.name} towards ${stripStationSuffix(direction)}` : option.name
 }
 
 // Modes whose stops are train stations we hold accessibility data for. Bus/coach stops, river
@@ -84,25 +94,25 @@ export function LegStations({
               <MaterialIcons
                 name="arrow-forward"
                 size={13}
-                color="#9ca3af"
-                accessibilityLabel="to"
+                color={Colors.tertiaryText}
+                aria-label="to"
               />
             )}
             {resolved ? (
               <Text
                 fontSize={13}
                 fontWeight="600"
-                color="#2563eb"
-                pressStyle={{ opacity: 0.6 }}
+                color={Colors.blue}
+                pressStyle={{ opacity: Opacity.disabledMid }}
                 onPress={() => onStationPress(resolved)}
-                accessibilityRole="button"
-                accessibilityLabel={`View accessibility for ${resolved}`}
+                role="button"
+                aria-label={`View accessibility for ${resolved}`}
                 style={{ textDecorationLine: 'underline' }}
               >
                 {resolved}
               </Text>
             ) : (
-              <Text fontSize={13} color="#6b7280">
+              <Text fontSize={13} color={Colors.secondaryText}>
                 {stripStationSuffix(commonName)}
               </Text>
             )}
@@ -164,10 +174,22 @@ export function clockTime(local: string): string {
  * omitted even for ticketed journeys — so we only say "Free" when the journey is genuinely
  * walking-only. A paid journey with missing fare data returns null (we show nothing) rather
  * than a misleading "Free".
+ *
+ * Pass a railcard code to apply the standard 1/3 discount where applicable. Railcards do not
+ * apply to bus-only journeys.
  */
-export function fareLabel(journey: Journey): string | null {
+export function fareLabel(
+  journey: Journey,
+  travellerType?: string | null,
+  railcard?: string | null,
+): string | null {
   const { fare, legs } = journey
-  if (fare && fare.totalCost > 0) return `£${(fare.totalCost / 100).toFixed(2)}`
+  if (fare && fare.totalCost > 0) {
+    const discount = effectiveDiscount(journey, travellerType, railcard)
+    const cost = Math.floor(fare.totalCost * (1 - discount))
+    if (cost === 0) return 'Free'
+    return `£${(cost / 100).toFixed(2)}`
+  }
   const walkingOnly = legs.length > 0 && legs.every((leg) => leg.mode.name === 'walking')
   if (walkingOnly) return 'Free'
   return null

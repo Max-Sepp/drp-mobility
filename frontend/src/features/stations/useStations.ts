@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useEffect, useState } from 'react'
 import { apiClient } from '@/api/client'
 import type { components } from '@/api/schema.d'
@@ -11,7 +12,13 @@ type UseStations = {
   error: boolean
 }
 
-/** Fetches the full station list (with platforms) from the backend once on mount. */
+const CACHE_KEY = 'stations_v1'
+
+/**
+ * Fetches the full station list (with platforms) from the backend.
+ * Loads from AsyncStorage on mount (instant, works offline), then refreshes
+ * from the API in the background and persists the latest data.
+ */
 export function useStations(): UseStations {
   const [stations, setStations] = useState<StationDetail[]>([])
   const [loading, setLoading] = useState(true)
@@ -19,12 +26,31 @@ export function useStations(): UseStations {
 
   useEffect(() => {
     let active = true
-    apiClient.GET('/stations').then(({ data }) => {
+    let hadCache = false
+
+    async function load() {
+      try {
+        const cached = await AsyncStorage.getItem(CACHE_KEY)
+        if (active && cached) {
+          setStations(JSON.parse(cached))
+          setLoading(false)
+          hadCache = true
+        }
+      } catch {}
+
+      const { data } = await apiClient.GET('/stations')
       if (!active) return
-      if (data) setStations(data)
-      else setError(true)
-      setLoading(false)
-    })
+      if (data) {
+        setStations(data)
+        setLoading(false)
+        AsyncStorage.setItem(CACHE_KEY, JSON.stringify(data)).catch(() => {})
+      } else if (!hadCache) {
+        setError(true)
+        setLoading(false)
+      }
+    }
+
+    load()
     return () => {
       active = false
     }

@@ -57,6 +57,21 @@ class OutageReportRepository:
             .all()
         )
 
+    def list_active_open(self) -> list[OutageReport]:
+        """List active reports under unresolved failures, newest first.
+
+        This is the "currently-open feed": it drops both soft-deleted reports and reports whose
+        failure has been resolved. Used to seed the SSE stream's initial snapshot.
+        """
+        return (
+            self._db.query(OutageReport)
+            .join(Failure, OutageReport.failure_id == Failure.id)
+            .options(*_REPORT_JOINEDLOAD)
+            .filter(Failure.resolved.is_(False), _ACTIVE_FILTER)
+            .order_by(OutageReport.breakdown_time.desc())
+            .all()
+        )
+
     def is_deleted(self, report_id: int) -> bool:
         """True if a soft-deletion record exists for this report id."""
         return self._db.query(exists().where(OutageReportDeletion.report_id == report_id)).scalar()

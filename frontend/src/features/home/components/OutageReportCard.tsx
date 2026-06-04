@@ -5,6 +5,7 @@ import { BASE_URL } from '@/api/client'
 import type { components } from '@/api/schema.d'
 import { Heading } from '@/components/Heading'
 import { formatTime, isToday } from '@/lib/datetime'
+import { Colors, Radii } from '@/theme'
 
 type OutageReport = components['schemas']['OutageReportSummary']
 
@@ -21,7 +22,6 @@ function alertLabel(report: OutageReport): string {
   return `${type} BROKEN – ${conn}`
 }
 
-/** A single outage alert. When it has a photo it becomes tappable to expand the description + image. */
 export const OutageReportCard = ({ report, expanded, onToggle }: OutageReportCardProps) => {
   const hasPhoto = !!report.image_content_type
 
@@ -31,21 +31,21 @@ export const OutageReportCard = ({ report, expanded, onToggle }: OutageReportCar
         style={{
           width: 36,
           height: 36,
-          borderRadius: 18,
-          backgroundColor: '#b91c1c',
+          borderRadius: Radii.pill,
+          backgroundColor: Colors.dangerDark,
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
-        <Text color="white" fontWeight="700" fontSize={18}>
+        <Text color={Colors.card} fontWeight="700" fontSize={18}>
           !
         </Text>
       </YStack>
       <YStack flex={1}>
-        <Heading fontSize={14} color="#7f1d1d">
+        <Heading fontSize={14} color={Colors.dangerDark}>
           {alertLabel(report)}
         </Heading>
-        <Text fontSize={12} color="#991b1b" mt="$1">
+        <Text fontSize={12} color={Colors.dangerDark} mt="$1">
           reported at {formatTime(report.breakdown_time)}
           {isToday(report.breakdown_time) ? ' today' : ''}
         </Text>
@@ -59,7 +59,7 @@ export const OutageReportCard = ({ report, expanded, onToggle }: OutageReportCar
         )}
       </YStack>
       {hasPhoto && (
-        <Text fontSize={12} color="#991b1b">
+        <Text fontSize={12} color={Colors.dangerDark}>
           {expanded ? '▲' : '▼'}
         </Text>
       )}
@@ -68,11 +68,11 @@ export const OutageReportCard = ({ report, expanded, onToggle }: OutageReportCar
 
   if (!hasPhoto) {
     return (
-      <YStack style={{ backgroundColor: '#fee2e2', borderRadius: 10 }}>
+      <YStack style={{ backgroundColor: Colors.dangerBg, borderRadius: Radii.button }}>
         {header}
         {report.description ? (
           <YStack px="$4" pb="$4">
-            <Text fontSize={13} color="#7f1d1d">
+            <Text fontSize={13} color={Colors.dangerDark}>
               {report.description}
             </Text>
           </YStack>
@@ -83,18 +83,18 @@ export const OutageReportCard = ({ report, expanded, onToggle }: OutageReportCar
 
   return (
     <Pressable onPress={onToggle}>
-      <YStack style={{ backgroundColor: '#fee2e2', borderRadius: 10 }}>
+      <YStack style={{ backgroundColor: Colors.dangerBg, borderRadius: Radii.button }}>
         {header}
         {expanded && (
           <YStack px="$4" pb="$4" gap="$3">
             {report.description ? (
-              <Text fontSize={13} color="#7f1d1d">
+              <Text fontSize={13} color={Colors.dangerDark}>
                 {report.description}
               </Text>
             ) : null}
             <Image
               source={{ uri: `${BASE_URL}/outage-reports/${report.id}/image` }}
-              style={{ width: '100%', height: 180, borderRadius: 8 }}
+              style={{ width: '100%', height: 180, borderRadius: Radii.small }}
               resizeMode="cover"
             />
           </YStack>

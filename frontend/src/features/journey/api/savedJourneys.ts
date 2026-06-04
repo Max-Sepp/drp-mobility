@@ -11,11 +11,11 @@
 // local copy is cleared (see migrateLocalJourneys, called by AuthContext on sign-in).
 
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { apiClient } from '@/api/client'
 import { getAuthToken } from '@/api/authToken'
-import type { StationOutage } from './accessibility'
-import type { ResolvedLocation } from './geocode'
-import type { AccessibilityPreference, Journey } from './tfl'
+import { apiClient } from '@/api/client'
+import type { StationOutage } from '@/features/journey/api/accessibility'
+import type { ResolvedLocation } from '@/features/journey/api/geocode'
+import type { AccessibilityPreference, Journey } from '@/features/journey/api/tfl'
 
 export const LOCAL_STORAGE_KEY = '@drp/saved-journeys'
 
