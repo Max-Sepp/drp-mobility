@@ -883,6 +883,67 @@
     }
   },
   {
+    "name": "Anerley",
+    "platforms": [
+      {
+        "id": "910GANERLEY-Plat01-NB-london-overground|national-rail",
+        "name": "Northbound Platform 1",
+        "direction": "Northbound",
+        "lines": [
+          "London Overground",
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "accessibleEntrance": "Ridslade Road",
+        "boardingRamp": true,
+        "levelAccess": false,
+        "interchangeTo": [
+          {
+            "to": "Southbound Platform 2",
+            "distanceM": 220
+          }
+        ]
+      },
+      {
+        "id": "910GANERLEY-Plat02-SB-london-overground|national-rail",
+        "name": "Southbound Platform 2",
+        "direction": "Southbound",
+        "lines": [
+          "London Overground",
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "accessibleEntrance": "Anerley Station Road",
+        "boardingRamp": true,
+        "levelAccess": false,
+        "interchangeTo": [
+          {
+            "to": "Northbound Platform 1",
+            "distanceM": 220
+          }
+        ]
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "910GANERLEY",
+    "zones": [
+      4
+    ],
+    "wifi": true,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.412058,
+      "lng": -0.065674
+    }
+  },
+  {
     "name": "Angel",
     "lifts": 0,
     "escalators": 6,
@@ -2441,6 +2502,53 @@
     }
   },
   {
+    "name": "Beckenham Hill",
+    "platforms": [
+      {
+        "id": "910GBCKNHMH-Plat01-NB-national-rail",
+        "name": "Northbound Platform 1",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GBCKNHMH-Plat02-SB-national-rail",
+        "name": "Southbound Platform 2",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "910GBCKNHMH",
+    "zones": [
+      4
+    ],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.423754,
+      "lng": -0.014894
+    }
+  },
+  {
     "name": "Beckenham Junction",
     "platforms": [
       {
@@ -2756,6 +2864,53 @@
     }
   },
   {
+    "name": "Bellingham",
+    "platforms": [
+      {
+        "id": "910GBELNGHM-Plat01-NB-national-rail",
+        "name": "Northbound Platform 1",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GBELNGHM-Plat02-SB-national-rail",
+        "name": "Southbound Platform 2",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "910GBELNGHM",
+    "zones": [
+      3
+    ],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.433874,
+      "lng": -0.02044
+    }
+  },
+  {
     "name": "Belsize Park",
     "lifts": 3,
     "escalators": 0,
@@ -2968,6 +3123,73 @@
         "mocked": true
       }
     ]
+  },
+  {
+    "name": "Bickley",
+    "platforms": [
+      {
+        "id": "910GBICKLEY-Plat01-NB-national-rail",
+        "name": "Northbound Platform 1",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false
+      },
+      {
+        "id": "910GBICKLEY-Plat02-SB-national-rail",
+        "name": "Southbound Platform 2",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false
+      },
+      {
+        "id": "910GBICKLEY-Plat03-NB-national-rail",
+        "name": "Northbound Platform 3",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false
+      },
+      {
+        "id": "910GBICKLEY-Plat04-SB-national-rail",
+        "name": "Southbound Platform 4",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "910GBICKLEY",
+    "zones": [
+      5
+    ],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.40012,
+      "lng": 0.045241
+    }
   },
   {
     "name": "Birkbeck",
@@ -4708,6 +4930,95 @@
     "coordinates": {
       "lat": 51.602772,
       "lng": -0.264048
+    }
+  },
+  {
+    "name": "Bushey",
+    "platforms": [
+      {
+        "id": "HUBBSH-Plat01-NB-london-overground",
+        "name": "Northbound Platform 1",
+        "direction": "Northbound",
+        "lines": [
+          "London Overground"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false
+      },
+      {
+        "id": "HUBBSH-Plat02-SB-london-overground",
+        "name": "Southbound Platform 2",
+        "direction": "Southbound",
+        "lines": [
+          "London Overground"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false
+      },
+      {
+        "id": "HUBBSH-Plat04-SB-national-rail",
+        "name": "Southbound Platform 4",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false
+      },
+      {
+        "id": "HUBBSH-Plat03-NB-national-rail",
+        "name": "Northbound Platform 3",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false
+      },
+      {
+        "id": "HUBBSH-Plat06-SB-national-rail",
+        "name": "Southbound Platform 6",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false
+      },
+      {
+        "id": "HUBBSH-Plat05-NB-national-rail",
+        "name": "Northbound Platform 5",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "HUBBSH",
+    "zones": [
+      8
+    ],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.645628,
+      "lng": -0.3856
     }
   },
   {
@@ -6760,6 +7071,100 @@
     ]
   },
   {
+    "name": "Cheshunt",
+    "platforms": [
+      {
+        "id": "910GCHESHNT-Plat01-SB-national-rail",
+        "name": "Southbound Platform 1",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false,
+        "accessibilityNote": "Step-free platform interchange to/from Platform 1 requires a 70m journey by street"
+      },
+      {
+        "id": "910GCHESHNT-Plat02-NB-national-rail",
+        "name": "Northbound Platform 2",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false,
+        "accessibilityNote": "Step-free platform interchange to/from Platform 1 requires a 70m journey by street"
+      },
+      {
+        "id": "910GCHESHNT-Plat03-SB-london-overground",
+        "name": "Southbound Platform 3",
+        "direction": "Southbound",
+        "lines": [
+          "London Overground"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false,
+        "accessibilityNote": "Step-free platform interchange to/from Platform 1 requires a 70m journey by street"
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "910GCHESHNT",
+    "zones": [
+      8
+    ],
+    "wifi": true,
+    "blueBadgeParking": true,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "Partial",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.702864,
+      "lng": -0.02176
+    },
+    "toilets": [
+      {
+        "type": "Male",
+        "accessible": false,
+        "babyChanging": false,
+        "insideGateline": false,
+        "feeCharged": false,
+        "radarKey": false,
+        "opensWithStation": false,
+        "managedByTfL": false,
+        "location": "Located in ticket hall"
+      },
+      {
+        "type": "Female",
+        "accessible": false,
+        "babyChanging": false,
+        "insideGateline": false,
+        "feeCharged": false,
+        "radarKey": false,
+        "opensWithStation": false,
+        "managedByTfL": false,
+        "location": "Located in ticket hall"
+      },
+      {
+        "type": "Unisex",
+        "accessible": true,
+        "babyChanging": false,
+        "insideGateline": false,
+        "feeCharged": false,
+        "radarKey": false,
+        "opensWithStation": false,
+        "managedByTfL": false,
+        "location": "Located in ticket hall"
+      }
+    ]
+  },
+  {
     "name": "Chigwell",
     "lifts": 0,
     "escalators": 0,
@@ -7745,6 +8150,124 @@
     "coordinates": {
       "lat": 51.513092,
       "lng": -0.124436
+    }
+  },
+  {
+    "name": "Cricklewood",
+    "platforms": [
+      {
+        "id": "910GCRKLWD-Plat01-SB-national-rail",
+        "name": "Southbound Platform 1",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GCRKLWD-Plat02-NB-national-rail",
+        "name": "Northbound Platform 2",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GCRKLWD-Plat03-SB-national-rail",
+        "name": "Southbound Platform 3",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GCRKLWD-Plat04-NB-national-rail",
+        "name": "Northbound Platform 4",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "910GCRKLWD",
+    "zones": [
+      3
+    ],
+    "wifi": true,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.558321,
+      "lng": -0.212364
+    }
+  },
+  {
+    "name": "Crofton Park",
+    "platforms": [
+      {
+        "id": "910GCFPK-Plat01-NB-national-rail",
+        "name": "Northbound Platform 1",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GCFPK-Plat02-SB-national-rail",
+        "name": "Southbound Platform 2",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "910GCFPK",
+    "zones": [
+      3
+    ],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.454573,
+      "lng": -0.037422
     }
   },
   {
@@ -13459,6 +13982,53 @@
     }
   },
   {
+    "name": "Hackbridge",
+    "platforms": [
+      {
+        "id": "910GHKBG-Plat01-EB-national-rail",
+        "name": "Eastbound Platform 1",
+        "direction": "Eastbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GHKBG-Plat02-WB-national-rail",
+        "name": "Westbound Platform 2",
+        "direction": "Westbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "910GHKBG",
+    "zones": [
+      4
+    ],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.378051,
+      "lng": -0.153986
+    }
+  },
+  {
     "name": "Hackney Central",
     "escalators": 0,
     "platforms": [
@@ -15091,6 +15661,53 @@
     }
   },
   {
+    "name": "Haydons Road",
+    "platforms": [
+      {
+        "id": "910GHYDNSRD-Plat01-NB-national-rail",
+        "name": "Northbound Platform 1",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GHYDNSRD-Plat02-SB-national-rail",
+        "name": "Southbound Platform 2",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "910GHYDNSRD",
+    "zones": [
+      3
+    ],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.425536,
+      "lng": -0.188826
+    }
+  },
+  {
     "name": "Hayes & Harlington",
     "escalators": 0,
     "platforms": [
@@ -15885,6 +16502,78 @@
         "mocked": true
       }
     ]
+  },
+  {
+    "name": "Hendon",
+    "platforms": [
+      {
+        "id": "910GHDON-Plat01-SB-national-rail",
+        "name": "Southbound Platform 1",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GHDON-Plat02-NB-national-rail",
+        "name": "Northbound Platform 2",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GHDON-Plat03-SB-national-rail",
+        "name": "Southbound Platform 3",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GHDON-Plat04-NB-national-rail",
+        "name": "Northbound Platform 4",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "910GHDON",
+    "zones": [
+      3,
+      4
+    ],
+    "wifi": true,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.580699,
+      "lng": -0.238895
+    }
   },
   {
     "name": "Hendon Central",
@@ -21010,6 +21699,53 @@
     "lifts": 2
   },
   {
+    "name": "Loughborough Junction",
+    "platforms": [
+      {
+        "id": "910GLBGHJN-Plat01-NB-national-rail",
+        "name": "Northbound Platform 1",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GLBGHJN-Plat02-SB-national-rail",
+        "name": "Southbound Platform 2",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "910GLBGHJN",
+    "zones": [
+      2
+    ],
+    "wifi": true,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.466599,
+      "lng": -0.102573
+    }
+  },
+  {
     "name": "Loughton",
     "lifts": 0,
     "escalators": 0,
@@ -21841,6 +22577,53 @@
     ]
   },
   {
+    "name": "Maze Hill",
+    "platforms": [
+      {
+        "id": "910GMAZEH-Plat01-WB-national-rail",
+        "name": "Westbound Platform 1",
+        "direction": "Westbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GMAZEH-Plat02-EB-national-rail",
+        "name": "Eastbound Platform 2",
+        "direction": "Eastbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "910GMAZEH",
+    "zones": [
+      3
+    ],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.482567,
+      "lng": 0.003056
+    }
+  },
+  {
     "name": "Merton Park",
     "platforms": [
       {
@@ -21950,6 +22733,77 @@
     "coordinates": {
       "lat": 51.52512,
       "lng": -0.03364
+    }
+  },
+  {
+    "name": "Mill Hill Broadway",
+    "platforms": [
+      {
+        "id": "910GMLHB-Plat01-SB-national-rail",
+        "name": "Southbound Platform 1",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GMLHB-Plat02-NB-national-rail",
+        "name": "Northbound Platform 2",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GMLHB-Plat03-SB-national-rail",
+        "name": "Southbound Platform 3",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GMLHB-Plat04-NB-national-rail",
+        "name": "Northbound Platform 4",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "to_platform",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "910GMLHB",
+    "zones": [
+      4
+    ],
+    "wifi": true,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.61365,
+      "lng": -0.249363
     }
   },
   {
@@ -22672,6 +23526,53 @@
     }
   },
   {
+    "name": "Morden South",
+    "platforms": [
+      {
+        "id": "910GMORDENS-Plat01-NB-national-rail",
+        "name": "Northbound Platform 1",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GMORDENS-Plat02-SB-national-rail",
+        "name": "Southbound Platform 2",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "910GMORDENS",
+    "zones": [
+      4
+    ],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.396063,
+      "lng": -0.200211
+    }
+  },
+  {
     "name": "Mornington Crescent",
     "lifts": 2,
     "escalators": 0,
@@ -22807,6 +23708,77 @@
     "coordinates": {
       "lat": 51.343155,
       "lng": -0.01779
+    }
+  },
+  {
+    "name": "New Barnet",
+    "platforms": [
+      {
+        "id": "910GNBARNET-Plat01-SB-national-rail",
+        "name": "Southbound Platform 1",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GNBARNET-Plat02-SB-national-rail",
+        "name": "Southbound Platform 2",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GNBARNET-Plat03-NB-national-rail",
+        "name": "Northbound Platform 3",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GNBARNET-Plat04-NB-national-rail",
+        "name": "Northbound Platform 4",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "910GNBARNET",
+    "zones": [
+      5
+    ],
+    "wifi": true,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.649014,
+      "lng": -0.173587
     }
   },
   {
@@ -23028,6 +24000,77 @@
       "lng": -0.040275
     },
     "lifts": 3
+  },
+  {
+    "name": "New Southgate",
+    "platforms": [
+      {
+        "id": "910GNEWSGAT-Plat01-SB-national-rail",
+        "name": "Southbound Platform 1",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GNEWSGAT-Plat02-SB-national-rail",
+        "name": "Southbound Platform 2",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GNEWSGAT-Plat03-NB-national-rail",
+        "name": "Northbound Platform 3",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GNEWSGAT-Plat04-NB-national-rail",
+        "name": "Northbound Platform 4",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "910GNEWSGAT",
+    "zones": [
+      4
+    ],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.615197,
+      "lng": -0.143413
+    }
   },
   {
     "name": "Newbury Park",
@@ -23894,6 +24937,123 @@
     ]
   },
   {
+    "name": "Norwood Junction",
+    "platforms": [
+      {
+        "id": "HUBNWD-Plat01-NB-london-overground|national-rail",
+        "name": "Northbound Platform 1",
+        "direction": "Northbound",
+        "lines": [
+          "London Overground",
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "accessibleEntrance": "Station Road",
+        "boardingRamp": true,
+        "levelAccess": false,
+        "accessibilityNote": "You can only enter and exit the northbound platform via the Station Road entrance"
+      },
+      {
+        "id": "HUBNWD-Plat03-NB-london-overground|national-rail",
+        "name": "Northbound Platform 3",
+        "direction": "Northbound",
+        "lines": [
+          "London Overground",
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false
+      },
+      {
+        "id": "HUBNWD-Plat04-SB-national-rail",
+        "name": "Southbound Platform 4",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "HUBNWD-Plat05-SB-london-overground|national-rail",
+        "name": "Southbound Platform 5",
+        "direction": "Southbound",
+        "lines": [
+          "London Overground",
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false
+      },
+      {
+        "id": "HUBNWD-Plat06-SB-london-overground|national-rail",
+        "name": "Southbound Platform 6",
+        "direction": "Southbound",
+        "lines": [
+          "London Overground",
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "HUBNWD",
+    "zones": [
+      4
+    ],
+    "wifi": false,
+    "blueBadgeParking": true,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "Partial",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.398634,
+      "lng": -0.075125
+    },
+    "toilets": [
+      {
+        "type": "Male",
+        "accessible": false,
+        "babyChanging": false,
+        "insideGateline": true,
+        "feeCharged": false,
+        "radarKey": false,
+        "opensWithStation": false,
+        "managedByTfL": true
+      },
+      {
+        "type": "Female",
+        "accessible": false,
+        "babyChanging": true,
+        "insideGateline": true,
+        "feeCharged": false,
+        "radarKey": false,
+        "opensWithStation": false,
+        "managedByTfL": true
+      },
+      {
+        "type": "Unisex",
+        "accessible": true,
+        "babyChanging": false,
+        "insideGateline": true,
+        "feeCharged": false,
+        "radarKey": false,
+        "opensWithStation": false,
+        "managedByTfL": true
+      }
+    ]
+  },
+  {
     "name": "Notting Hill Gate",
     "lifts": 0,
     "escalators": 6,
@@ -24006,6 +25166,124 @@
         "mocked": true
       }
     ]
+  },
+  {
+    "name": "Nunhead",
+    "platforms": [
+      {
+        "id": "910GNUNHEAD-Plat01-WB-national-rail",
+        "name": "Westbound Platform 1",
+        "direction": "Westbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GNUNHEAD-Plat02-EB-national-rail",
+        "name": "Eastbound Platform 2",
+        "direction": "Eastbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "910GNUNHEAD",
+    "zones": [
+      2
+    ],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.466591,
+      "lng": -0.05162
+    }
+  },
+  {
+    "name": "Oakleigh Park",
+    "platforms": [
+      {
+        "id": "910GOKLGHPK-Plat01-SB-national-rail",
+        "name": "Southbound Platform 1",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GOKLGHPK-Plat02-SB-national-rail",
+        "name": "Southbound Platform 2",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GOKLGHPK-Plat03-NB-national-rail",
+        "name": "Northbound Platform 3",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GOKLGHPK-Plat04-NB-national-rail",
+        "name": "Northbound Platform 4",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "910GOKLGHPK",
+    "zones": [
+      4
+    ],
+    "wifi": true,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.637284,
+      "lng": -0.166442
+    }
   },
   {
     "name": "Oakwood",
@@ -25607,6 +26885,156 @@
     }
   },
   {
+    "name": "Peckham Rye",
+    "platforms": [
+      {
+        "id": "910GPCKHMRY-Plat01-WB-london-overground|national-rail",
+        "name": "Westbound Platform 1",
+        "direction": "Westbound",
+        "lines": [
+          "London Overground",
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false
+      },
+      {
+        "id": "910GPCKHMRY-Plat02-EB-london-overground|national-rail",
+        "name": "Eastbound Platform 2",
+        "direction": "Eastbound",
+        "lines": [
+          "London Overground",
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false
+      },
+      {
+        "id": "910GPCKHMRY-Plat03-NB-national-rail",
+        "name": "Northbound Platform 3",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GPCKHMRY-Plat04-SB-national-rail",
+        "name": "Southbound Platform 4",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "910GPCKHMRY",
+    "zones": [
+      2
+    ],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.470113,
+      "lng": -0.069397
+    }
+  },
+  {
+    "name": "Penge West",
+    "platforms": [
+      {
+        "id": "910GPENEW-Plat01-NB-london-overground|national-rail",
+        "name": "Northbound Platform 1",
+        "direction": "Northbound",
+        "lines": [
+          "London Overground",
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false
+      },
+      {
+        "id": "910GPENEW-Plat02-SB-london-overground|national-rail",
+        "name": "Southbound Platform 2",
+        "direction": "Southbound",
+        "lines": [
+          "London Overground",
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "910GPENEW",
+    "zones": [
+      4
+    ],
+    "wifi": true,
+    "blueBadgeParking": true,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.417666,
+      "lng": -0.061123
+    },
+    "toilets": [
+      {
+        "type": "Male",
+        "accessible": false,
+        "babyChanging": false,
+        "insideGateline": true,
+        "feeCharged": false,
+        "radarKey": false,
+        "opensWithStation": false,
+        "managedByTfL": true
+      },
+      {
+        "type": "Female",
+        "accessible": false,
+        "babyChanging": true,
+        "insideGateline": true,
+        "feeCharged": false,
+        "radarKey": false,
+        "opensWithStation": false,
+        "managedByTfL": true
+      },
+      {
+        "type": "Unisex",
+        "accessible": true,
+        "babyChanging": false,
+        "insideGateline": true,
+        "feeCharged": false,
+        "radarKey": false,
+        "opensWithStation": false,
+        "managedByTfL": true
+      }
+    ]
+  },
+  {
     "name": "Perivale",
     "lifts": 0,
     "escalators": 0,
@@ -27064,6 +28492,53 @@
     "coordinates": {
       "lat": 51.51031,
       "lng": -0.187152
+    }
+  },
+  {
+    "name": "Ravensbourne",
+    "platforms": [
+      {
+        "id": "910GRBRN-Plat01-NB-national-rail",
+        "name": "Northbound Platform 1",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GRBRN-Plat02-SB-national-rail",
+        "name": "Southbound Platform 2",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "910GRBRN",
+    "zones": [
+      4
+    ],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.41418,
+      "lng": -0.007687
     }
   },
   {
@@ -29154,6 +30629,53 @@
     "lifts": 3
   },
   {
+    "name": "Slade Green",
+    "platforms": [
+      {
+        "id": "910GSLADEGN-Plat01-WB-national-rail",
+        "name": "Westbound Platform 1",
+        "direction": "Westbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GSLADEGN-Plat02-EB-national-rail",
+        "name": "Eastbound Platform 2",
+        "direction": "Eastbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "910GSLADEGN",
+    "zones": [
+      6
+    ],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.467685,
+      "lng": 0.190501
+    }
+  },
+  {
     "name": "Sloane Square",
     "lifts": 0,
     "escalators": 2,
@@ -29424,6 +30946,86 @@
     ]
   },
   {
+    "name": "South Croydon",
+    "platforms": [
+      {
+        "id": "910GSCROYDN-Plat01-NB-national-rail",
+        "name": "Northbound Platform 1",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false
+      },
+      {
+        "id": "910GSCROYDN-Plat02-SB-national-rail",
+        "name": "Southbound Platform 2",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false
+      },
+      {
+        "id": "910GSCROYDN-Plat03-NB-national-rail",
+        "name": "Northbound Platform 3",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GSCROYDN-Plat04-SB-national-rail",
+        "name": "Southbound Platform 4",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false
+      },
+      {
+        "id": "910GSCROYDN-Plat05-SB-national-rail",
+        "name": "Southbound Platform 5",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "910GSCROYDN",
+    "zones": [
+      5
+    ],
+    "wifi": true,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.362834,
+      "lng": -0.093778
+    }
+  },
+  {
     "name": "South Ealing",
     "lifts": 0,
     "escalators": 0,
@@ -29686,6 +31288,53 @@
     "coordinates": {
       "lat": 51.57023,
       "lng": -0.308433
+    }
+  },
+  {
+    "name": "South Merton",
+    "platforms": [
+      {
+        "id": "910GSMERTON-Plat01-NB-national-rail",
+        "name": "Northbound Platform 1",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GSMERTON-Plat02-SB-national-rail",
+        "name": "Southbound Platform 2",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "910GSMERTON",
+    "zones": [
+      4
+    ],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.402718,
+      "lng": -0.204938
     }
   },
   {
@@ -30376,6 +32025,53 @@
         "mocked": true
       }
     ]
+  },
+  {
+    "name": "St Helier (London)",
+    "platforms": [
+      {
+        "id": "910GSHLIER-Plat01-NB-national-rail",
+        "name": "Northbound Platform 1",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GSHLIER-Plat02-SB-national-rail",
+        "name": "Southbound Platform 2",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "910GSHLIER",
+    "zones": [
+      4
+    ],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.390161,
+      "lng": -0.198272
+    }
   },
   {
     "name": "St Mary Cray",
@@ -31870,6 +33566,100 @@
     ]
   },
   {
+    "name": "Sutton",
+    "platforms": [
+      {
+        "id": "910GSUTTON-Plat01-EB-national-rail",
+        "name": "Eastbound Platform 1",
+        "direction": "Eastbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GSUTTON-Plat02-WB-national-rail",
+        "name": "Westbound Platform 2",
+        "direction": "Westbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "910GSUTTON",
+    "zones": [
+      5
+    ],
+    "wifi": true,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.359553,
+      "lng": -0.191415
+    }
+  },
+  {
+    "name": "Sutton Common",
+    "platforms": [
+      {
+        "id": "910GSUTTONC-Plat01-NB-national-rail",
+        "name": "Northbound Platform 1",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GSUTTONC-Plat02-SB-national-rail",
+        "name": "Southbound Platform 2",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "910GSUTTONC",
+    "zones": [
+      4
+    ],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.374955,
+      "lng": -0.196541
+    }
+  },
+  {
     "name": "Swanley",
     "escalators": 0,
     "platforms": [
@@ -32016,6 +33806,69 @@
         "mocked": true
       }
     ]
+  },
+  {
+    "name": "Sydenham",
+    "platforms": [
+      {
+        "id": "HUBSYD-Plat01-NB-london-overground|national-rail",
+        "name": "Northbound Platform 1",
+        "direction": "Northbound",
+        "lines": [
+          "London Overground",
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "accessibleEntrance": "Peak Hill Gardens",
+        "boardingRamp": true,
+        "levelAccess": false,
+        "accessibilityNote": "Use the Peak Hill Gardens entrance for northbound platform",
+        "interchangeTo": [
+          {
+            "to": "Southbound Platform 2",
+            "distanceM": 350
+          }
+        ]
+      },
+      {
+        "id": "HUBSYD-Plat02-SB-london-overground|national-rail",
+        "name": "Southbound Platform 2",
+        "direction": "Southbound",
+        "lines": [
+          "London Overground",
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "accessibleEntrance": "Station Approach",
+        "boardingRamp": true,
+        "levelAccess": false,
+        "accessibilityNote": "Use the Station Approach emtrance for southbound platform",
+        "interchangeTo": [
+          {
+            "to": "Northbound Platform 1",
+            "distanceM": 350
+          }
+        ]
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "HUBSYD",
+    "zones": [
+      3
+    ],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "Partial",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.427354,
+      "lng": -0.054225
+    }
   },
   {
     "name": "Taplow",
@@ -33126,6 +34979,53 @@
     "coordinates": {
       "lat": 51.55682,
       "lng": -0.138434
+    }
+  },
+  {
+    "name": "Tulse Hill",
+    "platforms": [
+      {
+        "id": "910GTULSEH-Plat01-NB-national-rail",
+        "name": "Northbound Platform 1",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GTULSEH-Plat02-SB-national-rail",
+        "name": "Southbound Platform 2",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "910GTULSEH",
+    "zones": [
+      3
+    ],
+    "wifi": true,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.439747,
+      "lng": -0.106477
     }
   },
   {
@@ -37132,6 +39032,53 @@
     "lifts": 2
   },
   {
+    "name": "West Sutton",
+    "platforms": [
+      {
+        "id": "910GWSUTTON-Plat01-NB-national-rail",
+        "name": "Northbound Platform 1",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GWSUTTON-Plat02-SB-national-rail",
+        "name": "Southbound Platform 2",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "910GWSUTTON",
+    "zones": [
+      5
+    ],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.365804,
+      "lng": -0.205577
+    }
+  },
+  {
     "name": "Westbourne Park",
     "lifts": 0,
     "escalators": 0,
@@ -37176,6 +39123,53 @@
     "coordinates": {
       "lat": 51.521108,
       "lng": -0.201065
+    }
+  },
+  {
+    "name": "Westcombe Park",
+    "platforms": [
+      {
+        "id": "910GWCOMBEP-Plat01-WB-national-rail",
+        "name": "Westbound Platform 1",
+        "direction": "Westbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GWCOMBEP-Plat02-EB-national-rail",
+        "name": "Eastbound Platform 2",
+        "direction": "Eastbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "Full",
+        "boardingRamp": true,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "910GWCOMBEP",
+    "zones": [
+      3
+    ],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.483233,
+      "lng": 0.019763
     }
   },
   {
@@ -38250,6 +40244,53 @@
         "location": "Located in National Rail station"
       }
     ]
+  },
+  {
+    "name": "Wimbledon Chase",
+    "platforms": [
+      {
+        "id": "910GWIMLCHS-Plat01-NB-national-rail",
+        "name": "Northbound Platform 1",
+        "direction": "Northbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      },
+      {
+        "id": "910GWIMLCHS-Plat02-SB-national-rail",
+        "name": "Southbound Platform 2",
+        "direction": "Southbound",
+        "lines": [
+          "National Rail"
+        ],
+        "stepFreeAccess": "none",
+        "boardingRamp": false,
+        "levelAccess": false,
+        "accessibilityNote": "Not operated by TfL. If you need assistance, please check assisted travel at www.thameslinkrailway.co.uk"
+      }
+    ],
+    "lifts": 0,
+    "escalators": 0,
+    "id": "910GWIMLCHS",
+    "zones": [
+      3
+    ],
+    "wifi": false,
+    "blueBadgeParking": false,
+    "taxiRank": false,
+    "interchange": {
+      "nationalRail": "None",
+      "bus": "None",
+      "pier": "None"
+    },
+    "coordinates": {
+      "lat": 51.409233,
+      "lng": -0.214058
+    }
   },
   {
     "name": "Wimbledon Park",
