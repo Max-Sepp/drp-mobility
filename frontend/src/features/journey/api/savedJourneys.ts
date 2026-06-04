@@ -6,9 +6,9 @@
 // a single array under one AsyncStorage key.
 
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import type { StationOutage } from './accessibility'
-import type { ResolvedLocation } from './geocode'
-import type { AccessibilityPreference, Journey } from './tfl'
+import type { StationOutage } from '@/features/journey/api/accessibility'
+import type { ResolvedLocation } from '@/features/journey/api/geocode'
+import type { AccessibilityPreference, Journey } from '@/features/journey/api/tfl'
 
 const STORAGE_KEY = '@drp/saved-journeys'
 

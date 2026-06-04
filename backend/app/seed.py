@@ -52,7 +52,12 @@ def seed_defaults(db: Session) -> None:
     stations = {s.name: s for s in db.query(Station).all()}
     for data in stations_data:
         if data["name"] not in stations:
-            stations[data["name"]] = Station(name=data["name"])
+            coords = data.get("coordinates") or {}
+            stations[data["name"]] = Station(
+                name=data["name"],
+                latitude=coords.get("lat"),
+                longitude=coords.get("lng"),
+            )
             db.add(stations[data["name"]])
     db.flush()
 

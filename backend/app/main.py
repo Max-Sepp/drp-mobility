@@ -1,4 +1,7 @@
+import os
+
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import Base, SessionLocal, engine
 
@@ -22,6 +25,21 @@ with SessionLocal() as session:
     seed_defaults(session)
 
 app = FastAPI()
+
+if os.getenv("DEV", "false").lower() == "true":
+    app.add_middleware(
+        CORSMiddleware,
+        # Allow Expo web dev server (8081) and any LAN IP the dev may use.
+        # In production (EAS native build) the app hits the API directly — no browser CORS applies.
+        allow_origins=[
+            "http://localhost:8081",
+            "http://localhost:19006",
+            "http://127.0.0.1:8081",
+        ],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 app.include_router(outage_reports.router)
 app.include_router(failures.router)

@@ -1,6 +1,7 @@
 import { Spinner, Text, XStack, YStack } from 'tamagui'
 import type { components } from '@/api/schema.d'
-import { FormSection } from './FormSection'
+import { FormSection } from '@/features/reporting/components/FormSection'
+import { Borders, Colors, Opacity, Radii } from '@/theme'
 
 type Equipment = components['schemas']['EquipmentSummary']
 
@@ -13,7 +14,6 @@ type EquipmentPickerProps = {
   emptyText: string
 }
 
-/** Single-select list of equipment connections; shows a spinner while loading and a message when empty. */
 export const EquipmentPicker = ({
   label,
   loading,
@@ -25,9 +25,9 @@ export const EquipmentPicker = ({
   return (
     <FormSection label={label}>
       {loading ? (
-        <Spinner color="#9ca3af" />
+        <Spinner color={Colors.secondaryText} />
       ) : equipment.length === 0 ? (
-        <Text fontSize={15} color="#9ca3af">
+        <Text fontSize={15} color={Colors.secondaryText}>
           {emptyText}
         </Text>
       ) : (
@@ -38,37 +38,37 @@ export const EquipmentPicker = ({
               key={e.id}
               items="center"
               gap="$3"
-              pressStyle={{ opacity: 0.7 }}
+              pressStyle={{ opacity: Opacity.pressed }}
               onPress={() => onSelect(e.id)}
               mb="$2"
               style={{
                 paddingVertical: 12,
                 paddingHorizontal: 14,
-                borderWidth: 1,
-                borderColor: selected ? '#2d6a4f' : '#e5e7eb',
-                borderRadius: 8,
-                backgroundColor: selected ? '#f0fdf4' : 'white',
+                borderWidth: Borders.thin,
+                borderColor: selected ? Colors.successDark : Colors.border,
+                borderRadius: Radii.small,
+                backgroundColor: selected ? Colors.successBg : Colors.card,
               }}
             >
               <YStack
                 style={{
                   width: 22,
                   height: 22,
-                  borderRadius: 4,
-                  borderWidth: 2,
-                  borderColor: selected ? '#2d6a4f' : '#9ca3af',
-                  backgroundColor: selected ? '#2d6a4f' : 'transparent',
+                  borderRadius: Radii.xs,
+                  borderWidth: Borders.thick,
+                  borderColor: selected ? Colors.blue : Colors.placeholderText,
+                  backgroundColor: selected ? Colors.blue : 'transparent',
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
               >
                 {selected && (
-                  <Text color="white" fontSize={12} fontWeight="700">
-                    ✕
+                  <Text color={Colors.card} fontSize={12} fontWeight="700">
+                    ✓
                   </Text>
                 )}
               </YStack>
-              <Text flex={1} fontSize={15} color="#111827">
+              <Text flex={1} fontSize={15} color={Colors.text}>
                 {e.connection}
               </Text>
             </XStack>
