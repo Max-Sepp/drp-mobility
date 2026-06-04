@@ -23,13 +23,11 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  Pressable,
   TouchableOpacity,
   View,
 } from 'react-native'
 import type { CustomPlace, SavedPlaces } from '@/features/journey/api/savedPlaces'
-
-// useNativeDriver is not available on web (no native animation module).
-const USE_NATIVE_DRIVER = Platform.OS !== 'web'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { clockTime } from '@/features/journey/components/legDisplay'
 import type { SavedJourney } from '@/features/journey/api/savedJourneys'
@@ -43,7 +41,10 @@ import {
 import { useStations, type StationDetail } from '@/features/stations/useStations'
 import { fuzzyScore } from '@/lib/fuzzy'
 import { useAppLocation } from '@/lib/LocationContext'
-import { Colors, Radii, Shadows, Spacing, Typography } from '@/theme'
+import { Colors, Overlays, Radii, Shadows, Spacing, Typography } from '@/theme'
+
+// useNativeDriver is not available on web (no native animation module).
+const USE_NATIVE_DRIVER = Platform.OS !== 'web'
 
 // ---------------------------------------------------------------------------
 // Geometry
@@ -373,7 +374,15 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
 
     const [contentPanHandlers] = useState(() =>
       PanResponder.create({
+        // Capture phase fires parent-before-child, so the body View claims the drag
+        // before the ScrollView inside can hold it. Only active when not at full snap
+        // (where the ScrollView should scroll normally). Pure taps are unaffected
+        // because move handlers only fire once the finger actually moves.
         onMoveShouldSetPanResponder: (_evt, g) => {
+          if (snapRef.current === 'full') return false
+          return Math.abs(g.dy) > 8 && Math.abs(g.dy) > Math.abs(g.dx)
+        },
+        onMoveShouldSetPanResponderCapture: (_evt, g) => {
           if (snapRef.current === 'full') return false
           return Math.abs(g.dy) > 8 && Math.abs(g.dy) > Math.abs(g.dx)
         },
@@ -497,8 +506,23 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
     const hasQuery = query.length >= 3
     const hasResults = stationResults.length > 0 || locationResults.length > 0
 
+    // Backdrop opacity interpolated from translateY so it tracks the drag in real time.
+    // Full snap (translateY=0) → fully opaque; mid snap (translateY=SNAP_MID) → transparent.
+    const backdropOpacity = translateY.interpolate({
+      inputRange: [SNAP_FULL, SNAP_MID],
+      outputRange: [1, 0],
+      extrapolate: 'clamp',
+    })
+
     return (
-      <Animated.View
+      <>
+        <Animated.View
+          pointerEvents={atFull ? 'auto' : 'none'}
+          style={[StyleSheet.absoluteFill, styles.backdrop, { opacity: backdropOpacity }]}
+        >
+          <Pressable style={StyleSheet.absoluteFill} onPress={() => snapTo('mid')} />
+        </Animated.View>
+        <Animated.View
         style={[
           styles.sheet,
           {
@@ -546,15 +570,6 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
             )}
           </TouchableOpacity>
 
-          {atFull && (
-            <TouchableOpacity
-              onPress={() => snapTo('collapsed')}
-              style={styles.cancelBtn}
-              activeOpacity={0.7}
-            >
-              <Text style={[Typography.bodyBold, { color: Colors.blue }]}>Cancel</Text>
-            </TouchableOpacity>
-          )}
         </View>
 
         {/* Body — always mounted so it slides off-screen rather than popping out */}
@@ -665,7 +680,8 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
               </ScrollView>
             )}
         </View>
-      </Animated.View>
+        </Animated.View>
+      </>
     )
   },
 )
@@ -675,6 +691,9 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
 // ---------------------------------------------------------------------------
 
 const styles = StyleSheet.create({
+  backdrop: {
+    backgroundColor: Overlays.backdrop,
+  },
   sheet: {
     position: 'absolute',
     bottom: 0,
@@ -725,8 +744,6 @@ const styles = StyleSheet.create({
     color: Colors.text,
     padding: 0,
   },
-  cancelBtn: {},
-
   // Body wrapper — contentPanHandlers spread here so anywhere on the body is draggable
   // when not at full snap.
   bodyWrapper: {
