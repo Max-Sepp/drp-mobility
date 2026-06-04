@@ -1,8 +1,9 @@
 import { useEffect, useRef } from 'react'
+import Constants from 'expo-constants'
 import * as Notifications from 'expo-notifications'
 import { Platform } from 'react-native'
 import { useAuth } from '@/features/auth/context/AuthContext'
-import { registerPushToken } from '@/features/auth/api/pushToken'
+import { registerPushToken, setActivePushToken } from '@/features/auth/api/pushToken'
 import { navigationRef } from '@/navigation/navigationRef'
 
 // Show notifications even when the app is in the foreground.
@@ -56,12 +57,12 @@ export function usePushNotifications(): void {
       }
       if (finalStatus !== 'granted') return
 
-      const { data: token } = await Notifications.getExpoPushTokenAsync({
-        projectId: 'fa941353-94dc-490c-a5b0-209e52e4ee56',
-      })
+      const projectId = Constants.expoConfig?.extra?.eas?.projectId as string | undefined
+      const { data: token } = await Notifications.getExpoPushTokenAsync({ projectId })
 
       if (cancelled) return
       tokenRef.current = token
+      setActivePushToken(token)
       await registerPushToken(token)
     }
 

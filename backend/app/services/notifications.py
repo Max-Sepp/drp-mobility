@@ -28,7 +28,7 @@ from app.models.saved_journey import SavedJourney
 
 _log = logging.getLogger(__name__)
 
-EXPO_PUSH_URL = "https://exp.host/--/expoent/api/v2/push/send"
+EXPO_PUSH_URL = "https://exp.host/--/api/v2/push/send"
 
 _STATION_SUFFIX_RE = re.compile(
     r"\s+(?:underground|overground|rail|dlr|bus|elizabeth\s+line)?\s*station$",

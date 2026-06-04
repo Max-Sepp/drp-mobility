@@ -11,6 +11,7 @@ import {
   saveToken,
   signup,
 } from '../api/auth'
+import { deregisterPushToken, getActivePushToken, setActivePushToken } from '../api/pushToken'
 
 // 'loading' only covers the initial token check on launch; the UI stays usable anonymously and
 // never blocks on it. 'authed'/'unauthed' reflect whether a valid session is currently held.
@@ -81,8 +82,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function signOut(): Promise<void> {
-    // Hit the server while the token is still attached, then clear local state.
-    if (getAuthToken()) await logout()
+    // Deregister the push token and invalidate the session while the auth token is still
+    // attached, then clear local state.
+    const pushToken = getActivePushToken()
+    if (getAuthToken()) {
+      await Promise.all([
+        pushToken ? deregisterPushToken(pushToken) : Promise.resolve(),
+        logout(),
+      ])
+    }
+    setActivePushToken(null)
     setAuthToken(null)
     await deleteToken()
     setUser(null)
