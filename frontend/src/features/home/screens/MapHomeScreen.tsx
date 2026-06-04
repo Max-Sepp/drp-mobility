@@ -171,10 +171,6 @@ export function MapHomeScreen({ navigation }: Props) {
     const updated = await loadSavedPlaces(user.id)
     setSavedPlaces(updated)
     setSetPlaceModal(null)
-    const label = key === 'home' ? 'Home' : 'Work'
-    navigation.navigate('JourneyPlanner', {
-      initialTo: { postcode, label },
-    })
   }
 
   function resumeActive(item: ActiveJourney) {
