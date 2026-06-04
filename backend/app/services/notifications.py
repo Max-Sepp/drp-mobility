@@ -17,14 +17,12 @@ import re
 from collections import defaultdict
 
 import httpx
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import joinedload
 
 from app.database import SessionLocal
 from app.models.equipment import Equipment
-from app.models.equipment_type import EquipmentType
 from app.models.failure import Failure
-from app.models.push_token import PushToken
-from app.models.saved_journey import SavedJourney
+from app.repositories.push_token import PushTokenRepository
 
 _log = logging.getLogger(__name__)
 
@@ -63,22 +61,13 @@ def _journey_touches_station(payload_json: str, station_name: str) -> bool:
     return False
 
 
-def _remove_stale_tokens(db: Session, stale_tokens: list[str]) -> None:
-    """Delete push token rows that Expo has reported as no longer valid."""
-    if not stale_tokens:
-        return
-    db.query(PushToken).filter(PushToken.token.in_(stale_tokens)).delete(
-        synchronize_session=False
-    )
-    db.commit()
-
-
 def notify_affected_users(failure_id: int) -> None:
     """Background task: send Expo push notifications for a newly-created Failure.
 
     Opens its own DB session so it can safely run after the request session closes."""
     _log.info("notify_affected_users: starting for failure_id=%d", failure_id)
     with SessionLocal() as db:
+        push_tokens = PushTokenRepository(db)
         failure = (
             db.query(Failure)
             .options(
@@ -96,14 +85,12 @@ def notify_affected_users(failure_id: int) -> None:
 
         station_name: str = failure.equipment.station.name
         equipment_type: str = failure.equipment.equipment_type.name
-        _log.info("notify_affected_users: station=%r equipment_type=%r", station_name, equipment_type)
+        _log.info(
+            "notify_affected_users: station=%r equipment_type=%r", station_name, equipment_type
+        )
 
         # Collect push tokens and journey payloads grouped by user.
-        rows = (
-            db.query(PushToken.token, PushToken.user_id, SavedJourney.payload)
-            .join(SavedJourney, SavedJourney.user_id == PushToken.user_id)
-            .all()
-        )
+        rows = push_tokens.tokens_with_saved_journeys()
         _log.info("notify_affected_users: %d (token, journey) rows found", len(rows))
 
         # user_id → {"tokens": {str, ...}, "payloads": [str, ...]}
@@ -146,7 +133,7 @@ def notify_affected_users(failure_id: int) -> None:
                 )
             if resp.status_code == 200:
                 _log.info("notify_affected_users: Expo accepted %d message(s)", len(messages))
-                _prune_stale_tokens(db, resp.json(), list(tokens_to_notify))
+                _prune_stale_tokens(push_tokens, resp.json(), list(tokens_to_notify))
             else:
                 _log.error(
                     "notify_affected_users: Expo push API returned %d: %s",
@@ -157,7 +144,9 @@ def notify_affected_users(failure_id: int) -> None:
             _log.exception("Failed to dispatch push notifications for failure %d", failure_id)
 
 
-def _prune_stale_tokens(db: Session, expo_response: dict, sent_tokens: list[str]) -> None:
+def _prune_stale_tokens(
+    repo: PushTokenRepository, expo_response: dict, sent_tokens: list[str]
+) -> None:
     """Remove tokens that Expo reports as DeviceNotRegistered."""
     data = expo_response.get("data", [])
     if not isinstance(data, list):
@@ -171,4 +160,4 @@ def _prune_stale_tokens(db: Session, expo_response: dict, sent_tokens: list[str]
             and i < len(sent_tokens)
         ):
             stale.append(sent_tokens[i])
-    _remove_stale_tokens(db, stale)
+    repo.delete_by_tokens(stale)

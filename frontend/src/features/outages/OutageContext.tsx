@@ -70,10 +70,15 @@ export function OutageProvider({ children }: { children: ReactNode }) {
   }, [reports])
 
   useEffect(() => {
+    console.log('[outages] opening SSE to', STREAM_URL)
     const es = new EventSource<OutageStreamEvent>(STREAM_URL)
 
-    es.addEventListener('open', () => setConnected(true))
-    es.addEventListener('error', () => {
+    es.addEventListener('open', () => {
+      console.log('[outages] SSE open')
+      setConnected(true)
+    })
+    es.addEventListener('error', (event) => {
+      console.log('[outages] SSE error', JSON.stringify(event))
       setConnected(false)
       // Don't spin forever if the server is unreachable — fall back to whatever is cached.
       setLoading(false)
@@ -82,6 +87,7 @@ export function OutageProvider({ children }: { children: ReactNode }) {
     es.addEventListener('snapshot', (event) => {
       receivedSnapshot.current = true
       const { reports: next } = JSON.parse(event.data ?? '{"reports":[]}') as SnapshotData
+      console.log('[outages] snapshot:', next.length, 'reports')
       setReports([...next].sort(byBreakdownDesc))
       setLoading(false)
     })
