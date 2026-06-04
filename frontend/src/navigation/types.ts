@@ -26,6 +26,16 @@ export type RootStackParamList = {
   }
   // The list of journeys saved to the device.
   SavedJourneys: undefined
+  // The follow/execute screen for an in-progress journey. Mirrors JourneyDetail's payload plus
+  // the savedId every active journey is anchored to (the detail screen saves before starting).
+  ActiveJourney: {
+    savedId: string
+    journey: Journey
+    from?: ResolvedLocation
+    to?: ResolvedLocation
+    outages?: StationOutage[]
+    level?: AccessibilityPreference | null
+  }
   // The station-specific screen (platform access, quick reports, station picker). Reached by
   // tapping a station in a planned journey; `station` is optional so it can also open standalone.
   Station: { station?: Station }
@@ -45,6 +55,7 @@ export type SearchScreenProps = NativeStackScreenProps<RootStackParamList, 'Sear
 export type JourneyPlannerScreenProps = NativeStackScreenProps<RootStackParamList, 'JourneyPlanner'>
 export type JourneyDetailScreenProps = NativeStackScreenProps<RootStackParamList, 'JourneyDetail'>
 export type SavedJourneysScreenProps = NativeStackScreenProps<RootStackParamList, 'SavedJourneys'>
+export type ActiveJourneyScreenProps = NativeStackScreenProps<RootStackParamList, 'ActiveJourney'>
 export type StationScreenProps = NativeStackScreenProps<RootStackParamList, 'Station'>
 export type SelectStationScreenProps = NativeStackScreenProps<RootStackParamList, 'SelectStation'>
 export type ReportFormScreenProps = NativeStackScreenProps<RootStackParamList, 'ReportForm'>

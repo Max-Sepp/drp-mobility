@@ -4,32 +4,31 @@ import { Alert } from 'react-native'
 import { Text, XStack, YStack } from 'tamagui'
 import { ScreenHeader } from '@/components/ScreenHeader'
 import { FormScreenLayout } from '@/features/reporting/components/FormScreenLayout'
+import { SubmitBar } from '@/features/reporting/components/SubmitBar'
 import { useStations } from '@/features/stations'
 import type { JourneyDetailScreenProps } from '@/navigation/types'
 import { resolveStationName } from '@/features/journey/api/accessibility'
 import { assessOutages } from '@/features/journey/api/outageRelevance'
-import type { Leg } from '@/features/journey/api/tfl'
-import { deleteJourney, journeyKey, loadSavedJourneys, saveJourney } from '@/features/journey/api/savedJourneys'
+import { startActiveJourney } from '@/features/journey/api/activeJourney'
+import {
+  deleteJourney,
+  journeyKey,
+  loadSavedJourneys,
+  saveJourney,
+} from '@/features/journey/api/savedJourneys'
 import {
   clockTime,
   fareLabel,
   humanizeSummary,
   LegStations,
+  lineLabel,
   modeIcon,
   modeLabel,
   RouteTags,
-  stripStationSuffix,
 } from '@/features/journey/components/legDisplay'
 import { OutageDetail } from '@/features/journey/components/OutageDetail'
 import { useAuth } from '@/features/auth'
 import { Borders, Colors, Heights, Opacity, Radii } from '@/theme'
-
-function lineLabel(leg: Leg): string | null {
-  const option = leg.routeOptions?.[0]
-  if (!option?.name) return null
-  const direction = option.directions?.find(Boolean)
-  return direction ? `${option.name} towards ${stripStationSuffix(direction)}` : option.name
-}
 
 export const JourneyDetailScreen = ({ navigation, route }: JourneyDetailScreenProps) => {
   const { journey, from, to, outages = [], level, savedId, tags } = route.params
@@ -47,7 +46,9 @@ export const JourneyDetailScreen = ({ navigation, route }: JourneyDetailScreenPr
       const match = saved.find((s) => journeyKey(s.journey, s.from, s.to) === key)
       if (match) setCurrentSavedId(match.id)
     })()
-    return () => { active = false }
+    return () => {
+      active = false
+    }
   }, [savedId, journey, from, to])
 
   const { stations } = useStations()
@@ -81,6 +82,42 @@ export const JourneyDetailScreen = ({ navigation, route }: JourneyDetailScreenPr
     }
   }
 
+  // Begin following the route. A journey must be saved to be followed, so save it first if the
+  // rider hasn't already (silently — the save toggle simply flips to "Saved" afterwards), then
+  // hand off to the active-journey screen.
+  async function startJourney() {
+    if (busy) return
+    setBusy(true)
+    try {
+      let savedJourneyId = currentSavedId
+      if (!savedJourneyId) {
+        const record = await saveJourney({ from, to, level: level ?? null, outages, journey })
+        savedJourneyId = record.id
+        setCurrentSavedId(record.id)
+      }
+      await startActiveJourney({
+        savedId: savedJourneyId,
+        journey,
+        from,
+        to,
+        outages,
+        level: level ?? null,
+      })
+      navigation.replace('ActiveJourney', {
+        savedId: savedJourneyId,
+        journey,
+        from,
+        to,
+        outages,
+        level: level ?? null,
+      })
+    } catch {
+      Alert.alert('Error', 'Could not start this journey. Please try again.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
   const { user } = useAuth()
   const fare = fareLabel(journey, user?.traveller_type, user?.railcard)
   const legTotal = journey.legs.reduce((sum, leg) => sum + leg.duration, 0)
@@ -90,7 +127,7 @@ export const JourneyDetailScreen = ({ navigation, route }: JourneyDetailScreenPr
   return (
     <FormScreenLayout
       header={<ScreenHeader title="Journey details" onBack={() => navigation.goBack()} />}
-      footer={null}
+      footer={<SubmitBar label="Start journey" submitting={busy} onPress={startJourney} />}
     >
       <YStack px="$5" mt="$4" gap="$4">
         {/* Summary card */}
@@ -110,14 +147,28 @@ export const JourneyDetailScreen = ({ navigation, route }: JourneyDetailScreenPr
             <YStack gap="$1">
               {from && (
                 <XStack gap="$2" items="center">
-                  <MaterialIcons name="trip-origin" size={14} color={Colors.secondaryText} style={{ width: 18 }} />
-                  <Text fontSize={14} color={Colors.text} flex={1}>{from.label}</Text>
+                  <MaterialIcons
+                    name="trip-origin"
+                    size={14}
+                    color={Colors.secondaryText}
+                    style={{ width: 18 }}
+                  />
+                  <Text fontSize={14} color={Colors.text} flex={1}>
+                    {from.label}
+                  </Text>
                 </XStack>
               )}
               {to && (
                 <XStack gap="$2" items="center">
-                  <MaterialIcons name="place" size={16} color={Colors.secondaryText} style={{ width: 18 }} />
-                  <Text fontSize={14} color={Colors.text} flex={1}>{to.label}</Text>
+                  <MaterialIcons
+                    name="place"
+                    size={16}
+                    color={Colors.secondaryText}
+                    style={{ width: 18 }}
+                  />
+                  <Text fontSize={14} color={Colors.text} flex={1}>
+                    {to.label}
+                  </Text>
                 </XStack>
               )}
             </YStack>

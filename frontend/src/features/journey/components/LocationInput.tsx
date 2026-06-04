@@ -57,14 +57,15 @@ export const LocationInput = ({
   // initial pre-filled value doesn't trigger a dropdown.
   const skipNextSearch = useRef(isResolvedProp ?? false)
 
-  // Kept in sync during render (not via effect) so it is current when the search effect runs.
-  // Prevents the search from firing whenever the field is in a resolved state — including when
-  // the parent sets "Current location" + postcode in the same render batch.
+  // Mirrors the resolved state so the search effect can read it without taking it as a dependency
+  // (which would re-fire search on resolve). Prevents the search from firing whenever the field is
+  // in a resolved state — including when the parent sets "Current location" + postcode in the same
+  // render batch. Synced in the effect below, which runs before the search effect on every commit.
   const isResolvedRef = useRef(isResolvedProp ?? false)
-  isResolvedRef.current = isResolvedProp ?? false
 
-  // Keep the tick in sync when the parent changes the resolved state externally.
+  // Keep the ref and the tick in sync when the parent changes the resolved state externally.
   useEffect(() => {
+    isResolvedRef.current = isResolvedProp ?? false
     if (isResolvedProp !== undefined) setResolved(isResolvedProp)
   }, [isResolvedProp])
 

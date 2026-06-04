@@ -11,14 +11,7 @@
 
 import { MaterialIcons } from '@expo/vector-icons'
 import * as Location from 'expo-location'
-import {
-  useRef,
-  useState,
-  useCallback,
-  useEffect,
-  useImperativeHandle,
-  forwardRef,
-} from 'react'
+import { useRef, useState, useCallback, useEffect, useImperativeHandle, forwardRef } from 'react'
 import {
   ActivityIndicator,
   Alert,
@@ -26,6 +19,7 @@ import {
   Dimensions,
   FlatList,
   Keyboard,
+  PanResponder,
   Platform,
   ScrollView,
   StyleSheet,
@@ -105,13 +99,7 @@ function PlacesRow() {
   )
 }
 
-function SavedRow({
-  item,
-  onPress,
-}: {
-  item: SavedJourney
-  onPress: () => void
-}) {
+function SavedRow({ item, onPress }: { item: SavedJourney; onPress: () => void }) {
   const from = item.from?.label ?? 'Start'
   const to = item.to?.label ?? 'Destination'
   const time = `${clockTime(item.journey.startDateTime)} → ${clockTime(item.journey.arrivalDateTime)}`
@@ -125,7 +113,7 @@ function SavedRow({
           {from}
         </Text>
         <Text style={[Typography.caption, { color: Colors.secondaryText }]} numberOfLines={1}>
-          → {to}  ·  {item.journey.duration} min  ·  {time}
+          → {to} · {item.journey.duration} min · {time}
         </Text>
       </View>
       <MaterialIcons name="chevron-right" size={16} color={Colors.tertiaryText} />
@@ -133,13 +121,7 @@ function SavedRow({
   )
 }
 
-function StationResultRow({
-  station,
-  onPress,
-}: {
-  station: StationDetail
-  onPress: () => void
-}) {
+function StationResultRow({ station, onPress }: { station: StationDetail; onPress: () => void }) {
   return (
     <TouchableOpacity onPress={onPress} style={styles.resultRow} activeOpacity={0.7}>
       <View style={styles.resultRowIcon}>
@@ -169,7 +151,10 @@ function LocationResultRow({
         <MaterialIcons name="place" size={16} color={Colors.secondaryText} />
       </View>
       <View style={{ flex: 1 }}>
-        <Text style={[Typography.body, { color: Colors.text, fontWeight: '600' }]} numberOfLines={1}>
+        <Text
+          style={[Typography.body, { color: Colors.text, fontWeight: '600' }]}
+          numberOfLines={1}
+        >
           {suggestion.label}
         </Text>
         {suggestion.subtitle ? (
@@ -211,8 +196,9 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
     const { stations } = useStations()
     const cachedCoords = useAppLocation()
 
-    // Start translated down so only COLLAPSED_VISIBLE is showing.
-    const translateY = useRef(new Animated.Value(SLIDE_OFFSET)).current
+    // Start translated down so only COLLAPSED_VISIBLE is showing. A lazy useState keeps the single
+    // Animated.Value stable across renders while staying safe to read during render.
+    const [translateY] = useState(() => new Animated.Value(SLIDE_OFFSET))
 
     // ── Debounced search ──────────────────────────────────────────────────
 
@@ -268,6 +254,44 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
 
     useImperativeHandle(ref, () => ({ expand }), [expand])
 
+    // ── Drag to slide ─────────────────────────────────────────────────────
+    // The drag handle implies the sheet can be dragged; wire that up so dragging up expands and
+    // dragging down collapses, snapping on release. Tap-to-expand still works because the pan only
+    // claims the gesture once the finger has moved vertically — a tap never triggers it. expand /
+    // collapse are stable (their only dependency is the stable Animated.Value), so the responder
+    // created once below always calls the right version.
+
+    // Created once via a lazy initialiser; panHandlers is a plain value (not a ref) so it's safe to
+    // spread during render. `dragStart` lives in the responder's own closure — shared across its
+    // handlers and persisting between grant/move/release — holding the sheet's translateY when the
+    // drag began so the move tracks the finger 1:1.
+    // react-hooks/refs mis-reads the responder's closure-captured `dragStart` as a ref accessed
+    // during render; it's an ordinary closure variable and the responder is built exactly once.
+    // eslint-disable-next-line react-hooks/refs
+    const [panHandlers] = useState(() => {
+      let dragStart = SLIDE_OFFSET
+      return PanResponder.create({
+        onMoveShouldSetPanResponder: (_evt, g) =>
+          Math.abs(g.dy) > 8 && Math.abs(g.dy) > Math.abs(g.dx),
+        onPanResponderGrant: () => {
+          translateY.stopAnimation((value) => {
+            dragStart = value
+          })
+        },
+        onPanResponderMove: (_evt, g) => {
+          translateY.setValue(Math.min(SLIDE_OFFSET, Math.max(0, dragStart + g.dy)))
+        },
+        onPanResponderRelease: (_evt, g) => {
+          const landing = dragStart + g.dy
+          const flungUp = g.vy < -0.5
+          const flungDown = g.vy > 0.5
+          // Snap to whichever end is closer, unless the gesture was a clear fling either way.
+          if (flungUp || (!flungDown && landing < SLIDE_OFFSET / 2)) expand()
+          else collapse()
+        },
+      }).panHandlers
+    })
+
     // ── Location tap handler ──────────────────────────────────────────────
 
     async function handleLocationSelect(suggestion: LocationSuggestion) {
@@ -290,7 +314,8 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
         if (status === 'granted') {
           const pos =
             cachedCoords ??
-            (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })).coords
+            (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }))
+              .coords
           const fromResult = await resolveToPostcode(`${pos.latitude},${pos.longitude}`)
           if (!('error' in fromResult)) {
             from = { postcode: fromResult.postcode, label: 'Current location' }
@@ -319,11 +344,13 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
           },
         ]}
       >
-        {/* Drag handle */}
-        <View style={styles.handle} />
+        {/* Drag handle — its zone is draggable to slide the sheet up/down */}
+        <View {...panHandlers} style={styles.handleZone}>
+          <View style={styles.handle} />
+        </View>
 
-        {/* Search bar */}
-        <View style={styles.searchRow}>
+        {/* Search bar — also draggable, so the whole header acts as a grab area */}
+        <View {...panHandlers} style={styles.searchRow}>
           <TouchableOpacity
             style={[styles.searchPill, expanded && styles.searchPillExpanded]}
             onPress={expanded ? undefined : expand}
@@ -351,9 +378,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
                 onChangeText={setQuery}
               />
             </View>
-            {!expanded && (
-              <MaterialIcons name="mic" size={16} color={Colors.secondaryText} />
-            )}
+            {!expanded && <MaterialIcons name="mic" size={16} color={Colors.secondaryText} />}
             {expanded && searching && (
               <ActivityIndicator size="small" color={Colors.secondaryText} />
             )}
@@ -405,10 +430,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
                 <Text style={styles.sectionLabel}>PLACES</Text>
                 {locationResults.map((loc, i) => (
                   <View key={i}>
-                    <LocationResultRow
-                      suggestion={loc}
-                      onPress={() => handleLocationSelect(loc)}
-                    />
+                    <LocationResultRow suggestion={loc} onPress={() => handleLocationSelect(loc)} />
                     <View style={styles.separator} />
                   </View>
                 ))}
@@ -419,9 +441,12 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
               <View style={styles.emptyState}>
                 <MaterialIcons name="search-off" size={36} color={Colors.tertiaryText} />
                 <Text
-                  style={[Typography.caption, { color: Colors.secondaryText, marginTop: Spacing.sm }]}
+                  style={[
+                    Typography.caption,
+                    { color: Colors.secondaryText, marginTop: Spacing.sm },
+                  ]}
                 >
-                  No results for "{query}"
+                  {`No results for "${query}"`}
                 </Text>
               </View>
             )}
@@ -434,10 +459,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
               <Text style={styles.sectionLabel}>SAVED JOURNEYS</Text>
               {savedJourneys.length === 0 ? (
                 <Text
-                  style={[
-                    Typography.caption,
-                    { color: Colors.secondaryText, paddingVertical: 6 },
-                  ]}
+                  style={[Typography.caption, { color: Colors.secondaryText, paddingVertical: 6 }]}
                 >
                   No saved journeys yet — plan one to save it here.
                 </Text>
@@ -478,13 +500,17 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.sm,
     ...Shadows.top,
   },
+  // Enlarged, full-width hit area around the handle so it's easy to grab and drag.
+  handleZone: {
+    alignItems: 'center',
+    paddingTop: 4,
+    paddingBottom: Spacing.md,
+  },
   handle: {
     width: 36,
     height: 4,
     borderRadius: Radii.handle,
     backgroundColor: Colors.separator,
-    alignSelf: 'center',
-    marginBottom: Spacing.md,
   },
 
   // Search

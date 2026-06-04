@@ -65,12 +65,16 @@ export async function patchProfile(
 // Token persistence (encrypted device storage, localStorage fallback on web)
 // ---------------------------------------------------------------------------
 
-export async function saveToken(token: string): Promise<void> {
+async function setStoredItem(key: string, value: string): Promise<void> {
   if (Platform.OS === 'web') {
-    localStorage.setItem(TOKEN_KEY, token)
+    localStorage.setItem(key, value)
   } else {
-    await SecureStore.setItemAsync(TOKEN_KEY, token)
+    await SecureStore.setItemAsync(key, value)
   }
+}
+
+export async function saveToken(token: string): Promise<void> {
+  await setStoredItem(TOKEN_KEY, token)
 }
 
 export async function loadToken(): Promise<string | null> {

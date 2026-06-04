@@ -4,7 +4,12 @@ import { StationScreen } from '@/features/home'
 import { MapHomeScreen } from '@/features/home/screens/MapHomeScreen'
 import { SelectStationScreen } from '@/features/stations'
 import { ReportCustomScreen, ReportFormScreen, SuccessScreen } from '@/features/reporting'
-import { JourneyDetailScreen, JourneyPlannerScreen, SavedJourneysScreen } from '@/features/journey'
+import {
+  ActiveJourneyScreen,
+  JourneyDetailScreen,
+  JourneyPlannerScreen,
+  SavedJourneysScreen,
+} from '@/features/journey'
 import { SearchScreen } from '@/features/search/screens/SearchScreen'
 import type { RootStackParamList } from '@/navigation/types'
 
@@ -18,6 +23,12 @@ export default function RootNavigator() {
       <Stack.Screen name="JourneyPlanner" component={JourneyPlannerScreen} />
       <Stack.Screen name="JourneyDetail" component={JourneyDetailScreen} />
       <Stack.Screen name="SavedJourneys" component={SavedJourneysScreen} />
+      {/* gestureEnabled off so a swipe-back can't silently abandon a journey — back runs a confirm. */}
+      <Stack.Screen
+        name="ActiveJourney"
+        component={ActiveJourneyScreen}
+        options={{ gestureEnabled: false }}
+      />
       <Stack.Screen name="Station" component={StationScreen} />
       <Stack.Screen name="SelectStation" component={SelectStationScreen} />
       <Stack.Screen name="ReportForm" component={ReportFormScreen} />
