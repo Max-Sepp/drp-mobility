@@ -1,7 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import { Text, XStack } from 'tamagui'
 import type { ResolvedLocation } from '@/features/journey/api/geocode'
-import type { Journey, RouteTag } from '@/features/journey/api/tfl'
+import type { Journey, Leg, RouteTag } from '@/features/journey/api/tfl'
 import { Borders, Colors, Opacity, Radii } from '@/theme'
 
 export type ResolveStation = (commonName: string) => string | null
@@ -42,6 +42,14 @@ export function RouteTags({ tags }: { tags?: RouteTag[] }) {
 /** Drop the "… Underground/Rail/DLR/Bus Station" suffix TfL appends, preserving case for display. */
 export function stripStationSuffix(name: string): string {
   return name.replace(/\s+(?:underground|rail|dlr|bus)?\s*station$/i, '').trim()
+}
+
+/** The line a leg runs on with its direction, e.g. "Victoria towards Brixton", or null. */
+export function lineLabel(leg: Leg): string | null {
+  const option = leg.routeOptions?.[0]
+  if (!option?.name) return null
+  const direction = option.directions?.find(Boolean)
+  return direction ? `${option.name} towards ${stripStationSuffix(direction)}` : option.name
 }
 
 // Modes whose stops are train stations we hold accessibility data for. Bus/coach stops, river

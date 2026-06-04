@@ -168,7 +168,7 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
                 pressStyle={{ opacity: Opacity.disabledMid }}
                 onPress={() => navigation.navigate('SavedJourneys')}
                 role="button"
-                accessibilityLabel={`Saved journeys${savedCount > 0 ? `, ${savedCount}` : ''}`}
+                aria-label={`Saved journeys${savedCount > 0 ? `, ${savedCount}` : ''}`}
               >
                 <MaterialIcons name="bookmark" size={18} color={Colors.blue} />
                 <Text fontSize={14} fontWeight="600" color={Colors.blue}>
