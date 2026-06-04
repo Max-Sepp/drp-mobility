@@ -1,12 +1,13 @@
 import os
 
-from fastapi import APIRouter, Depends, HTTPException, UploadFile
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, UploadFile
 from fastapi.responses import Response
 
 from app.dependencies.auth import get_optional_user
 from app.models.user import User, UserRole
 from app.repositories.outage_report import OutageReportRepository, get_repo
 from app.schemas.outage_report import OutageReportCreate, OutageReportSummary
+from app.services.notifications import notify_affected_users
 
 router = APIRouter(prefix="/outage-reports", tags=["outage-reports"])
 
@@ -44,6 +45,7 @@ def _resolve_content_type(file: UploadFile) -> str:
 @router.post("", response_model=OutageReportSummary, status_code=201)
 def create_outage_report(
     payload: OutageReportCreate,
+    background_tasks: BackgroundTasks,
     repo: OutageReportRepository = Depends(get_repo),
     current_user: User | None = Depends(get_optional_user),
 ) -> OutageReportSummary:
@@ -52,14 +54,23 @@ def create_outage_report(
     Open to anonymous callers: the report is tagged with the authenticated user's role, or
     `untrusted` when submitted without a valid token. To attach an image, follow up with
     POST /outage-reports/{id}/image.
+
+    When this report opens a brand-new Failure (first report for the equipment's current
+    incident), a background task fires Expo push notifications to all authenticated users
+    whose saved journeys pass through the affected station.
     """
     reporter_role = current_user.role if current_user else UserRole.UNTRUSTED.value
     try:
-        return repo.create(payload, reporter_role=reporter_role)
+        report, new_failure_id = repo.create(payload, reporter_role=reporter_role)
     except ValueError as exc:
         # 422 Unprocessable Entity: payload parsed fine, but a referenced row
         # (e.g. equipment_id) doesn't exist — semantically invalid input.
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+    if new_failure_id is not None:
+        background_tasks.add_task(notify_affected_users, new_failure_id)
+
+    return report
 
 
 @router.get("", response_model=list[OutageReportSummary])
