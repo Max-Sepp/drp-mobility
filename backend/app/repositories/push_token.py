@@ -33,7 +33,6 @@ class PushTokenRepository:
         )
         self._db.commit()
 
-
     def upsert(self, user_id: int, token: str) -> None:
         """Register a push token for a user.
 

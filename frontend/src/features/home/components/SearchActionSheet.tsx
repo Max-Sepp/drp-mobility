@@ -101,9 +101,7 @@ function PlacesRow({
   const contentWidth = tileCount * 64 + (tileCount - 1) * Spacing.md
 
   const scrollable = containerWidth > 0 && contentWidth > containerWidth
-  const thumbWidth = scrollable
-    ? Math.max(24, (containerWidth / contentWidth) * containerWidth)
-    : 0
+  const thumbWidth = scrollable ? Math.max(24, (containerWidth / contentWidth) * containerWidth) : 0
   const thumbLeft = scrollable
     ? (scrollX / (contentWidth - containerWidth)) * (containerWidth - thumbWidth)
     : 0
@@ -130,7 +128,11 @@ function PlacesRow({
               onLongPress={() => onLongPress(key)}
               accessibilityRole="button"
               accessibilityLabel={saved ? `${label}: ${savedPlaces[key]!.address}` : `Set ${label}`}
-              accessibilityHint={saved ? 'Tap to plan journey. Long press to edit or remove.' : 'Tap to set your address'}
+              accessibilityHint={
+                saved
+                  ? 'Tap to plan journey. Long press to edit or remove.'
+                  : 'Tap to set your address'
+              }
             >
               <View style={[styles.placesTileIcon, saved && styles.placesTileIconSaved]}>
                 <MaterialIcons name={icon} size={22} color={saved ? Colors.card : Colors.blue} />
@@ -165,11 +167,7 @@ function PlacesRow({
             </Text>
           </TouchableOpacity>
         ))}
-        <TouchableOpacity
-          style={styles.placesTile}
-          activeOpacity={0.75}
-          onPress={onAddPress}
-        >
+        <TouchableOpacity style={styles.placesTile} activeOpacity={0.75} onPress={onAddPress}>
           <View style={styles.placesTileIcon}>
             <MaterialIcons name="add" size={22} color={Colors.blue} />
           </View>
@@ -178,7 +176,12 @@ function PlacesRow({
       </ScrollView>
       {scrollable && (
         <View style={styles.scrollbarTrack}>
-          <View style={[styles.scrollbarThumb, { width: thumbWidth, transform: [{ translateX: thumbLeft }] }]} />
+          <View
+            style={[
+              styles.scrollbarThumb,
+              { width: thumbWidth, transform: [{ translateX: thumbLeft }] },
+            ]}
+          />
         </View>
       )}
     </View>

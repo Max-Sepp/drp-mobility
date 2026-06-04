@@ -76,7 +76,8 @@ export function usePushNotifications(): void {
 
   // Navigate to the relevant station when the user taps a notification.
   useEffect(() => {
-    const subscription = Notifications.addNotificationResponseReceivedListener(handleNotificationTap)
+    const subscription =
+      Notifications.addNotificationResponseReceivedListener(handleNotificationTap)
     return () => subscription.remove()
   }, [])
 }

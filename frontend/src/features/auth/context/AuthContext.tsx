@@ -12,7 +12,11 @@ import {
   saveToken,
   signup,
 } from '@/features/auth/api/auth'
-import { deregisterPushToken, getActivePushToken, setActivePushToken } from '@/features/auth/api/pushToken'
+import {
+  deregisterPushToken,
+  getActivePushToken,
+  setActivePushToken,
+} from '@/features/auth/api/pushToken'
 
 // 'loading' only covers the initial token check on launch; the UI stays usable anonymously and
 // never blocks on it. 'authed'/'unauthed' reflect whether a valid session is currently held.
@@ -83,7 +87,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { ok: true }
   }
 
-  async function updateProfile(travellerType: string | null, railcard: string | null): Promise<void> {
+  async function updateProfile(
+    travellerType: string | null,
+    railcard: string | null,
+  ): Promise<void> {
     const updated = await patchProfile(travellerType, railcard)
     if (updated) setUser(updated)
   }
@@ -93,10 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // attached, then clear local state.
     const pushToken = getActivePushToken()
     if (getAuthToken()) {
-      await Promise.all([
-        pushToken ? deregisterPushToken(pushToken) : Promise.resolve(),
-        logout(),
-      ])
+      await Promise.all([pushToken ? deregisterPushToken(pushToken) : Promise.resolve(), logout()])
     }
     setActivePushToken(null)
     setAuthToken(null)

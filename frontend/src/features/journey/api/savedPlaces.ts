@@ -50,7 +50,10 @@ export async function clearPlace(userId: number, placeKey: 'home' | 'work'): Pro
   await AsyncStorage.setItem(key(userId), JSON.stringify(rest))
 }
 
-export async function addCustomPlace(userId: number, place: Omit<CustomPlace, 'id'>): Promise<CustomPlace> {
+export async function addCustomPlace(
+  userId: number,
+  place: Omit<CustomPlace, 'id'>,
+): Promise<CustomPlace> {
   const current = await loadSavedPlaces(userId)
   const newPlace: CustomPlace = { ...place, id: String(Date.now()) }
   await AsyncStorage.setItem(

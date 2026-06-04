@@ -71,10 +71,8 @@ def notify_affected_users(failure_id: int) -> None:
         failure = (
             db.query(Failure)
             .options(
-                joinedload(Failure.equipment)
-                .joinedload(Equipment.station),
-                joinedload(Failure.equipment)
-                .joinedload(Equipment.equipment_type),
+                joinedload(Failure.equipment).joinedload(Equipment.station),
+                joinedload(Failure.equipment).joinedload(Equipment.equipment_type),
             )
             .filter_by(id=failure_id)
             .one_or_none()

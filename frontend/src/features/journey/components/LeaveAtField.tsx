@@ -95,9 +95,7 @@ export const LeaveAtField = ({ value, onChange }: LeaveAtFieldProps) => {
           pressStyle={{ opacity: Opacity.pressedLight }}
           onPress={chooseLater}
           role="button"
-          aria-label={
-            isLater ? `Leaving ${formatDepart(value)}, tap to change` : 'Leave later'
-          }
+          aria-label={isLater ? `Leaving ${formatDepart(value)}, tap to change` : 'Leave later'}
           style={{
             ...SEGMENT_STYLE,
             paddingHorizontal: 8,

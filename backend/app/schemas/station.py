@@ -1,5 +1,3 @@
-from typing import Optional
-
 from pydantic import BaseModel, ConfigDict
 
 from app.models.station import StepFree
@@ -22,6 +20,6 @@ class StationDetail(StationSchema):
 
     `step_free` is the summary derived from these platforms (see Station.step_free)."""
 
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
+    latitude: float | None = None
+    longitude: float | None = None
     platforms: list[PlatformSchema]
