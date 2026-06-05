@@ -32,6 +32,10 @@ import {
 } from '@/features/home/components/SearchActionSheet'
 import { StationSheet } from '@/features/home/components/StationSheet'
 import { ReportSheet } from '@/features/home/components/ReportSheet'
+import {
+  JourneyPlannerSheet,
+  type JourneyPlan,
+} from '@/features/home/components/JourneyPlannerSheet'
 import { SetPlaceModal } from '@/features/home/components/SetPlaceModal'
 import { AddCustomPlaceModal } from '@/features/home/components/AddCustomPlaceModal'
 
@@ -116,6 +120,7 @@ export function MapHomeScreen({ navigation }: Props) {
   const [addCustomPlaceVisible, setAddCustomPlaceVisible] = useState(false)
   const [activeStation, setActiveStation] = useState<string | null>(null)
   const [activeReport, setActiveReport] = useState<string | null>(null)
+  const [activePlan, setActivePlan] = useState<JourneyPlan | null>(null)
   const sheetRef = useRef<SearchActionSheetHandle>(null)
   const mapRef = useRef<StationMapHandle>(null)
   const { status, user } = useAuth()
@@ -148,9 +153,8 @@ export function MapHomeScreen({ navigation }: Props) {
       return
     }
     const label = key === 'home' ? 'Home' : 'Work'
-    navigation.navigate('JourneyPlanner', {
-      initialTo: { postcode: place.postcode, label, isNamedPlace: true },
-    })
+    setActivePlan({ initialTo: { postcode: place.postcode, label, isNamedPlace: true } })
+    sheetRef.current?.dismiss()
   }
 
   function handlePlaceLongPress(key: 'home' | 'work') {
@@ -215,9 +219,8 @@ export function MapHomeScreen({ navigation }: Props) {
   }
 
   function handleCustomPlacePress(place: CustomPlace) {
-    navigation.navigate('JourneyPlanner', {
-      initialTo: { postcode: place.postcode, label: place.name, isNamedPlace: true },
-    })
+    setActivePlan({ initialTo: { postcode: place.postcode, label: place.name, isNamedPlace: true } })
+    sheetRef.current?.dismiss()
   }
 
   function handleCustomPlaceLongPress(place: CustomPlace) {
@@ -297,7 +300,13 @@ export function MapHomeScreen({ navigation }: Props) {
   }
 
   function openJourneyFromTo(from: ResolvedLocation | undefined, to: ResolvedLocation) {
-    navigation.navigate('JourneyPlanner', { initialFrom: from, initialTo: to })
+    setActivePlan({ initialFrom: from, initialTo: to })
+    sheetRef.current?.dismiss()
+  }
+
+  function closePlan() {
+    setActivePlan(null)
+    sheetRef.current?.restore()
   }
 
   return (
@@ -354,9 +363,15 @@ export function MapHomeScreen({ navigation }: Props) {
         station={activeStation}
         onClose={closeStation}
         onReportPress={() => activeStation && setActiveReport(activeStation)}
+        onOpenJourney={(plan) => {
+          setActivePlan(plan)
+          sheetRef.current?.dismiss()
+        }}
       />
 
       <ReportSheet station={activeReport} onClose={() => setActiveReport(null)} />
+
+      <JourneyPlannerSheet plan={activePlan} onClose={closePlan} />
 
       {setPlaceModal && (
         <SetPlaceModal

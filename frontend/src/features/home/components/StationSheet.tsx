@@ -8,8 +8,6 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { Text } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useNavigation } from '@react-navigation/native'
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import BottomSheet, { BottomSheetScrollView, type BottomSheetRef } from '@/components/BottomSheet'
 import { PlatformAccessCard } from '@/features/home/components/PlatformAccessCard'
 import { ReportsStatus } from '@/features/home/components/ReportsStatus'
@@ -17,7 +15,7 @@ import { useOutages } from '@/features/outages'
 import { useStations } from '@/features/stations'
 import { resolveToPostcode, type ResolvedLocation } from '@/features/journey/api/geocode'
 import { useAppLocation } from '@/lib/LocationContext'
-import type { RootStackParamList } from '@/navigation/types'
+import type { JourneyPlan } from '@/features/home/components/JourneyPlannerSheet'
 import { Colors, Heights, Radii, Shadows, Spacing } from '@/theme'
 
 const SCREEN_H = Dimensions.get('window').height
@@ -27,10 +25,10 @@ type Props = {
   station: string | null
   onClose: () => void
   onReportPress: () => void
+  onOpenJourney: (plan: JourneyPlan) => void
 }
 
-export function StationSheet({ station, onClose, onReportPress }: Props) {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+export function StationSheet({ station, onClose, onReportPress, onOpenJourney }: Props) {
   const insets = useSafeAreaInsets()
   const cachedCoords = useAppLocation()
   const [goingHere, setGoingHere] = useState(false)
@@ -90,7 +88,7 @@ export function StationSheet({ station, onClose, onReportPress }: Props) {
         }
       }
 
-      navigation.navigate('JourneyPlanner', { initialFrom: from, initialTo: to })
+      onOpenJourney({ initialFrom: from, initialTo: to })
     } finally {
       setGoingHere(false)
     }
