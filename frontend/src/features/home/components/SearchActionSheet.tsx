@@ -357,8 +357,8 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
     // contentPanHandlers: only claims when not at full snap, so the ScrollView
     //   can scroll normally when the sheet is fully open.
 
-    // eslint-disable-next-line react-hooks/refs
     const [headerPanHandlers] = useState(
+      // eslint-disable-next-line react-hooks/refs
       () =>
         PanResponder.create({
           onMoveShouldSetPanResponder: (_evt, g) =>
@@ -385,8 +385,8 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
         }).panHandlers,
     )
 
-    // eslint-disable-next-line react-hooks/refs
     const [contentPanHandlers] = useState(
+      // eslint-disable-next-line react-hooks/refs
       () =>
         PanResponder.create({
           // Capture phase fires parent-before-child, so the body View claims the drag
