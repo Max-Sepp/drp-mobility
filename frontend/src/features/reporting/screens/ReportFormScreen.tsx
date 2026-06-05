@@ -39,7 +39,9 @@ export const ReportFormScreen = ({ navigation, route }: ReportFormScreenProps) =
       if (!active) return
       if (data) {
         setEquipment(
-          data.filter((e) => e.station.name === station && e.equipment_type.name === equipmentType),
+          data
+            .filter((e) => e.station.name === station && e.equipment_type.name === equipmentType)
+            .sort((a, b) => a.connection.localeCompare(b.connection, undefined, { numeric: true })),
         )
       }
       setLoadingEquipment(false)

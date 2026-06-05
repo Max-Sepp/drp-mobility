@@ -1,11 +1,12 @@
 import * as Location from 'expo-location'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { ScrollView } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { DEFAULT_STATION, stationPicker, useStations } from '@/features/stations'
 import { useOutages } from '@/features/outages'
 import { resolveToPostcode, type ResolvedLocation } from '@/features/journey/api/geocode'
+import { apiClient } from '@/api/client'
 import { useAppLocation } from '@/lib/LocationContext'
 import type { Station, StationScreenProps } from '@/navigation/types'
 import { Colors, Heights, Radii, Spacing } from '@/theme'
@@ -21,6 +22,21 @@ export const StationScreen = ({ navigation, route }: StationScreenProps) => {
   const stationDetail = useMemo(() => stations.find((s) => s.name === station), [stations, station])
   const insets = useSafeAreaInsets()
   const cachedCoords = useAppLocation()
+  const [hasLifts, setHasLifts] = useState<boolean | undefined>(undefined)
+  const [hasEscalators, setHasEscalators] = useState<boolean | undefined>(undefined)
+
+  useEffect(() => {
+    if (!stationDetail) return
+    setHasLifts(undefined)
+    setHasEscalators(undefined)
+    apiClient
+      .GET('/equipment', { params: { query: { station_id: stationDetail.id } } })
+      .then(({ data }) => {
+        if (!data) return
+        setHasLifts(data.some((e) => e.equipment_type.name === 'lift'))
+        setHasEscalators(data.some((e) => e.equipment_type.name === 'escalator'))
+      })
+  }, [stationDetail?.id])
 
   // Live feed of outage reports, filtered to this station. Updates in real time as reports are
   // created, resolved or deleted — no manual refetch on focus.
@@ -91,7 +107,7 @@ export const StationScreen = ({ navigation, route }: StationScreenProps) => {
         />
         {stationDetail && <PlatformAccessCard key={station} platforms={stationDetail.platforms} />}
         <ReportsStatus loading={loading} reports={reports} />
-        <QuickReportGrid onSelect={quickReport} />
+        <QuickReportGrid onSelect={quickReport} hasLifts={hasLifts} hasEscalators={hasEscalators} />
       </ScrollView>
 
       {/* Sticky "Go here" footer */}

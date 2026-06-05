@@ -52,7 +52,14 @@ export function LocationProvider({ children }: { children: ReactNode }) {
       })
 
       if (Platform.OS !== 'web') {
+        // Throttle: process at most one heading reading per 300ms.
+        // This keeps tracksViewChanges cycling in UserLocationMarker stable —
+        // the 250ms turn-off timer can fire between consecutive state updates.
+        let lastHeadingMs = 0
         Location.watchHeadingAsync((h) => {
+          const now = Date.now()
+          if (now - lastHeadingMs < 300) return
+          lastHeadingMs = now
           const deg = h.trueHeading >= 0 ? h.trueHeading : h.magHeading
           if (deg < 0) return
           setHeading((prev) =>
