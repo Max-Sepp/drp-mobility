@@ -63,6 +63,7 @@ const SNAP_IDX_OPEN = 2
 export type SearchActionSheetHandle = {
   expand: () => void   // snap to OPEN (search active)
   dismiss: () => void  // snap to PILL (map focus)
+  restore: () => void  // snap to HOME (normal state)
 }
 
 // ---------------------------------------------------------------------------
@@ -338,7 +339,11 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
       sheetRef.current?.snapToIndex(SNAP_IDX_PILL)
     }, [])
 
-    useImperativeHandle(ref, () => ({ expand, dismiss }), [expand, dismiss])
+    const restore = useCallback(() => {
+      sheetRef.current?.snapToIndex(SNAP_IDX_HOME)
+    }, [])
+
+    useImperativeHandle(ref, () => ({ expand, dismiss, restore }), [expand, dismiss, restore])
 
     function handleSheetChange(index: number) {
       if (index === SNAP_IDX_OPEN) {

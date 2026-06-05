@@ -29,6 +29,7 @@ import {
   SearchActionSheet,
   type SearchActionSheetHandle,
 } from '@/features/home/components/SearchActionSheet'
+import { StationSheet } from '@/features/home/components/StationSheet'
 import { SetPlaceModal } from '@/features/home/components/SetPlaceModal'
 import { AddCustomPlaceModal } from '@/features/home/components/AddCustomPlaceModal'
 
@@ -111,6 +112,7 @@ export function MapHomeScreen({ navigation }: Props) {
   const [savedPlaces, setSavedPlaces] = useState<SavedPlaces>({ custom: [] })
   const [setPlaceModal, setSetPlaceModal] = useState<{ key: 'home' | 'work' } | null>(null)
   const [addCustomPlaceVisible, setAddCustomPlaceVisible] = useState(false)
+  const [activeStation, setActiveStation] = useState<string | null>(null)
   const sheetRef = useRef<SearchActionSheetHandle>(null)
   const { status, user } = useAuth()
 
@@ -270,7 +272,13 @@ export function MapHomeScreen({ navigation }: Props) {
   }
 
   function openStation(stationName: string) {
-    navigation.navigate('Station', { station: stationName })
+    setActiveStation(stationName)
+    sheetRef.current?.dismiss()
+  }
+
+  function closeStation() {
+    setActiveStation(null)
+    sheetRef.current?.restore()
   }
 
   function openJourneyFromTo(from: ResolvedLocation | undefined, to: ResolvedLocation) {
@@ -325,6 +333,8 @@ export function MapHomeScreen({ navigation }: Props) {
         onCustomPlaceLongPress={handleCustomPlaceLongPress}
         onAddCustomPlace={handleAddCustomPlacePress}
       />
+
+      <StationSheet station={activeStation} onClose={closeStation} />
 
       {setPlaceModal && (
         <SetPlaceModal
