@@ -1,6 +1,6 @@
-// Bottom sheet showing station detail — platform access, live outage reports, and quick-report buttons.
+// Bottom sheet showing station detail — platform access and live outage reports.
 // Always mounted in MapHomeScreen; opens when `station` prop is set, closes when null.
-// The reporting / journey-planner flows still navigate onto the stack (full-screen forms).
+// Reporting opens ReportSheet (sibling in MapHomeScreen). JourneyPlanner navigates on the stack.
 
 import { MaterialIcons } from '@expo/vector-icons'
 import * as Location from 'expo-location'
@@ -12,7 +12,6 @@ import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import BottomSheet, { BottomSheetScrollView, type BottomSheetRef } from '@/components/BottomSheet'
 import { PlatformAccessCard } from '@/features/home/components/PlatformAccessCard'
-import { QuickReportGrid, type QuickReportAction } from '@/features/home/components/QuickReportGrid'
 import { ReportsStatus } from '@/features/home/components/ReportsStatus'
 import { useOutages } from '@/features/outages'
 import { useStations } from '@/features/stations'
@@ -27,9 +26,10 @@ const SNAP_POINTS = [SCREEN_H * 0.52, SCREEN_H * 0.82]
 type Props = {
   station: string | null
   onClose: () => void
+  onReportPress: () => void
 }
 
-export function StationSheet({ station, onClose }: Props) {
+export function StationSheet({ station, onClose, onReportPress }: Props) {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const insets = useSafeAreaInsets()
   const cachedCoords = useAppLocation()
@@ -65,15 +65,6 @@ export function StationSheet({ station, onClose }: Props) {
   function handleChange(index: number) {
     setSnapIndex(index)
     if (index === -1) onClose()
-  }
-
-  function handleQuickReport(action: QuickReportAction) {
-    if (!station) return
-    if (action.route === 'ReportForm') {
-      navigation.navigate('ReportForm', { equipmentType: action.equipmentType, station })
-    } else {
-      navigation.navigate('ReportCustom', { station })
-    }
   }
 
   async function handleGoHere() {
@@ -150,7 +141,7 @@ export function StationSheet({ station, onClose }: Props) {
         <TouchableOpacity
           style={[styles.actionBtn, styles.actionBtnOutline]}
           activeOpacity={0.8}
-          onPress={() => station && navigation.navigate('ReportCustom', { station })}
+          onPress={onReportPress}
         >
           <MaterialIcons name="flag" size={18} color={Colors.text} style={{ marginRight: 6 }} />
           <Text fontSize={14} fontWeight="600" color={Colors.text}>
@@ -173,8 +164,6 @@ export function StationSheet({ station, onClose }: Props) {
         )}
 
         <ReportsStatus loading={loading} reports={reports} />
-
-        <QuickReportGrid onSelect={handleQuickReport} />
       </BottomSheetScrollView>
     </BottomSheet>
   )

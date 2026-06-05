@@ -31,6 +31,7 @@ import {
   type SearchActionSheetHandle,
 } from '@/features/home/components/SearchActionSheet'
 import { StationSheet } from '@/features/home/components/StationSheet'
+import { ReportSheet } from '@/features/home/components/ReportSheet'
 import { SetPlaceModal } from '@/features/home/components/SetPlaceModal'
 import { AddCustomPlaceModal } from '@/features/home/components/AddCustomPlaceModal'
 
@@ -114,6 +115,7 @@ export function MapHomeScreen({ navigation }: Props) {
   const [setPlaceModal, setSetPlaceModal] = useState<{ key: 'home' | 'work' } | null>(null)
   const [addCustomPlaceVisible, setAddCustomPlaceVisible] = useState(false)
   const [activeStation, setActiveStation] = useState<string | null>(null)
+  const [activeReport, setActiveReport] = useState<string | null>(null)
   const sheetRef = useRef<SearchActionSheetHandle>(null)
   const mapRef = useRef<StationMapHandle>(null)
   const { status, user } = useAuth()
@@ -348,7 +350,13 @@ export function MapHomeScreen({ navigation }: Props) {
         onSnapChange={setSheetVisibleHeight}
       />
 
-      <StationSheet station={activeStation} onClose={closeStation} />
+      <StationSheet
+        station={activeStation}
+        onClose={closeStation}
+        onReportPress={() => activeStation && setActiveReport(activeStation)}
+      />
+
+      <ReportSheet station={activeReport} onClose={() => setActiveReport(null)} />
 
       {setPlaceModal && (
         <SetPlaceModal
