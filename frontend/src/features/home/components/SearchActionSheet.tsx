@@ -9,7 +9,7 @@
 
 import { MaterialIcons } from '@expo/vector-icons'
 import * as Location from 'expo-location'
-import { useRef, useState, useCallback, useEffect, useImperativeHandle, forwardRef } from 'react'
+import { useRef, useState, useCallback, useEffect, useImperativeHandle, useLayoutEffect, forwardRef } from 'react'
 import {
   ActivityIndicator,
   Alert,
@@ -318,7 +318,6 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
     const insets = useSafeAreaInsets()
     // Stable ref so snapTo's useCallback doesn't need onSnapChange as a dep.
     const onSnapChangeRef = useRef(onSnapChange)
-    onSnapChangeRef.current = onSnapChange
 
     // Collapsed: just handle zone + search bar + bottom safe area.
     // ~88px of content + bottom inset.
@@ -335,7 +334,6 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
     const snapRef = useRef<SnapState>('mid')
     // Keeps snap geometry up-to-date for PanResponder closures (created once).
     const snapPointsRef = useRef({ collapsed: SNAP_COLLAPSED, mid: SNAP_MID, full: SNAP_FULL })
-    snapPointsRef.current = { collapsed: SNAP_COLLAPSED, mid: SNAP_MID, full: SNAP_FULL }
     // Forward to PanResponder closures so they always call the latest snapTo.
     const snapToRef = useRef<(target: SnapState, withFocus?: boolean) => void>(() => {})
     // Shared drag origin across both pan responders.
@@ -351,6 +349,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
     // contentPanHandlers: only claims when not at full snap, so the ScrollView
     //   can scroll normally when the sheet is fully open.
 
+    // eslint-disable-next-line react-hooks/refs
     const [headerPanHandlers] = useState(() =>
       PanResponder.create({
         onMoveShouldSetPanResponder: (_evt, g) =>
@@ -377,6 +376,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
       }).panHandlers,
     )
 
+    // eslint-disable-next-line react-hooks/refs
     const [contentPanHandlers] = useState(() =>
       PanResponder.create({
         // Capture phase fires parent-before-child, so the body View claims the drag
@@ -447,7 +447,13 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
       [translateY, insets.bottom],
     )
 
-    snapToRef.current = snapTo
+    // Keep all mutable refs in sync with latest values after every render so
+    // PanResponder closures (created once) always see current callbacks/geometry.
+    useLayoutEffect(() => {
+      onSnapChangeRef.current = onSnapChange
+      snapPointsRef.current = { collapsed: SNAP_COLLAPSED, mid: SNAP_MID, full: SNAP_FULL }
+      snapToRef.current = snapTo
+    })
 
     useImperativeHandle(ref, () => ({ expand: () => snapToRef.current('mid') }), [])
 

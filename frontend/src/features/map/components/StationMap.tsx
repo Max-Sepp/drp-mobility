@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react'
 import { StyleSheet } from 'react-native'
 import MapView, { PoiClickEvent, Region } from 'react-native-maps'
 import { fuzzyScore } from '@/lib/fuzzy'
@@ -65,15 +65,15 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
   const heading = useAppHeading()
   const mapRef = useRef<MapView>(null)
 
-  function animateToUser() {
+  const animateToUser = useCallback(() => {
     if (!coords) return
     mapRef.current?.animateToRegion(
       { latitude: coords.latitude, longitude: coords.longitude, latitudeDelta: 0.02, longitudeDelta: 0.02 },
       600,
     )
-  }
+  }, [coords])
 
-  useImperativeHandle(ref, () => ({ recentre: animateToUser }))
+  useImperativeHandle(ref, () => ({ recentre: animateToUser }), [animateToUser])
 
   // Animate to user location the first time coords become available.
   const centredRef = useRef(false)
@@ -82,7 +82,7 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
       centredRef.current = true
       animateToUser()
     }
-  }, [coords])
+  }, [coords, animateToUser])
 
   function handlePoiClick(event: PoiClickEvent) {
     const { name, coordinate } = event.nativeEvent
