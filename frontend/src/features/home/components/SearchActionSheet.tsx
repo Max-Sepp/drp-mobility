@@ -1,26 +1,20 @@
-// Animated bottom sheet that lives inside MapHomeScreen.
-// The card is always mounted; tapping the search bar slides it UP in place
-// (translateY: SLIDE_OFFSET → 0). No new screen is pushed.
+// Bottom sheet that lives inside MapHomeScreen.
+// Three snap points:
+//   index 0 – PILL   (~72 px)  : only the search pill visible; map in focus
+//   index 1 – HOME   (~320 px) : Places row + Saved Journeys (default / launch state)
+//   index 2 – OPEN   (82 % of screen) : search active; results fill the sheet
 //
-// Collapsed: shows Places row + Saved Journeys.
-// Expanded, empty query: same content (idle state).
-// Expanded, query ≥ 3 chars: debounced station + address search results replace the body.
-//
-// Single spring covers 100% of the travel for a clean, continuous slide.
-// Dismiss reverses with a slightly stiffer spring for a snappier close.
+// Gestures, keyboard avoidance, and scroll-vs-drag conflicts are all handled by
+// @gorhom/bottom-sheet — no PanResponder or Animated wiring needed here.
 
 import { MaterialIcons } from '@expo/vector-icons'
 import * as Location from 'expo-location'
-import { useRef, useState, useCallback, useEffect, useImperativeHandle, forwardRef } from 'react'
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import {
   ActivityIndicator,
   Alert,
-  Animated,
   Dimensions,
-  FlatList,
   Keyboard,
-  PanResponder,
-  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -28,8 +22,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
-import type { CustomPlace, SavedPlaces } from '@/features/journey/api/savedPlaces'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import type { CustomPlace, SavedPlaces } from '@/features/journey/api/savedPlaces'
 import { clockTime } from '@/features/journey/components/legDisplay'
 import type { SavedJourney } from '@/features/journey/api/savedJourneys'
 import {
@@ -42,33 +36,37 @@ import {
 import { useStations, type StationDetail } from '@/features/stations/useStations'
 import { fuzzyScore } from '@/lib/fuzzy'
 import { useAppLocation } from '@/lib/LocationContext'
-import { Colors, Radii, Shadows, Spacing, Typography } from '@/theme'
-
-// useNativeDriver is not available on web (no native animation module).
-const USE_NATIVE_DRIVER = Platform.OS !== 'web'
+import { Colors, Radii, Spacing, Typography } from '@/theme'
+import BottomSheet, {
+  BottomSheetScrollView,
+  BottomSheetFlatList,
+  type BottomSheetRef,
+} from '@/components/BottomSheet'
 
 // ---------------------------------------------------------------------------
-// Geometry
+// Snap indices
 // ---------------------------------------------------------------------------
 
 const SCREEN_H = Dimensions.get('window').height
-// Total card height (sets how much map is visible above when expanded: ~18%).
-const SHEET_H = SCREEN_H * 0.82
-// How much of the card is visible in the collapsed state.
-const COLLAPSED_VISIBLE = 300
-// How far to translate the card down so only COLLAPSED_VISIBLE is shown.
-const SLIDE_OFFSET = SHEET_H - COLLAPSED_VISIBLE
+
+// Heights of the visible sheet at each snap point (gorhom convention: height from bottom).
+const SNAP_POINTS = [72, 320, SCREEN_H * 0.82]
+
+const SNAP_IDX_PILL = 0
+const SNAP_IDX_HOME = 1
+const SNAP_IDX_OPEN = 2
 
 // ---------------------------------------------------------------------------
 // Public handle
 // ---------------------------------------------------------------------------
 
 export type SearchActionSheetHandle = {
-  expand: () => void
+  expand: () => void   // snap to OPEN (search active)
+  dismiss: () => void  // snap to PILL (map focus)
 }
 
 // ---------------------------------------------------------------------------
-// Internal sub-components
+// Sub-components
 // ---------------------------------------------------------------------------
 
 const NAMED_PLACES: { key: 'home' | 'work'; icon: 'home' | 'work'; label: string }[] = [
@@ -94,15 +92,9 @@ function PlacesRow({
   const [scrollX, setScrollX] = useState(0)
   const [containerWidth, setContainerWidth] = useState(0)
 
-  // Compute content width directly from tile count — avoids onContentSizeChange
-  // being unreliable on web (it reports scrollWidth = clientWidth).
-  // Tile width is from styles.placesTile (64px), gap is Spacing.md (12px).
-  const tileCount = NAMED_PLACES.length + savedPlaces.custom.length + 1 // +1 for Add
+  const tileCount = NAMED_PLACES.length + savedPlaces.custom.length + 1
   const contentWidth = tileCount * 64 + (tileCount - 1) * Spacing.md
-
   const scrollable = containerWidth > 0 && contentWidth > containerWidth
-  // Cap at 40% so the thumb looks small even with minor overflow, and shrinks
-  // clearly as more tiles are added.
   const thumbWidth = scrollable
     ? Math.max(24, Math.min(containerWidth * 0.4, (containerWidth / contentWidth) * containerWidth))
     : 0
@@ -297,13 +289,10 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
     const [searching, setSearching] = useState(false)
     const [gpsLoading, setGpsLoading] = useState(false)
     const inputRef = useRef<TextInput>(null)
+    const sheetRef = useRef<BottomSheetRef>(null)
 
     const { stations } = useStations()
     const cachedCoords = useAppLocation()
-
-    // Start translated down so only COLLAPSED_VISIBLE is showing. A lazy useState keeps the single
-    // Animated.Value stable across renders while staying safe to read during render.
-    const [translateY] = useState(() => new Animated.Value(SLIDE_OFFSET))
 
     // ── Debounced search ──────────────────────────────────────────────────
 
@@ -330,72 +319,36 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
       return () => clearTimeout(timer)
     }, [query, stations])
 
-    // ── Animation helpers ─────────────────────────────────────────────────
+    // ── Snap helpers ──────────────────────────────────────────────────────
 
     const expand = useCallback(() => {
       setExpanded(true)
-      Animated.spring(translateY, {
-        toValue: 0,
-        stiffness: 130,
-        damping: 22,
-        mass: 1.1,
-        useNativeDriver: USE_NATIVE_DRIVER,
-      }).start(() => {
-        inputRef.current?.focus()
-      })
-    }, [translateY])
+      sheetRef.current?.snapToIndex(SNAP_IDX_OPEN)
+    }, [])
 
     const collapse = useCallback(() => {
       Keyboard.dismiss()
       setQuery('')
-      Animated.spring(translateY, {
-        toValue: SLIDE_OFFSET,
-        stiffness: 200,
-        damping: 28,
-        mass: 0.9,
-        useNativeDriver: USE_NATIVE_DRIVER,
-      }).start(() => setExpanded(false))
-    }, [translateY])
+      sheetRef.current?.snapToIndex(SNAP_IDX_HOME)
+    }, [])
 
-    useImperativeHandle(ref, () => ({ expand }), [expand])
+    const dismiss = useCallback(() => {
+      Keyboard.dismiss()
+      setQuery('')
+      sheetRef.current?.snapToIndex(SNAP_IDX_PILL)
+    }, [])
 
-    // ── Drag to slide ─────────────────────────────────────────────────────
-    // The drag handle implies the sheet can be dragged; wire that up so dragging up expands and
-    // dragging down collapses, snapping on release. Tap-to-expand still works because the pan only
-    // claims the gesture once the finger has moved vertically — a tap never triggers it. expand /
-    // collapse are stable (their only dependency is the stable Animated.Value), so the responder
-    // created once below always calls the right version.
+    useImperativeHandle(ref, () => ({ expand, dismiss }), [expand, dismiss])
 
-    // Created once via a lazy initialiser; panHandlers is a plain value (not a ref) so it's safe to
-    // spread during render. `dragStart` lives in the responder's own closure — shared across its
-    // handlers and persisting between grant/move/release — holding the sheet's translateY when the
-    // drag began so the move tracks the finger 1:1.
-    // react-hooks/refs mis-reads the responder's closure-captured `dragStart` as a ref accessed
-    // during render; it's an ordinary closure variable and the responder is built exactly once.
-    // eslint-disable-next-line react-hooks/refs
-    const [panHandlers] = useState(() => {
-      let dragStart = SLIDE_OFFSET
-      return PanResponder.create({
-        onMoveShouldSetPanResponder: (_evt, g) =>
-          Math.abs(g.dy) > 8 && Math.abs(g.dy) > Math.abs(g.dx),
-        onPanResponderGrant: () => {
-          translateY.stopAnimation((value) => {
-            dragStart = value
-          })
-        },
-        onPanResponderMove: (_evt, g) => {
-          translateY.setValue(Math.min(SLIDE_OFFSET, Math.max(0, dragStart + g.dy)))
-        },
-        onPanResponderRelease: (_evt, g) => {
-          const landing = dragStart + g.dy
-          const flungUp = g.vy < -0.5
-          const flungDown = g.vy > 0.5
-          // Snap to whichever end is closer, unless the gesture was a clear fling either way.
-          if (flungUp || (!flungDown && landing < SLIDE_OFFSET / 2)) expand()
-          else collapse()
-        },
-      }).panHandlers
-    })
+    function handleSheetChange(index: number) {
+      if (index === SNAP_IDX_OPEN) {
+        setExpanded(true)
+        inputRef.current?.focus()
+      } else {
+        setExpanded(false)
+        setQuery('')
+      }
+    }
 
     // ── Location tap handler ──────────────────────────────────────────────
 
@@ -412,8 +365,6 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
         }
         const to: ResolvedLocation = { postcode: toPostcode, label: suggestion.label }
 
-        // Attempt to resolve current location for the "from" field, but don't
-        // block navigation if unavailable — the journey planner handles an empty from.
         let from: ResolvedLocation | undefined
         const { status } = await Location.requestForegroundPermissionsAsync()
         if (status === 'granted') {
@@ -440,22 +391,14 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
     const hasResults = stationResults.length > 0 || locationResults.length > 0
 
     return (
-      <Animated.View
-        style={[
-          styles.sheet,
-          {
-            paddingBottom: insets.bottom + Spacing.md,
-            transform: [{ translateY }],
-          },
-        ]}
+      <BottomSheet
+        ref={sheetRef}
+        index={SNAP_IDX_HOME}
+        snapPoints={SNAP_POINTS}
+        onChange={handleSheetChange}
       >
-        {/* Drag handle — its zone is draggable to slide the sheet up/down */}
-        <View {...panHandlers} style={styles.handleZone}>
-          <View style={styles.handle} />
-        </View>
-
-        {/* Search bar — also draggable, so the whole header acts as a grab area */}
-        <View {...panHandlers} style={styles.searchRow}>
+        {/* Search bar */}
+        <View style={styles.searchRow}>
           <TouchableOpacity
             style={[styles.searchPill, expanded && styles.searchPillExpanded]}
             onPress={expanded ? undefined : expand}
@@ -467,8 +410,6 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
               color={Colors.secondaryText}
               style={{ marginRight: 6 }}
             />
-            {/* pointerEvents="none" when collapsed so touches pass through to the
-                TouchableOpacity on native (editable=false alone doesn't stop touch capture). */}
             <View style={{ flex: 1, pointerEvents: expanded ? 'auto' : 'none' }}>
               <TextInput
                 ref={inputRef}
@@ -496,17 +437,20 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
           )}
         </View>
 
-        {/* Body: search results when querying, idle content otherwise */}
+        {/* Body: search results when querying, home content otherwise */}
         {hasQuery ? (
-          <ScrollView
+          <BottomSheetScrollView
             style={styles.resultsScroll}
+            contentContainerStyle={{ paddingBottom: insets.bottom + Spacing.md }}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
             {gpsLoading && (
               <View style={styles.gpsLoadingRow}>
                 <ActivityIndicator size="small" color={Colors.blue} />
-                <Text style={[Typography.caption, { color: Colors.secondaryText, marginLeft: 8 }]}>
+                <Text
+                  style={[Typography.caption, { color: Colors.secondaryText, marginLeft: 8 }]}
+                >
                   Getting your location…
                 </Text>
               </View>
@@ -535,7 +479,10 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
                 <Text style={styles.sectionLabel}>PLACES</Text>
                 {locationResults.map((loc, i) => (
                   <View key={i}>
-                    <LocationResultRow suggestion={loc} onPress={() => handleLocationSelect(loc)} />
+                    <LocationResultRow
+                      suggestion={loc}
+                      onPress={() => handleLocationSelect(loc)}
+                    />
                     <View style={styles.separator} />
                   </View>
                 ))}
@@ -555,41 +502,46 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
                 </Text>
               </View>
             )}
-          </ScrollView>
+          </BottomSheetScrollView>
         ) : (
-          <>
-            <PlacesRow
-              savedPlaces={savedPlaces}
-              onPress={onPlacePress}
-              onLongPress={onPlaceLongPress}
-              onCustomPlacePress={onCustomPlacePress}
-              onCustomPlaceLongPress={onCustomPlaceLongPress}
-              onAddPress={onAddCustomPlace}
-            />
-
-            <View>
-              <Text style={styles.sectionLabel}>SAVED JOURNEYS</Text>
-              {savedJourneys.length === 0 ? (
-                <Text
-                  style={[Typography.caption, { color: Colors.secondaryText, paddingVertical: 6 }]}
-                >
-                  No saved journeys yet — plan one to save it here.
-                </Text>
-              ) : (
-                <FlatList
-                  data={savedJourneys}
-                  keyExtractor={(item) => item.id}
-                  scrollEnabled={false}
-                  renderItem={({ item }) => (
-                    <SavedRow item={item} onPress={() => onSavedJourneyPress(item)} />
-                  )}
-                  ItemSeparatorComponent={() => <View style={styles.separator} />}
+          <BottomSheetFlatList
+            data={[]}
+            keyExtractor={() => ''}
+            renderItem={() => null}
+            ListHeaderComponent={
+              <View style={{ paddingBottom: insets.bottom + Spacing.md }}>
+                <PlacesRow
+                  savedPlaces={savedPlaces}
+                  onPress={onPlacePress}
+                  onLongPress={onPlaceLongPress}
+                  onCustomPlacePress={onCustomPlacePress}
+                  onCustomPlaceLongPress={onCustomPlaceLongPress}
+                  onAddPress={onAddCustomPlace}
                 />
-              )}
-            </View>
-          </>
+
+                <Text style={styles.sectionLabel}>SAVED JOURNEYS</Text>
+                {savedJourneys.length === 0 ? (
+                  <Text
+                    style={[
+                      Typography.caption,
+                      { color: Colors.secondaryText, paddingVertical: 6 },
+                    ]}
+                  >
+                    No saved journeys yet — plan one to save it here.
+                  </Text>
+                ) : (
+                  savedJourneys.map((item, i) => (
+                    <View key={item.id}>
+                      <SavedRow item={item} onPress={() => onSavedJourneyPress(item)} />
+                      {i < savedJourneys.length - 1 && <View style={styles.separator} />}
+                    </View>
+                  ))
+                )}
+              </View>
+            }
+          />
         )}
-      </Animated.View>
+      </BottomSheet>
     )
   },
 )
@@ -599,38 +551,13 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
 // ---------------------------------------------------------------------------
 
 const styles = StyleSheet.create({
-  sheet: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: SHEET_H,
-    backgroundColor: Colors.card,
-    borderTopLeftRadius: Radii.card + 4,
-    borderTopRightRadius: Radii.card + 4,
-    paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.sm,
-    ...Shadows.top,
-  },
-  // Enlarged, full-width hit area around the handle so it's easy to grab and drag.
-  handleZone: {
-    alignItems: 'center',
-    paddingTop: 4,
-    paddingBottom: Spacing.md,
-  },
-  handle: {
-    width: 36,
-    height: 4,
-    borderRadius: Radii.handle,
-    backgroundColor: Colors.separator,
-  },
-
   // Search
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.md,
-    marginBottom: Spacing.lg,
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.lg,
   },
   searchPill: {
     flex: 1,
@@ -655,12 +582,14 @@ const styles = StyleSheet.create({
   // Places
   placesSection: {
     marginBottom: Spacing.lg,
+    paddingHorizontal: Spacing.lg,
   },
   sectionLabel: {
     ...Typography.label,
     color: Colors.secondaryText,
     marginBottom: Spacing.sm,
     letterSpacing: 0.5,
+    paddingHorizontal: Spacing.lg,
   },
   placesRow: {
     flexDirection: 'row',
@@ -699,6 +628,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.md,
     paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.lg,
   },
   savedRowIcon: {
     width: 34,
@@ -712,6 +642,7 @@ const styles = StyleSheet.create({
   // Search results
   resultsScroll: {
     flex: 1,
+    paddingHorizontal: Spacing.lg,
   },
   resultRow: {
     flexDirection: 'row',
@@ -741,6 +672,6 @@ const styles = StyleSheet.create({
   separator: {
     height: StyleSheet.hairlineWidth,
     backgroundColor: Colors.separator,
-    marginLeft: 50,
+    marginLeft: Spacing.lg + 34 + Spacing.md,
   },
 })
