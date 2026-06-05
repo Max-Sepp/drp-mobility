@@ -27,17 +27,13 @@
     "name": "Addington Village",
     "lat": 51.356486,
     "lng": -0.032396,
-    "lines": [
-      "Tram"
-    ]
+    "lines": ["Tram"]
   },
   {
     "name": "Addiscombe",
     "lat": 51.380152,
     "lng": -0.073357,
-    "lines": [
-      "Tram"
-    ]
+    "lines": ["Tram"]
   },
   {
     "name": "Aldgate",
@@ -73,18 +69,13 @@
     "name": "Ampere Way",
     "lat": 51.382143,
     "lng": -0.123442,
-    "lines": [
-      "Tram"
-    ]
+    "lines": ["Tram"]
   },
   {
     "name": "Anerley",
     "lat": 51.412058,
     "lng": -0.065674,
-    "lines": [
-      "London Overground",
-      "National Rail"
-    ]
+    "lines": ["London Overground", "National Rail"]
   },
   {
     "name": "Angel",
@@ -102,9 +93,7 @@
     "name": "Arena",
     "lat": 51.389335,
     "lng": -0.056528,
-    "lines": [
-      "Tram"
-    ]
+    "lines": ["Tram"]
   },
   {
     "name": "Arnos Grove",
@@ -122,9 +111,7 @@
     "name": "Avenue Road",
     "lat": 51.406887,
     "lng": -0.048882,
-    "lines": [
-      "Tram"
-    ]
+    "lines": ["Tram"]
   },
   {
     "name": "Baker Street",
@@ -190,26 +177,19 @@
     "name": "Beckenham Hill",
     "lat": 51.423754,
     "lng": -0.014894,
-    "lines": [
-      "National Rail"
-    ]
+    "lines": ["National Rail"]
   },
   {
     "name": "Beckenham Junction",
     "lat": 51.410594,
     "lng": -0.025904,
-    "lines": [
-      "National Rail",
-      "Tram"
-    ]
+    "lines": ["National Rail", "Tram"]
   },
   {
     "name": "Beckenham Road",
     "lat": 51.409363,
     "lng": -0.043629,
-    "lines": [
-      "Tram"
-    ]
+    "lines": ["Tram"]
   },
   {
     "name": "Becontree",
@@ -221,25 +201,19 @@
     "name": "Beddington Lane",
     "lat": 51.388108,
     "lng": -0.141078,
-    "lines": [
-      "Tram"
-    ]
+    "lines": ["Tram"]
   },
   {
     "name": "Belgrave Walk",
     "lat": 51.399341,
     "lng": -0.179524,
-    "lines": [
-      "Tram"
-    ]
+    "lines": ["Tram"]
   },
   {
     "name": "Bellingham",
     "lat": 51.433874,
     "lng": -0.02044,
-    "lines": [
-      "National Rail"
-    ]
+    "lines": ["National Rail"]
   },
   {
     "name": "Belsize Park",
@@ -263,18 +237,13 @@
     "name": "Bickley",
     "lat": 51.40012,
     "lng": 0.045241,
-    "lines": [
-      "National Rail"
-    ]
+    "lines": ["National Rail"]
   },
   {
     "name": "Birkbeck",
     "lat": 51.403738,
     "lng": -0.055285,
-    "lines": [
-      "Tram",
-      "rail"
-    ]
+    "lines": ["Tram", "rail"]
   },
   {
     "name": "Blackfriars",
@@ -286,9 +255,7 @@
     "name": "Blackhorse Lane",
     "lat": 51.385683,
     "lng": -0.071745,
-    "lines": [
-      "Tram"
-    ]
+    "lines": ["Tram"]
   },
   {
     "name": "Blackhorse Road",
@@ -402,10 +369,7 @@
     "name": "Bushey",
     "lat": 51.645628,
     "lng": -0.3856,
-    "lines": [
-      "London Overground",
-      "National Rail"
-    ]
+    "lines": ["London Overground", "National Rail"]
   },
   {
     "name": "Caledonian Road",
@@ -483,9 +447,7 @@
     "name": "Centrale",
     "lat": 51.375855,
     "lng": -0.10377,
-    "lines": [
-      "Tram"
-    ]
+    "lines": ["Tram"]
   },
   {
     "name": "Chadwell Heath",
@@ -533,10 +495,7 @@
     "name": "Cheshunt",
     "lat": 51.702864,
     "lng": -0.02176,
-    "lines": [
-      "London Overground",
-      "National Rail"
-    ]
+    "lines": ["London Overground", "National Rail"]
   },
   {
     "name": "Chigwell",
@@ -560,9 +519,7 @@
     "name": "Church Street",
     "lat": 51.374006,
     "lng": -0.105082,
-    "lines": [
-      "Tram"
-    ]
+    "lines": ["Tram"]
   },
   {
     "name": "City Thameslink",
@@ -616,9 +573,7 @@
     "name": "Coombe Lane",
     "lat": 51.359362,
     "lng": -0.05547,
-    "lines": [
-      "Tram"
-    ]
+    "lines": ["Tram"]
   },
   {
     "name": "Coulsdon South",
@@ -636,17 +591,13 @@
     "name": "Cricklewood",
     "lat": 51.558321,
     "lng": -0.212364,
-    "lines": [
-      "National Rail"
-    ]
+    "lines": ["National Rail"]
   },
   {
     "name": "Crofton Park",
     "lat": 51.454573,
     "lng": -0.037422,
-    "lines": [
-      "National Rail"
-    ]
+    "lines": ["National Rail"]
   },
   {
     "name": "Crossharbour",
@@ -742,9 +693,7 @@
     "name": "Dundonald Road",
     "lat": 51.417434,
     "lng": -0.207511,
-    "lines": [
-      "Tram"
-    ]
+    "lines": ["Tram"]
   },
   {
     "name": "Ealing Broadway",
@@ -846,10 +795,7 @@
     "name": "Elmers End",
     "lat": 51.399291,
     "lng": -0.050126,
-    "lines": [
-      "National Rail",
-      "Tram"
-    ]
+    "lines": ["National Rail", "Tram"]
   },
   {
     "name": "Elstree & Borehamwood",
@@ -897,9 +843,7 @@
     "name": "Fieldway",
     "lat": 51.350903,
     "lng": -0.023932,
-    "lines": [
-      "Tram"
-    ]
+    "lines": ["Tram"]
   },
   {
     "name": "Finchley Central",
@@ -953,9 +897,7 @@
     "name": "George Street",
     "lat": 51.373975,
     "lng": -0.098746,
-    "lines": [
-      "Tram"
-    ]
+    "lines": ["Tram"]
   },
   {
     "name": "Gidea Park",
@@ -1009,9 +951,7 @@
     "name": "Gravel Hill",
     "lat": 51.352786,
     "lng": -0.037509,
-    "lines": [
-      "Tram"
-    ]
+    "lines": ["Tram"]
   },
   {
     "name": "Great Portland Street",
@@ -1047,9 +987,7 @@
     "name": "Hackbridge",
     "lat": 51.378051,
     "lng": -0.153986,
-    "lines": [
-      "National Rail"
-    ]
+    "lines": ["National Rail"]
   },
   {
     "name": "Hackney Central",
@@ -1133,9 +1071,7 @@
     "name": "Harrington Road",
     "lat": 51.399444,
     "lng": -0.060384,
-    "lines": [
-      "Tram"
-    ]
+    "lines": ["Tram"]
   },
   {
     "name": "Harrow & Wealdstone",
@@ -1159,9 +1095,7 @@
     "name": "Haydons Road",
     "lat": 51.425536,
     "lng": -0.188826,
-    "lines": [
-      "National Rail"
-    ]
+    "lines": ["National Rail"]
   },
   {
     "name": "Hayes & Harlington",
@@ -1203,9 +1137,7 @@
     "name": "Hendon",
     "lat": 51.580699,
     "lng": -0.238895,
-    "lines": [
-      "National Rail"
-    ]
+    "lines": ["National Rail"]
   },
   {
     "name": "Hendon Central",
@@ -1409,9 +1341,7 @@
     "name": "King Henry's Drive",
     "lat": 51.345575,
     "lng": -0.020528,
-    "lines": [
-      "Tram"
-    ]
+    "lines": ["Tram"]
   },
   {
     "name": "King's Cross & St Pancras International",
@@ -1479,9 +1409,7 @@
     "name": "Lebanon Road",
     "lat": 51.375176,
     "lng": -0.084687,
-    "lines": [
-      "Tram"
-    ]
+    "lines": ["Tram"]
   },
   {
     "name": "Leicester Square",
@@ -1525,9 +1453,7 @@
     "name": "Lloyd Park",
     "lat": 51.364238,
     "lng": -0.081782,
-    "lines": [
-      "Tram"
-    ]
+    "lines": ["Tram"]
   },
   {
     "name": "London Bridge",
@@ -1545,9 +1471,7 @@
     "name": "Loughborough Junction",
     "lat": 51.466599,
     "lng": -0.102573,
-    "lines": [
-      "National Rail"
-    ]
+    "lines": ["National Rail"]
   },
   {
     "name": "Loughton",
@@ -1607,17 +1531,13 @@
     "name": "Maze Hill",
     "lat": 51.482567,
     "lng": 0.003056,
-    "lines": [
-      "National Rail"
-    ]
+    "lines": ["National Rail"]
   },
   {
     "name": "Merton Park",
     "lat": 51.414795,
     "lng": -0.201431,
-    "lines": [
-      "Tram"
-    ]
+    "lines": ["Tram"]
   },
   {
     "name": "Mile End",
@@ -1629,9 +1549,7 @@
     "name": "Mill Hill Broadway",
     "lat": 51.61365,
     "lng": -0.249363,
-    "lines": [
-      "National Rail"
-    ]
+    "lines": ["National Rail"]
   },
   {
     "name": "Mill Hill East",
@@ -1643,9 +1561,7 @@
     "name": "Mitcham",
     "lat": 51.397403,
     "lng": -0.172888,
-    "lines": [
-      "Tram"
-    ]
+    "lines": ["Tram"]
   },
   {
     "name": "Mitcham Eastfields",
@@ -1657,10 +1573,7 @@
     "name": "Mitcham Junction",
     "lat": 51.392738,
     "lng": -0.158124,
-    "lines": [
-      "National Rail",
-      "Tram"
-    ]
+    "lines": ["National Rail", "Tram"]
   },
   {
     "name": "Monument",
@@ -1690,17 +1603,13 @@
     "name": "Morden Road",
     "lat": 51.409288,
     "lng": -0.192387,
-    "lines": [
-      "Tram"
-    ]
+    "lines": ["Tram"]
   },
   {
     "name": "Morden South",
     "lat": 51.396063,
     "lng": -0.200211,
-    "lines": [
-      "National Rail"
-    ]
+    "lines": ["National Rail"]
   },
   {
     "name": "Mornington Crescent",
@@ -1718,17 +1627,13 @@
     "name": "New Addington",
     "lat": 51.343155,
     "lng": -0.01779,
-    "lines": [
-      "Tram"
-    ]
+    "lines": ["Tram"]
   },
   {
     "name": "New Barnet",
     "lat": 51.649014,
     "lng": -0.173587,
-    "lines": [
-      "National Rail"
-    ]
+    "lines": ["National Rail"]
   },
   {
     "name": "New Cross",
@@ -1746,9 +1651,7 @@
     "name": "New Southgate",
     "lat": 51.615197,
     "lng": -0.143413,
-    "lines": [
-      "National Rail"
-    ]
+    "lines": ["National Rail"]
   },
   {
     "name": "Newbury Park",
@@ -1826,10 +1729,7 @@
     "name": "Norwood Junction",
     "lat": 51.398634,
     "lng": -0.075125,
-    "lines": [
-      "London Overground",
-      "National Rail"
-    ]
+    "lines": ["London Overground", "National Rail"]
   },
   {
     "name": "Notting Hill Gate",
@@ -1841,17 +1741,13 @@
     "name": "Nunhead",
     "lat": 51.466591,
     "lng": -0.05162,
-    "lines": [
-      "National Rail"
-    ]
+    "lines": ["National Rail"]
   },
   {
     "name": "Oakleigh Park",
     "lat": 51.637284,
     "lng": -0.166442,
-    "lines": [
-      "National Rail"
-    ]
+    "lines": ["National Rail"]
   },
   {
     "name": "Oakwood",
@@ -1917,19 +1813,13 @@
     "name": "Peckham Rye",
     "lat": 51.470113,
     "lng": -0.069397,
-    "lines": [
-      "London Overground",
-      "National Rail"
-    ]
+    "lines": ["London Overground", "National Rail"]
   },
   {
     "name": "Penge West",
     "lat": 51.417666,
     "lng": -0.061123,
-    "lines": [
-      "London Overground",
-      "National Rail"
-    ]
+    "lines": ["London Overground", "National Rail"]
   },
   {
     "name": "Perivale",
@@ -1947,9 +1837,7 @@
     "name": "Phipps Bridge",
     "lat": 51.40423,
     "lng": -0.182249,
-    "lines": [
-      "Tram"
-    ]
+    "lines": ["Tram"]
   },
   {
     "name": "Piccadilly Circus",
@@ -2051,9 +1939,7 @@
     "name": "Ravensbourne",
     "lat": 51.41418,
     "lng": -0.007687,
-    "lines": [
-      "National Rail"
-    ]
+    "lines": ["National Rail"]
   },
   {
     "name": "Ravenscourt Park",
@@ -2083,9 +1969,7 @@
     "name": "Reeves Corner",
     "lat": 51.374744,
     "lng": -0.106244,
-    "lines": [
-      "Tram"
-    ]
+    "lines": ["Tram"]
   },
   {
     "name": "Regent's Park",
@@ -2163,9 +2047,7 @@
     "name": "Sandilands",
     "lat": 51.375163,
     "lng": -0.078912,
-    "lines": [
-      "Tram"
-    ]
+    "lines": ["Tram"]
   },
   {
     "name": "Seven Kings",
@@ -2219,9 +2101,7 @@
     "name": "Slade Green",
     "lat": 51.467685,
     "lng": 0.190501,
-    "lines": [
-      "National Rail"
-    ]
+    "lines": ["National Rail"]
   },
   {
     "name": "Sloane Square",
@@ -2245,9 +2125,7 @@
     "name": "South Croydon",
     "lat": 51.362834,
     "lng": -0.093778,
-    "lines": [
-      "National Rail"
-    ]
+    "lines": ["National Rail"]
   },
   {
     "name": "South Ealing",
@@ -2277,9 +2155,7 @@
     "name": "South Merton",
     "lat": 51.402718,
     "lng": -0.204938,
-    "lines": [
-      "National Rail"
-    ]
+    "lines": ["National Rail"]
   },
   {
     "name": "South Quay",
@@ -2339,9 +2215,7 @@
     "name": "St Helier (London)",
     "lat": 51.390161,
     "lng": -0.198272,
-    "lines": [
-      "National Rail"
-    ]
+    "lines": ["National Rail"]
   },
   {
     "name": "St Mary Cray",
@@ -2443,17 +2317,13 @@
     "name": "Sutton",
     "lat": 51.359553,
     "lng": -0.191415,
-    "lines": [
-      "National Rail"
-    ]
+    "lines": ["National Rail"]
   },
   {
     "name": "Sutton Common",
     "lat": 51.374955,
     "lng": -0.196541,
-    "lines": [
-      "National Rail"
-    ]
+    "lines": ["National Rail"]
   },
   {
     "name": "Swanley",
@@ -2471,10 +2341,7 @@
     "name": "Sydenham",
     "lat": 51.427354,
     "lng": -0.054225,
-    "lines": [
-      "London Overground",
-      "National Rail"
-    ]
+    "lines": ["London Overground", "National Rail"]
   },
   {
     "name": "Taplow",
@@ -2492,9 +2359,7 @@
     "name": "Therapia Lane",
     "lat": 51.385535,
     "lng": -0.128578,
-    "lines": [
-      "Tram"
-    ]
+    "lines": ["Tram"]
   },
   {
     "name": "Theydon Bois",
@@ -2560,9 +2425,7 @@
     "name": "Tulse Hill",
     "lat": 51.439747,
     "lng": -0.106477,
-    "lines": [
-      "National Rail"
-    ]
+    "lines": ["National Rail"]
   },
   {
     "name": "Turnham Green",
@@ -2628,9 +2491,7 @@
     "name": "Waddon Marsh",
     "lat": 51.376684,
     "lng": -0.118349,
-    "lines": [
-      "Tram"
-    ]
+    "lines": ["Tram"]
   },
   {
     "name": "Walthamstow Central",
@@ -2642,9 +2503,7 @@
     "name": "Wandle Park",
     "lat": 51.373164,
     "lng": -0.113105,
-    "lines": [
-      "Tram"
-    ]
+    "lines": ["Tram"]
   },
   {
     "name": "Wanstead",
@@ -2686,9 +2545,7 @@
     "name": "Wellesley Road",
     "lat": 51.375466,
     "lng": -0.097478,
-    "lines": [
-      "Tram"
-    ]
+    "lines": ["Tram"]
   },
   {
     "name": "Wembley Central",
@@ -2718,11 +2575,7 @@
     "name": "West Croydon",
     "lat": 51.378619,
     "lng": -0.103397,
-    "lines": [
-      "London Overground",
-      "National Rail",
-      "Tram"
-    ]
+    "lines": ["London Overground", "National Rail", "Tram"]
   },
   {
     "name": "West Drayton",
@@ -2794,9 +2647,7 @@
     "name": "West Sutton",
     "lat": 51.365804,
     "lng": -0.205577,
-    "lines": [
-      "National Rail"
-    ]
+    "lines": ["National Rail"]
   },
   {
     "name": "Westbourne Park",
@@ -2808,9 +2659,7 @@
     "name": "Westcombe Park",
     "lat": 51.483233,
     "lng": 0.019763,
-    "lines": [
-      "National Rail"
-    ]
+    "lines": ["National Rail"]
   },
   {
     "name": "Westferry",
@@ -2864,9 +2713,7 @@
     "name": "Wimbledon Chase",
     "lat": 51.409233,
     "lng": -0.214058,
-    "lines": [
-      "National Rail"
-    ]
+    "lines": ["National Rail"]
   },
   {
     "name": "Wimbledon Park",
@@ -2896,9 +2743,7 @@
     "name": "Woodside",
     "lat": 51.388249,
     "lng": -0.064839,
-    "lines": [
-      "Tram"
-    ]
+    "lines": ["Tram"]
   },
   {
     "name": "Woodside Park",

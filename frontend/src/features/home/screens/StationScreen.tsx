@@ -29,11 +29,13 @@ export const StationScreen = ({ navigation, route }: StationScreenProps) => {
     if (!stationDetail) return
     setHasLifts(undefined)
     setHasEscalators(undefined)
-    apiClient.GET('/equipment', { params: { query: { station_id: stationDetail.id } } }).then(({ data }) => {
-      if (!data) return
-      setHasLifts(data.some((e) => e.equipment_type.name === 'lift'))
-      setHasEscalators(data.some((e) => e.equipment_type.name === 'escalator'))
-    })
+    apiClient
+      .GET('/equipment', { params: { query: { station_id: stationDetail.id } } })
+      .then(({ data }) => {
+        if (!data) return
+        setHasLifts(data.some((e) => e.equipment_type.name === 'lift'))
+        setHasEscalators(data.some((e) => e.equipment_type.name === 'escalator'))
+      })
   }, [stationDetail?.id])
 
   // Live feed of outage reports, filtered to this station. Updates in real time as reports are

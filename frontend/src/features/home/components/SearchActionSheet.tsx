@@ -9,7 +9,15 @@
 
 import { MaterialIcons } from '@expo/vector-icons'
 import * as Location from 'expo-location'
-import { useRef, useState, useCallback, useEffect, useImperativeHandle, useLayoutEffect, forwardRef } from 'react'
+import {
+  useRef,
+  useState,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useLayoutEffect,
+  forwardRef,
+} from 'react'
 import {
   ActivityIndicator,
   Alert,
@@ -350,67 +358,69 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
     //   can scroll normally when the sheet is fully open.
 
     // eslint-disable-next-line react-hooks/refs
-    const [headerPanHandlers] = useState(() =>
-      PanResponder.create({
-        onMoveShouldSetPanResponder: (_evt, g) =>
-          Math.abs(g.dy) > 8 && Math.abs(g.dy) > Math.abs(g.dx),
-        onPanResponderGrant: () => {
-          translateY.stopAnimation((val) => {
-            dragStartRef.current = val
-          })
-        },
-        onPanResponderMove: (_evt, g) => {
-          const max = snapPointsRef.current.collapsed
-          translateY.setValue(Math.max(0, Math.min(max, dragStartRef.current + g.dy)))
-        },
-        onPanResponderRelease: (_evt, g) => {
-          const { collapsed } = snapPointsRef.current
-          const target = computeTarget(
-            dragStartRef.current + g.dy,
-            g.vy,
-            snapRef.current,
-            collapsed,
-          )
-          snapToRef.current(target)
-        },
-      }).panHandlers,
+    const [headerPanHandlers] = useState(
+      () =>
+        PanResponder.create({
+          onMoveShouldSetPanResponder: (_evt, g) =>
+            Math.abs(g.dy) > 8 && Math.abs(g.dy) > Math.abs(g.dx),
+          onPanResponderGrant: () => {
+            translateY.stopAnimation((val) => {
+              dragStartRef.current = val
+            })
+          },
+          onPanResponderMove: (_evt, g) => {
+            const max = snapPointsRef.current.collapsed
+            translateY.setValue(Math.max(0, Math.min(max, dragStartRef.current + g.dy)))
+          },
+          onPanResponderRelease: (_evt, g) => {
+            const { collapsed } = snapPointsRef.current
+            const target = computeTarget(
+              dragStartRef.current + g.dy,
+              g.vy,
+              snapRef.current,
+              collapsed,
+            )
+            snapToRef.current(target)
+          },
+        }).panHandlers,
     )
 
     // eslint-disable-next-line react-hooks/refs
-    const [contentPanHandlers] = useState(() =>
-      PanResponder.create({
-        // Capture phase fires parent-before-child, so the body View claims the drag
-        // before the ScrollView inside can hold it. Only active when not at full snap
-        // (where the ScrollView should scroll normally). Pure taps are unaffected
-        // because move handlers only fire once the finger actually moves.
-        onMoveShouldSetPanResponder: (_evt, g) => {
-          if (snapRef.current === 'full') return false
-          return Math.abs(g.dy) > 8 && Math.abs(g.dy) > Math.abs(g.dx)
-        },
-        onMoveShouldSetPanResponderCapture: (_evt, g) => {
-          if (snapRef.current === 'full') return false
-          return Math.abs(g.dy) > 8 && Math.abs(g.dy) > Math.abs(g.dx)
-        },
-        onPanResponderGrant: () => {
-          translateY.stopAnimation((val) => {
-            dragStartRef.current = val
-          })
-        },
-        onPanResponderMove: (_evt, g) => {
-          const max = snapPointsRef.current.collapsed
-          translateY.setValue(Math.max(0, Math.min(max, dragStartRef.current + g.dy)))
-        },
-        onPanResponderRelease: (_evt, g) => {
-          const { collapsed } = snapPointsRef.current
-          const target = computeTarget(
-            dragStartRef.current + g.dy,
-            g.vy,
-            snapRef.current,
-            collapsed,
-          )
-          snapToRef.current(target)
-        },
-      }).panHandlers,
+    const [contentPanHandlers] = useState(
+      () =>
+        PanResponder.create({
+          // Capture phase fires parent-before-child, so the body View claims the drag
+          // before the ScrollView inside can hold it. Only active when not at full snap
+          // (where the ScrollView should scroll normally). Pure taps are unaffected
+          // because move handlers only fire once the finger actually moves.
+          onMoveShouldSetPanResponder: (_evt, g) => {
+            if (snapRef.current === 'full') return false
+            return Math.abs(g.dy) > 8 && Math.abs(g.dy) > Math.abs(g.dx)
+          },
+          onMoveShouldSetPanResponderCapture: (_evt, g) => {
+            if (snapRef.current === 'full') return false
+            return Math.abs(g.dy) > 8 && Math.abs(g.dy) > Math.abs(g.dx)
+          },
+          onPanResponderGrant: () => {
+            translateY.stopAnimation((val) => {
+              dragStartRef.current = val
+            })
+          },
+          onPanResponderMove: (_evt, g) => {
+            const max = snapPointsRef.current.collapsed
+            translateY.setValue(Math.max(0, Math.min(max, dragStartRef.current + g.dy)))
+          },
+          onPanResponderRelease: (_evt, g) => {
+            const { collapsed } = snapPointsRef.current
+            const target = computeTarget(
+              dragStartRef.current + g.dy,
+              g.vy,
+              snapRef.current,
+              collapsed,
+            )
+            snapToRef.current(target)
+          },
+        }).panHandlers,
     )
 
     // ── Snap action ───────────────────────────────────────────────────────
@@ -431,9 +441,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
         }
 
         const visibleHeight =
-          target === 'full' ? SHEET_H :
-          target === 'mid' ? MID_H :
-          88 + insets.bottom
+          target === 'full' ? SHEET_H : target === 'mid' ? MID_H : 88 + insets.bottom
         onSnapChangeRef.current?.(visibleHeight)
 
         Animated.spring(translateY, {
@@ -540,57 +548,56 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
           <Pressable style={StyleSheet.absoluteFill} onPress={() => snapTo('mid')} />
         </Animated.View>
         <Animated.View
-        style={[
-          styles.sheet,
-          {
-            paddingBottom: insets.bottom + Spacing.md,
-            transform: [{ translateY }],
-          },
-        ]}
-      >
-        {/* Drag handle — always draggable */}
-        <View {...headerPanHandlers} style={styles.handleZone}>
-          <View style={styles.handle} />
-        </View>
+          style={[
+            styles.sheet,
+            {
+              paddingBottom: insets.bottom + Spacing.md,
+              transform: [{ translateY }],
+            },
+          ]}
+        >
+          {/* Drag handle — always draggable */}
+          <View {...headerPanHandlers} style={styles.handleZone}>
+            <View style={styles.handle} />
+          </View>
 
-        {/* Search bar — also always draggable; tap opens full snap + focuses */}
-        <View {...headerPanHandlers} style={styles.searchRow}>
-          <TouchableOpacity
-            style={[styles.searchPill, atFull && styles.searchPillExpanded]}
-            onPress={!atFull ? () => snapTo('full', true) : undefined}
-            activeOpacity={atFull ? 1 : 0.8}
-          >
-            <MaterialIcons
-              name="search"
-              size={18}
-              color={Colors.secondaryText}
-              style={{ marginRight: 6 }}
-            />
-            {/* pointerEvents="none" when not at full so taps pass through to TouchableOpacity */}
-            <View style={{ flex: 1, pointerEvents: atFull ? 'auto' : 'none' }}>
-              <TextInput
-                ref={inputRef}
-                style={styles.searchInput}
-                placeholder="Where to?"
-                placeholderTextColor={Colors.placeholderText}
-                editable={atFull}
-                autoCapitalize="none"
-                autoCorrect={false}
-                returnKeyType="search"
-                value={query}
-                onChangeText={setQuery}
+          {/* Search bar — also always draggable; tap opens full snap + focuses */}
+          <View {...headerPanHandlers} style={styles.searchRow}>
+            <TouchableOpacity
+              style={[styles.searchPill, atFull && styles.searchPillExpanded]}
+              onPress={!atFull ? () => snapTo('full', true) : undefined}
+              activeOpacity={atFull ? 1 : 0.8}
+            >
+              <MaterialIcons
+                name="search"
+                size={18}
+                color={Colors.secondaryText}
+                style={{ marginRight: 6 }}
               />
-            </View>
-            {!atFull && <MaterialIcons name="mic" size={16} color={Colors.secondaryText} />}
-            {atFull && searching && (
-              <ActivityIndicator size="small" color={Colors.secondaryText} />
-            )}
-          </TouchableOpacity>
+              {/* pointerEvents="none" when not at full so taps pass through to TouchableOpacity */}
+              <View style={{ flex: 1, pointerEvents: atFull ? 'auto' : 'none' }}>
+                <TextInput
+                  ref={inputRef}
+                  style={styles.searchInput}
+                  placeholder="Where to?"
+                  placeholderTextColor={Colors.placeholderText}
+                  editable={atFull}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  returnKeyType="search"
+                  value={query}
+                  onChangeText={setQuery}
+                />
+              </View>
+              {!atFull && <MaterialIcons name="mic" size={16} color={Colors.secondaryText} />}
+              {atFull && searching && (
+                <ActivityIndicator size="small" color={Colors.secondaryText} />
+              )}
+            </TouchableOpacity>
+          </View>
 
-        </View>
-
-        {/* Body — always mounted so it slides off-screen rather than popping out */}
-        <View {...contentPanHandlers} style={styles.bodyWrapper}>
+          {/* Body — always mounted so it slides off-screen rather than popping out */}
+          <View {...contentPanHandlers} style={styles.bodyWrapper}>
             {hasQuery ? (
               <ScrollView
                 style={styles.resultsScroll}
@@ -696,7 +703,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
                 </View>
               </ScrollView>
             )}
-        </View>
+          </View>
         </Animated.View>
       </>
     )

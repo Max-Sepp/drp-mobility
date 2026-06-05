@@ -68,7 +68,12 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
   const animateToUser = useCallback(() => {
     if (!coords) return
     mapRef.current?.animateToRegion(
-      { latitude: coords.latitude, longitude: coords.longitude, latitudeDelta: 0.02, longitudeDelta: 0.02 },
+      {
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+        latitudeDelta: 0.02,
+        longitudeDelta: 0.02,
+      },
       600,
     )
   }, [coords])

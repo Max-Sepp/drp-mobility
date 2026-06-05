@@ -112,7 +112,10 @@ export function AddCustomPlaceModal({ visible, existingNames = [], onSave, onDis
       return
     }
     if (existingNames.some((n) => n.toLowerCase() === trimmed.toLowerCase())) {
-      Alert.alert('Name already used', 'You already have a place with that name. Please choose a different one.')
+      Alert.alert(
+        'Name already used',
+        'You already have a place with that name. Please choose a different one.',
+      )
       return
     }
     if (!resolved) {
