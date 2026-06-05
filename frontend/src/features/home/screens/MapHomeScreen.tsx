@@ -1,9 +1,10 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import { useFocusEffect } from '@react-navigation/native'
 import { useCallback, useRef, useState } from 'react'
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { StationMap } from '@/features/map/components/StationMap'
+import { StationMap, type StationMapHandle } from '@/features/map/components/StationMap'
+import { useAppLocation } from '@/lib/LocationContext'
 import { loadSavedJourneys, type SavedJourney } from '@/features/journey/api/savedJourneys'
 import {
   clearActiveJourney,
@@ -114,7 +115,13 @@ export function MapHomeScreen({ navigation }: Props) {
   const [addCustomPlaceVisible, setAddCustomPlaceVisible] = useState(false)
   const [activeStation, setActiveStation] = useState<string | null>(null)
   const sheetRef = useRef<SearchActionSheetHandle>(null)
+  const mapRef = useRef<StationMapHandle>(null)
   const { status, user } = useAuth()
+  const coords = useAppLocation()
+  // Tracks the visible height of the sheet so the map can pad its camera correctly.
+  const [sheetVisibleHeight, setSheetVisibleHeight] = useState(
+    Dimensions.get('window').height * 0.5,
+  )
 
   // Refresh on focus so the banner reflects progress made on the active screen and survives a
   // restart (the record is read from storage each time the map regains focus).
@@ -193,7 +200,13 @@ export function MapHomeScreen({ navigation }: Props) {
 
   async function handleSaveCustomPlace(place: Omit<CustomPlace, 'id'>) {
     if (!user) return
-    await addCustomPlace(user.id, place)
+    const lowerName = place.name.toLowerCase()
+    if (lowerName === 'home' || lowerName === 'work') {
+      const key = lowerName as 'home' | 'work'
+      await savePlace(user.id, key, { address: place.address, postcode: place.postcode })
+    } else {
+      await addCustomPlace(user.id, place)
+    }
     const updated = await loadSavedPlaces(user.id)
     setSavedPlaces(updated)
     setAddCustomPlaceVisible(false)
@@ -287,17 +300,17 @@ export function MapHomeScreen({ navigation }: Props) {
 
   return (
     <View style={styles.screen}>
-      <StationMap onStationPress={openStation} />
+      <StationMap ref={mapRef} onStationPress={openStation} bottomInset={sheetVisibleHeight} />
 
       {/* Top overlay: icon buttons, then a resume banner when a journey is in progress */}
       <SafeAreaView edges={['top']} style={[styles.topSafe, { pointerEvents: 'box-none' }]}>
         <View style={[styles.topButtons, { pointerEvents: 'box-none' }]}>
           <TopIconButton
-            icon="accessible"
+            icon="my-location"
             size={50}
-            onPress={() =>
-              Alert.alert('Coming soon', 'Accessibility settings are not yet available.')
-            }
+            color={coords ? Colors.blue : Colors.secondaryText}
+            accessibilityLabel="Re-centre map on my location"
+            onPress={() => mapRef.current?.recentre()}
           />
           {status !== 'loading' && (
             <TopIconButton
@@ -332,6 +345,7 @@ export function MapHomeScreen({ navigation }: Props) {
         onCustomPlacePress={handleCustomPlacePress}
         onCustomPlaceLongPress={handleCustomPlaceLongPress}
         onAddCustomPlace={handleAddCustomPlacePress}
+        onSnapChange={setSheetVisibleHeight}
       />
 
       <StationSheet station={activeStation} onClose={closeStation} />
@@ -347,6 +361,11 @@ export function MapHomeScreen({ navigation }: Props) {
 
       <AddCustomPlaceModal
         visible={addCustomPlaceVisible}
+        existingNames={[
+          ...(savedPlaces.home ? ['Home'] : []),
+          ...(savedPlaces.work ? ['Work'] : []),
+          ...savedPlaces.custom.map((p) => p.name),
+        ]}
         onSave={handleSaveCustomPlace}
         onDismiss={() => setAddCustomPlaceVisible(false)}
       />
@@ -367,10 +386,9 @@ const styles = StyleSheet.create({
   },
   topButtons: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: 8,
+    justifyContent: 'space-between',
     paddingTop: 8,
-    paddingRight: Spacing.md,
+    paddingHorizontal: Spacing.md,
   },
   topButton: {
     backgroundColor: Colors.card,

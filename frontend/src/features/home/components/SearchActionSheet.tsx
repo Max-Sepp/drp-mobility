@@ -135,6 +135,9 @@ function PlacesRow({
                 <MaterialIcons name={icon} size={22} color={saved ? Colors.card : Colors.blue} />
               </View>
               <Text style={[Typography.label, { color: Colors.text, marginTop: 4 }]}>{label}</Text>
+              {!saved && (
+                <Text style={[Typography.label, { color: Colors.blue, marginTop: 1 }]}>Add</Text>
+              )}
             </TouchableOpacity>
           )
         })}
@@ -264,6 +267,8 @@ type Props = {
   onCustomPlacePress: (place: CustomPlace) => void
   onCustomPlaceLongPress: (place: CustomPlace) => void
   onAddCustomPlace: () => void
+  /** Called whenever the sheet snaps, with the visible height in pixels. */
+  onSnapChange?: (visibleHeight: number) => void
 }
 
 export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
@@ -279,6 +284,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
       onCustomPlacePress,
       onCustomPlaceLongPress,
       onAddCustomPlace,
+      onSnapChange,
     },
     ref,
   ) {
@@ -289,6 +295,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
     const [locationResults, setLocationResults] = useState<LocationSuggestion[]>([])
     const [searching, setSearching] = useState(false)
     const [gpsLoading, setGpsLoading] = useState(false)
+
     const inputRef = useRef<TextInput>(null)
     const sheetRef = useRef<BottomSheetRef>(null)
 
@@ -353,6 +360,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
         setExpanded(false)
         setQuery('')
       }
+      onSnapChange?.(SNAP_POINTS[index] ?? 0)
     }
 
     // ── Location tap handler ──────────────────────────────────────────────
@@ -582,7 +590,15 @@ const styles = StyleSheet.create({
     color: Colors.text,
     padding: 0,
   },
-  cancelBtn: {},
+  cancelBtn: {
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 8,
+  },
+
+  // Body wrapper
+  bodyWrapper: {
+    flex: 1,
+  },
 
   // Places
   placesSection: {

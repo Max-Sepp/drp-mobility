@@ -26,6 +26,7 @@ import { Colors, Radii, Shadows, Spacing, Typography } from '@/theme'
 
 type Props = {
   visible: boolean
+  existingNames?: string[]
   onSave: (place: Omit<CustomPlace, 'id'>) => void
   onDismiss: () => void
 }
@@ -45,7 +46,7 @@ const ICONS: { name: keyof typeof MaterialIcons.glyphMap; label: string }[] = [
   { name: 'local-hospital', label: 'Medical' },
 ]
 
-export function AddCustomPlaceModal({ visible, onSave, onDismiss }: Props) {
+export function AddCustomPlaceModal({ visible, existingNames = [], onSave, onDismiss }: Props) {
   const insets = useSafeAreaInsets()
   const [name, setName] = useState('')
   const [icon, setIcon] = useState<keyof typeof MaterialIcons.glyphMap>('star')
@@ -108,6 +109,13 @@ export function AddCustomPlaceModal({ visible, onSave, onDismiss }: Props) {
     const trimmed = name.trim()
     if (!trimmed) {
       Alert.alert('Name required', 'Please give this place a name.')
+      return
+    }
+    if (existingNames.some((n) => n.toLowerCase() === trimmed.toLowerCase())) {
+      Alert.alert(
+        'Name already used',
+        'You already have a place with that name. Please choose a different one.',
+      )
       return
     }
     if (!resolved) {

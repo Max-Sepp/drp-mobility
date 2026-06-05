@@ -9,21 +9,22 @@ type Props = {
   heading: number | null
 }
 
-// How long to keep redrawing the marker bitmap after its content changes.
-const TRACK_DURATION_MS = 500
+// How long to keep tracksViewChanges=true after heading changes.
+// Must be shorter than the heading throttle interval in LocationContext (300ms)
+// so the timer can fire between consecutive heading state updates.
+const TRACK_DURATION_MS = 250
 
 export function UserLocationMarker({ latitude, longitude, heading }: Props) {
-  // react-native-maps redraws the marker bitmap on every render while
-  // tracksViewChanges is true, which makes a custom marker flicker. Keep it on
-  // only briefly after the rendered content changes, then switch it off so the
-  // marker stays static between updates.
+  // tracksViewChanges=true tells react-native-maps to regenerate the marker bitmap.
+  // Only heading changes need a bitmap refresh (cone rotation). Coordinate changes
+  // move the pin natively via the coordinate prop without touching the bitmap.
   const [tracksViewChanges, setTracksViewChanges] = useState(true)
 
   useEffect(() => {
     setTracksViewChanges(true)
     const timer = setTimeout(() => setTracksViewChanges(false), TRACK_DURATION_MS)
     return () => clearTimeout(timer)
-  }, [latitude, longitude, heading])
+  }, [heading])
 
   return (
     <Marker
@@ -33,13 +34,11 @@ export function UserLocationMarker({ latitude, longitude, heading }: Props) {
       flat
     >
       <View style={styles.container}>
-        {/* Directional cone — only shown when heading is available */}
         {heading !== null && (
           <View style={[styles.coneWrapper, { transform: [{ rotate: `${heading}deg` }] }]}>
             <View style={styles.cone} />
           </View>
         )}
-        {/* User dot */}
         <View style={styles.dot}>
           <View style={styles.dotInner} />
         </View>
@@ -65,7 +64,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-start',
   },
-  // Triangle pointing upward (north before rotation)
   cone: {
     width: 0,
     height: 0,
@@ -75,7 +73,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 18,
     borderLeftColor: 'transparent',
     borderRightColor: 'transparent',
-    borderBottomColor: `${Colors.blue}55`, // 33% opacity
+    borderBottomColor: `${Colors.blue}55`,
   },
   dot: {
     position: 'absolute',

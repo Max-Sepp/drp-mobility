@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Alert } from 'react-native'
 import { Text, XStack, YStack } from 'tamagui'
 import { ScreenHeader } from '@/components/ScreenHeader'
-import { AccountButton, useAuth } from '@/features/auth'
+import { useAuth } from '@/features/auth'
 import { useStations } from '@/features/stations'
 import { FormScreenLayout } from '@/features/reporting/components/FormScreenLayout'
 import type { JourneyPlannerScreenProps } from '@/navigation/types'
@@ -186,7 +186,6 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
                   Saved{savedCount > 0 ? ` (${savedCount})` : ''}
                 </Text>
               </XStack>
-              <AccountButton />
             </XStack>
           }
         />

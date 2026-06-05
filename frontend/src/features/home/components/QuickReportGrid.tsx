@@ -30,9 +30,20 @@ const GRID_ITEMS: GridItem[] = [
 
 type QuickReportGridProps = {
   onSelect: (action: QuickReportAction) => void
+  hasLifts?: boolean
+  hasEscalators?: boolean
 }
 
-export const QuickReportGrid = ({ onSelect }: QuickReportGridProps) => {
+export const QuickReportGrid = ({ onSelect, hasLifts, hasEscalators }: QuickReportGridProps) => {
+  function isDisabled(item: GridItem): boolean {
+    if (!item.action) return true
+    if (item.action.route === 'ReportForm') {
+      if (item.action.equipmentType === 'lift') return hasLifts === false
+      if (item.action.equipmentType === 'escalator') return hasEscalators === false
+    }
+    return false
+  }
+
   return (
     <>
       <Heading
@@ -47,7 +58,7 @@ export const QuickReportGrid = ({ onSelect }: QuickReportGridProps) => {
       </Heading>
       <XStack flexWrap="wrap" mx="$4" gap="$2.5" justify="center">
         {GRID_ITEMS.map((item) => {
-          const disabled = !item.action
+          const disabled = isDisabled(item)
           return (
             <YStack
               key={item.label}

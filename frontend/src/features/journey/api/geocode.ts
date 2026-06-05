@@ -89,7 +89,7 @@ function buildSubtitle(context: MapboxContext[]): string {
 async function coordsFromAddress(query: string): Promise<{ lat: number; lon: number } | null> {
   const url =
     `${MAPBOX_BASE}/${encodeURIComponent(query)}.json` +
-    `?access_token=${MAPBOX_TOKEN}&country=gb&limit=1`
+    `?access_token=${MAPBOX_TOKEN}&country=gb&proximity=${LONDON_CENTRE}&limit=1`
   const res = await fetch(url)
   if (!res.ok) return null
   const body = await res.json().catch(() => null)
