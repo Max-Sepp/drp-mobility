@@ -6,14 +6,10 @@
 import * as ImagePicker from 'expo-image-picker'
 import { MaterialIcons } from '@expo/vector-icons'
 import { useEffect, useRef, useState } from 'react'
-import { Alert, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { Alert, Dimensions, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
 import { Text } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import BottomSheet, {
-  BottomSheetScrollView,
-  BottomSheetTextInput,
-  type BottomSheetRef,
-} from '@/components/BottomSheet'
+import BottomSheet, { BottomSheetScrollView, type BottomSheetRef } from '@/components/BottomSheet'
 import { apiClient } from '@/api/client'
 import type { components } from '@/api/schema.d'
 import { EquipmentPicker } from '@/features/reporting/components/EquipmentPicker'
@@ -53,6 +49,7 @@ export function ReportSheet({ station, onClose }: Props) {
   const [equipmentId, setEquipmentId] = useState<number | null>(null)
   const [loadingEquipment, setLoadingEquipment] = useState(false)
   const [description, setDescription] = useState('')
+  const [area, setArea] = useState('')
   const [photo, setPhoto] = useState<ImagePicker.ImagePickerAsset | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
@@ -72,6 +69,7 @@ export function ReportSheet({ station, onClose }: Props) {
     setEquipmentId(null)
     setLoadingEquipment(false)
     setDescription('')
+    setArea('')
     setPhoto(null)
     setSubmitting(false)
   }
@@ -110,8 +108,14 @@ export function ReportSheet({ station, onClose }: Props) {
   async function submit() {
     if (!station) return
 
+    // Custom / overcrowding: validate description then go straight to success
+    // (no equipment_id, backend support pending)
     if (issueType === 'overcrowding' || issueType === 'custom') {
-      Alert.alert('Coming soon', 'Custom issue reporting will be available in a future update.')
+      if (!description.trim()) {
+        Alert.alert('Required', 'Please describe the issue.')
+        return
+      }
+      setStep('success')
       return
     }
 
@@ -278,29 +282,58 @@ export function ReportSheet({ station, onClose }: Props) {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: insets.bottom + Spacing.xl }}
           >
-            {(issueType === 'lift' || issueType === 'escalator') && (
-              <EquipmentPicker
-                label={issueType === 'lift' ? 'Which lift?' : 'Which escalator?'}
-                loading={loadingEquipment}
-                equipment={equipment}
-                selectedId={equipmentId}
-                onSelect={setEquipmentId}
-                emptyText={`No ${issueType}s registered at this station.`}
-              />
+            {(issueType === 'lift' || issueType === 'escalator') ? (
+              <>
+                <EquipmentPicker
+                  label={issueType === 'lift' ? 'Which lift?' : 'Which escalator?'}
+                  loading={loadingEquipment}
+                  equipment={equipment}
+                  selectedId={equipmentId}
+                  onSelect={setEquipmentId}
+                  emptyText={`No ${issueType}s registered at this station.`}
+                />
+                <FormSection label="Comments (optional)">
+                  <TextInput
+                    style={styles.textArea}
+                    placeholder="e.g. doors won't open…"
+                    placeholderTextColor={Colors.placeholderText}
+                    value={description}
+                    onChangeText={setDescription}
+                    multiline
+                    numberOfLines={3}
+                    textAlignVertical="top"
+                  />
+                </FormSection>
+              </>
+            ) : (
+              <>
+                <FormSection label="Describe the issue">
+                  <TextInput
+                    style={styles.textArea}
+                    placeholder={
+                      issueType === 'overcrowding'
+                        ? 'e.g. platform dangerously crowded at 8am…'
+                        : 'e.g. fallen light blocking path to escalator…'
+                    }
+                    placeholderTextColor={Colors.placeholderText}
+                    value={description}
+                    onChangeText={setDescription}
+                    multiline
+                    numberOfLines={4}
+                    textAlignVertical="top"
+                  />
+                </FormSection>
+                <FormSection label="Area within station (optional)">
+                  <TextInput
+                    style={styles.textInput}
+                    placeholder="e.g. northbound platform, main entrance…"
+                    placeholderTextColor={Colors.placeholderText}
+                    value={area}
+                    onChangeText={setArea}
+                  />
+                </FormSection>
+              </>
             )}
-
-            <FormSection label="Comments (optional)">
-              <BottomSheetTextInput
-                style={styles.textArea}
-                placeholder="e.g. doors won't open…"
-                placeholderTextColor={Colors.placeholderText}
-                value={description}
-                onChangeText={setDescription}
-                multiline
-                numberOfLines={3}
-                textAlignVertical="top"
-              />
-            </FormSection>
 
             <PhotoPicker photo={photo} onPicked={setPhoto} />
 
@@ -415,6 +448,17 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm,
     minHeight: 80,
     textAlignVertical: 'top',
+  },
+  textInput: {
+    borderWidth: Borders.thin,
+    borderColor: Colors.border,
+    borderRadius: Radii.input,
+    backgroundColor: Colors.searchBg,
+    color: Colors.text,
+    fontSize: 15,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    height: 44,
   },
   submitRow: {
     paddingHorizontal: Spacing.lg,
