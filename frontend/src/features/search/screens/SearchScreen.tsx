@@ -109,7 +109,6 @@ export function SearchScreen({ navigation }: Props) {
     // pointerEvents="box-none" lets touches on transparent areas fall through
     // to the backdrop TouchableWithoutFeedback, but the card itself is solid.
     <View style={[StyleSheet.absoluteFill, { pointerEvents: 'box-none' }]}>
-
       {/* Dimmed backdrop — tapping it dismisses */}
       <TouchableWithoutFeedback onPress={dismiss}>
         <Animated.View style={[styles.backdrop, { opacity: backdropOpacity }]} />

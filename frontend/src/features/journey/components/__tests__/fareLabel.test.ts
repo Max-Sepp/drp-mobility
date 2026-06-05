@@ -1,19 +1,25 @@
 import { describe, expect, it, vi } from 'vitest'
+import { fareLabel } from '@/features/journey/components/legDisplay'
+import type { Journey } from '@/features/journey/api/tfl'
 
 // legDisplay.tsx imports React Native / Tamagui / Expo components for its visual
 // exports. Mock them so Vitest (node environment) can load the module without
-// a native runtime — fareLabel itself uses none of these.
+// a native runtime — fareLabel itself uses none of these. vi.mock is hoisted
+// above the imports by Vitest, so the mocks apply even though they appear below.
 vi.mock('tamagui', () => ({ Text: null, XStack: null }))
 vi.mock('@expo/vector-icons', () => ({ MaterialIcons: null }))
 vi.mock('@/theme', () => ({
   Borders: {},
-  Colors: { blue: '#007AFF', secondaryText: '#8E8E93', warningBg: '', warningBorder: '', warningDark: '' },
+  Colors: {
+    blue: '#007AFF',
+    secondaryText: '#8E8E93',
+    warningBg: '',
+    warningBorder: '',
+    warningDark: '',
+  },
   Opacity: { pressed: 0.7 },
   Radii: {},
 }))
-
-import { fareLabel } from '../legDisplay'
-import type { Journey } from '@/features/journey/api/tfl'
 
 // ---------------------------------------------------------------------------
 // Helpers

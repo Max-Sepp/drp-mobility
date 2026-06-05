@@ -14,6 +14,7 @@ import asyncio
 import json
 from datetime import datetime, timezone
 
+from fastapi import BackgroundTasks
 from sqlalchemy.orm import Session
 
 from app.events import broker, sse_event
@@ -199,7 +200,10 @@ def test_stream_pushes_created_event(db_session: Session) -> None:
             equipment_id=_equipment_id(db_session), breakdown_time=_BREAKDOWN_TIME
         )
         created = create_outage_report(
-            payload, repo=OutageReportRepository(db_session), current_user=None
+            payload,
+            BackgroundTasks(),
+            repo=OutageReportRepository(db_session),
+            current_user=None,
         )
 
         data = await _next_event(generator, "created")

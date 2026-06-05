@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "162551131440",
+    "project_id": "drp-mobility",
+    "storage_bucket": "drp-mobility.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:162551131440:android:be1f9d2866d69097482cf5",
+        "android_client_info": {
+          "package_name": "com.drpmobility.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAYQIsnLEOPOTTPPVvt8hdTExVxqU6qZG8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

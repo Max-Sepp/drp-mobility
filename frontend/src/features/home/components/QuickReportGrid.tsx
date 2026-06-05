@@ -14,8 +14,16 @@ type GridItem = {
 }
 
 const GRID_ITEMS: GridItem[] = [
-  { label: 'Lift\nBroken', icon: 'elevator', action: { route: 'ReportForm', equipmentType: 'lift' } },
-  { label: 'Escalator\nBroken', icon: 'escalator', action: { route: 'ReportForm', equipmentType: 'escalator' } },
+  {
+    label: 'Lift\nBroken',
+    icon: 'elevator',
+    action: { route: 'ReportForm', equipmentType: 'lift' },
+  },
+  {
+    label: 'Escalator\nBroken',
+    icon: 'escalator',
+    action: { route: 'ReportForm', equipmentType: 'escalator' },
+  },
   { label: 'Overcrowding', icon: 'groups' },
   { label: 'Custom\nIssue', icon: 'edit-note', action: { route: 'ReportCustom' } },
 ]

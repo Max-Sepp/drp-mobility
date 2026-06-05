@@ -85,18 +85,18 @@ There is no web build. The app ships through EAS — slug `drp-mobility`, projec
 
 All design tokens live here — import from `@/theme`, never hardcode values in components. Exports:
 
-| Export | Contents |
-|---|---|
-| `Colors` | Palette + semantic colours |
-| `Radii` | Border radii (`card`, `button`, `input`, `pill`, `small`, `xs`, `handle`, `icon`) |
-| `Shadows` | `card`, `heavy`, `top`, `marker` — hard-offset for neo-brutalist, soft blur for default |
-| `Borders` | `thin`, `medium`, `thick` |
-| `Opacity` | `disabled`, `disabledMid`, `subtle`, `pressed`, `pressedLight` — use for all interactive state opacity instead of hardcoding |
-| `Overlays` | `backdrop` — modal/sheet backdrop colour |
-| `Typography` | Font size + weight presets |
-| `Spacing` | 4 pt grid (`xs` → `section`) |
-| `Heights` | `button`, `touchTarget` |
-| `SharedStyles` | Common `StyleSheet` fragments (`card`, `row`, `screenBackground`) |
+| Export         | Contents                                                                                                                     |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `Colors`       | Palette + semantic colours                                                                                                   |
+| `Radii`        | Border radii (`card`, `button`, `input`, `pill`, `small`, `xs`, `handle`, `icon`)                                            |
+| `Shadows`      | `card`, `heavy`, `top`, `marker` — hard-offset for neo-brutalist, soft blur for default                                      |
+| `Borders`      | `thin`, `medium`, `thick`                                                                                                    |
+| `Opacity`      | `disabled`, `disabledMid`, `subtle`, `pressed`, `pressedLight` — use for all interactive state opacity instead of hardcoding |
+| `Overlays`     | `backdrop` — modal/sheet backdrop colour                                                                                     |
+| `Typography`   | Font size + weight presets                                                                                                   |
+| `Spacing`      | 4 pt grid (`xs` → `section`)                                                                                                 |
+| `Heights`      | `button`, `touchTarget`                                                                                                      |
+| `SharedStyles` | Common `StyleSheet` fragments (`card`, `row`, `screenBackground`)                                                            |
 
 ## When working on UI
 

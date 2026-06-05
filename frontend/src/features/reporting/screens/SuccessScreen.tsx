@@ -8,13 +8,22 @@ export const SuccessScreen = ({ navigation, route }: SuccessScreenProps) => {
   const { station } = route.params
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigation.reset({ index: 0, routes: [{ name: 'MapHome' }, { name: 'Station', params: { station } }] })
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'MapHome' }, { name: 'Station', params: { station } }],
+      })
     }, 2000)
     return () => clearTimeout(timer)
   }, [navigation])
 
   return (
-    <YStack flex={1} items="center" justify="center" gap="$5" style={{ backgroundColor: Colors.card }}>
+    <YStack
+      flex={1}
+      items="center"
+      justify="center"
+      gap="$5"
+      style={{ backgroundColor: Colors.card }}
+    >
       <YStack
         items="center"
         justify="center"

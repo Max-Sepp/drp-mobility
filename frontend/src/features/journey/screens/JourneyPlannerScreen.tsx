@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Alert } from 'react-native'
 import { Text, XStack, YStack } from 'tamagui'
 import { ScreenHeader } from '@/components/ScreenHeader'
+import { useAuth } from '@/features/auth'
 import { useStations } from '@/features/stations'
 import { FormScreenLayout } from '@/features/reporting/components/FormScreenLayout'
 import type { JourneyPlannerScreenProps } from '@/navigation/types'
@@ -68,38 +69,46 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
   )
   const openStation = (station: string) => navigation.navigate('Station', { station })
 
+  // Count of saved journeys for the header badge, refreshed on focus and on auth status change.
+  const { status } = useAuth()
   const [savedCount, setSavedCount] = useState(0)
   useEffect(() => {
     const reload = () => loadSavedJourneys().then((s) => setSavedCount(s.length))
     reload()
     return navigation.addListener('focus', reload)
-  }, [navigation])
+  }, [navigation, status])
 
-  const handleCurrentLocation = useCallback(async (silent = false) => {
-    setGettingLocation(true)
-    try {
-      const { status } = await Location.requestForegroundPermissionsAsync()
-      if (status !== 'granted') {
-        if (!silent) {
-          Alert.alert('Location required', 'Enable location access in Settings to use this feature.')
+  const handleCurrentLocation = useCallback(
+    async (silent = false) => {
+      setGettingLocation(true)
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync()
+        if (status !== 'granted') {
+          if (!silent) {
+            Alert.alert(
+              'Location required',
+              'Enable location access in Settings to use this feature.',
+            )
+          }
+          return
         }
-        return
+        const pos =
+          cachedCoords ??
+          (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })).coords
+        const result = await resolveToPostcode(`${pos.latitude},${pos.longitude}`)
+        if ('error' in result) {
+          if (!silent) Alert.alert('Location error', result.error)
+          return
+        }
+        setFrom('Current location')
+        setFromPostcode(result.postcode)
+        setFromIsCurrentLocation(true)
+      } finally {
+        setGettingLocation(false)
       }
-      const pos =
-        cachedCoords ??
-        (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })).coords
-      const result = await resolveToPostcode(`${pos.latitude},${pos.longitude}`)
-      if ('error' in result) {
-        if (!silent) Alert.alert('Location error', result.error)
-        return
-      }
-      setFrom('Current location')
-      setFromPostcode(result.postcode)
-      setFromIsCurrentLocation(true)
-    } finally {
-      setGettingLocation(false)
-    }
-  }, [cachedCoords])
+    },
+    [cachedCoords],
+  )
 
   useEffect(() => {
     if (!route.params?.initialFrom) {
@@ -235,7 +244,11 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
                       backgroundColor: selected ? Colors.text : Colors.searchBg,
                     }}
                   >
-                    <Text fontSize={14} fontWeight="600" color={selected ? Colors.card : Colors.text}>
+                    <Text
+                      fontSize={14}
+                      fontWeight="600"
+                      color={selected ? Colors.card : Colors.text}
+                    >
                       {label}
                     </Text>
                   </YStack>
@@ -253,7 +266,11 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
             pressStyle={{ opacity: Opacity.pressedLight }}
             onPress={loading ? undefined : run}
             opacity={loading ? Opacity.disabledMid : 1}
-            style={{ backgroundColor: Colors.text, borderRadius: Radii.button, height: Heights.button }}
+            style={{
+              backgroundColor: Colors.text,
+              borderRadius: Radii.button,
+              height: Heights.button,
+            }}
           >
             <Text color={Colors.card} fontSize={16} fontWeight="700">
               {loading ? 'Planning…' : 'Plan journey'}
@@ -279,7 +296,12 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
           >
             <YStack flex={1} gap="$1">
               <XStack gap="$2" items="center">
-                <MaterialIcons name="trip-origin" size={14} color={Colors.secondaryText} style={{ width: 18 }} />
+                <MaterialIcons
+                  name="trip-origin"
+                  size={14}
+                  color={Colors.secondaryText}
+                  style={{ width: 18 }}
+                />
                 <Text
                   fontSize={14}
                   color={resolved.from.isNamedPlace ? Colors.blue : Colors.text}
@@ -291,7 +313,12 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
                 </Text>
               </XStack>
               <XStack gap="$2" items="center">
-                <MaterialIcons name="place" size={16} color={Colors.secondaryText} style={{ width: 18 }} />
+                <MaterialIcons
+                  name="place"
+                  size={16}
+                  color={Colors.secondaryText}
+                  style={{ width: 18 }}
+                />
                 <Text
                   fontSize={14}
                   color={resolved.to.isNamedPlace ? Colors.blue : Colors.text}
@@ -304,7 +331,12 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
               </XStack>
               {departAt && (
                 <XStack gap="$2" items="center">
-                  <MaterialIcons name="schedule" size={14} color={Colors.secondaryText} style={{ width: 18 }} />
+                  <MaterialIcons
+                    name="schedule"
+                    size={14}
+                    color={Colors.secondaryText}
+                    style={{ width: 18 }}
+                  />
                   <Text fontSize={14} color={Colors.secondaryText} flex={1} numberOfLines={1}>
                     Leaving {formatDepart(departAt)}
                   </Text>
