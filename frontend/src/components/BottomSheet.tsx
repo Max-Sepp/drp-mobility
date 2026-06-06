@@ -7,12 +7,14 @@
 
 import GorhomBottomSheet, {
   type BottomSheetProps,
+  type BottomSheetBackdropProps,
+  BottomSheetBackdrop,
   BottomSheetView,
   BottomSheetScrollView,
   BottomSheetFlatList,
   BottomSheetTextInput,
 } from '@gorhom/bottom-sheet'
-import { forwardRef } from 'react'
+import { forwardRef, useCallback } from 'react'
 import { StyleSheet } from 'react-native'
 import { Colors, Radii, Shadows } from '@/theme'
 
@@ -25,16 +27,41 @@ const BottomSheet = forwardRef<GorhomBottomSheet, BottomSheetProps>(function Bot
   props,
   ref,
 ) {
+  const { enablePanDownToClose = false, backdropComponent, ...rest } = props
+
+  // When a sheet is dismissible, provide a transparent backdrop so tapping the map
+  // above the sheet closes it — no dimming, just touch interception.
+  const transparentBackdrop = useCallback(
+    (backdropProps: BottomSheetBackdropProps) => (
+      <BottomSheetBackdrop
+        {...backdropProps}
+        opacity={0}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        pressBehavior="close"
+      />
+    ),
+    [],
+  )
+
+  const resolvedBackdrop =
+    backdropComponent !== undefined
+      ? backdropComponent
+      : enablePanDownToClose
+        ? transparentBackdrop
+        : null
+
   return (
     <GorhomBottomSheet
-      enablePanDownToClose={false}
+      enablePanDownToClose={enablePanDownToClose}
       enableDynamicSizing={false}
       handleIndicatorStyle={styles.handle}
       backgroundStyle={styles.background}
       keyboardBehavior="extend"
       keyboardBlurBehavior="restore"
       android_keyboardInputMode="adjustResize"
-      {...props}
+      backdropComponent={resolvedBackdrop ?? undefined}
+      {...rest}
       ref={ref}
     />
   )
