@@ -348,7 +348,10 @@ export function MapHomeScreen({ navigation }: Props) {
           <ActiveJourneyBanner
             active={active}
             onResume={() => resumeActive(active)}
-            onEnd={endActive}
+            onEnd={async () => {
+              await clearActiveJourney()
+              setActive(null)
+            }}
           />
         )}
       </SafeAreaView>
