@@ -31,6 +31,7 @@ import { JourneyResultCard } from '@/features/journey/components/JourneyResultCa
 import { formatDepart, LeaveAtField } from '@/features/journey/components/LeaveAtField'
 import { LocationInput } from '@/features/journey/components/LocationInput'
 import type { RootStackParamList } from '@/navigation/types'
+import type { JourneyDetailParams } from '@/features/home/components/JourneyDetailSheet'
 import { Borders, Colors, Heights, Opacity, Radii, Spacing, Typography } from '@/theme'
 
 // ---------------------------------------------------------------------------
@@ -48,6 +49,7 @@ export type JourneyPlan = {
 type Props = {
   plan: JourneyPlan | null  // null = closed
   onClose: () => void
+  onJourneySelect: (params: JourneyDetailParams) => void
 }
 
 // ---------------------------------------------------------------------------
@@ -66,7 +68,7 @@ const LEVELS: { value: AccessibilityPreference; label: string }[] = [
 // Component
 // ---------------------------------------------------------------------------
 
-export function JourneyPlannerSheet({ plan, onClose }: Props) {
+export function JourneyPlannerSheet({ plan, onClose, onJourneySelect }: Props) {
   const insets = useSafeAreaInsets()
   const sheetRef = useRef<BottomSheetRef>(null)
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
@@ -437,7 +439,7 @@ export function JourneyPlannerSheet({ plan, onClose }: Props) {
             resolveStation={resolveStation}
             onStationPress={(station) => navigation.navigate('Station', { station })}
             onPress={() =>
-              navigation.navigate('JourneyDetail', {
+              onJourneySelect({
                 journey,
                 from: resolved?.from,
                 to: resolved?.to,

@@ -36,6 +36,12 @@ import {
   JourneyPlannerSheet,
   type JourneyPlan,
 } from '@/features/home/components/JourneyPlannerSheet'
+import {
+  JourneyDetailSheet,
+  type JourneyDetailParams,
+  type ActiveJourneyParams,
+} from '@/features/home/components/JourneyDetailSheet'
+import { ActiveJourneySheet } from '@/features/home/components/ActiveJourneySheet'
 import { SetPlaceModal } from '@/features/home/components/SetPlaceModal'
 import { AddCustomPlaceModal } from '@/features/home/components/AddCustomPlaceModal'
 
@@ -121,6 +127,8 @@ export function MapHomeScreen({ navigation }: Props) {
   const [activeStation, setActiveStation] = useState<string | null>(null)
   const [activeReport, setActiveReport] = useState<string | null>(null)
   const [activePlan, setActivePlan] = useState<JourneyPlan | null>(null)
+  const [activeDetail, setActiveDetail] = useState<JourneyDetailParams | null>(null)
+  const [activeJourneyParams, setActiveJourneyParams] = useState<ActiveJourneyParams | null>(null)
   const sheetRef = useRef<SearchActionSheetHandle>(null)
   const mapRef = useRef<StationMapHandle>(null)
   const { status, user } = useAuth()
@@ -240,7 +248,7 @@ export function MapHomeScreen({ navigation }: Props) {
   }
 
   function resumeActive(item: ActiveJourney) {
-    navigation.navigate('ActiveJourney', {
+    setActiveJourneyParams({
       savedId: item.savedId,
       journey: item.journey,
       from: item.from,
@@ -279,7 +287,7 @@ export function MapHomeScreen({ navigation }: Props) {
   }
 
   function openSaved(item: SavedJourney) {
-    navigation.navigate('JourneyDetail', {
+    setActiveDetail({
       journey: item.journey,
       from: item.from,
       to: item.to,
@@ -287,6 +295,7 @@ export function MapHomeScreen({ navigation }: Props) {
       level: item.level,
       savedId: item.id,
     })
+    sheetRef.current?.dismiss()
   }
 
   function openStation(stationName: string) {
@@ -335,7 +344,7 @@ export function MapHomeScreen({ navigation }: Props) {
             />
           )}
         </View>
-        {active && (
+        {active && !activeJourneyParams && (
           <ActiveJourneyBanner
             active={active}
             onResume={() => resumeActive(active)}
@@ -371,7 +380,32 @@ export function MapHomeScreen({ navigation }: Props) {
 
       <ReportSheet station={activeReport} onClose={() => setActiveReport(null)} />
 
-      <JourneyPlannerSheet plan={activePlan} onClose={closePlan} />
+      <JourneyPlannerSheet
+        plan={activePlan}
+        onClose={closePlan}
+        onJourneySelect={(params) => setActiveDetail(params)}
+      />
+
+      <JourneyDetailSheet
+        params={activeDetail}
+        onClose={() => setActiveDetail(null)}
+        onStartJourney={(params) => {
+          setActiveDetail(null)
+          setActiveJourneyParams(params)
+        }}
+      />
+
+      <ActiveJourneySheet
+        params={activeJourneyParams}
+        onComplete={() => {
+          setActiveJourneyParams(null)
+          setActive(null)
+        }}
+        onEnd={() => {
+          setActiveJourneyParams(null)
+          setActive(null)
+        }}
+      />
 
       {setPlaceModal && (
         <SetPlaceModal
