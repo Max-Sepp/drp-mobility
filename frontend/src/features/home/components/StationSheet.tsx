@@ -11,6 +11,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import BottomSheet, { BottomSheetScrollView, type BottomSheetRef } from '@/components/BottomSheet'
 import { PlatformAccessCard } from '@/features/home/components/PlatformAccessCard'
 import { ReportsStatus } from '@/features/home/components/ReportsStatus'
+import { StationAdditionalInfoCard } from '@/features/home/components/StationAdditionalInfoCard'
+import { StationInfoCard } from '@/features/home/components/StationInfoCard'
 import { useOutages } from '@/features/outages'
 import { useStations } from '@/features/stations'
 import { resolveToPostcode, type ResolvedLocation } from '@/features/journey/api/geocode'
@@ -213,9 +215,10 @@ export function StationSheet({ station, onClose, onReportPress, onOpenJourney }:
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: insets.bottom + Spacing.xl }}
       >
+        {stationDetail && <StationInfoCard station={stationDetail} />}
         {stationDetail && <PlatformAccessCard key={station} platforms={stationDetail.platforms} />}
-
         <ReportsStatus loading={loading} reports={reports} />
+        {stationDetail && <StationAdditionalInfoCard station={stationDetail} />}
       </BottomSheetScrollView>
     </BottomSheet>
   )

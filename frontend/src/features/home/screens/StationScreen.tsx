@@ -14,6 +14,8 @@ import { PlatformAccessCard } from '@/features/home/components/PlatformAccessCar
 import { QuickReportGrid, type QuickReportAction } from '@/features/home/components/QuickReportGrid'
 import { ReportsStatus } from '@/features/home/components/ReportsStatus'
 import { StationHeader } from '@/features/home/components/StationHeader'
+import { StationAdditionalInfoCard } from '@/features/home/components/StationAdditionalInfoCard'
+import { StationInfoCard } from '@/features/home/components/StationInfoCard'
 
 export const StationScreen = ({ navigation, route }: StationScreenProps) => {
   const { Colors, Radii } = useTheme()
@@ -138,8 +140,10 @@ export const StationScreen = ({ navigation, route }: StationScreenProps) => {
           onPress={changeStation}
           onBack={navigation.canGoBack() ? () => navigation.goBack() : undefined}
         />
+        {stationDetail && <StationInfoCard station={stationDetail} />}
         {stationDetail && <PlatformAccessCard key={station} platforms={stationDetail.platforms} />}
         <ReportsStatus loading={loading} reports={reports} />
+        {stationDetail && <StationAdditionalInfoCard station={stationDetail} />}
         <QuickReportGrid onSelect={quickReport} hasLifts={hasLifts} hasEscalators={hasEscalators} />
       </ScrollView>
 
