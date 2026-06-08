@@ -163,9 +163,7 @@ export function StationSheet({ station, onClose, onReportPress, onOpenJourney }:
             {station ?? ''}
           </Text>
           <XStack gap="$2" flexWrap="wrap">
-            {stationDetail?.step_free && (
-              <StepFreeBadge value={stationDetail.step_free} />
-            )}
+            {stationDetail?.step_free && <StepFreeBadge value={stationDetail.step_free} />}
             {reports.length > 0 && (
               <XStack
                 items="center"

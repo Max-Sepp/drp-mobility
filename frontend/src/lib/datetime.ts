@@ -21,6 +21,10 @@ export function formatDatetime(iso: string): string {
   const time = formatTime(iso)
   if (isToday(iso)) return `${time} today`
   const d = parseUtc(iso)
-  const dateStr = d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
+  const dateStr = d.toLocaleDateString('en-GB', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+  })
   return `${time} on ${dateStr}`
 }
