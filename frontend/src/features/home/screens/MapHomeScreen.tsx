@@ -125,11 +125,12 @@ export function MapHomeScreen({ navigation }: Props) {
   // restart (the record is read from storage each time the map regains focus).
   useFocusEffect(
     useCallback(() => {
+      if (status === 'loading') return
       loadSavedJourneys().then(setSaved)
       loadActiveJourney().then(setActive)
       if (user) loadSavedPlaces(user.id).then(setSavedPlaces)
       else setSavedPlaces({ custom: [] })
-    }, [user]),
+    }, [status, user]),
   )
 
   function handlePlacePress(key: 'home' | 'work') {

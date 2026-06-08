@@ -20,6 +20,7 @@ from app.models import outage_report_deletion as _outage_report_deletion  # noqa
 from app.models import platform as _platform  # noqa: F401
 from app.models import push_token as _push_token  # noqa: F401
 from app.models import saved_journey as _saved_journey  # noqa: F401
+from app.models import saved_place as _saved_place  # noqa: F401
 from app.models import session as _session  # noqa: F401
 from app.models import station as _station  # noqa: F401
 from app.models import user as _user  # noqa: F401
@@ -30,6 +31,7 @@ from app.routers import (
     failures,
     journeys,
     outage_reports,
+    saved_places,
     stations,
     users,
 )
@@ -76,6 +78,7 @@ if os.getenv("DEV", "false").lower() == "true":
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(journeys.router)
+app.include_router(saved_places.router)
 app.include_router(outage_reports.router)
 app.include_router(failures.router)
 app.include_router(stations.router)
