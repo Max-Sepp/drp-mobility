@@ -6,13 +6,15 @@ import { MaterialIcons } from '@expo/vector-icons'
 import * as Location from 'expo-location'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native'
-import { Text } from 'tamagui'
+import { Text, XStack } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import BottomSheet, { BottomSheetScrollView, type BottomSheetRef } from '@/components/BottomSheet'
 import { PlatformAccessCard } from '@/features/home/components/PlatformAccessCard'
 import { ReportsStatus } from '@/features/home/components/ReportsStatus'
+import { StationAdditionalInfoCard } from '@/features/home/components/StationAdditionalInfoCard'
+import { StationInfoCard } from '@/features/home/components/StationInfoCard'
 import { useOutages } from '@/features/outages'
-import { useStations } from '@/features/stations'
+import { StepFreeBadge, useStations } from '@/features/stations'
 import { resolveToPostcode, type ResolvedLocation } from '@/features/journey/api/geocode'
 import { useAppLocation } from '@/lib/LocationContext'
 import type { JourneyPlan } from '@/features/home/components/JourneyPlannerSheet'
@@ -103,6 +105,7 @@ export function StationSheet({ station, onClose, onReportPress, onOpenJourney }:
     } else {
       sheetRef.current?.close()
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setGoingHere(false)
   }, [station])
 
@@ -155,13 +158,27 @@ export function StationSheet({ station, onClose, onReportPress, onOpenJourney }:
     >
       {/* Header: station name + close button */}
       <View style={styles.header}>
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, gap: 6 }}>
           <Text fontSize={20} fontWeight="700" color={Colors.text} numberOfLines={1}>
             {station ?? ''}
           </Text>
-          <Text fontSize={13} color={Colors.secondaryText} mt="$1">
-            Underground station
-          </Text>
+          <XStack gap="$2" flexWrap="wrap">
+            {stationDetail?.step_free && <StepFreeBadge value={stationDetail.step_free} />}
+            {reports.length > 0 && (
+              <XStack
+                items="center"
+                gap="$1.5"
+                px="$2"
+                py="$1"
+                style={{ backgroundColor: Colors.dangerBg, borderRadius: 6 }}
+              >
+                <MaterialIcons name="warning" size={16} color={Colors.dangerDark} />
+                <Text fontSize={13} fontWeight="600" color={Colors.dangerDark}>
+                  Issues reported
+                </Text>
+              </XStack>
+            )}
+          </XStack>
         </View>
         <TouchableOpacity
           onPress={() => sheetRef.current?.close()}
@@ -213,9 +230,10 @@ export function StationSheet({ station, onClose, onReportPress, onOpenJourney }:
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: insets.bottom + Spacing.xl }}
       >
+        {stationDetail && <StationInfoCard station={stationDetail} />}
         {stationDetail && <PlatformAccessCard key={station} platforms={stationDetail.platforms} />}
-
         <ReportsStatus loading={loading} reports={reports} />
+        {stationDetail && <StationAdditionalInfoCard station={stationDetail} />}
       </BottomSheetScrollView>
     </BottomSheet>
   )

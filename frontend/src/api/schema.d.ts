@@ -678,6 +678,18 @@ export interface components {
             longitude?: number | null;
             /** Platforms */
             platforms: components["schemas"]["PlatformSchema"][];
+            /** Wifi */
+            wifi?: boolean;
+            /** Zones */
+            zones?: number[];
+            /** Has Toilets */
+            has_toilets?: boolean;
+            /** Has Accessible Toilets */
+            has_accessible_toilets?: boolean;
+            /** Blue Badge Parking */
+            blue_badge_parking?: boolean;
+            /** Taxi Rank */
+            taxi_rank?: boolean;
         };
         /**
          * StationSchema

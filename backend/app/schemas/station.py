@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, field_validator
 
 from app.models.station import StepFree
 from app.schemas.platform import PlatformSchema
@@ -23,3 +23,18 @@ class StationDetail(StationSchema):
     latitude: float | None = None
     longitude: float | None = None
     platforms: list[PlatformSchema]
+    wifi: bool = False
+    zones: list[int] = []
+    has_toilets: bool = False
+    has_accessible_toilets: bool = False
+    blue_badge_parking: bool = False
+    taxi_rank: bool = False
+
+    @field_validator("zones", mode="before")
+    @classmethod
+    def _parse_zones(cls, v: object) -> list[int]:
+        if not v:
+            return []
+        if isinstance(v, list):
+            return [int(x) for x in v]
+        return [int(x.strip()) for x in str(v).split(",") if x.strip()]

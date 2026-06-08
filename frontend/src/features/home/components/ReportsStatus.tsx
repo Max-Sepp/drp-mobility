@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Spinner, Text, YStack } from 'tamagui'
 import { apiClient } from '@/api/client'
 import type { components } from '@/api/schema.d'
@@ -18,24 +18,39 @@ export const ReportsStatus = ({ loading, reports }: ReportsStatusProps) => {
   const { Colors, Radii } = useTheme()
   const { user } = useAuth()
   const isTrusted = user?.role === 'trusted'
-  const [expandedId, setExpandedId] = useState<number | null>(null)
-  const [verifyingId, setVerifyingId] = useState<number | null>(null)
-  const [resolvingId, setResolvingId] = useState<number | null>(null)
+  const [expandedFailureId, setExpandedFailureId] = useState<number | null>(null)
+  const [verifyingFailureId, setVerifyingFailureId] = useState<number | null>(null)
+  const [resolvingFailureId, setResolvingFailureId] = useState<number | null>(null)
 
-  async function handleVerify(reportId: number) {
-    setVerifyingId(reportId)
+  // Group reports by failure_id. Preserves order of first occurrence (newest failure first,
+  // since the feed is sorted newest breakdown_time first). Within each group, sort oldest-first
+  // so the expanded detail reads chronologically.
+  const issueGroups = useMemo(() => {
+    const map = new Map<number, OutageReport[]>()
+    for (const report of reports) {
+      const group = map.get(report.failure_id) ?? []
+      map.set(report.failure_id, [...group, report])
+    }
+    return Array.from(map.entries()).map(([failureId, group]) => ({
+      failureId,
+      reports: [...group].sort((a, b) => a.breakdown_time.localeCompare(b.breakdown_time)),
+    }))
+  }, [reports])
+
+  async function handleVerify(failureId: number, reportId: number) {
+    setVerifyingFailureId(failureId)
     await apiClient.PATCH('/outage-reports/{report_id}/verify', {
       params: { path: { report_id: reportId } },
     })
-    setVerifyingId(null)
+    setVerifyingFailureId(null)
   }
 
   async function handleResolve(failureId: number) {
-    setResolvingId(failureId)
+    setResolvingFailureId(failureId)
     await apiClient.PATCH('/failures/{failure_id}/resolve', {
       params: { path: { failure_id: failureId } },
     })
-    setResolvingId(null)
+    setResolvingFailureId(null)
   }
 
   if (loading) {
@@ -52,7 +67,7 @@ export const ReportsStatus = ({ loading, reports }: ReportsStatusProps) => {
     )
   }
 
-  if (reports.length === 0) {
+  if (issueGroups.length === 0) {
     return (
       <YStack
         mx="$4"
@@ -85,18 +100,25 @@ export const ReportsStatus = ({ loading, reports }: ReportsStatusProps) => {
 
   return (
     <YStack mx="$4" mt="$4" gap="$2">
-      {reports.map((r) => (
-        <OutageReportCard
-          key={r.id}
-          report={r}
-          expanded={expandedId === r.id}
-          onToggle={() => setExpandedId(expandedId === r.id ? null : r.id)}
-          onVerify={isTrusted ? () => handleVerify(r.id) : undefined}
-          verifying={verifyingId === r.id}
-          onResolve={isTrusted ? () => handleResolve(r.failure_id) : undefined}
-          resolving={resolvingId === r.failure_id}
-        />
-      ))}
+      {issueGroups.map(({ failureId, reports: group }) => {
+        const firstUnverified = group.find((r) => !r.verified)
+        return (
+          <OutageReportCard
+            key={failureId}
+            reports={group}
+            expanded={expandedFailureId === failureId}
+            onToggle={() => setExpandedFailureId(expandedFailureId === failureId ? null : failureId)}
+            onVerify={
+              isTrusted && firstUnverified
+                ? () => handleVerify(failureId, firstUnverified.id)
+                : undefined
+            }
+            verifying={verifyingFailureId === failureId}
+            onResolve={isTrusted ? () => handleResolve(failureId) : undefined}
+            resolving={resolvingFailureId === failureId}
+          />
+        )
+      })}
     </YStack>
   )
 }
