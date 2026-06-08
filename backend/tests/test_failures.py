@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from datetime import datetime, timedelta, timezone
 
 import pytest
@@ -9,6 +10,7 @@ from app.models.equipment import Equipment
 from app.models.equipment_type import EquipmentType
 from app.models.failure import Failure
 from app.models.station import Station
+from app.models.user import UserRole
 from app.repositories.outage_report import OutageReportRepository
 
 _BASE_TIME = datetime(2024, 6, 1, 9, 0, 0, tzinfo=timezone.utc)
@@ -98,13 +100,14 @@ def test_reports_for_different_station_get_different_failures(
 
 
 def test_report_after_resolved_failure_starts_new_failure(
-    client: TestClient, db_session: Session
+    client: TestClient, db_session: Session, auth_headers_factory: Callable
 ) -> None:
     r1 = client.post("/outage-reports", json=_base_payload(db_session))
     assert r1.status_code == 201
     original_failure_id = r1.json()["failure_id"]
+    trusted = auth_headers_factory(UserRole.TRUSTED)
 
-    client.patch(f"/failures/{original_failure_id}/resolve")
+    client.patch(f"/failures/{original_failure_id}/resolve", headers=trusted)
 
     r2 = client.post("/outage-reports", json=_base_payload(db_session))
     assert r2.status_code == 201
@@ -112,15 +115,16 @@ def test_report_after_resolved_failure_starts_new_failure(
 
 
 def test_two_sequential_failures_for_same_equipment_have_distinct_ids(
-    client: TestClient, db_session: Session
+    client: TestClient, db_session: Session, auth_headers_factory: Callable
 ) -> None:
+    trusted = auth_headers_factory(UserRole.TRUSTED)
     r1 = client.post("/outage-reports", json=_base_payload(db_session))
     failure_a = r1.json()["failure_id"]
-    client.patch(f"/failures/{failure_a}/resolve")
+    client.patch(f"/failures/{failure_a}/resolve", headers=trusted)
 
     r2 = client.post("/outage-reports", json=_base_payload(db_session))
     failure_b = r2.json()["failure_id"]
-    client.patch(f"/failures/{failure_b}/resolve")
+    client.patch(f"/failures/{failure_b}/resolve", headers=trusted)
 
     assert failure_a != failure_b
 
@@ -311,29 +315,77 @@ def test_get_failure_not_found_returns_404(client: TestClient) -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_resolve_failure_returns_resolved_true(client: TestClient, db_session: Session) -> None:
+def test_resolve_failure_returns_resolved_true(
+    client: TestClient, db_session: Session, auth_headers_factory: Callable
+) -> None:
     r = client.post("/outage-reports", json=_base_payload(db_session))
     failure_id = r.json()["failure_id"]
 
-    response = client.patch(f"/failures/{failure_id}/resolve")
+    response = client.patch(
+        f"/failures/{failure_id}/resolve", headers=auth_headers_factory(UserRole.TRUSTED)
+    )
 
     assert response.status_code == 200
     assert response.json()["resolved"] is True
 
 
-def test_resolve_failure_not_found_returns_404(client: TestClient) -> None:
-    response = client.patch("/failures/999/resolve")
+def test_resolve_failure_not_found_returns_404(
+    client: TestClient, auth_headers_factory: Callable
+) -> None:
+    response = client.patch(
+        "/failures/999/resolve", headers=auth_headers_factory(UserRole.TRUSTED)
+    )
 
     assert response.status_code == 404
     assert response.json() == {"detail": "Failure not found"}
 
 
-def test_resolve_failure_is_persisted(client: TestClient, db_session: Session) -> None:
+def test_resolve_failure_is_persisted(
+    client: TestClient, db_session: Session, auth_headers_factory: Callable
+) -> None:
     r = client.post("/outage-reports", json=_base_payload(db_session))
     failure_id = r.json()["failure_id"]
 
-    client.patch(f"/failures/{failure_id}/resolve")
+    client.patch(f"/failures/{failure_id}/resolve", headers=auth_headers_factory(UserRole.TRUSTED))
 
     db_session.expire_all()
     failure = db_session.get(Failure, failure_id)
     assert failure.resolved is True
+
+
+def test_resolve_failure_unauthenticated_returns_401(
+    client: TestClient, db_session: Session
+) -> None:
+    r = client.post("/outage-reports", json=_base_payload(db_session))
+    failure_id = r.json()["failure_id"]
+
+    response = client.patch(f"/failures/{failure_id}/resolve")
+
+    assert response.status_code == 401
+
+
+def test_resolve_failure_untrusted_user_returns_403(
+    client: TestClient, db_session: Session, auth_headers_factory: Callable
+) -> None:
+    r = client.post("/outage-reports", json=_base_payload(db_session))
+    failure_id = r.json()["failure_id"]
+
+    response = client.patch(
+        f"/failures/{failure_id}/resolve", headers=auth_headers_factory(UserRole.UNTRUSTED)
+    )
+
+    assert response.status_code == 403
+
+
+def test_resolve_failure_trusted_user_succeeds(
+    client: TestClient, db_session: Session, auth_headers_factory: Callable
+) -> None:
+    r = client.post("/outage-reports", json=_base_payload(db_session))
+    failure_id = r.json()["failure_id"]
+
+    response = client.patch(
+        f"/failures/{failure_id}/resolve", headers=auth_headers_factory(UserRole.TRUSTED)
+    )
+
+    assert response.status_code == 200
+    assert response.json()["resolved"] is True

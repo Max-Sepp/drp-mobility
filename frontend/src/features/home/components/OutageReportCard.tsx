@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons'
-import { Image, Pressable } from 'react-native'
-import { Text, XStack, YStack } from 'tamagui'
+import { Image, Pressable, StyleSheet } from 'react-native'
+import { Spinner, Text, XStack, YStack } from 'tamagui'
 import { BASE_URL } from '@/api/client'
 import type { components } from '@/api/schema.d'
 import { Heading } from '@/components/Heading'
@@ -13,6 +13,10 @@ type OutageReportCardProps = {
   report: OutageReport
   expanded: boolean
   onToggle: () => void
+  onVerify?: () => void
+  verifying?: boolean
+  onResolve?: () => void
+  resolving?: boolean
 }
 
 function alertLabel(report: OutageReport): string {
@@ -22,9 +26,61 @@ function alertLabel(report: OutageReport): string {
   return `${type} BROKEN – ${conn}`
 }
 
-export const OutageReportCard = ({ report, expanded, onToggle }: OutageReportCardProps) => {
+export const OutageReportCard = ({
+  report,
+  expanded,
+  onToggle,
+  onVerify,
+  verifying,
+  onResolve,
+  resolving,
+}: OutageReportCardProps) => {
   const { Colors, Radii } = useTheme()
   const hasPhoto = !!report.image_content_type
+  const showActions = (onVerify && !report.verified) || !!onResolve
+
+  const actionRow = showActions ? (
+    <XStack px="$4" pb="$4" gap="$2">
+      {onVerify && !report.verified && (
+        <Pressable
+          onPress={onVerify}
+          disabled={verifying}
+          style={[
+            actionStyles.button,
+            { borderColor: '#1d4ed8', flex: 1, opacity: verifying ? 0.6 : 1 },
+          ]}
+        >
+          {verifying ? (
+            <Spinner size="small" color="#1d4ed8" />
+          ) : (
+            <Ionicons name="checkmark-circle-outline" size={16} color="#1d4ed8" />
+          )}
+          <Text fontSize={13} fontWeight="600" color="#1d4ed8">
+            {verifying ? 'Verifying…' : 'Verify on-site'}
+          </Text>
+        </Pressable>
+      )}
+      {onResolve && (
+        <Pressable
+          onPress={onResolve}
+          disabled={resolving}
+          style={[
+            actionStyles.button,
+            { borderColor: Colors.successDark, flex: 1, opacity: resolving ? 0.6 : 1 },
+          ]}
+        >
+          {resolving ? (
+            <Spinner size="small" color={Colors.successDark} />
+          ) : (
+            <Ionicons name="checkmark-done-outline" size={16} color={Colors.successDark} />
+          )}
+          <Text fontSize={13} fontWeight="600" color={Colors.successDark}>
+            {resolving ? 'Resolving…' : 'Mark Resolved'}
+          </Text>
+        </Pressable>
+      )}
+    </XStack>
+  ) : null
 
   const header = (
     <XStack p="$4" items="center" gap="$3">
@@ -58,6 +114,14 @@ export const OutageReportCard = ({ report, expanded, onToggle }: OutageReportCar
             </Text>
           </XStack>
         )}
+        {report.verified && (
+          <XStack items="center" gap="$1" mt="$1">
+            <Ionicons name="shield-checkmark" size={12} color="#1d4ed8" />
+            <Text fontSize={12} fontWeight="600" color="#1d4ed8">
+              Verified on-site
+            </Text>
+          </XStack>
+        )}
       </YStack>
       {hasPhoto && (
         <Text fontSize={12} color={Colors.dangerDark}>
@@ -72,12 +136,13 @@ export const OutageReportCard = ({ report, expanded, onToggle }: OutageReportCar
       <YStack style={{ backgroundColor: Colors.dangerBg, borderRadius: Radii.button }}>
         {header}
         {report.description ? (
-          <YStack px="$4" pb="$4">
+          <YStack px="$4" pb={showActions ? '$2' : '$4'}>
             <Text fontSize={13} color={Colors.dangerDark}>
               {report.description}
             </Text>
           </YStack>
         ) : null}
+        {actionRow}
       </YStack>
     )
   }
@@ -87,7 +152,7 @@ export const OutageReportCard = ({ report, expanded, onToggle }: OutageReportCar
       <YStack style={{ backgroundColor: Colors.dangerBg, borderRadius: Radii.button }}>
         {header}
         {expanded && (
-          <YStack px="$4" pb="$4" gap="$3">
+          <YStack px="$4" pb={showActions ? '$2' : '$4'} gap="$3">
             {report.description ? (
               <Text fontSize={13} color={Colors.dangerDark}>
                 {report.description}
@@ -100,7 +165,21 @@ export const OutageReportCard = ({ report, expanded, onToggle }: OutageReportCar
             />
           </YStack>
         )}
+        {actionRow}
       </YStack>
     </Pressable>
   )
 }
+
+const actionStyles = StyleSheet.create({
+  button: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    borderWidth: 1.5,
+  },
+})

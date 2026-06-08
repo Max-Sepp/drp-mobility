@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 
+from app.dependencies.auth import get_trusted_user
 from app.events import broker, sse_event
+from app.models.user import User
 from app.repositories.failure import FailureRepository, get_failure_repo
 from app.schemas.failure import FailureDetail, FailureSummary
 from app.schemas.outage_report import OutageReportSummary
@@ -48,6 +50,7 @@ def get_failure(
 def resolve_failure(
     failure_id: int,
     repo: FailureRepository = Depends(get_failure_repo),
+    _current_user: User = Depends(get_trusted_user),
 ) -> FailureSummary:
     """Mark a failure as resolved. New reports for the same equipment will start a fresh failure."""
     failure = repo.get(failure_id)
