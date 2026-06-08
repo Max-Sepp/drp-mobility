@@ -44,7 +44,6 @@ module.exports = {
       'expo-notifications',
       'expo-location',
       'expo-image-picker',
-      'expo-speech-recognition',
       [
         'expo-build-properties',
         {

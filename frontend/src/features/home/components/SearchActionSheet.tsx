@@ -9,11 +9,9 @@
 
 import { MaterialIcons } from '@expo/vector-icons'
 import * as Location from 'expo-location'
-import { ExpoSpeechRecognitionModule, useSpeechRecognitionEvent } from 'expo-speech-recognition'
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import {
   ActivityIndicator,
-  Alert,
   Dimensions,
   Keyboard,
   ScrollView,
@@ -297,44 +295,11 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
     const [searching, setSearching] = useState(false)
     const [gpsLoading, setGpsLoading] = useState(false)
 
-    const [listening, setListening] = useState(false)
-
     const inputRef = useRef<TextInput>(null)
     const sheetRef = useRef<BottomSheetRef>(null)
 
     const { stations } = useStations()
     const cachedCoords = useAppLocation()
-
-    // ── Speech recognition ────────────────────────────────────────────────
-
-    useSpeechRecognitionEvent('result', (e) => {
-      const text = e.results[0]?.transcript ?? ''
-      if (text) setQuery(text)
-      if (e.isFinal) setListening(false)
-    })
-
-    useSpeechRecognitionEvent('error', () => setListening(false))
-    useSpeechRecognitionEvent('end', () => setListening(false))
-
-    async function startListening() {
-      const { granted } = await ExpoSpeechRecognitionModule.requestPermissionsAsync()
-      if (!granted) {
-        Alert.alert(
-          'Microphone required',
-          'Enable microphone access in Settings to search by voice.',
-        )
-        return
-      }
-      expand()
-      setQuery('')
-      setListening(true)
-      ExpoSpeechRecognitionModule.start({ lang: 'en-GB', interimResults: true })
-    }
-
-    function stopListening() {
-      ExpoSpeechRecognitionModule.stop()
-      setListening(false)
-    }
 
     // ── Debounced search ──────────────────────────────────────────────────
 
@@ -372,18 +337,14 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
       Keyboard.dismiss()
       setQuery('')
       setExpanded(false)
-      if (listening) ExpoSpeechRecognitionModule.stop()
-      setListening(false)
       sheetRef.current?.snapToIndex(SNAP_IDX_HOME)
-    }, [listening])
+    }, [])
 
     const dismiss = useCallback(() => {
       Keyboard.dismiss()
       setQuery('')
-      if (listening) ExpoSpeechRecognitionModule.stop()
-      setListening(false)
       sheetRef.current?.snapToIndex(SNAP_IDX_PILL)
-    }, [listening])
+    }, [])
 
     const restore = useCallback(() => {
       sheetRef.current?.snapToIndex(SNAP_IDX_HOME)
@@ -466,8 +427,8 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
               <TextInput
                 ref={inputRef}
                 style={styles.searchInput}
-                placeholder={listening ? 'Listening…' : 'Where to?'}
-                placeholderTextColor={listening ? Colors.blue : Colors.placeholderText}
+                placeholder="Where to?"
+                placeholderTextColor={Colors.placeholderText}
                 editable={expanded}
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -476,22 +437,8 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
                 onChangeText={setQuery}
               />
             </View>
-            {/* Right-side control: spinner while searching, mic otherwise */}
-            {expanded && searching ? (
+            {expanded && searching && (
               <ActivityIndicator size="small" color={Colors.secondaryText} />
-            ) : (
-              <TouchableOpacity
-                onPress={listening ? stopListening : startListening}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                accessibilityRole="button"
-                accessibilityLabel={listening ? 'Stop listening' : 'Search by voice'}
-              >
-                <MaterialIcons
-                  name={listening ? 'mic' : 'mic-none'}
-                  size={18}
-                  color={listening ? Colors.blue : Colors.secondaryText}
-                />
-              </TouchableOpacity>
             )}
           </TouchableOpacity>
 
