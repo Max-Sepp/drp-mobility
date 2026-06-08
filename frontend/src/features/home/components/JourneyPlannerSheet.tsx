@@ -77,8 +77,8 @@ const PREF_TAG: Record<JourneyPreference, RouteTag> = {
 // Component
 // ---------------------------------------------------------------------------
 
-const SWAP_BTN = 36  // diameter of the floating swap button
-const FROM_TO_GAP = 10  // vertical gap between From and To inputs
+const SWAP_BTN = 36 // diameter of the floating swap button
+const FROM_TO_GAP = 10 // vertical gap between From and To inputs
 
 export function JourneyPlannerSheet({ plan, onClose, onJourneySelect, savedPlaces }: Props) {
   const { Colors, Radii } = useTheme()
@@ -148,9 +148,13 @@ export function JourneyPlannerSheet({ plan, onClose, onJourneySelect, savedPlace
   const placeShortcuts = useMemo<PlaceShortcut[]>(() => {
     if (!savedPlaces) return []
     const shortcuts: PlaceShortcut[] = []
-    if (savedPlaces.home) shortcuts.push({ label: 'Home', icon: 'home', postcode: savedPlaces.home.postcode })
-    if (savedPlaces.work) shortcuts.push({ label: 'Work', icon: 'work', postcode: savedPlaces.work.postcode })
-    savedPlaces.custom.forEach((p) => shortcuts.push({ label: p.name, icon: p.icon, postcode: p.postcode }))
+    if (savedPlaces.home)
+      shortcuts.push({ label: 'Home', icon: 'home', postcode: savedPlaces.home.postcode })
+    if (savedPlaces.work)
+      shortcuts.push({ label: 'Work', icon: 'work', postcode: savedPlaces.work.postcode })
+    savedPlaces.custom.forEach((p) =>
+      shortcuts.push({ label: p.name, icon: p.icon, postcode: p.postcode }),
+    )
     return shortcuts
   }, [savedPlaces])
 
@@ -273,7 +277,13 @@ export function JourneyPlannerSheet({ plan, onClose, onJourneySelect, savedPlace
 
     let optResult: JourneyOptionsResult
     if (preference) {
-      const single = await planJourney(fromLoc.postcode, toLoc.postcode, level, departAt, preference)
+      const single = await planJourney(
+        fromLoc.postcode,
+        toLoc.postcode,
+        level,
+        departAt,
+        preference,
+      )
       if (single.kind !== 'journeys') {
         setLoading(false)
         Alert.alert('No journey', single.message)
@@ -316,12 +326,7 @@ export function JourneyPlannerSheet({ plan, onClose, onJourneySelect, savedPlace
   }, [insets.top])
 
   return (
-    <BottomSheet
-      ref={sheetRef}
-      index={-1}
-      snapPoints={snapPoints}
-      onChange={handleChange}
-    >
+    <BottomSheet ref={sheetRef} index={-1} snapPoints={snapPoints} onChange={handleChange}>
       {/* Outside the scroll view so it never gets double-padded */}
       <SheetHeader
         title="Plan a journey"

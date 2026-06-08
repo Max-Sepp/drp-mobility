@@ -201,7 +201,13 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
 
     let optResult: JourneyOptionsResult
     if (preference) {
-      const single = await planJourney(fromLoc.postcode, toLoc.postcode, level, departAt, preference)
+      const single = await planJourney(
+        fromLoc.postcode,
+        toLoc.postcode,
+        level,
+        departAt,
+        preference,
+      )
       if (single.kind !== 'journeys') {
         setLoading(false)
         Alert.alert('No journey', single.message)
@@ -235,12 +241,7 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
 
   return (
     <FormScreenLayout
-      header={
-        <ScreenHeader
-          title="Plan a journey"
-          onBack={() => navigation.goBack()}
-        />
-      }
+      header={<ScreenHeader title="Plan a journey" onBack={() => navigation.goBack()} />}
       footer={null}
     >
       <YStack px="$5" mt="$4" gap="$2">

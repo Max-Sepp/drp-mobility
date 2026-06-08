@@ -4,11 +4,7 @@ import { StationScreen } from '@/features/home'
 import { MapHomeScreen } from '@/features/home/screens/MapHomeScreen'
 import { SelectStationScreen } from '@/features/stations'
 import { ReportCustomScreen, ReportFormScreen, SuccessScreen } from '@/features/reporting'
-import {
-  ActiveJourneyScreen,
-  JourneyDetailScreen,
-  JourneyPlannerScreen,
-} from '@/features/journey'
+import { ActiveJourneyScreen, JourneyDetailScreen, JourneyPlannerScreen } from '@/features/journey'
 import { SearchScreen } from '@/features/search/screens/SearchScreen'
 import type { RootStackParamList } from '@/navigation/types'
 

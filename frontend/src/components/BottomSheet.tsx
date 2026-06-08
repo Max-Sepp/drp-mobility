@@ -79,7 +79,7 @@ const BottomSheet = forwardRef<GorhomBottomSheet, BottomSheetProps>(
         keyboardBlurBehavior="restore"
         android_keyboardInputMode="adjustResize"
         backdropComponent={resolvedBackdrop ?? undefined}
-{...rest}
+        {...rest}
         ref={ref}
       />
     )

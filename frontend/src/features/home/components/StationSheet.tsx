@@ -141,12 +141,7 @@ export function StationSheet({ station, onClose, onReportPress, onOpenJourney }:
   }
 
   return (
-    <BottomSheet
-      ref={sheetRef}
-      index={-1}
-      snapPoints={snapPoints}
-      onChange={handleChange}
-    >
+    <BottomSheet ref={sheetRef} index={-1} snapPoints={snapPoints} onChange={handleChange}>
       <SheetHeader
         title={station ?? ''}
         subtitle="Underground station"

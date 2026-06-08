@@ -149,76 +149,84 @@ function PlacesRow({
     <View style={placesStyles.placesSection}>
       <Text style={placesStyles.sectionLabel}>PLACES</Text>
       <NativeViewGestureHandler disallowInterruption>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={placesStyles.placesRow}
-        onScroll={(e) => setScrollX(e.nativeEvent.contentOffset.x)}
-        onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}
-        scrollEventThrottle={16}
-      >
-        {NAMED_PLACES.map(({ key, icon, label }) => {
-          const saved = Boolean(savedPlaces[key])
-          return (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={placesStyles.placesRow}
+          onScroll={(e) => setScrollX(e.nativeEvent.contentOffset.x)}
+          onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}
+          scrollEventThrottle={16}
+        >
+          {NAMED_PLACES.map(({ key, icon, label }) => {
+            const saved = Boolean(savedPlaces[key])
+            return (
+              <TouchableOpacity
+                key={key}
+                style={placesStyles.placesTile}
+                activeOpacity={0.75}
+                onPress={() => onPress(key)}
+                onLongPress={() => onLongPress(key)}
+                accessibilityRole="button"
+                accessibilityLabel={
+                  saved ? `${label}: ${savedPlaces[key]!.address}` : `Set ${label}`
+                }
+                accessibilityHint={
+                  saved
+                    ? 'Tap to plan journey. Long press to edit or remove.'
+                    : 'Tap to set your address'
+                }
+              >
+                <View
+                  style={[placesStyles.placesTileIcon, saved && placesStyles.placesTileIconSaved]}
+                >
+                  <MaterialIcons name={icon} size={22} color={saved ? Colors.card : Colors.blue} />
+                </View>
+                <Text style={[Typography.label, { color: Colors.text, marginTop: 4 }]}>
+                  {label}
+                </Text>
+                {!saved && (
+                  <Text style={[Typography.label, { color: Colors.blue, marginTop: 1 }]}>Add</Text>
+                )}
+              </TouchableOpacity>
+            )
+          })}
+          {savedPlaces.custom.map((place) => (
             <TouchableOpacity
-              key={key}
+              key={place.id}
               style={placesStyles.placesTile}
               activeOpacity={0.75}
-              onPress={() => onPress(key)}
-              onLongPress={() => onLongPress(key)}
+              onPress={() => onCustomPlacePress(place)}
+              onLongPress={() => onCustomPlaceLongPress(place)}
               accessibilityRole="button"
-              accessibilityLabel={saved ? `${label}: ${savedPlaces[key]!.address}` : `Set ${label}`}
-              accessibilityHint={
-                saved
-                  ? 'Tap to plan journey. Long press to edit or remove.'
-                  : 'Tap to set your address'
-              }
+              accessibilityLabel={`${place.name}: ${place.address}`}
+              accessibilityHint="Tap to plan journey. Long press to remove."
             >
-              <View
-                style={[placesStyles.placesTileIcon, saved && placesStyles.placesTileIconSaved]}
-              >
-                <MaterialIcons name={icon} size={22} color={saved ? Colors.card : Colors.blue} />
+              <View style={[placesStyles.placesTileIcon, placesStyles.placesTileIconSaved]}>
+                <MaterialIcons
+                  name={place.icon as keyof typeof MaterialIcons.glyphMap}
+                  size={22}
+                  color={Colors.card}
+                />
               </View>
-              <Text style={[Typography.label, { color: Colors.text, marginTop: 4 }]}>{label}</Text>
-              {!saved && (
-                <Text style={[Typography.label, { color: Colors.blue, marginTop: 1 }]}>Add</Text>
-              )}
+              <Text
+                style={[Typography.label, { color: Colors.text, marginTop: 4 }]}
+                numberOfLines={1}
+              >
+                {place.name}
+              </Text>
             </TouchableOpacity>
-          )
-        })}
-        {savedPlaces.custom.map((place) => (
+          ))}
           <TouchableOpacity
-            key={place.id}
             style={placesStyles.placesTile}
             activeOpacity={0.75}
-            onPress={() => onCustomPlacePress(place)}
-            onLongPress={() => onCustomPlaceLongPress(place)}
-            accessibilityRole="button"
-            accessibilityLabel={`${place.name}: ${place.address}`}
-            accessibilityHint="Tap to plan journey. Long press to remove."
+            onPress={onAddPress}
           >
-            <View style={[placesStyles.placesTileIcon, placesStyles.placesTileIconSaved]}>
-              <MaterialIcons
-                name={place.icon as keyof typeof MaterialIcons.glyphMap}
-                size={22}
-                color={Colors.card}
-              />
+            <View style={placesStyles.placesTileIcon}>
+              <MaterialIcons name="add" size={22} color={Colors.blue} />
             </View>
-            <Text
-              style={[Typography.label, { color: Colors.text, marginTop: 4 }]}
-              numberOfLines={1}
-            >
-              {place.name}
-            </Text>
+            <Text style={[Typography.label, { color: Colors.text, marginTop: 4 }]}>Add</Text>
           </TouchableOpacity>
-        ))}
-        <TouchableOpacity style={placesStyles.placesTile} activeOpacity={0.75} onPress={onAddPress}>
-          <View style={placesStyles.placesTileIcon}>
-            <MaterialIcons name="add" size={22} color={Colors.blue} />
-          </View>
-          <Text style={[Typography.label, { color: Colors.text, marginTop: 4 }]}>Add</Text>
-        </TouchableOpacity>
-      </ScrollView>
+        </ScrollView>
       </NativeViewGestureHandler>
       {scrollable && (
         <View style={placesStyles.scrollbarTrack}>

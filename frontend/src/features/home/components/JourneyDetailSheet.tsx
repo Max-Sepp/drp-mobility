@@ -197,11 +197,7 @@ function TimelineConnector({
             {/* Stops + duration */}
             <XStack items="center" gap={4}>
               {stopCount > 0 ? (
-                <MaterialIcons
-                  name="add-circle-outline"
-                  size={13}
-                  color={Colors.secondaryText}
-                />
+                <MaterialIcons name="add-circle-outline" size={13} color={Colors.secondaryText} />
               ) : null}
               <Text fontSize={12} color={Colors.secondaryText}>
                 {stopLabel}
@@ -445,15 +441,13 @@ export function JourneyDetailSheet({ params, onClose, onStartJourney, onSaveChan
   const fare = fareLabel(journey, user?.traveller_type, user?.railcard)
   const saved = currentSavedId !== null
   const anyBusy = startBusy || saveBusy
-  const primaryMode =
-    journey.legs.find((l) => l.mode.name !== 'walking')?.mode.name ?? 'walking'
+  const primaryMode = journey.legs.find((l) => l.mode.name !== 'walking')?.mode.name ?? 'walking'
   const legTotal = journey.legs.reduce((sum, leg) => sum + leg.duration, 0)
   const waiting = journey.duration - legTotal
 
   // ── Build gutter timeline ──────────────────────────────────────────────
   const originName =
-    from?.label ??
-    stripStationSuffix(journey.legs[0]?.departurePoint?.commonName ?? 'Start')
+    from?.label ?? stripStationSuffix(journey.legs[0]?.departurePoint?.commonName ?? 'Start')
 
   const timelineItems: React.ReactNode[] = []
 
@@ -540,7 +534,8 @@ export function JourneyDetailSheet({ params, onClose, onStartJourney, onSaveChan
             {journey.duration} min
           </Text>
           <Text fontSize={14} color={Colors.secondaryText}>
-            Arrive {clockTime(journey.arrivalDateTime)}{fare ? ` · ${fare}` : ''}
+            Arrive {clockTime(journey.arrivalDateTime)}
+            {fare ? ` · ${fare}` : ''}
           </Text>
         </View>
         <TouchableOpacity
