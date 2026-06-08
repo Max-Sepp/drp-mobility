@@ -332,9 +332,7 @@ def test_resolve_failure_returns_resolved_true(
 def test_resolve_failure_not_found_returns_404(
     client: TestClient, auth_headers_factory: Callable
 ) -> None:
-    response = client.patch(
-        "/failures/999/resolve", headers=auth_headers_factory(UserRole.TRUSTED)
-    )
+    response = client.patch("/failures/999/resolve", headers=auth_headers_factory(UserRole.TRUSTED))
 
     assert response.status_code == 404
     assert response.json() == {"detail": "Failure not found"}

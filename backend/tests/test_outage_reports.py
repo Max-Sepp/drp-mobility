@@ -413,9 +413,7 @@ def test_download_image_no_image_attached_returns_404(
 # ---------------------------------------------------------------------------
 
 
-def test_verify_report_unauthenticated_returns_401(
-    client: TestClient, db_session: Session
-) -> None:
+def test_verify_report_unauthenticated_returns_401(client: TestClient, db_session: Session) -> None:
     report = _create_report(db_session)
 
     response = client.patch(f"/outage-reports/{report.id}/verify")
