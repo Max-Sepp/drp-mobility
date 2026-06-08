@@ -334,17 +334,15 @@ export function MapHomeScreen({ navigation }: Props) {
             accessibilityLabel="Re-centre map on my location"
             onPress={() => mapRef.current?.recentre()}
           />
-          {status !== 'loading' && (
-            <TopIconButton
-              icon={status === 'authed' ? 'account-circle' : 'person'}
-              color={status === 'authed' ? Colors.blue : Colors.text}
-              size={50}
-              accessibilityLabel={
-                status === 'authed' && user ? `Logged in as ${user.username}` : 'Log in'
-              }
-              onPress={handleAccountPress}
-            />
-          )}
+          <TopIconButton
+            icon={status === 'authed' ? 'account-circle' : 'person'}
+            color={status === 'authed' ? Colors.blue : Colors.text}
+            size={50}
+            accessibilityLabel={
+              status === 'authed' && user ? `Logged in as ${user.username}` : 'Log in'
+            }
+            onPress={handleAccountPress}
+          />
         </View>
         {active && !activeJourneyParams && (
           <ActiveJourneyBanner
