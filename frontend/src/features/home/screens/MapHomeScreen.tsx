@@ -227,7 +227,9 @@ export function MapHomeScreen({ navigation }: Props) {
   }
 
   function handleCustomPlacePress(place: CustomPlace) {
-    setActivePlan({ initialTo: { postcode: place.postcode, label: place.name, isNamedPlace: true } })
+    setActivePlan({
+      initialTo: { postcode: place.postcode, label: place.name, isNamedPlace: true },
+    })
     sheetRef.current?.dismiss()
   }
 

@@ -9,10 +9,7 @@
 
 import { MaterialIcons } from '@expo/vector-icons'
 import * as Location from 'expo-location'
-import {
-  ExpoSpeechRecognitionModule,
-  useSpeechRecognitionEvent,
-} from 'expo-speech-recognition'
+import { ExpoSpeechRecognitionModule, useSpeechRecognitionEvent } from 'expo-speech-recognition'
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import {
   ActivityIndicator,
@@ -65,9 +62,9 @@ const SNAP_IDX_OPEN = 2
 // ---------------------------------------------------------------------------
 
 export type SearchActionSheetHandle = {
-  expand: () => void   // snap to OPEN (search active)
-  dismiss: () => void  // snap to PILL (map focus)
-  restore: () => void  // snap to HOME (normal state)
+  expand: () => void // snap to OPEN (search active)
+  dismiss: () => void // snap to PILL (map focus)
+  restore: () => void // snap to HOME (normal state)
 }
 
 // ---------------------------------------------------------------------------
@@ -322,7 +319,10 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
     async function startListening() {
       const { granted } = await ExpoSpeechRecognitionModule.requestPermissionsAsync()
       if (!granted) {
-        Alert.alert('Microphone required', 'Enable microphone access in Settings to search by voice.')
+        Alert.alert(
+          'Microphone required',
+          'Enable microphone access in Settings to search by voice.',
+        )
         return
       }
       expand()
@@ -496,7 +496,13 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
           </TouchableOpacity>
 
           {expanded && (
-            <TouchableOpacity onPress={collapse} style={styles.cancelBtn} activeOpacity={0.7} accessibilityRole="button" accessibilityLabel="Close search">
+            <TouchableOpacity
+              onPress={collapse}
+              style={styles.cancelBtn}
+              activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityLabel="Close search"
+            >
               <MaterialIcons name="close" size={22} color={Colors.secondaryText} />
             </TouchableOpacity>
           )}
@@ -513,9 +519,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
             {gpsLoading && (
               <View style={styles.gpsLoadingRow}>
                 <ActivityIndicator size="small" color={Colors.blue} />
-                <Text
-                  style={[Typography.caption, { color: Colors.secondaryText, marginLeft: 8 }]}
-                >
+                <Text style={[Typography.caption, { color: Colors.secondaryText, marginLeft: 8 }]}>
                   Getting your location…
                 </Text>
               </View>
@@ -544,10 +548,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
                 <Text style={styles.sectionLabel}>PLACES</Text>
                 {locationResults.map((loc, i) => (
                   <View key={i}>
-                    <LocationResultRow
-                      suggestion={loc}
-                      onPress={() => handleLocationSelect(loc)}
-                    />
+                    <LocationResultRow suggestion={loc} onPress={() => handleLocationSelect(loc)} />
                     <View style={styles.separator} />
                   </View>
                 ))}

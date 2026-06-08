@@ -47,7 +47,7 @@ export type JourneyPlan = {
 }
 
 type Props = {
-  plan: JourneyPlan | null  // null = closed
+  plan: JourneyPlan | null // null = closed
   onClose: () => void
   onJourneySelect: (params: JourneyDetailParams) => void
 }

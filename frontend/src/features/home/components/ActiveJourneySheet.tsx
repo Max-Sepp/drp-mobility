@@ -57,10 +57,7 @@ export function ActiveJourneySheet({ params, onComplete, onEnd }: Props) {
   const insets = useSafeAreaInsets()
   // Compact snap exactly fits: gorhom handle (~20) + compact row (~56) + footer (8 + 48 + 1 + insets.bottom + 8).
   // No arithmetic relies on screen %, so it works on any device regardless of safe area size.
-  const snapPoints = useMemo(
-    () => [20 + 56 + 65 + insets.bottom, SNAP_FULL],
-    [insets.bottom],
-  )
+  const snapPoints = useMemo(() => [20 + 56 + 65 + insets.bottom, SNAP_FULL], [insets.bottom])
   const sheetRef = useRef<BottomSheetRef>(null)
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
@@ -93,7 +90,9 @@ export function ActiveJourneySheet({ params, onComplete, onEnd }: Props) {
         setLegIndex(record.currentLegIndex)
       }
     })
-    return () => { active = false }
+    return () => {
+      active = false
+    }
   }, [params])
 
   function handleChange(index: number) {
@@ -161,7 +160,10 @@ export function ActiveJourneySheet({ params, onComplete, onEnd }: Props) {
           }
         },
       )
-      if (cancelled) { sub.remove(); sub = null }
+      if (cancelled) {
+        sub.remove()
+        sub = null
+      }
     })()
     return () => {
       cancelled = true
@@ -226,7 +228,9 @@ export function ActiveJourneySheet({ params, onComplete, onEnd }: Props) {
             accessibilityRole="button"
             accessibilityLabel="Previous leg"
           >
-            <Text fontSize={16} fontWeight="700" color={Colors.text}>Previous</Text>
+            <Text fontSize={16} fontWeight="700" color={Colors.text}>
+              Previous
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.primaryBtn}
@@ -261,7 +265,9 @@ export function ActiveJourneySheet({ params, onComplete, onEnd }: Props) {
       <BottomSheet ref={sheetRef} index={-1} snapPoints={snapPoints} onChange={handleChange}>
         <YStack flex={1} items="center" justify="center" gap="$3">
           <Spinner color={Colors.blue} />
-          <Text fontSize={15} color={Colors.secondaryText}>Loading your journey…</Text>
+          <Text fontSize={15} color={Colors.secondaryText}>
+            Loading your journey…
+          </Text>
         </YStack>
       </BottomSheet>
     )
@@ -313,9 +319,7 @@ export function ActiveJourneySheet({ params, onComplete, onEnd }: Props) {
             Leg {legIndex + 1} of {legs.length}
           </Text>
         </YStack>
-        {!isExpanded && (
-          <MaterialIcons name="expand-less" size={20} color={Colors.secondaryText} />
-        )}
+        {!isExpanded && <MaterialIcons name="expand-less" size={20} color={Colors.secondaryText} />}
       </TouchableOpacity>
 
       {/* Full detail — always rendered so content slides in during snap transition */}
@@ -323,95 +327,105 @@ export function ActiveJourneySheet({ params, onComplete, onEnd }: Props) {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[styles.content, { paddingBottom: 65 + insets.bottom + Spacing.xl }]}
       >
-          <YStack gap="$4">
-            <YStack
-              p="$4"
-              gap="$2"
-              style={{
-                borderWidth: Borders.thick,
-                borderColor: Colors.blue,
-                borderRadius: Radii.button,
-                backgroundColor: Colors.card,
-              }}
-            >
-              <XStack items="center" gap="$2">
-                <MaterialIcons
-                  name={modeIcon(currentLeg.mode.name)}
-                  size={26}
-                  color={Colors.blue}
-                  aria-label={modeLabel(currentLeg.mode.name)}
-                />
-                <Text fontSize={13} fontWeight="700" color={Colors.blue}>
-                  {modeLabel(currentLeg.mode.name)} · now
-                </Text>
-              </XStack>
-              <Text fontSize={19} fontWeight="700" color={Colors.text}>
-                {humanizeSummary(currentLeg.instruction.summary, [from, to])}
-              </Text>
-              {line && <Text fontSize={14} fontWeight="600" color={Colors.blue}>{line}</Text>}
-              <LegStations
-                leg={currentLeg}
-                resolveStation={resolveStation}
-                onStationPress={(s) => navigation.navigate('Station', { station: s })}
-              />
-              {!line && detailed && (
-                <Text fontSize={14} color={Colors.text}>{humanizeSummary(detailed, [from, to])}</Text>
-              )}
-              {legTimes && (
-                <Text fontSize={13} color={Colors.secondaryText}>
-                  {legTimes} · {currentLeg.duration} min
-                </Text>
-              )}
-            </YStack>
-
+        <YStack gap="$4">
+          <YStack
+            p="$4"
+            gap="$2"
+            style={{
+              borderWidth: Borders.thick,
+              borderColor: Colors.blue,
+              borderRadius: Radii.button,
+              backgroundColor: Colors.card,
+            }}
+          >
             <XStack items="center" gap="$2">
               <MaterialIcons
-                name={gpsActive ? 'my-location' : 'location-disabled'}
-                size={16}
-                color={Colors.secondaryText}
+                name={modeIcon(currentLeg.mode.name)}
+                size={26}
+                color={Colors.blue}
+                aria-label={modeLabel(currentLeg.mode.name)}
               />
-              <Text fontSize={13} color={Colors.secondaryText} flex={1}>
-                {gpsActive
-                  ? 'Advancing automatically as you arrive — or tap Arrived.'
-                  : 'Tap Arrived when you reach each stop.'}
+              <Text fontSize={13} fontWeight="700" color={Colors.blue}>
+                {modeLabel(currentLeg.mode.name)} · now
               </Text>
             </XStack>
-
-            <OutageDetail assessments={upcomingAssessments} />
-
-            {remaining.length > 0 && (
-              <YStack gap="$2">
-                <Text fontSize={13} fontWeight="700" color={Colors.secondaryText}>COMING UP</Text>
-                {remaining.map((leg, i) => (
-                  <XStack key={legIndex + 1 + i} gap="$2.5" items="center" opacity={Opacity.subtle}>
-                    <MaterialIcons
-                      name={modeIcon(leg.mode.name)}
-                      size={20}
-                      color={Colors.secondaryText}
-                      aria-label={modeLabel(leg.mode.name)}
-                      style={{ width: 22 }}
-                    />
-                    <Text fontSize={14} color={Colors.text} flex={1}>
-                      {humanizeSummary(leg.instruction.summary, [from, to])}
-                    </Text>
-                  </XStack>
-                ))}
-              </YStack>
+            <Text fontSize={19} fontWeight="700" color={Colors.text}>
+              {humanizeSummary(currentLeg.instruction.summary, [from, to])}
+            </Text>
+            {line && (
+              <Text fontSize={14} fontWeight="600" color={Colors.blue}>
+                {line}
+              </Text>
             )}
-
-            <YStack
-              items="center"
-              justify="center"
-              py="$2"
-              onPress={endJourney}
-              pressStyle={{ opacity: Opacity.pressedLight }}
-              role="button"
-              aria-label="End journey"
-            >
-              <Text fontSize={14} fontWeight="600" color={Colors.danger}>End journey</Text>
-            </YStack>
+            <LegStations
+              leg={currentLeg}
+              resolveStation={resolveStation}
+              onStationPress={(s) => navigation.navigate('Station', { station: s })}
+            />
+            {!line && detailed && (
+              <Text fontSize={14} color={Colors.text}>
+                {humanizeSummary(detailed, [from, to])}
+              </Text>
+            )}
+            {legTimes && (
+              <Text fontSize={13} color={Colors.secondaryText}>
+                {legTimes} · {currentLeg.duration} min
+              </Text>
+            )}
           </YStack>
-        </BottomSheetScrollView>
+
+          <XStack items="center" gap="$2">
+            <MaterialIcons
+              name={gpsActive ? 'my-location' : 'location-disabled'}
+              size={16}
+              color={Colors.secondaryText}
+            />
+            <Text fontSize={13} color={Colors.secondaryText} flex={1}>
+              {gpsActive
+                ? 'Advancing automatically as you arrive — or tap Arrived.'
+                : 'Tap Arrived when you reach each stop.'}
+            </Text>
+          </XStack>
+
+          <OutageDetail assessments={upcomingAssessments} />
+
+          {remaining.length > 0 && (
+            <YStack gap="$2">
+              <Text fontSize={13} fontWeight="700" color={Colors.secondaryText}>
+                COMING UP
+              </Text>
+              {remaining.map((leg, i) => (
+                <XStack key={legIndex + 1 + i} gap="$2.5" items="center" opacity={Opacity.subtle}>
+                  <MaterialIcons
+                    name={modeIcon(leg.mode.name)}
+                    size={20}
+                    color={Colors.secondaryText}
+                    aria-label={modeLabel(leg.mode.name)}
+                    style={{ width: 22 }}
+                  />
+                  <Text fontSize={14} color={Colors.text} flex={1}>
+                    {humanizeSummary(leg.instruction.summary, [from, to])}
+                  </Text>
+                </XStack>
+              ))}
+            </YStack>
+          )}
+
+          <YStack
+            items="center"
+            justify="center"
+            py="$2"
+            onPress={endJourney}
+            pressStyle={{ opacity: Opacity.pressedLight }}
+            role="button"
+            aria-label="End journey"
+          >
+            <Text fontSize={14} fontWeight="600" color={Colors.danger}>
+              End journey
+            </Text>
+          </YStack>
+        </YStack>
+      </BottomSheetScrollView>
     </BottomSheet>
   )
 }

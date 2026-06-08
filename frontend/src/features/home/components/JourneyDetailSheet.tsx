@@ -163,7 +163,13 @@ export function JourneyDetailSheet({ params, onClose, onStartJourney }: Props) {
 
   if (!params) {
     return (
-      <BottomSheet ref={sheetRef} index={-1} snapPoints={SNAP_POINTS} enablePanDownToClose onChange={handleChange}>
+      <BottomSheet
+        ref={sheetRef}
+        index={-1}
+        snapPoints={SNAP_POINTS}
+        enablePanDownToClose
+        onChange={handleChange}
+      >
         {null}
       </BottomSheet>
     )
@@ -221,14 +227,28 @@ export function JourneyDetailSheet({ params, onClose, onStartJourney }: Props) {
               <YStack gap="$1">
                 {from && (
                   <XStack gap="$2" items="center">
-                    <MaterialIcons name="trip-origin" size={14} color={Colors.secondaryText} style={{ width: 18 }} />
-                    <Text fontSize={14} color={Colors.text} flex={1}>{from.label}</Text>
+                    <MaterialIcons
+                      name="trip-origin"
+                      size={14}
+                      color={Colors.secondaryText}
+                      style={{ width: 18 }}
+                    />
+                    <Text fontSize={14} color={Colors.text} flex={1}>
+                      {from.label}
+                    </Text>
                   </XStack>
                 )}
                 {to && (
                   <XStack gap="$2" items="center">
-                    <MaterialIcons name="place" size={16} color={Colors.secondaryText} style={{ width: 18 }} />
-                    <Text fontSize={14} color={Colors.text} flex={1}>{to.label}</Text>
+                    <MaterialIcons
+                      name="place"
+                      size={16}
+                      color={Colors.secondaryText}
+                      style={{ width: 18 }}
+                    />
+                    <Text fontSize={14} color={Colors.text} flex={1}>
+                      {to.label}
+                    </Text>
                   </XStack>
                 )}
               </YStack>
@@ -236,8 +256,14 @@ export function JourneyDetailSheet({ params, onClose, onStartJourney }: Props) {
 
             <XStack items="center" justify="space-between">
               <XStack items="baseline" gap="$2">
-                <Text fontSize={22} fontWeight="700" color={Colors.text}>{journey.duration} min</Text>
-                {fare && <Text fontSize={16} fontWeight="600" color={Colors.success}>{fare}</Text>}
+                <Text fontSize={22} fontWeight="700" color={Colors.text}>
+                  {journey.duration} min
+                </Text>
+                {fare && (
+                  <Text fontSize={16} fontWeight="600" color={Colors.success}>
+                    {fare}
+                  </Text>
+                )}
               </XStack>
               <Text fontSize={16} color={Colors.text}>
                 {clockTime(journey.startDateTime)} → {clockTime(journey.arrivalDateTime)}
@@ -296,27 +322,46 @@ export function JourneyDetailSheet({ params, onClose, onStartJourney }: Props) {
                     <Text fontSize={15} fontWeight="600" color={Colors.text}>
                       {humanizeSummary(leg.instruction.summary, [from, to])}
                     </Text>
-                    {line && <Text fontSize={13} color={Colors.blue} fontWeight="600">{line}</Text>}
+                    {line && (
+                      <Text fontSize={13} color={Colors.blue} fontWeight="600">
+                        {line}
+                      </Text>
+                    )}
                     <LegStations
                       leg={leg}
                       resolveStation={resolveStation}
                       onStationPress={(s) => navigation.navigate('Station', { station: s })}
                     />
-                    {!line && leg.instruction.detailed && leg.instruction.detailed !== leg.instruction.summary && (
-                      <Text fontSize={13} color={Colors.text}>
-                        {humanizeSummary(leg.instruction.detailed, [from, to])}
-                      </Text>
-                    )}
+                    {!line &&
+                      leg.instruction.detailed &&
+                      leg.instruction.detailed !== leg.instruction.summary && (
+                        <Text fontSize={13} color={Colors.text}>
+                          {humanizeSummary(leg.instruction.detailed, [from, to])}
+                        </Text>
+                      )}
                     {stopCount > 0 && (
                       <Text fontSize={13} color={Colors.secondaryText}>
                         {stopCount} {stopCount === 1 ? 'stop' : 'stops'}
                       </Text>
                     )}
                     {leg.isDisrupted && leg.disruptions?.some((d) => d.description) && (
-                      <YStack gap="$1" p="$2" style={{ backgroundColor: Colors.dangerBg, borderWidth: Borders.thin, borderColor: Colors.dangerBorder, borderRadius: Radii.small }}>
-                        {leg.disruptions.filter((d) => d.description).map((d, j) => (
-                          <Text key={j} fontSize={12} color={Colors.dangerDark}>{d.description}</Text>
-                        ))}
+                      <YStack
+                        gap="$1"
+                        p="$2"
+                        style={{
+                          backgroundColor: Colors.dangerBg,
+                          borderWidth: Borders.thin,
+                          borderColor: Colors.dangerBorder,
+                          borderRadius: Radii.small,
+                        }}
+                      >
+                        {leg.disruptions
+                          .filter((d) => d.description)
+                          .map((d, j) => (
+                            <Text key={j} fontSize={12} color={Colors.dangerDark}>
+                              {d.description}
+                            </Text>
+                          ))}
                       </YStack>
                     )}
                     <Text fontSize={12} color={Colors.secondaryText}>
@@ -329,10 +374,19 @@ export function JourneyDetailSheet({ params, onClose, onStartJourney }: Props) {
 
             {waiting >= 1 && (
               <XStack gap="$3" items="flex-start">
-                <MaterialIcons name="schedule" size={24} color={Colors.secondaryText} style={{ width: 26, marginTop: 1 }} />
+                <MaterialIcons
+                  name="schedule"
+                  size={24}
+                  color={Colors.secondaryText}
+                  style={{ width: 26, marginTop: 1 }}
+                />
                 <YStack flex={1} gap="$0.5">
-                  <Text fontSize={15} fontWeight="600" color={Colors.secondaryText}>Waiting & connections</Text>
-                  <Text fontSize={12} color={Colors.secondaryText}>{waiting} min</Text>
+                  <Text fontSize={15} fontWeight="600" color={Colors.secondaryText}>
+                    Waiting & connections
+                  </Text>
+                  <Text fontSize={12} color={Colors.secondaryText}>
+                    {waiting} min
+                  </Text>
                 </YStack>
               </XStack>
             )}

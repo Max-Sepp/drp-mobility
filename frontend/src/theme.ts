@@ -25,11 +25,11 @@ export const Colors = {
   placeholderText: '#AAAAAA',
 
   // Separator / border
-  separator: '#CCCCCC',   // hairline dividers between list items
-  border: '#0A0A0A',      // hard black borders on cards and buttons
+  separator: '#CCCCCC', // hairline dividers between list items
+  border: '#0A0A0A', // hard black borders on cards and buttons
 
   // Brand / interactive
-  blue: '#1A56FF',        // electric blue
+  blue: '#1A56FF', // electric blue
   blueDark: '#0033CC',
 
   // Semantic — base colours
@@ -57,7 +57,7 @@ export const Radii = {
   card: 6,
   button: 6,
   input: 6,
-  pill: 6,    // search bar becomes a rounded rectangle
+  pill: 6, // search bar becomes a rounded rectangle
   small: 4,
   xs: 2,
   handle: 2,

@@ -23,49 +23,48 @@ export { BottomSheetView, BottomSheetScrollView, BottomSheetFlatList, BottomShee
 // The ref type exposed by a BottomSheet instance.
 export type BottomSheetRef = GorhomBottomSheet
 
-const BottomSheet = forwardRef<GorhomBottomSheet, BottomSheetProps>(function BottomSheet(
-  props,
-  ref,
-) {
-  const { enablePanDownToClose = false, backdropComponent, ...rest } = props
+const BottomSheet = forwardRef<GorhomBottomSheet, BottomSheetProps>(
+  function BottomSheet(props, ref) {
+    const { enablePanDownToClose = false, backdropComponent, ...rest } = props
 
-  // When a sheet is dismissible, provide a transparent backdrop so tapping the map
-  // above the sheet closes it — no dimming, just touch interception.
-  const transparentBackdrop = useCallback(
-    (backdropProps: BottomSheetBackdropProps) => (
-      <BottomSheetBackdrop
-        {...backdropProps}
-        opacity={0}
-        disappearsOnIndex={-1}
-        appearsOnIndex={0}
-        pressBehavior="close"
+    // When a sheet is dismissible, provide a transparent backdrop so tapping the map
+    // above the sheet closes it — no dimming, just touch interception.
+    const transparentBackdrop = useCallback(
+      (backdropProps: BottomSheetBackdropProps) => (
+        <BottomSheetBackdrop
+          {...backdropProps}
+          opacity={0}
+          disappearsOnIndex={-1}
+          appearsOnIndex={0}
+          pressBehavior="close"
+        />
+      ),
+      [],
+    )
+
+    const resolvedBackdrop =
+      backdropComponent !== undefined
+        ? backdropComponent
+        : enablePanDownToClose
+          ? transparentBackdrop
+          : null
+
+    return (
+      <GorhomBottomSheet
+        enablePanDownToClose={enablePanDownToClose}
+        enableDynamicSizing={false}
+        handleIndicatorStyle={styles.handle}
+        backgroundStyle={styles.background}
+        keyboardBehavior="extend"
+        keyboardBlurBehavior="restore"
+        android_keyboardInputMode="adjustResize"
+        backdropComponent={resolvedBackdrop ?? undefined}
+        {...rest}
+        ref={ref}
       />
-    ),
-    [],
-  )
-
-  const resolvedBackdrop =
-    backdropComponent !== undefined
-      ? backdropComponent
-      : enablePanDownToClose
-        ? transparentBackdrop
-        : null
-
-  return (
-    <GorhomBottomSheet
-      enablePanDownToClose={enablePanDownToClose}
-      enableDynamicSizing={false}
-      handleIndicatorStyle={styles.handle}
-      backgroundStyle={styles.background}
-      keyboardBehavior="extend"
-      keyboardBlurBehavior="restore"
-      android_keyboardInputMode="adjustResize"
-      backdropComponent={resolvedBackdrop ?? undefined}
-      {...rest}
-      ref={ref}
-    />
-  )
-})
+    )
+  },
+)
 
 export default BottomSheet
 

@@ -53,16 +53,6 @@ export function ReportSheet({ station, onClose }: Props) {
   const [photo, setPhoto] = useState<ImagePicker.ImagePickerAsset | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
-  useEffect(() => {
-    if (station) {
-      resetForm()
-      setStep('type')
-      sheetRef.current?.snapToIndex(0)
-    } else {
-      sheetRef.current?.close()
-    }
-  }, [station])
-
   function resetForm() {
     setIssueType(null)
     setEquipment([])
@@ -73,6 +63,16 @@ export function ReportSheet({ station, onClose }: Props) {
     setPhoto(null)
     setSubmitting(false)
   }
+
+  useEffect(() => {
+    if (station) {
+      resetForm()
+      setStep('type')
+      sheetRef.current?.snapToIndex(0)
+    } else {
+      sheetRef.current?.close()
+    }
+  }, [station])
 
   function handleChange(index: number) {
     if (index === -1) onClose()
@@ -282,7 +282,7 @@ export function ReportSheet({ station, onClose }: Props) {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: insets.bottom + Spacing.xl }}
           >
-            {(issueType === 'lift' || issueType === 'escalator') ? (
+            {issueType === 'lift' || issueType === 'escalator' ? (
               <>
                 <EquipmentPicker
                   label={issueType === 'lift' ? 'Which lift?' : 'Which escalator?'}

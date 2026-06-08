@@ -36,10 +36,7 @@ export function StationSheet({ station, onClose, onReportPress, onOpenJourney }:
   const sheetRef = useRef<BottomSheetRef>(null)
 
   const { stations } = useStations()
-  const stationDetail = useMemo(
-    () => stations.find((s) => s.name === station),
-    [stations, station],
-  )
+  const stationDetail = useMemo(() => stations.find((s) => s.name === station), [stations, station])
 
   const { reports: allReports, loading } = useOutages()
   const reports = useMemo(
@@ -71,7 +68,10 @@ export function StationSheet({ station, onClose, onReportPress, onOpenJourney }:
     try {
       const toResult = await resolveToPostcode(station)
       if ('error' in toResult) {
-        Alert.alert('Station error', `Couldn't find a postcode for ${station}. Try planning manually.`)
+        Alert.alert(
+          'Station error',
+          `Couldn't find a postcode for ${station}. Try planning manually.`,
+        )
         return
       }
       const to: ResolvedLocation = { postcode: toResult.postcode, label: station }
@@ -130,7 +130,12 @@ export function StationSheet({ station, onClose, onReportPress, onOpenJourney }:
           activeOpacity={0.8}
           onPress={goingHere ? undefined : handleGoHere}
         >
-          <MaterialIcons name="directions" size={18} color={Colors.card} style={{ marginRight: 6 }} />
+          <MaterialIcons
+            name="directions"
+            size={18}
+            color={Colors.card}
+            style={{ marginRight: 6 }}
+          />
           <Text fontSize={14} fontWeight="600" color={Colors.card}>
             {goingHere ? 'Getting location…' : 'Directions'}
           </Text>
@@ -157,9 +162,7 @@ export function StationSheet({ station, onClose, onReportPress, onOpenJourney }:
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: insets.bottom + Spacing.xl }}
       >
-        {stationDetail && (
-          <PlatformAccessCard key={station} platforms={stationDetail.platforms} />
-        )}
+        {stationDetail && <PlatformAccessCard key={station} platforms={stationDetail.platforms} />}
 
         <ReportsStatus loading={loading} reports={reports} />
       </BottomSheetScrollView>
