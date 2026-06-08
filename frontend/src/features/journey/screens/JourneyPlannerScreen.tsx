@@ -1,6 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import * as Location from 'expo-location'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Alert } from 'react-native'
 import { Text, XStack, YStack } from 'tamagui'
 import { ScreenHeader } from '@/components/ScreenHeader'
@@ -16,6 +16,7 @@ import {
 } from '@/features/journey/api/accessibility'
 import { type ResolvedLocation, resolveToPostcode } from '@/features/journey/api/geocode'
 import { useAppLocation } from '@/lib/LocationContext'
+import { useAccessibilityPreference } from '@/lib/AccessibilityPreferenceContext'
 import { loadSavedJourneys } from '@/features/journey/api/savedJourneys'
 import {
   type AccessibilityPreference,
@@ -38,6 +39,7 @@ const LEVELS: { value: AccessibilityPreference; label: string }[] = [
 
 export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreenProps) => {
   const { Colors, Radii } = useTheme()
+  const { defaultLevel } = useAccessibilityPreference()
   const [from, setFrom] = useState(route.params?.initialFrom?.label ?? '')
   const [to, setTo] = useState(route.params?.initialTo?.label ?? '')
   const [fromPostcode, setFromPostcode] = useState<string | null>(
@@ -53,7 +55,11 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
     Boolean(route.params?.initialTo?.isNamedPlace),
   )
   const [gettingLocation, setGettingLocation] = useState(false)
-  const [level, setLevel] = useState<AccessibilityPreference | null>(null)
+  const [level, setLevel] = useState<AccessibilityPreference | null>(defaultLevel)
+  const levelSetByUser = useRef(false)
+  useEffect(() => {
+    if (!levelSetByUser.current) setLevel(defaultLevel)
+  }, [defaultLevel])
   const [departAt, setDepartAt] = useState<Date | null>(null)
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState<JourneyResult[]>([])
@@ -236,7 +242,10 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
                     items="center"
                     justify="center"
                     pressStyle={{ opacity: Opacity.pressedLight }}
-                    onPress={() => setLevel((prev) => (prev === value ? null : value))}
+                    onPress={() => {
+                      levelSetByUser.current = true
+                      setLevel((prev) => (prev === value ? null : value))
+                    }}
                     style={{
                       minHeight: Heights.touchTarget,
                       borderRadius: Radii.button,

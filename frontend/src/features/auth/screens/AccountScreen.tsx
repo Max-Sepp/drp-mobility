@@ -19,6 +19,8 @@ import type { AccountScreenProps } from '@/navigation/types'
 import { Borders, Opacity, Overlays, Spacing, useTheme, useThemeControls, THEMES } from '@/theme'
 import type { ThemeId } from '@/theme'
 import { useAuth } from '@/features/auth/context/AuthContext'
+import { useAccessibilityPreference } from '@/lib/AccessibilityPreferenceContext'
+import type { AccessibilityPreference } from '@/features/journey/api/tfl'
 
 const USE_NATIVE_DRIVER = Platform.OS !== 'web'
 
@@ -26,14 +28,18 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
   const { user, signOut, updateProfile } = useAuth()
   const { Colors, Radii, Shadows } = useTheme()
   const { themeId, setTheme } = useThemeControls()
+  const { defaultLevel, setDefaultLevel } = useAccessibilityPreference()
 
   const [saving, setSaving] = useState(false)
   const [travellerModalVisible, setTravellerModalVisible] = useState(false)
   const [themeModalVisible, setThemeModalVisible] = useState(false)
+  const [accessibilityModalVisible, setAccessibilityModalVisible] = useState(false)
   const [backdropAnim] = useState(() => new Animated.Value(0))
   const [sheetAnim] = useState(() => new Animated.Value(500))
   const [themeBackdropAnim] = useState(() => new Animated.Value(0))
   const [themeSheetAnim] = useState(() => new Animated.Value(500))
+  const [accessibilityBackdropAnim] = useState(() => new Animated.Value(0))
+  const [accessibilitySheetAnim] = useState(() => new Animated.Value(500))
 
   const styles = useMemo(
     () =>
@@ -230,6 +236,57 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
   }
 
   // ---------------------------------------------------------------------------
+  // Accessibility default picker
+  // ---------------------------------------------------------------------------
+
+  const ACCESSIBILITY_OPTIONS: { value: AccessibilityPreference | null; name: string; description: string }[] = [
+    { value: null, name: 'None', description: 'No accessibility filter applied by default' },
+    { value: 'StepFreeToPlatform', name: 'Step-free to platform', description: 'Routes with step-free access to the platform' },
+    { value: 'StepFreeToVehicle', name: 'Step-free to train', description: 'Routes with step-free access all the way to the train' },
+  ]
+
+  const currentAccessibilityOption =
+    ACCESSIBILITY_OPTIONS.find((o) => o.value === defaultLevel) ?? ACCESSIBILITY_OPTIONS[0]
+
+  function openAccessibilityPicker() {
+    setAccessibilityModalVisible(true)
+    Animated.parallel([
+      Animated.timing(accessibilityBackdropAnim, {
+        toValue: 1,
+        duration: 220,
+        useNativeDriver: USE_NATIVE_DRIVER,
+      }),
+      Animated.spring(accessibilitySheetAnim, {
+        toValue: 0,
+        stiffness: 130,
+        damping: 22,
+        mass: 1,
+        useNativeDriver: USE_NATIVE_DRIVER,
+      }),
+    ]).start()
+  }
+
+  function closeAccessibilityPicker() {
+    Animated.parallel([
+      Animated.timing(accessibilityBackdropAnim, {
+        toValue: 0,
+        duration: 180,
+        useNativeDriver: USE_NATIVE_DRIVER,
+      }),
+      Animated.timing(accessibilitySheetAnim, {
+        toValue: 500,
+        duration: 220,
+        useNativeDriver: USE_NATIVE_DRIVER,
+      }),
+    ]).start(() => setAccessibilityModalVisible(false))
+  }
+
+  function handleSelectAccessibility(value: AccessibilityPreference | null) {
+    setDefaultLevel(value)
+    closeAccessibilityPicker()
+  }
+
+  // ---------------------------------------------------------------------------
   // Sign out
   // ---------------------------------------------------------------------------
 
@@ -316,6 +373,28 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
             <YStack flex={1} gap={2}>
               <Text fontSize={15} fontWeight="500" color={Colors.text}>
                 {currentTheme.label}
+              </Text>
+            </YStack>
+            <Ionicons name="chevron-down" size={16} color={Colors.secondaryText} />
+          </TouchableOpacity>
+        </YStack>
+
+        {/* Journey accessibility default */}
+        <YStack gap="$2">
+          <Text fontSize={12} fontWeight="600" color={Colors.secondaryText} letterSpacing={0.8}>
+            DEFAULT ACCESSIBILITY
+          </Text>
+          <TouchableOpacity
+            style={[styles.card, styles.triggerRow]}
+            activeOpacity={Opacity.pressed}
+            onPress={openAccessibilityPicker}
+          >
+            <YStack flex={1} gap={2}>
+              <Text fontSize={15} fontWeight="500" color={Colors.text}>
+                {currentAccessibilityOption.name}
+              </Text>
+              <Text fontSize={13} color={Colors.secondaryText} numberOfLines={2}>
+                {currentAccessibilityOption.description}
               </Text>
             </YStack>
             <Ionicons name="chevron-down" size={16} color={Colors.secondaryText} />
@@ -433,6 +512,57 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
                     <View style={{ flex: 1 }}>
                       <RNText style={[styles.optionName, selected && styles.optionNameSelected]}>
                         {t.label}
+                      </RNText>
+                    </View>
+                    {selected && <Ionicons name="checkmark" size={20} color={Colors.blue} />}
+                  </TouchableOpacity>
+                )
+              })}
+            </ScrollView>
+          </Animated.View>
+        </View>
+      </Modal>
+      {/* Accessibility default modal */}
+      <Modal
+        visible={accessibilityModalVisible}
+        transparent
+        animationType="none"
+        onRequestClose={closeAccessibilityPicker}
+      >
+        <View style={styles.modalRoot}>
+          <Animated.View
+            style={[StyleSheet.absoluteFillObject, styles.backdrop, { opacity: accessibilityBackdropAnim }]}
+            pointerEvents="none"
+          />
+          <TouchableOpacity
+            style={StyleSheet.absoluteFillObject}
+            onPress={closeAccessibilityPicker}
+            activeOpacity={1}
+          />
+          <Animated.View style={[styles.sheet, { transform: [{ translateY: accessibilitySheetAnim }] }]}>
+            <View style={styles.handle} />
+            <RNText style={styles.sheetTitle}>DEFAULT ACCESSIBILITY</RNText>
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              bounces={false}
+              style={styles.optionList}
+            >
+              {ACCESSIBILITY_OPTIONS.map((opt, i) => {
+                const selected = defaultLevel === opt.value
+                const isLast = i === ACCESSIBILITY_OPTIONS.length - 1
+                return (
+                  <TouchableOpacity
+                    key={String(opt.value)}
+                    style={[styles.option, !isLast && styles.optionSeparator]}
+                    activeOpacity={Opacity.pressed}
+                    onPress={() => handleSelectAccessibility(opt.value)}
+                  >
+                    <View style={{ flex: 1 }}>
+                      <RNText style={[styles.optionName, selected && styles.optionNameSelected]}>
+                        {opt.name}
+                      </RNText>
+                      <RNText style={styles.optionDesc} numberOfLines={2}>
+                        {opt.description}
                       </RNText>
                     </View>
                     {selected && <Ionicons name="checkmark" size={20} color={Colors.blue} />}

@@ -20,6 +20,7 @@ import {
 } from '@/features/journey/api/accessibility'
 import { type ResolvedLocation, resolveToPostcode } from '@/features/journey/api/geocode'
 import { useAppLocation } from '@/lib/LocationContext'
+import { useAccessibilityPreference } from '@/lib/AccessibilityPreferenceContext'
 import { loadSavedJourneys } from '@/features/journey/api/savedJourneys'
 import {
   type AccessibilityPreference,
@@ -70,6 +71,7 @@ const LEVELS: { value: AccessibilityPreference; label: string }[] = [
 
 export function JourneyPlannerSheet({ plan, onClose, onJourneySelect }: Props) {
   const { Colors, Radii } = useTheme()
+  const { defaultLevel } = useAccessibilityPreference()
   const styles = useMemo(
     () =>
       StyleSheet.create({
@@ -115,7 +117,7 @@ export function JourneyPlannerSheet({ plan, onClose, onJourneySelect }: Props) {
   const [fromIsCurrentLocation, setFromIsCurrentLocation] = useState(false)
   const [toIsNamedPlace, setToIsNamedPlace] = useState(false)
   const [gettingLocation, setGettingLocation] = useState(false)
-  const [level, setLevel] = useState<AccessibilityPreference | null>(null)
+  const [level, setLevel] = useState<AccessibilityPreference | null>(defaultLevel)
   const [departAt, setDepartAt] = useState<Date | null>(null)
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState<JourneyResult[]>([])
@@ -172,7 +174,7 @@ export function JourneyPlannerSheet({ plan, onClose, onJourneySelect }: Props) {
       setToPostcode(plan.initialTo?.postcode ?? null)
       setFromIsCurrentLocation(plan.initialFrom?.label === 'Current location')
       setToIsNamedPlace(Boolean(plan.initialTo?.isNamedPlace))
-      setLevel(null)
+      setLevel(defaultLevel)
       setDepartAt(null)
       setResults([])
       setResolved(null)
