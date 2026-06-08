@@ -404,10 +404,7 @@ export function MapHomeScreen({ navigation }: Props) {
           setActiveJourneyParams(null)
           setActive(null)
         }}
-        onEnd={() => {
-          setActiveJourneyParams(null)
-          setActive(null)
-        }}
+        onEnd={endActive}
       />
 
       {setPlaceModal && (

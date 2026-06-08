@@ -2,14 +2,13 @@
 // Single snap at 92%. Scrollable content, fixed "Start journey" bar pinned at the bottom.
 
 import { MaterialIcons } from '@expo/vector-icons'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { Text, XStack, YStack } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useNavigation } from '@react-navigation/native'
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import BottomSheet, { BottomSheetScrollView, type BottomSheetRef } from '@/components/BottomSheet'
-import { useRef } from 'react'
 import { useStations } from '@/features/stations'
 import { useAuth } from '@/features/auth'
 import { resolveStationName } from '@/features/journey/api/accessibility'
