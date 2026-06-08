@@ -14,7 +14,7 @@ import { ReportsStatus } from '@/features/home/components/ReportsStatus'
 import { StationAdditionalInfoCard } from '@/features/home/components/StationAdditionalInfoCard'
 import { StationInfoCard } from '@/features/home/components/StationInfoCard'
 import { useOutages } from '@/features/outages'
-import { useStations } from '@/features/stations'
+import { StepFreeBadge, useStations } from '@/features/stations'
 import { resolveToPostcode, type ResolvedLocation } from '@/features/journey/api/geocode'
 import { useAppLocation } from '@/lib/LocationContext'
 import type { JourneyPlan } from '@/features/home/components/JourneyPlannerSheet'
@@ -158,13 +158,18 @@ export function StationSheet({ station, onClose, onReportPress, onOpenJourney }:
     >
       {/* Header: station name + close button */}
       <View style={styles.header}>
-        <View style={{ flex: 1 }}>
-          <Text fontSize={20} fontWeight="700" color={Colors.text} numberOfLines={1}>
-            {station ?? ''}
-          </Text>
-          <Text fontSize={13} color={Colors.secondaryText} mt="$1">
-            Underground station
-          </Text>
+        <View style={{ flex: 1, gap: 6 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <Text fontSize={20} fontWeight="700" color={Colors.text} numberOfLines={1} style={{ flexShrink: 1 }}>
+              {station ?? ''}
+            </Text>
+            {reports.length > 0 && (
+              <MaterialIcons name="warning" size={20} color={Colors.danger} />
+            )}
+          </View>
+          {stationDetail?.step_free && (
+            <StepFreeBadge value={stationDetail.step_free} />
+          )}
         </View>
         <TouchableOpacity
           onPress={() => sheetRef.current?.close()}
