@@ -6,7 +6,7 @@ import { MaterialIcons } from '@expo/vector-icons'
 import * as Location from 'expo-location'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native'
-import { Text } from 'tamagui'
+import { Text, XStack } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import BottomSheet, { BottomSheetScrollView, type BottomSheetRef } from '@/components/BottomSheet'
 import { PlatformAccessCard } from '@/features/home/components/PlatformAccessCard'
@@ -159,17 +159,28 @@ export function StationSheet({ station, onClose, onReportPress, onOpenJourney }:
       {/* Header: station name + close button */}
       <View style={styles.header}>
         <View style={{ flex: 1, gap: 6 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-            <Text fontSize={20} fontWeight="700" color={Colors.text} numberOfLines={1} style={{ flexShrink: 1 }}>
-              {station ?? ''}
-            </Text>
-            {reports.length > 0 && (
-              <MaterialIcons name="warning" size={20} color={Colors.danger} />
+          <Text fontSize={20} fontWeight="700" color={Colors.text} numberOfLines={1}>
+            {station ?? ''}
+          </Text>
+          <XStack gap="$2" flexWrap="wrap">
+            {stationDetail?.step_free && (
+              <StepFreeBadge value={stationDetail.step_free} />
             )}
-          </View>
-          {stationDetail?.step_free && (
-            <StepFreeBadge value={stationDetail.step_free} />
-          )}
+            {reports.length > 0 && (
+              <XStack
+                items="center"
+                gap="$1.5"
+                px="$2"
+                py="$1"
+                style={{ backgroundColor: Colors.dangerBg, borderRadius: 6 }}
+              >
+                <MaterialIcons name="warning" size={16} color={Colors.dangerDark} />
+                <Text fontSize={13} fontWeight="600" color={Colors.dangerDark}>
+                  Issues reported
+                </Text>
+              </XStack>
+            )}
+          </XStack>
         </View>
         <TouchableOpacity
           onPress={() => sheetRef.current?.close()}
