@@ -406,3 +406,94 @@ def test_download_image_no_image_attached_returns_404(
 
     assert response.status_code == 404
     assert response.json() == {"detail": "No image attached to this outage report"}
+
+
+# ---------------------------------------------------------------------------
+# PATCH /outage-reports/{report_id}/verify
+# ---------------------------------------------------------------------------
+
+
+def test_verify_report_unauthenticated_returns_401(client: TestClient, db_session: Session) -> None:
+    report = _create_report(db_session)
+
+    response = client.patch(f"/outage-reports/{report.id}/verify")
+
+    assert response.status_code == 401
+
+
+def test_verify_report_untrusted_user_returns_403(
+    client: TestClient,
+    db_session: Session,
+    auth_headers_factory: Callable,
+) -> None:
+    report = _create_report(db_session)
+
+    response = client.patch(
+        f"/outage-reports/{report.id}/verify",
+        headers=auth_headers_factory(UserRole.UNTRUSTED),
+    )
+
+    assert response.status_code == 403
+
+
+def test_verify_report_trusted_user_returns_200_with_verified_true(
+    client: TestClient,
+    db_session: Session,
+    auth_headers_factory: Callable,
+) -> None:
+    report = _create_report(db_session)
+
+    response = client.patch(
+        f"/outage-reports/{report.id}/verify",
+        headers=auth_headers_factory(UserRole.TRUSTED),
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["id"] == report.id
+    assert body["verified"] is True
+
+
+def test_verify_report_missing_returns_404(
+    client: TestClient, auth_headers_factory: Callable
+) -> None:
+    response = client.patch(
+        "/outage-reports/999/verify",
+        headers=auth_headers_factory(UserRole.TRUSTED),
+    )
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Outage report not found"}
+
+
+def test_verify_report_already_deleted_returns_404(
+    client: TestClient,
+    db_session: Session,
+    auth_headers_factory: Callable,
+) -> None:
+    report = _create_report(db_session)
+    client.delete(f"/outage-reports/{report.id}")
+
+    response = client.patch(
+        f"/outage-reports/{report.id}/verify",
+        headers=auth_headers_factory(UserRole.TRUSTED),
+    )
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Outage report not found"}
+
+
+def test_verify_report_twice_is_idempotent(
+    client: TestClient,
+    db_session: Session,
+    auth_headers_factory: Callable,
+) -> None:
+    report = _create_report(db_session)
+    headers = auth_headers_factory(UserRole.TRUSTED)
+
+    first = client.patch(f"/outage-reports/{report.id}/verify", headers=headers)
+    second = client.patch(f"/outage-reports/{report.id}/verify", headers=headers)
+
+    assert first.status_code == 200
+    assert second.status_code == 200
+    assert second.json()["verified"] is True

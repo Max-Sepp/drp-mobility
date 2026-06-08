@@ -27,3 +27,10 @@ def get_current_user(user: User | None = Depends(get_optional_user)) -> User:
     if user is None:
         raise HTTPException(status_code=401, detail="Not authenticated")
     return user
+
+
+def get_trusted_user(user: User = Depends(get_current_user)) -> User:
+    """Require an authenticated user with the trusted role, raising 403 otherwise."""
+    if user.role != "trusted":
+        raise HTTPException(status_code=403, detail="Trusted role required")
+    return user

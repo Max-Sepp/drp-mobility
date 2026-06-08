@@ -266,9 +266,23 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
           </Text>
           <XStack items="center" gap="$3" style={styles.card}>
             <Ionicons name="person-circle" size={36} color={Colors.blue} />
-            <Text fontSize={15} fontWeight="600" color={Colors.text}>
-              {user.username}
-            </Text>
+            <YStack gap={4}>
+              <Text fontSize={15} fontWeight="600" color={Colors.text}>
+                {user.username}
+              </Text>
+              {user.role === 'trusted' ? (
+                <XStack items="center" gap="$1">
+                  <Ionicons name="shield-checkmark" size={13} color="#15803d" />
+                  <Text fontSize={12} fontWeight="600" color="#15803d">
+                    Trusted reporter
+                  </Text>
+                </XStack>
+              ) : (
+                <Text fontSize={12} color={Colors.secondaryText}>
+                  Standard account
+                </Text>
+              )}
+            </YStack>
           </XStack>
         </YStack>
 

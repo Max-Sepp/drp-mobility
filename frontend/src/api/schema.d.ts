@@ -162,6 +162,34 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/users/me/saved-places": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Saved Places
+         * @description Return the authenticated user's saved places (home, work, custom).
+         */
+        get: operations["get_saved_places_users_me_saved_places_get"];
+        /**
+         * Put Saved Places
+         * @description Replace the authenticated user's full set of saved places in a single atomic write.
+         *
+         *     Replaces home, work, and all custom places at once — the caller sends the complete
+         *     desired state and the backend overwrites the previous state. This keeps the API surface
+         *     minimal (two endpoints instead of five) and matches the frontend's read-modify-write flow.
+         */
+        put: operations["put_saved_places_users_me_saved_places_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/outage-reports": {
         parameters: {
             query?: never;
@@ -241,6 +269,26 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/outage-reports/{report_id}/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Verify Outage Report
+         * @description Mark an outage report as physically verified by a trusted worker. Idempotent.
+         */
+        patch: operations["verify_outage_report_outage_reports__report_id__verify_patch"];
         trace?: never;
     };
     "/outage-reports/{report_id}/image": {
@@ -407,6 +455,19 @@ export interface components {
             /** File */
             file: string;
         };
+        /** CustomPlaceSchema */
+        CustomPlaceSchema: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Icon */
+            icon: string;
+            /** Address */
+            address: string;
+            /** Postcode */
+            postcode: string;
+        };
         /**
          * EquipmentSummary
          * @description Equipment row with its Station and EquipmentType inlined for client convenience.
@@ -514,6 +575,8 @@ export interface components {
             image_content_type?: string | null;
             /** Reporter Role */
             reporter_role: string;
+            /** Verified */
+            verified: boolean;
         };
         /**
          * PlatformSchema
@@ -569,6 +632,33 @@ export interface components {
             saved_at: string;
             /** Payload */
             payload: string;
+        };
+        /** SavedPlaceSchema */
+        SavedPlaceSchema: {
+            /** Address */
+            address: string;
+            /** Postcode */
+            postcode: string;
+        };
+        /** SavedPlacesIn */
+        SavedPlacesIn: {
+            home?: components["schemas"]["SavedPlaceSchema"] | null;
+            work?: components["schemas"]["SavedPlaceSchema"] | null;
+            /**
+             * Custom
+             * @default []
+             */
+            custom: components["schemas"]["CustomPlaceSchema"][];
+        };
+        /** SavedPlacesOut */
+        SavedPlacesOut: {
+            home?: components["schemas"]["SavedPlaceSchema"] | null;
+            work?: components["schemas"]["SavedPlaceSchema"] | null;
+            /**
+             * Custom
+             * @default []
+             */
+            custom: components["schemas"]["CustomPlaceSchema"][];
         };
         /**
          * StationDetail
@@ -961,6 +1051,59 @@ export interface operations {
             };
         };
     };
+    get_saved_places_users_me_saved_places_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SavedPlacesOut"];
+                };
+            };
+        };
+    };
+    put_saved_places_users_me_saved_places_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SavedPlacesIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SavedPlacesOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_outage_reports_outage_reports_get: {
         parameters: {
             query?: never;
@@ -1084,6 +1227,37 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    verify_outage_report_outage_reports__report_id__verify_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                report_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OutageReportSummary"];
+                };
             };
             /** @description Validation Error */
             422: {
