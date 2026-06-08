@@ -422,4 +422,3 @@ export function AddCustomPlaceModal({ visible, existingNames = [], onSave, onDis
     </Modal>
   )
 }
-

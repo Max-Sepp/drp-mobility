@@ -236,7 +236,7 @@ const dark: Theme = {
     mapGrid: '#243318',
     mapWater: '#142030',
     text: '#FFFFFF',
-    secondaryText: '#EBEBF5CC',  // translucent white
+    secondaryText: '#EBEBF5CC', // translucent white
     tertiaryText: '#EBEBF560',
     placeholderText: '#EBEBF540',
     separator: '#3A3A3C',
@@ -308,7 +308,7 @@ const highContrast: Theme = {
     placeholderText: '#BBBBBB',
     separator: '#FFFFFF',
     border: '#FFFFFF',
-    blue: '#FFFF00',     // yellow — maximum visibility on black
+    blue: '#FFFF00', // yellow — maximum visibility on black
     blueDark: '#DDDD00',
     success: '#00FF88',
     warning: '#FFAA00',
@@ -351,11 +351,11 @@ const deuteranopia: Theme = {
     placeholderText: '#AAAAAA',
     separator: '#CCCCCC',
     border: '#0A0A0A',
-    blue: '#0072B2',     // Okabe-Ito blue
+    blue: '#0072B2', // Okabe-Ito blue
     blueDark: '#004E7A',
-    success: '#009E73',  // Okabe-Ito bluish green (distinguishable from orange)
-    warning: '#E69F00',  // Okabe-Ito orange
-    danger: '#D55E00',   // Okabe-Ito vermillion
+    success: '#009E73', // Okabe-Ito bluish green (distinguishable from orange)
+    warning: '#E69F00', // Okabe-Ito orange
+    danger: '#D55E00', // Okabe-Ito vermillion
     successBg: '#CCF0E8',
     successDark: '#005940',
     warningBg: '#FFF0CC',
@@ -394,11 +394,11 @@ const protanopia: Theme = {
     placeholderText: '#AAAAAA',
     separator: '#CCCCCC',
     border: '#0A0A0A',
-    blue: '#56B4E9',     // Okabe-Ito sky blue (very distinct for protanopes)
+    blue: '#56B4E9', // Okabe-Ito sky blue (very distinct for protanopes)
     blueDark: '#2288CC',
-    success: '#009E73',  // Okabe-Ito bluish green
-    warning: '#F0E442',  // Okabe-Ito yellow (high visibility)
-    danger: '#D55E00',   // Okabe-Ito vermillion (looks orange to protanopes — distinct from blue)
+    success: '#009E73', // Okabe-Ito bluish green
+    warning: '#F0E442', // Okabe-Ito yellow (high visibility)
+    danger: '#D55E00', // Okabe-Ito vermillion (looks orange to protanopes — distinct from blue)
     successBg: '#CCF0E8',
     successDark: '#005940',
     warningBg: '#FAFACC',

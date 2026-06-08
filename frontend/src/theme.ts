@@ -16,13 +16,13 @@ export type { Theme, ThemeId, ThemeColors, ThemeRadii, ThemeShadows } from './th
 
 export const Typography = {
   largeTitle: { fontSize: 28, fontWeight: '800' as const },
-  heading:    { fontSize: 22, fontWeight: '800' as const },
-  sectionTitle:{ fontSize: 17, fontWeight: '700' as const },
-  body:       { fontSize: 15, fontWeight: '400' as const },
-  bodyBold:   { fontSize: 15, fontWeight: '700' as const },
-  caption:    { fontSize: 13, fontWeight: '400' as const },
-  captionBold:{ fontSize: 13, fontWeight: '700' as const },
-  label:      { fontSize: 11, fontWeight: '700' as const },
+  heading: { fontSize: 22, fontWeight: '800' as const },
+  sectionTitle: { fontSize: 17, fontWeight: '700' as const },
+  body: { fontSize: 15, fontWeight: '400' as const },
+  bodyBold: { fontSize: 15, fontWeight: '700' as const },
+  caption: { fontSize: 13, fontWeight: '400' as const },
+  captionBold: { fontSize: 13, fontWeight: '700' as const },
+  label: { fontSize: 11, fontWeight: '700' as const },
 } as const
 
 // ---------------------------------------------------------------------------

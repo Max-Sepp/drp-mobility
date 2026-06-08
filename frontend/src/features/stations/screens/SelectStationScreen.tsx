@@ -112,4 +112,3 @@ export const SelectStationScreen = ({ navigation, route }: SelectStationScreenPr
     </YStack>
   )
 }
-

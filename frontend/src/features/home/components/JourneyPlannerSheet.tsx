@@ -489,4 +489,3 @@ export function JourneyPlannerSheet({ plan, onClose, onJourneySelect }: Props) {
     </BottomSheet>
   )
 }
-

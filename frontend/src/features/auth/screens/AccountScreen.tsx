@@ -144,15 +144,33 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
     if (saving) return
     setTravellerModalVisible(true)
     Animated.parallel([
-      Animated.timing(backdropAnim, { toValue: 1, duration: 220, useNativeDriver: USE_NATIVE_DRIVER }),
-      Animated.spring(sheetAnim, { toValue: 0, stiffness: 130, damping: 22, mass: 1, useNativeDriver: USE_NATIVE_DRIVER }),
+      Animated.timing(backdropAnim, {
+        toValue: 1,
+        duration: 220,
+        useNativeDriver: USE_NATIVE_DRIVER,
+      }),
+      Animated.spring(sheetAnim, {
+        toValue: 0,
+        stiffness: 130,
+        damping: 22,
+        mass: 1,
+        useNativeDriver: USE_NATIVE_DRIVER,
+      }),
     ]).start()
   }
 
   function closeTravellerPicker() {
     Animated.parallel([
-      Animated.timing(backdropAnim, { toValue: 0, duration: 180, useNativeDriver: USE_NATIVE_DRIVER }),
-      Animated.timing(sheetAnim, { toValue: 500, duration: 220, useNativeDriver: USE_NATIVE_DRIVER }),
+      Animated.timing(backdropAnim, {
+        toValue: 0,
+        duration: 180,
+        useNativeDriver: USE_NATIVE_DRIVER,
+      }),
+      Animated.timing(sheetAnim, {
+        toValue: 500,
+        duration: 220,
+        useNativeDriver: USE_NATIVE_DRIVER,
+      }),
     ]).start(() => setTravellerModalVisible(false))
   }
 
@@ -176,15 +194,33 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
   function openThemePicker() {
     setThemeModalVisible(true)
     Animated.parallel([
-      Animated.timing(themeBackdropAnim, { toValue: 1, duration: 220, useNativeDriver: USE_NATIVE_DRIVER }),
-      Animated.spring(themeSheetAnim, { toValue: 0, stiffness: 130, damping: 22, mass: 1, useNativeDriver: USE_NATIVE_DRIVER }),
+      Animated.timing(themeBackdropAnim, {
+        toValue: 1,
+        duration: 220,
+        useNativeDriver: USE_NATIVE_DRIVER,
+      }),
+      Animated.spring(themeSheetAnim, {
+        toValue: 0,
+        stiffness: 130,
+        damping: 22,
+        mass: 1,
+        useNativeDriver: USE_NATIVE_DRIVER,
+      }),
     ]).start()
   }
 
   function closeThemePicker() {
     Animated.parallel([
-      Animated.timing(themeBackdropAnim, { toValue: 0, duration: 180, useNativeDriver: USE_NATIVE_DRIVER }),
-      Animated.timing(themeSheetAnim, { toValue: 500, duration: 220, useNativeDriver: USE_NATIVE_DRIVER }),
+      Animated.timing(themeBackdropAnim, {
+        toValue: 0,
+        duration: 180,
+        useNativeDriver: USE_NATIVE_DRIVER,
+      }),
+      Animated.timing(themeSheetAnim, {
+        toValue: 500,
+        duration: 220,
+        useNativeDriver: USE_NATIVE_DRIVER,
+      }),
     ]).start(() => setThemeModalVisible(false))
   }
 
@@ -262,7 +298,15 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
             activeOpacity={Opacity.pressed}
             onPress={openThemePicker}
           >
-            <View style={[styles.themeSwatch, { backgroundColor: currentTheme.Colors.card, borderColor: currentTheme.Colors.border }]} />
+            <View
+              style={[
+                styles.themeSwatch,
+                {
+                  backgroundColor: currentTheme.Colors.card,
+                  borderColor: currentTheme.Colors.border,
+                },
+              ]}
+            />
             <YStack flex={1} gap={2}>
               <Text fontSize={15} fontWeight="500" color={Colors.text}>
                 {currentTheme.label}
@@ -288,17 +332,30 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
       </YStack>
 
       {/* Traveller type modal */}
-      <Modal visible={travellerModalVisible} transparent animationType="none" onRequestClose={closeTravellerPicker}>
+      <Modal
+        visible={travellerModalVisible}
+        transparent
+        animationType="none"
+        onRequestClose={closeTravellerPicker}
+      >
         <View style={styles.modalRoot}>
           <Animated.View
             style={[StyleSheet.absoluteFillObject, styles.backdrop, { opacity: backdropAnim }]}
             pointerEvents="none"
           />
-          <TouchableOpacity style={StyleSheet.absoluteFillObject} onPress={closeTravellerPicker} activeOpacity={1} />
+          <TouchableOpacity
+            style={StyleSheet.absoluteFillObject}
+            onPress={closeTravellerPicker}
+            activeOpacity={1}
+          />
           <Animated.View style={[styles.sheet, { transform: [{ translateY: sheetAnim }] }]}>
             <View style={styles.handle} />
             <RNText style={styles.sheetTitle}>TRAVELLER TYPE</RNText>
-            <ScrollView showsVerticalScrollIndicator={false} bounces={false} style={styles.optionList}>
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              bounces={false}
+              style={styles.optionList}
+            >
               {TRAVELLER_TYPES.map((tt, i) => {
                 const selected = currentTravellerType === tt.code
                 const isLast = i === TRAVELLER_TYPES.length - 1
@@ -327,17 +384,30 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
       </Modal>
 
       {/* Theme modal */}
-      <Modal visible={themeModalVisible} transparent animationType="none" onRequestClose={closeThemePicker}>
+      <Modal
+        visible={themeModalVisible}
+        transparent
+        animationType="none"
+        onRequestClose={closeThemePicker}
+      >
         <View style={styles.modalRoot}>
           <Animated.View
             style={[StyleSheet.absoluteFillObject, styles.backdrop, { opacity: themeBackdropAnim }]}
             pointerEvents="none"
           />
-          <TouchableOpacity style={StyleSheet.absoluteFillObject} onPress={closeThemePicker} activeOpacity={1} />
+          <TouchableOpacity
+            style={StyleSheet.absoluteFillObject}
+            onPress={closeThemePicker}
+            activeOpacity={1}
+          />
           <Animated.View style={[styles.sheet, { transform: [{ translateY: themeSheetAnim }] }]}>
             <View style={styles.handle} />
             <RNText style={styles.sheetTitle}>APPEARANCE</RNText>
-            <ScrollView showsVerticalScrollIndicator={false} bounces={false} style={styles.optionList}>
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              bounces={false}
+              style={styles.optionList}
+            >
               {allThemes.map((t, i) => {
                 const selected = themeId === t.id
                 const isLast = i === allThemes.length - 1
@@ -348,7 +418,12 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
                     activeOpacity={Opacity.pressed}
                     onPress={() => handleSelectTheme(t.id)}
                   >
-                    <View style={[styles.themeSwatch, { backgroundColor: t.Colors.card, borderColor: t.Colors.border }]} />
+                    <View
+                      style={[
+                        styles.themeSwatch,
+                        { backgroundColor: t.Colors.card, borderColor: t.Colors.border },
+                      ]}
+                    />
                     <View style={{ flex: 1 }}>
                       <RNText style={[styles.optionName, selected && styles.optionNameSelected]}>
                         {t.label}

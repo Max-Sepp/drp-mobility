@@ -388,4 +388,3 @@ export const ActiveJourneyScreen = ({ navigation, route }: ActiveJourneyScreenPr
     </FormScreenLayout>
   )
 }
-

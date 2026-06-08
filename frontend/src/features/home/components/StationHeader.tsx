@@ -66,4 +66,3 @@ export const StationHeader = ({ station, stepFree, onPress, onBack }: StationHea
     </SafeAreaView>
   )
 }
-

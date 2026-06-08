@@ -220,4 +220,3 @@ export function StationSheet({ station, onClose, onReportPress, onOpenJourney }:
     </BottomSheet>
   )
 }
-

@@ -243,4 +243,3 @@ export function SetPlaceModal({ visible, placeKey, onSave, onDismiss }: Props) {
     </Modal>
   )
 }
-

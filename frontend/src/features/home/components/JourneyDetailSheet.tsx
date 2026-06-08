@@ -452,4 +452,3 @@ export function JourneyDetailSheet({ params, onClose, onStartJourney }: Props) {
     </BottomSheet>
   )
 }
-

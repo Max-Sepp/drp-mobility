@@ -228,4 +228,3 @@ export function SearchScreen({ navigation }: Props) {
     </View>
   )
 }
-

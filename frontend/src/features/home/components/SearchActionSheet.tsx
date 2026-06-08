@@ -9,7 +9,15 @@
 
 import { MaterialIcons } from '@expo/vector-icons'
 import * as Location from 'expo-location'
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import {
   ActivityIndicator,
   Alert,
@@ -164,7 +172,9 @@ function PlacesRow({
                   : 'Tap to set your address'
               }
             >
-              <View style={[placesStyles.placesTileIcon, saved && placesStyles.placesTileIconSaved]}>
+              <View
+                style={[placesStyles.placesTileIcon, saved && placesStyles.placesTileIconSaved]}
+              >
                 <MaterialIcons name={icon} size={22} color={saved ? Colors.card : Colors.blue} />
               </View>
               <Text style={[Typography.label, { color: Colors.text, marginTop: 4 }]}>{label}</Text>
@@ -209,7 +219,9 @@ function PlacesRow({
       </ScrollView>
       {scrollable && (
         <View style={placesStyles.scrollbarTrack}>
-          <View style={[placesStyles.scrollbarThumb, { width: thumbWidth, marginLeft: thumbLeft }]} />
+          <View
+            style={[placesStyles.scrollbarThumb, { width: thumbWidth, marginLeft: thumbLeft }]}
+          />
         </View>
       )}
     </View>
@@ -798,4 +810,3 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
     )
   },
 )
-

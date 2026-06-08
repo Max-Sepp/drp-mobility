@@ -516,4 +516,3 @@ export function MapHomeScreen({ navigation }: Props) {
     </View>
   )
 }
-

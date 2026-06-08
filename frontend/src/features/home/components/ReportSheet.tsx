@@ -501,4 +501,3 @@ export function ReportSheet({ station, onClose }: Props) {
     </BottomSheet>
   )
 }
-

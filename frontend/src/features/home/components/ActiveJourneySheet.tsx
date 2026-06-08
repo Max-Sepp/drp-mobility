@@ -474,4 +474,3 @@ export function ActiveJourneySheet({ params, onComplete, onEnd }: Props) {
     </BottomSheet>
   )
 }
-

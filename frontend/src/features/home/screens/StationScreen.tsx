@@ -158,4 +158,3 @@ export const StationScreen = ({ navigation, route }: StationScreenProps) => {
     </View>
   )
 }
-
