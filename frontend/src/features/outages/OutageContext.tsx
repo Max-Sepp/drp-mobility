@@ -97,6 +97,11 @@ export function OutageProvider({ children }: { children: ReactNode }) {
       if (report) setReports((prev) => upsert(prev, report))
     })
 
+    es.addEventListener('verified', (event) => {
+      const report = JSON.parse(event.data ?? 'null') as OutageReport | null
+      if (report) setReports((prev) => upsert(prev, report))
+    })
+
     es.addEventListener('deleted', (event) => {
       const { id } = JSON.parse(event.data ?? '{}') as DeletedData
       setReports((prev) => prev.filter((r) => r.id !== id))

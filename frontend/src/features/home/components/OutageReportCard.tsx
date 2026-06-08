@@ -1,6 +1,6 @@
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'
-import { Image, StyleSheet } from 'react-native'
-import { Text, XStack, YStack } from 'tamagui'
+import { Image, Pressable, StyleSheet } from 'react-native'
+import { Spinner, Text, XStack, YStack } from 'tamagui'
 import { BASE_URL } from '@/api/client'
 import type { components } from '@/api/schema.d'
 import { formatDatetime } from '@/lib/datetime'
@@ -13,6 +13,10 @@ type OutageReportCardProps = {
   reports: OutageReport[]
   expanded: boolean
   onToggle: () => void
+  onVerify?: () => void
+  verifying?: boolean
+  onResolve?: () => void
+  resolving?: boolean
 }
 
 function alertLabel(report: OutageReport): string {
@@ -21,7 +25,15 @@ function alertLabel(report: OutageReport): string {
   return `${type} broken – ${equipment.connection}`
 }
 
-export const OutageReportCard = ({ reports, expanded, onToggle }: OutageReportCardProps) => {
+export const OutageReportCard = ({
+  reports,
+  expanded,
+  onToggle,
+  onVerify,
+  verifying,
+  onResolve,
+  resolving,
+}: OutageReportCardProps) => {
   const { Colors, Radii } = useTheme()
 
   const times = reports.map((r) => r.breakdown_time).sort()
@@ -30,6 +42,8 @@ export const OutageReportCard = ({ reports, expanded, onToggle }: OutageReportCa
   const reportCount = reports.length
   const hasTrustedReporter = reports.some((r) => r.reporter_role === 'trusted')
   const hasAnyContent = reports.some((r) => !!r.description || !!r.image_content_type)
+  const hasUnverified = reports.some((r) => !r.verified)
+  const showActions = (onVerify && hasUnverified) || !!onResolve
 
   const styles = StyleSheet.create({
     card: {
@@ -44,6 +58,49 @@ export const OutageReportCard = ({ reports, expanded, onToggle }: OutageReportCa
       opacity: 0.5,
     },
   })
+
+  const actionRow = showActions ? (
+    <XStack px="$4" pb="$4" gap="$2">
+      {onVerify && hasUnverified && (
+        <Pressable
+          onPress={onVerify}
+          disabled={verifying}
+          style={[
+            actionStyles.button,
+            { borderColor: '#1d4ed8', flex: 1, opacity: verifying ? 0.6 : 1 },
+          ]}
+        >
+          {verifying ? (
+            <Spinner size="small" color="#1d4ed8" />
+          ) : (
+            <Ionicons name="checkmark-circle-outline" size={16} color="#1d4ed8" />
+          )}
+          <Text fontSize={13} fontWeight="600" color="#1d4ed8">
+            {verifying ? 'Verifying…' : 'Verify on-site'}
+          </Text>
+        </Pressable>
+      )}
+      {onResolve && (
+        <Pressable
+          onPress={onResolve}
+          disabled={resolving}
+          style={[
+            actionStyles.button,
+            { borderColor: Colors.successDark, flex: 1, opacity: resolving ? 0.6 : 1 },
+          ]}
+        >
+          {resolving ? (
+            <Spinner size="small" color={Colors.successDark} />
+          ) : (
+            <Ionicons name="checkmark-done-outline" size={16} color={Colors.successDark} />
+          )}
+          <Text fontSize={13} fontWeight="600" color={Colors.successDark}>
+            {resolving ? 'Resolving…' : 'Mark Resolved'}
+          </Text>
+        </Pressable>
+      )}
+    </XStack>
+  ) : null
 
   return (
     <YStack style={styles.card}>
@@ -174,8 +231,22 @@ export const OutageReportCard = ({ reports, expanded, onToggle }: OutageReportCa
                 )
               })}
           </YStack>
+          {actionRow}
         </YStack>
       )}
     </YStack>
   )
 }
+
+const actionStyles = StyleSheet.create({
+  button: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    borderWidth: 1.5,
+  },
+})
