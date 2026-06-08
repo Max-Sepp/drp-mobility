@@ -15,7 +15,7 @@ export const SuccessScreen = ({ navigation, route }: SuccessScreenProps) => {
       })
     }, 2000)
     return () => clearTimeout(timer)
-  }, [navigation])
+  }, [navigation, station])
 
   return (
     <YStack

@@ -158,7 +158,7 @@ export function SearchScreen({ navigation }: Props) {
 
   useEffect(() => {
     enter()
-  }, [])
+  }, [enter])
 
   function dismiss() {
     exit(() => navigation.goBack())

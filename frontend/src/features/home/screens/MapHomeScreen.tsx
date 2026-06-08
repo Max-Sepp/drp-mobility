@@ -204,7 +204,7 @@ export function MapHomeScreen({ navigation }: Props) {
           ...Shadows.card,
         },
       }),
-    [Colors, Radii, Shadows],
+    [Colors, Shadows],
   )
   const [saved, setSaved] = useState<SavedJourney[]>([])
   const [active, setActive] = useState<ActiveJourney | null>(null)
