@@ -30,6 +30,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
+import { NativeViewGestureHandler } from 'react-native-gesture-handler'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import type { CustomPlace, SavedPlaces } from '@/features/journey/api/savedPlaces'
 import { clockTime } from '@/features/journey/components/legDisplay'
@@ -147,6 +148,7 @@ function PlacesRow({
   return (
     <View style={placesStyles.placesSection}>
       <Text style={placesStyles.sectionLabel}>PLACES</Text>
+      <NativeViewGestureHandler disallowInterruption>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -217,6 +219,7 @@ function PlacesRow({
           <Text style={[Typography.label, { color: Colors.text, marginTop: 4 }]}>Add</Text>
         </TouchableOpacity>
       </ScrollView>
+      </NativeViewGestureHandler>
       {scrollable && (
         <View style={placesStyles.scrollbarTrack}>
           <View
