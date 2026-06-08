@@ -124,6 +124,7 @@ export function ActiveJourneySheet({ params, onComplete, onEnd }: Props) {
       return
     }
     sheetRef.current?.snapToIndex(1)
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSnapIndex(1)
     setLegIndex(0)
     setGpsActive(false)
@@ -145,7 +146,7 @@ export function ActiveJourneySheet({ params, onComplete, onEnd }: Props) {
     if (index === -1) onEnd()
   }
 
-  const legs = params?.journey.legs ?? []
+  const legs = useMemo(() => params?.journey.legs ?? [], [params])
   const lastIndex = legs.length - 1
   const currentLeg = legs[legIndex]
   const isFinalLeg = legIndex >= lastIndex
@@ -216,13 +217,6 @@ export function ActiveJourneySheet({ params, onComplete, onEnd }: Props) {
     }
   }, [params, legs])
 
-  async function complete() {
-    await clearActiveJourney()
-    Alert.alert('Journey complete', 'You have arrived. Safe travels!', [
-      { text: 'Done', onPress: onComplete },
-    ])
-  }
-
   function endJourney() {
     Alert.alert(
       'End journey?',
@@ -241,10 +235,17 @@ export function ActiveJourneySheet({ params, onComplete, onEnd }: Props) {
     )
   }
 
-  function onArrived() {
-    if (isFinalLeg) void complete()
-    else goTo(legIndex + 1)
-  }
+  const onArrived = useCallback(() => {
+    if (isFinalLeg) {
+      void clearActiveJourney().then(() => {
+        Alert.alert('Journey complete', 'You have arrived. Safe travels!', [
+          { text: 'Done', onPress: onComplete },
+        ])
+      })
+    } else {
+      goTo(legIndex + 1)
+    }
+  }, [isFinalLeg, goTo, legIndex, onComplete])
 
   // Tapping above collapses to snap 0; sheet cannot be dragged below snap 0.
   const collapseBackdrop = useCallback(
@@ -294,7 +295,7 @@ export function ActiveJourneySheet({ params, onComplete, onEnd }: Props) {
         </View>
       </BottomSheetFooter>
     ),
-    [legIndex, isFinalLeg, goTo, onArrived, insets],
+    [legIndex, isFinalLeg, goTo, onArrived, insets, Colors, styles],
   )
 
   if (!params) {

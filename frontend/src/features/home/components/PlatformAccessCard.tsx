@@ -56,7 +56,9 @@ function computeInterchangeGroups(platforms: PlatformDetail[]): InterchangeGroup
     const outsideSet = new Set(outsideLines)
     const coveredBySingle = [...sharedMap.keys()].some((key) => {
       const sharedLines = key.split('|')
-      return sharedLines.length === outsideLines.length && sharedLines.every((l) => outsideSet.has(l))
+      return (
+        sharedLines.length === outsideLines.length && sharedLines.every((l) => outsideSet.has(l))
+      )
     })
     if (!coveredBySingle) {
       groups.push({ label: 'Via concourse', lines: outsideLines })
@@ -113,9 +115,13 @@ export const PlatformAccessCard = ({ platforms }: PlatformAccessCardProps) => {
   const inaccessible = platforms.filter((p) => p.step_free === 'none')
   const [expanded, setExpanded] = useState(false)
 
-  const { interchangeLines, allLines, totalLines } = useMemo(() => computeInterchange(platforms), [platforms])
+  const { interchangeLines, allLines, totalLines } = useMemo(
+    () => computeInterchange(platforms),
+    [platforms],
+  )
   const isFullInterchange = totalLines >= 2 && interchangeLines.length === totalLines
-  const isSomeInterchange = totalLines >= 2 && interchangeLines.length > 0 && interchangeLines.length < totalLines
+  const isSomeInterchange =
+    totalLines >= 2 && interchangeLines.length > 0 && interchangeLines.length < totalLines
   const groups = useMemo(() => computeInterchangeGroups(platforms), [platforms])
   const [interchangeExpanded, setInterchangeExpanded] = useState(false)
   const showDropdown = isSomeInterchange && groups.length > 0

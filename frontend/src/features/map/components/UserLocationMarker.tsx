@@ -74,9 +74,11 @@ export function UserLocationMarker({ latitude, longitude, heading }: Props) {
   const [tracksViewChanges, setTracksViewChanges] = useState(true)
 
   useEffect(() => {
-    setTracksViewChanges(true)
     const timer = setTimeout(() => setTracksViewChanges(false), TRACK_DURATION_MS)
-    return () => clearTimeout(timer)
+    return () => {
+      clearTimeout(timer)
+      setTracksViewChanges(true)
+    }
   }, [heading])
 
   return (

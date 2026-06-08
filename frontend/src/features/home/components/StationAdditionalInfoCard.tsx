@@ -27,7 +27,11 @@ export const StationAdditionalInfoCard = ({ station }: Props) => {
   if (station.has_accessible_toilets) {
     items.push({ icon: 'accessible', label: 'Accessible toilets', color: Colors.success })
   } else if (station.has_toilets) {
-    items.push({ icon: 'wc', label: 'Toilets available (not accessible)', color: Colors.secondaryText })
+    items.push({
+      icon: 'wc',
+      label: 'Toilets available (not accessible)',
+      color: Colors.secondaryText,
+    })
   } else {
     items.push({ icon: 'wc', label: 'No toilet facilities', color: Colors.secondaryText })
   }

@@ -105,6 +105,7 @@ export function StationSheet({ station, onClose, onReportPress, onOpenJourney }:
     } else {
       sheetRef.current?.close()
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setGoingHere(false)
   }, [station])
 

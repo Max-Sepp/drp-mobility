@@ -62,6 +62,7 @@ export const StationScreen = ({ navigation, route }: StationScreenProps) => {
 
   useEffect(() => {
     if (!stationDetail) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setHasLifts(undefined)
     setHasEscalators(undefined)
     apiClient
@@ -71,7 +72,7 @@ export const StationScreen = ({ navigation, route }: StationScreenProps) => {
         setHasLifts(data.some((e) => e.equipment_type.name === 'lift'))
         setHasEscalators(data.some((e) => e.equipment_type.name === 'escalator'))
       })
-  }, [stationDetail?.id])
+  }, [stationDetail])
 
   // Live feed of outage reports, filtered to this station. Updates in real time as reports are
   // created, resolved or deleted — no manual refetch on focus.
