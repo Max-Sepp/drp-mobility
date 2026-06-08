@@ -76,6 +76,7 @@ function computeInterchangeGroups(platforms: PlatformDetail[]): InterchangeGroup
  */
 function computeInterchange(platforms: PlatformDetail[]): {
   interchangeLines: string[]
+  allLines: string[]
   totalLines: number
 } {
   const sharedPlatformLines = new Set<string>()
@@ -99,7 +100,11 @@ function computeInterchange(platforms: PlatformDetail[]): {
     outsideAccessibleLines.forEach((l) => eligible.add(l))
   }
 
-  return { interchangeLines: [...eligible], totalLines: Object.keys(lineAccessMap).length }
+  return {
+    interchangeLines: [...eligible],
+    allLines: Object.keys(lineAccessMap),
+    totalLines: Object.keys(lineAccessMap).length,
+  }
 }
 
 export const PlatformAccessCard = ({ platforms }: PlatformAccessCardProps) => {
@@ -108,14 +113,12 @@ export const PlatformAccessCard = ({ platforms }: PlatformAccessCardProps) => {
   const inaccessible = platforms.filter((p) => p.step_free === 'none')
   const [expanded, setExpanded] = useState(false)
 
-  const { interchangeLines, totalLines } = useMemo(() => computeInterchange(platforms), [platforms])
-  const hasInterchange = totalLines >= 2 && interchangeLines.length >= 2
-  const partialInterchange =
-    totalLines >= 2 && interchangeLines.length >= 1 && interchangeLines.length < totalLines
+  const { interchangeLines, allLines, totalLines } = useMemo(() => computeInterchange(platforms), [platforms])
+  const isFullInterchange = totalLines >= 2 && interchangeLines.length === totalLines
+  const isSomeInterchange = totalLines >= 2 && interchangeLines.length > 0 && interchangeLines.length < totalLines
   const groups = useMemo(() => computeInterchangeGroups(platforms), [platforms])
   const [interchangeExpanded, setInterchangeExpanded] = useState(false)
-  const isFullInterchange = hasInterchange && interchangeLines.length === totalLines
-  const showDropdown = (hasInterchange || partialInterchange) && !isFullInterchange && groups.length > 0
+  const showDropdown = isSomeInterchange && groups.length > 0
 
   if (platforms.length === 0) return null
 
@@ -192,9 +195,9 @@ export const PlatformAccessCard = ({ platforms }: PlatformAccessCardProps) => {
                 width: 28,
                 height: 28,
                 borderRadius: Radii.small,
-                backgroundColor: isFullInterchange || hasInterchange
+                backgroundColor: isFullInterchange
                   ? Colors.successBg
-                  : partialInterchange
+                  : isSomeInterchange
                     ? Colors.warningBg
                     : Colors.dangerBg,
                 alignItems: 'center',
@@ -205,9 +208,9 @@ export const PlatformAccessCard = ({ platforms }: PlatformAccessCardProps) => {
                 name="accessible"
                 size={16}
                 color={
-                  isFullInterchange || hasInterchange
+                  isFullInterchange
                     ? Colors.success
-                    : partialInterchange
+                    : isSomeInterchange
                       ? Colors.warningDark
                       : Colors.danger
                 }
@@ -217,17 +220,12 @@ export const PlatformAccessCard = ({ platforms }: PlatformAccessCardProps) => {
               <Text fontSize={13} fontWeight="600" color={Colors.text}>
                 {isFullInterchange
                   ? 'Full step-free interchange'
-                  : hasInterchange || partialInterchange
-                    ? 'Step-free interchange'
+                  : isSomeInterchange
+                    ? 'Some step-free interchange'
                     : 'No step-free interchange'}
               </Text>
-              {!isFullInterchange && interchangeLines.length > 0 && !interchangeExpanded && (
-                <XStack gap="$1" items="center" flexWrap="wrap">
-                  <Text fontSize={11} color={Colors.secondaryText}>
-                    Only between
-                  </Text>
-                  <LineChips lines={interchangeLines} />
-                </XStack>
+              {(isFullInterchange || isSomeInterchange) && (
+                <LineChips lines={isFullInterchange ? allLines : interchangeLines} />
               )}
             </YStack>
             {showDropdown && (
@@ -239,16 +237,37 @@ export const PlatformAccessCard = ({ platforms }: PlatformAccessCardProps) => {
             )}
           </XStack>
 
-          {interchangeExpanded && (
+          {interchangeExpanded && showDropdown && (
             <YStack gap="$2" pl="$1">
-              {groups.map((group) => (
-                <XStack key={group.label} items="center" gap="$2" flexWrap="wrap">
-                  <Text fontSize={12} fontWeight="600" color={Colors.secondaryText} style={{ minWidth: 100 }}>
-                    {group.label}
-                  </Text>
-                  <LineChips lines={group.lines} />
-                </XStack>
-              ))}
+              {groups.map((group) => {
+                const isBothDir =
+                  group.label === 'Both directions' || group.label === 'All directions'
+                const isConcourse = group.label === 'Via concourse'
+                const labelBg = isBothDir
+                  ? Colors.successBg
+                  : isConcourse
+                    ? Colors.blueBg
+                    : Colors.warningBg
+                const labelColor = isBothDir
+                  ? Colors.success
+                  : isConcourse
+                    ? Colors.blue
+                    : Colors.warningDark
+                return (
+                  <XStack key={group.label} items="center" gap="$2" flexWrap="wrap">
+                    <XStack
+                      px="$2"
+                      py="$0.5"
+                      style={{ backgroundColor: labelBg, borderRadius: Radii.xs }}
+                    >
+                      <Text fontSize={11} fontWeight="600" color={labelColor}>
+                        {group.label}
+                      </Text>
+                    </XStack>
+                    <LineChips lines={group.lines} />
+                  </XStack>
+                )
+              })}
             </YStack>
           )}
         </>
