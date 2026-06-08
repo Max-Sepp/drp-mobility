@@ -16,7 +16,7 @@ import {
   type StationPressHandler,
 } from '@/features/journey/components/legDisplay'
 import { useAuth } from '@/features/auth'
-import { Borders, Colors, Opacity, Radii } from '@/theme'
+import { useTheme, Borders, Opacity } from '@/theme'
 
 type JourneyResultCardProps = {
   journey: Journey
@@ -44,6 +44,7 @@ export const JourneyResultCard = ({
   onStationPress,
   onPress,
 }: JourneyResultCardProps) => {
+  const { Colors, Radii } = useTheme()
   const { user } = useAuth()
   const fare = fareLabel(journey, user?.traveller_type, user?.railcard)
   // TfL's total duration includes interchange/platform waiting that the legs don't account for;

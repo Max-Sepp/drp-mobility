@@ -14,9 +14,9 @@ import GorhomBottomSheet, {
   BottomSheetFlatList,
   BottomSheetTextInput,
 } from '@gorhom/bottom-sheet'
-import { forwardRef, useCallback } from 'react'
+import { forwardRef, useCallback, useMemo } from 'react'
 import { StyleSheet } from 'react-native'
-import { Borders, Colors, Radii } from '@/theme'
+import { useTheme, Borders } from '@/theme'
 
 export { BottomSheetView, BottomSheetScrollView, BottomSheetFlatList, BottomSheetTextInput }
 
@@ -25,6 +25,7 @@ export type BottomSheetRef = GorhomBottomSheet
 
 const BottomSheet = forwardRef<GorhomBottomSheet, BottomSheetProps>(
   function BottomSheet(props, ref) {
+    const { Colors, Radii } = useTheme()
     const { enablePanDownToClose = false, backdropComponent, ...rest } = props
 
     // When a sheet is dismissible, provide a transparent backdrop so tapping the map
@@ -40,6 +41,25 @@ const BottomSheet = forwardRef<GorhomBottomSheet, BottomSheetProps>(
         />
       ),
       [],
+    )
+
+    const styles = useMemo(
+      () =>
+        StyleSheet.create({
+          handle: {
+            width: 36,
+            height: 4,
+            backgroundColor: Colors.separator,
+          },
+          background: {
+            backgroundColor: Colors.card,
+            borderTopLeftRadius: Radii.card + 4,
+            borderTopRightRadius: Radii.card + 4,
+            borderWidth: Borders.medium,
+            borderColor: Colors.border,
+          },
+        }),
+      [Colors, Radii],
     )
 
     const resolvedBackdrop =
@@ -67,18 +87,3 @@ const BottomSheet = forwardRef<GorhomBottomSheet, BottomSheetProps>(
 )
 
 export default BottomSheet
-
-const styles = StyleSheet.create({
-  handle: {
-    width: 36,
-    height: 4,
-    backgroundColor: Colors.separator,
-  },
-  background: {
-    backgroundColor: Colors.card,
-    borderTopLeftRadius: Radii.card + 4,
-    borderTopRightRadius: Radii.card + 4,
-    borderWidth: Borders.medium,
-    borderColor: Colors.border,
-  },
-})

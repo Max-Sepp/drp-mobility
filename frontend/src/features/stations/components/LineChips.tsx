@@ -1,6 +1,6 @@
 import { Text, XStack } from 'tamagui'
 import { lineColour } from '@/features/stations/lineColours'
-import { Radii } from '@/theme'
+import { useTheme } from '@/theme'
 
 type LineChipsProps = {
   lines: string[]
@@ -9,6 +9,7 @@ type LineChipsProps = {
 /** Renders each line name as a chip in its official TfL colour. The name is always shown, so
  * colour augments rather than replaces the label. */
 export const LineChips = ({ lines }: LineChipsProps) => {
+  const { Radii } = useTheme()
   if (lines.length === 0) return null
   return (
     <XStack flexWrap="wrap" gap="$1.5">

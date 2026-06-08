@@ -16,7 +16,7 @@ import { useStations } from '@/features/stations'
 import { resolveToPostcode, type ResolvedLocation } from '@/features/journey/api/geocode'
 import { useAppLocation } from '@/lib/LocationContext'
 import type { JourneyPlan } from '@/features/home/components/JourneyPlannerSheet'
-import { Colors, Heights, Radii, Shadows, Spacing } from '@/theme'
+import { useTheme, Heights, Spacing } from '@/theme'
 
 const SCREEN_H = Dimensions.get('window').height
 const SNAP_POINTS = [SCREEN_H * 0.52, SCREEN_H * 0.82]
@@ -29,6 +29,57 @@ type Props = {
 }
 
 export function StationSheet({ station, onClose, onReportPress, onOpenJourney }: Props) {
+  const { Colors, Radii, Shadows } = useTheme()
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        header: {
+          flexDirection: 'row',
+          alignItems: 'flex-start',
+          paddingHorizontal: Spacing.lg,
+          paddingBottom: Spacing.md,
+        },
+        closeBtn: {
+          width: 32,
+          height: 32,
+          borderRadius: 16,
+          backgroundColor: Colors.searchBg,
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginTop: 2,
+        },
+        actionsRow: {
+          flexDirection: 'row',
+          gap: Spacing.md,
+          paddingHorizontal: Spacing.lg,
+          paddingBottom: Spacing.lg,
+        },
+        divider: {
+          height: StyleSheet.hairlineWidth,
+          backgroundColor: Colors.separator,
+          marginHorizontal: Spacing.lg,
+          marginBottom: Spacing.xs,
+        },
+        actionBtn: {
+          flex: 1,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: Heights.button,
+          borderRadius: Radii.button,
+          backgroundColor: Colors.blue,
+          ...Shadows.card,
+        },
+        actionBtnDisabled: {
+          backgroundColor: Colors.secondaryText,
+        },
+        actionBtnOutline: {
+          backgroundColor: Colors.searchBg,
+          ...Shadows.card,
+        },
+      }),
+    [Colors, Radii, Shadows],
+  )
   const insets = useSafeAreaInsets()
   const cachedCoords = useAppLocation()
   const [goingHere, setGoingHere] = useState(false)
@@ -170,49 +221,3 @@ export function StationSheet({ station, onClose, onReportPress, onOpenJourney }:
   )
 }
 
-const styles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.md,
-  },
-  closeBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: Colors.searchBg,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 2,
-  },
-  actionsRow: {
-    flexDirection: 'row',
-    gap: Spacing.md,
-    paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.lg,
-  },
-  divider: {
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: Colors.separator,
-    marginHorizontal: Spacing.lg,
-    marginBottom: Spacing.xs,
-  },
-  actionBtn: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: Heights.button,
-    borderRadius: Radii.button,
-    backgroundColor: Colors.blue,
-    ...Shadows.card,
-  },
-  actionBtnDisabled: {
-    backgroundColor: Colors.secondaryText,
-  },
-  actionBtnOutline: {
-    backgroundColor: Colors.searchBg,
-    ...Shadows.card,
-  },
-})

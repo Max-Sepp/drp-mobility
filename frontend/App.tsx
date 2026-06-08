@@ -5,6 +5,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { TamaguiProvider } from 'tamagui'
 import { tamaguiConfig } from './tamagui.config'
 import { AuthProvider } from './src/features/auth'
+import { ThemeProvider } from './src/theme'
 import { OutageProvider } from './src/features/outages'
 import { usePushNotifications } from './src/hooks/usePushNotifications'
 import { LocationProvider } from './src/lib/LocationContext'
@@ -31,11 +32,13 @@ function AppContent() {
 export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <TamaguiProvider config={tamaguiConfig} defaultTheme="light">
-        <AuthProvider>
-          <AppContent />
-        </AuthProvider>
-      </TamaguiProvider>
+      <ThemeProvider>
+        <TamaguiProvider config={tamaguiConfig} defaultTheme="light">
+          <AuthProvider>
+            <AppContent />
+          </AuthProvider>
+        </TamaguiProvider>
+      </ThemeProvider>
     </GestureHandlerRootView>
   )
 }

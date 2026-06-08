@@ -5,7 +5,7 @@ import { BASE_URL } from '@/api/client'
 import type { components } from '@/api/schema.d'
 import { Heading } from '@/components/Heading'
 import { formatTime, isToday } from '@/lib/datetime'
-import { Colors, Radii } from '@/theme'
+import { useTheme } from '@/theme'
 
 type OutageReport = components['schemas']['OutageReportSummary']
 
@@ -23,6 +23,7 @@ function alertLabel(report: OutageReport): string {
 }
 
 export const OutageReportCard = ({ report, expanded, onToggle }: OutageReportCardProps) => {
+  const { Colors, Radii } = useTheme()
   const hasPhoto = !!report.image_content_type
 
   const header = (

@@ -6,7 +6,7 @@
 // Dismiss mirrors this in reverse before calling navigation.goBack().
 
 import { MaterialIcons } from '@expo/vector-icons'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Animated,
   Dimensions,
@@ -21,7 +21,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import type { RootStackParamList } from '@/navigation/types'
-import { Colors, Overlays, Radii, Shadows, Spacing, Typography } from '@/theme'
+import { useTheme, Overlays, Spacing, Typography } from '@/theme'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Search'>
 
@@ -94,6 +94,65 @@ function useSlideUp() {
 // ---------------------------------------------------------------------------
 
 export function SearchScreen({ navigation }: Props) {
+  const { Colors, Radii, Shadows } = useTheme()
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        backdrop: {
+          ...StyleSheet.absoluteFillObject,
+          backgroundColor: Overlays.backdrop,
+        },
+        card: {
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: CARD_HEIGHT,
+          backgroundColor: Colors.card,
+          borderTopLeftRadius: Radii.card + 4,
+          borderTopRightRadius: Radii.card + 4,
+          ...Shadows.heavy,
+          paddingHorizontal: Spacing.lg,
+          paddingTop: Spacing.sm,
+        },
+        handle: {
+          width: 36,
+          height: 4,
+          borderRadius: Radii.handle,
+          backgroundColor: Colors.separator,
+          alignSelf: 'center',
+          marginBottom: Spacing.md,
+        },
+        searchRow: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: Spacing.md,
+          marginBottom: Spacing.md,
+        },
+        searchInputWrap: {
+          flex: 1,
+          flexDirection: 'row',
+          alignItems: 'center',
+          backgroundColor: Colors.searchBg,
+          borderRadius: Radii.pill,
+          paddingHorizontal: Spacing.md,
+          paddingVertical: 9,
+        },
+        input: {
+          flex: 1,
+          fontSize: 15,
+          color: Colors.text,
+          padding: 0,
+        },
+        body: {
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+          paddingHorizontal: Spacing.xxl,
+        },
+      }),
+    [Colors, Radii, Shadows],
+  )
   const insets = useSafeAreaInsets()
   const { slideY, backdropOpacity, enter, exit } = useSlideUp()
 
@@ -170,61 +229,3 @@ export function SearchScreen({ navigation }: Props) {
   )
 }
 
-// ---------------------------------------------------------------------------
-// Styles
-// ---------------------------------------------------------------------------
-
-const styles = StyleSheet.create({
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: Overlays.backdrop,
-  },
-  card: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: CARD_HEIGHT,
-    backgroundColor: Colors.card,
-    borderTopLeftRadius: Radii.card + 4,
-    borderTopRightRadius: Radii.card + 4,
-    ...Shadows.heavy,
-    paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.sm,
-  },
-  handle: {
-    width: 36,
-    height: 4,
-    borderRadius: Radii.handle,
-    backgroundColor: Colors.separator,
-    alignSelf: 'center',
-    marginBottom: Spacing.md,
-  },
-  searchRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.md,
-    marginBottom: Spacing.md,
-  },
-  searchInputWrap: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.searchBg,
-    borderRadius: Radii.pill,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: 9,
-  },
-  input: {
-    flex: 1,
-    fontSize: 15,
-    color: Colors.text,
-    padding: 0,
-  },
-  body: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: Spacing.xxl,
-  },
-})

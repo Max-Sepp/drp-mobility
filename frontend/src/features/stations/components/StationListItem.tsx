@@ -2,7 +2,7 @@ import { Text, XStack, YStack } from 'tamagui'
 import type { StationStepFree } from '@/features/stations/stepFree'
 import { LineChips } from '@/features/stations/components/LineChips'
 import { StepFreeBadge } from '@/features/stations/components/StepFreeBadge'
-import { Borders, Colors, Opacity, Radii } from '@/theme'
+import { useTheme, Borders, Opacity } from '@/theme'
 
 type StationListItemProps = {
   name: string
@@ -19,6 +19,7 @@ export const StationListItem = ({
   selected,
   onPress,
 }: StationListItemProps) => {
+  const { Colors, Radii } = useTheme()
   return (
     <XStack
       items="center"

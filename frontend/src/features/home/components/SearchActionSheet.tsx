@@ -9,9 +9,10 @@
 
 import { MaterialIcons } from '@expo/vector-icons'
 import * as Location from 'expo-location'
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import {
   ActivityIndicator,
+  Alert,
   Dimensions,
   Keyboard,
   ScrollView,
@@ -35,7 +36,7 @@ import {
 import { useStations, type StationDetail } from '@/features/stations/useStations'
 import { fuzzyScore } from '@/lib/fuzzy'
 import { useAppLocation } from '@/lib/LocationContext'
-import { Colors, Radii, Spacing, Typography } from '@/theme'
+import { useTheme, Spacing, Typography } from '@/theme'
 import BottomSheet, {
   BottomSheetScrollView,
   BottomSheetFlatList,
@@ -89,6 +90,39 @@ function PlacesRow({
   onCustomPlaceLongPress: (place: CustomPlace) => void
   onAddPress: () => void
 }) {
+  const { Colors, Radii } = useTheme()
+  const placesStyles = useMemo(
+    () =>
+      StyleSheet.create({
+        placesSection: { marginBottom: Spacing.lg, paddingHorizontal: Spacing.lg },
+        sectionLabel: {
+          ...Typography.label,
+          color: Colors.secondaryText,
+          marginBottom: Spacing.sm,
+          letterSpacing: 0.5,
+          paddingHorizontal: Spacing.lg,
+        },
+        placesRow: { flexDirection: 'row', gap: Spacing.md },
+        placesTile: { alignItems: 'center', width: 64 },
+        placesTileIcon: {
+          width: 50,
+          height: 50,
+          borderRadius: Radii.button,
+          backgroundColor: Colors.searchBg,
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+        placesTileIconSaved: { backgroundColor: Colors.blue },
+        scrollbarTrack: {
+          height: 3,
+          borderRadius: 2,
+          backgroundColor: Colors.separator,
+          marginTop: Spacing.sm,
+        },
+        scrollbarThumb: { height: 3, borderRadius: 2, backgroundColor: Colors.secondaryText },
+      }),
+    [Colors, Radii],
+  )
   const [scrollX, setScrollX] = useState(0)
   const [containerWidth, setContainerWidth] = useState(0)
 
@@ -103,12 +137,12 @@ function PlacesRow({
     : 0
 
   return (
-    <View style={styles.placesSection}>
-      <Text style={styles.sectionLabel}>PLACES</Text>
+    <View style={placesStyles.placesSection}>
+      <Text style={placesStyles.sectionLabel}>PLACES</Text>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.placesRow}
+        contentContainerStyle={placesStyles.placesRow}
         onScroll={(e) => setScrollX(e.nativeEvent.contentOffset.x)}
         onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}
         scrollEventThrottle={16}
@@ -118,7 +152,7 @@ function PlacesRow({
           return (
             <TouchableOpacity
               key={key}
-              style={styles.placesTile}
+              style={placesStyles.placesTile}
               activeOpacity={0.75}
               onPress={() => onPress(key)}
               onLongPress={() => onLongPress(key)}
@@ -130,7 +164,7 @@ function PlacesRow({
                   : 'Tap to set your address'
               }
             >
-              <View style={[styles.placesTileIcon, saved && styles.placesTileIconSaved]}>
+              <View style={[placesStyles.placesTileIcon, saved && placesStyles.placesTileIconSaved]}>
                 <MaterialIcons name={icon} size={22} color={saved ? Colors.card : Colors.blue} />
               </View>
               <Text style={[Typography.label, { color: Colors.text, marginTop: 4 }]}>{label}</Text>
@@ -143,7 +177,7 @@ function PlacesRow({
         {savedPlaces.custom.map((place) => (
           <TouchableOpacity
             key={place.id}
-            style={styles.placesTile}
+            style={placesStyles.placesTile}
             activeOpacity={0.75}
             onPress={() => onCustomPlacePress(place)}
             onLongPress={() => onCustomPlaceLongPress(place)}
@@ -151,7 +185,7 @@ function PlacesRow({
             accessibilityLabel={`${place.name}: ${place.address}`}
             accessibilityHint="Tap to plan journey. Long press to remove."
           >
-            <View style={[styles.placesTileIcon, styles.placesTileIconSaved]}>
+            <View style={[placesStyles.placesTileIcon, placesStyles.placesTileIconSaved]}>
               <MaterialIcons
                 name={place.icon as keyof typeof MaterialIcons.glyphMap}
                 size={22}
@@ -166,16 +200,16 @@ function PlacesRow({
             </Text>
           </TouchableOpacity>
         ))}
-        <TouchableOpacity style={styles.placesTile} activeOpacity={0.75} onPress={onAddPress}>
-          <View style={styles.placesTileIcon}>
+        <TouchableOpacity style={placesStyles.placesTile} activeOpacity={0.75} onPress={onAddPress}>
+          <View style={placesStyles.placesTileIcon}>
             <MaterialIcons name="add" size={22} color={Colors.blue} />
           </View>
           <Text style={[Typography.label, { color: Colors.text, marginTop: 4 }]}>Add</Text>
         </TouchableOpacity>
       </ScrollView>
       {scrollable && (
-        <View style={styles.scrollbarTrack}>
-          <View style={[styles.scrollbarThumb, { width: thumbWidth, marginLeft: thumbLeft }]} />
+        <View style={placesStyles.scrollbarTrack}>
+          <View style={[placesStyles.scrollbarThumb, { width: thumbWidth, marginLeft: thumbLeft }]} />
         </View>
       )}
     </View>
@@ -183,12 +217,34 @@ function PlacesRow({
 }
 
 function SavedRow({ item, onPress }: { item: SavedJourney; onPress: () => void }) {
+  const { Colors, Radii } = useTheme()
+  const savedRowStyles = useMemo(
+    () =>
+      StyleSheet.create({
+        savedRow: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: Spacing.md,
+          paddingVertical: Spacing.sm,
+          paddingHorizontal: Spacing.lg,
+        },
+        savedRowIcon: {
+          width: 34,
+          height: 34,
+          borderRadius: Radii.icon,
+          backgroundColor: Colors.searchBg,
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+      }),
+    [Colors, Radii],
+  )
   const from = item.from?.label ?? 'Start'
   const to = item.to?.label ?? 'Destination'
   const time = `${clockTime(item.journey.startDateTime)} → ${clockTime(item.journey.arrivalDateTime)}`
   return (
-    <TouchableOpacity onPress={onPress} style={styles.savedRow} activeOpacity={0.7}>
-      <View style={styles.savedRowIcon}>
+    <TouchableOpacity onPress={onPress} style={savedRowStyles.savedRow} activeOpacity={0.7}>
+      <View style={savedRowStyles.savedRowIcon}>
         <MaterialIcons name="schedule" size={16} color={Colors.blue} />
       </View>
       <View style={{ flex: 1 }}>
@@ -205,9 +261,30 @@ function SavedRow({ item, onPress }: { item: SavedJourney; onPress: () => void }
 }
 
 function StationResultRow({ station, onPress }: { station: StationDetail; onPress: () => void }) {
+  const { Colors, Radii } = useTheme()
+  const resultRowStyles = useMemo(
+    () =>
+      StyleSheet.create({
+        resultRow: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: Spacing.md,
+          paddingVertical: Spacing.sm,
+        },
+        resultRowIcon: {
+          width: 34,
+          height: 34,
+          borderRadius: Radii.icon,
+          backgroundColor: Colors.searchBg,
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+      }),
+    [Colors, Radii],
+  )
   return (
-    <TouchableOpacity onPress={onPress} style={styles.resultRow} activeOpacity={0.7}>
-      <View style={styles.resultRowIcon}>
+    <TouchableOpacity onPress={onPress} style={resultRowStyles.resultRow} activeOpacity={0.7}>
+      <View style={resultRowStyles.resultRowIcon}>
         <MaterialIcons name="train" size={16} color={Colors.blue} />
       </View>
       <View style={{ flex: 1 }}>
@@ -228,9 +305,30 @@ function LocationResultRow({
   suggestion: LocationSuggestion
   onPress: () => void
 }) {
+  const { Colors, Radii } = useTheme()
+  const locResultStyles = useMemo(
+    () =>
+      StyleSheet.create({
+        resultRow: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: Spacing.md,
+          paddingVertical: Spacing.sm,
+        },
+        resultRowIcon: {
+          width: 34,
+          height: 34,
+          borderRadius: Radii.icon,
+          backgroundColor: Colors.searchBg,
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+      }),
+    [Colors, Radii],
+  )
   return (
-    <TouchableOpacity onPress={onPress} style={styles.resultRow} activeOpacity={0.7}>
-      <View style={styles.resultRowIcon}>
+    <TouchableOpacity onPress={onPress} style={locResultStyles.resultRow} activeOpacity={0.7}>
+      <View style={locResultStyles.resultRowIcon}>
         <MaterialIcons name="place" size={16} color={Colors.secondaryText} />
       </View>
       <View style={{ flex: 1 }}>
@@ -287,6 +385,148 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
     },
     ref,
   ) {
+    const { Colors, Radii } = useTheme()
+    const styles = useMemo(
+      () =>
+        StyleSheet.create({
+          // Search
+          searchRow: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: Spacing.md,
+            paddingHorizontal: Spacing.lg,
+            paddingBottom: Spacing.lg,
+          },
+          searchPill: {
+            flex: 1,
+            flexDirection: 'row',
+            alignItems: 'center',
+            backgroundColor: Colors.searchBg,
+            borderRadius: Radii.pill,
+            paddingHorizontal: Spacing.md,
+            paddingVertical: 10,
+          },
+          searchPillExpanded: {
+            backgroundColor: Colors.searchBg,
+          },
+          searchInput: {
+            flex: 1,
+            fontSize: 15,
+            color: Colors.text,
+            padding: 0,
+          },
+          cancelBtn: {
+            width: 32,
+            height: 32,
+            borderRadius: 16,
+            backgroundColor: Colors.searchBg,
+            alignItems: 'center',
+            justifyContent: 'center',
+          },
+
+          // Body wrapper
+          bodyWrapper: {
+            flex: 1,
+          },
+
+          // Places
+          placesSection: {
+            marginBottom: Spacing.lg,
+            paddingHorizontal: Spacing.lg,
+          },
+          sectionLabel: {
+            ...Typography.label,
+            color: Colors.secondaryText,
+            marginBottom: Spacing.sm,
+            letterSpacing: 0.5,
+            paddingHorizontal: Spacing.lg,
+          },
+          placesRow: {
+            flexDirection: 'row',
+            gap: Spacing.md,
+          },
+          placesTile: {
+            alignItems: 'center',
+            width: 64,
+          },
+          placesTileIcon: {
+            width: 50,
+            height: 50,
+            borderRadius: Radii.button,
+            backgroundColor: Colors.searchBg,
+            alignItems: 'center',
+            justifyContent: 'center',
+          },
+          placesTileIconSaved: {
+            backgroundColor: Colors.blue,
+          },
+          scrollbarTrack: {
+            height: 3,
+            borderRadius: 2,
+            backgroundColor: Colors.separator,
+            marginTop: Spacing.sm,
+          },
+          scrollbarThumb: {
+            height: 3,
+            borderRadius: 2,
+            backgroundColor: Colors.secondaryText,
+          },
+
+          // Saved journeys
+          savedRow: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: Spacing.md,
+            paddingVertical: Spacing.sm,
+            paddingHorizontal: Spacing.lg,
+          },
+          savedRowIcon: {
+            width: 34,
+            height: 34,
+            borderRadius: Radii.icon,
+            backgroundColor: Colors.searchBg,
+            alignItems: 'center',
+            justifyContent: 'center',
+          },
+
+          // Search results
+          resultsScroll: {
+            flex: 1,
+            paddingHorizontal: Spacing.lg,
+          },
+          resultRow: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: Spacing.md,
+            paddingVertical: Spacing.sm,
+          },
+          resultRowIcon: {
+            width: 34,
+            height: 34,
+            borderRadius: Radii.icon,
+            backgroundColor: Colors.searchBg,
+            alignItems: 'center',
+            justifyContent: 'center',
+          },
+          gpsLoadingRow: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingVertical: Spacing.sm,
+            marginBottom: Spacing.sm,
+          },
+          emptyState: {
+            alignItems: 'center',
+            paddingTop: Spacing.xxl * 2,
+          },
+
+          separator: {
+            height: StyleSheet.hairlineWidth,
+            backgroundColor: Colors.separator,
+            marginLeft: Spacing.lg + 34 + Spacing.md,
+          },
+        }),
+      [Colors, Radii],
+    )
     const insets = useSafeAreaInsets()
     const [expanded, setExpanded] = useState(false)
     const [query, setQuery] = useState('')
@@ -559,144 +799,3 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
   },
 )
 
-// ---------------------------------------------------------------------------
-// Styles
-// ---------------------------------------------------------------------------
-
-const styles = StyleSheet.create({
-  // Search
-  searchRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.md,
-    paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.lg,
-  },
-  searchPill: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.searchBg,
-    borderRadius: Radii.pill,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: 10,
-  },
-  searchPillExpanded: {
-    backgroundColor: Colors.searchBg,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 15,
-    color: Colors.text,
-    padding: 0,
-  },
-  cancelBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: Colors.searchBg,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  // Body wrapper
-  bodyWrapper: {
-    flex: 1,
-  },
-
-  // Places
-  placesSection: {
-    marginBottom: Spacing.lg,
-    paddingHorizontal: Spacing.lg,
-  },
-  sectionLabel: {
-    ...Typography.label,
-    color: Colors.secondaryText,
-    marginBottom: Spacing.sm,
-    letterSpacing: 0.5,
-    paddingHorizontal: Spacing.lg,
-  },
-  placesRow: {
-    flexDirection: 'row',
-    gap: Spacing.md,
-  },
-  placesTile: {
-    alignItems: 'center',
-    width: 64,
-  },
-  placesTileIcon: {
-    width: 50,
-    height: 50,
-    borderRadius: Radii.button,
-    backgroundColor: Colors.searchBg,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  placesTileIconSaved: {
-    backgroundColor: Colors.blue,
-  },
-  scrollbarTrack: {
-    height: 3,
-    borderRadius: 2,
-    backgroundColor: Colors.separator,
-    marginTop: Spacing.sm,
-  },
-  scrollbarThumb: {
-    height: 3,
-    borderRadius: 2,
-    backgroundColor: Colors.secondaryText,
-  },
-
-  // Saved journeys
-  savedRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.md,
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.lg,
-  },
-  savedRowIcon: {
-    width: 34,
-    height: 34,
-    borderRadius: Radii.icon,
-    backgroundColor: Colors.searchBg,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  // Search results
-  resultsScroll: {
-    flex: 1,
-    paddingHorizontal: Spacing.lg,
-  },
-  resultRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.md,
-    paddingVertical: Spacing.sm,
-  },
-  resultRowIcon: {
-    width: 34,
-    height: 34,
-    borderRadius: Radii.icon,
-    backgroundColor: Colors.searchBg,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  gpsLoadingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: Spacing.sm,
-    marginBottom: Spacing.sm,
-  },
-  emptyState: {
-    alignItems: 'center',
-    paddingTop: Spacing.xxl * 2,
-  },
-
-  separator: {
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: Colors.separator,
-    marginLeft: Spacing.lg + 34 + Spacing.md,
-  },
-})

@@ -2,7 +2,7 @@ import { MaterialIcons } from '@expo/vector-icons'
 import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker'
 import { Platform } from 'react-native'
 import { Text, XStack, YStack } from 'tamagui'
-import { Borders, Colors, Heights, Opacity, Radii } from '@/theme'
+import { useTheme, Borders, Heights, Opacity } from '@/theme'
 
 type LeaveAtFieldProps = {
   /** The chosen departure time, or null to leave now. */
@@ -20,18 +20,18 @@ export function formatDepart(date: Date): string {
   return `${day}, ${time}`
 }
 
-const SEGMENT_STYLE = {
-  flex: 1,
-  minHeight: Heights.touchTarget,
-  borderRadius: Radii.button,
-  borderWidth: Borders.medium,
-} as const
-
 /**
  * "Leave at" control: a Now / Later toggle. Choosing Later opens the platform's native date+time
  * picker (an imperative two-step date→time flow on Android; a single combined picker on iOS).
  */
 export const LeaveAtField = ({ value, onChange }: LeaveAtFieldProps) => {
+  const { Colors, Radii } = useTheme()
+  const SEGMENT_STYLE = {
+    flex: 1,
+    minHeight: Heights.touchTarget,
+    borderRadius: Radii.button,
+    borderWidth: Borders.medium,
+  } as const
   // iOS renders the picker inline as a component; this toggles it. Android uses the imperative
   // DateTimePickerAndroid API, so it never needs this flag.
   const isLater = value !== null

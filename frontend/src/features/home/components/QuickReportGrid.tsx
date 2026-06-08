@@ -1,7 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import { Text, XStack, YStack } from 'tamagui'
 import { Heading } from '@/components/Heading'
-import { Borders, Colors, Opacity, Radii, Typography } from '@/theme'
+import { useTheme, Borders, Opacity, Typography } from '@/theme'
 
 export type QuickReportAction =
   | { route: 'ReportForm'; equipmentType: 'lift' | 'escalator' }
@@ -35,6 +35,7 @@ type QuickReportGridProps = {
 }
 
 export const QuickReportGrid = ({ onSelect, hasLifts, hasEscalators }: QuickReportGridProps) => {
+  const { Colors, Radii } = useTheme()
   function isDisabled(item: GridItem): boolean {
     if (!item.action) return true
     if (item.action.route === 'ReportForm') {

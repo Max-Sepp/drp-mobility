@@ -1,109 +1,32 @@
-// Central design tokens for the app.
-// All components should import from here — never hardcode colours, radii, or spacing.
+// Central design tokens.
+// Theme-dependent tokens (Colors, Radii, Shadows) come from useTheme().
+// Everything here is static — layout values that never change between themes.
 
 import { StyleSheet } from 'react-native'
 
-// ---------------------------------------------------------------------------
-// Colors
-// ---------------------------------------------------------------------------
-
-export const Colors = {
-  // Page / background
-  background: '#FAFAF5', // warm off-white
-  card: '#FFFFFF',
-  searchBg: '#F0F0EE',
-
-  // Map placeholder
-  mapBg: '#D4E5C0',
-  mapGrid: '#BFCFAA',
-  mapWater: '#A8CCDE',
-
-  // Text
-  text: '#0A0A0A',
-  secondaryText: '#555555',
-  tertiaryText: '#999999',
-  placeholderText: '#AAAAAA',
-
-  // Separator / border
-  separator: '#CCCCCC', // hairline dividers between list items
-  border: '#0A0A0A', // hard black borders on cards and buttons
-
-  // Brand / interactive
-  blue: '#1A56FF', // electric blue
-  blueDark: '#0033CC',
-
-  // Semantic — base colours
-  success: '#00B050',
-  warning: '#FF8000',
-  danger: '#E8002D',
-
-  // Semantic — tinted backgrounds and dark variants
-  successBg: '#CCFCE0',
-  successDark: '#006630',
-  warningBg: '#FFF0CC',
-  warningDark: '#7A3A00',
-  warningBorder: '#FF8000',
-  dangerBg: '#FFD6DC',
-  dangerDark: '#990018',
-  dangerBorder: '#E8002D',
-  blueBg: '#DCE5FF',
-} as const
+// Re-export the hook and types so components import from one place.
+export { useTheme, useThemeControls, ThemeProvider } from './theme/ThemeContext'
+export { THEMES, DEFAULT_THEME_ID } from './theme/themes'
+export type { Theme, ThemeId, ThemeColors, ThemeRadii, ThemeShadows } from './theme/themes'
 
 // ---------------------------------------------------------------------------
-// Border radii — reduced for a boxy neo-brutalist feel
-// ---------------------------------------------------------------------------
-
-export const Radii = {
-  card: 6,
-  button: 6,
-  input: 6,
-  pill: 6, // search bar becomes a rounded rectangle
-  small: 4,
-  xs: 2,
-  handle: 2,
-  icon: 6,
-} as const
-
-// ---------------------------------------------------------------------------
-// Shadows — hard offset (defining neo-brutalist characteristic)
-// ---------------------------------------------------------------------------
-
-export const Shadows = {
-  card: {
-    boxShadow: '3px 3px 0px #0A0A0A',
-    elevation: 4,
-  },
-  heavy: {
-    boxShadow: '5px 5px 0px #0A0A0A',
-    elevation: 8,
-  },
-  top: {
-    boxShadow: '0px -3px 0px #0A0A0A',
-    elevation: 4,
-  },
-  marker: {
-    boxShadow: '2px 2px 0px #0A0A0A',
-    elevation: 4,
-  },
-} as const
-
-// ---------------------------------------------------------------------------
-// Typography
+// Typography — font size and weight only; colour is always set by the component
+// using its theme's Colors.text / Colors.secondaryText.
 // ---------------------------------------------------------------------------
 
 export const Typography = {
-  largeTitle: { fontSize: 28, fontWeight: '800' as const, color: Colors.text },
-  heading: { fontSize: 22, fontWeight: '800' as const, color: Colors.text },
-  sectionTitle: { fontSize: 17, fontWeight: '700' as const, color: Colors.text },
-  body: { fontSize: 15, fontWeight: '400' as const, color: Colors.text },
-  bodyBold: { fontSize: 15, fontWeight: '700' as const, color: Colors.text },
-  caption: { fontSize: 13, fontWeight: '400' as const, color: Colors.secondaryText },
-  captionBold: { fontSize: 13, fontWeight: '700' as const, color: Colors.secondaryText },
-  label: { fontSize: 11, fontWeight: '700' as const, color: Colors.secondaryText },
+  largeTitle: { fontSize: 28, fontWeight: '800' as const },
+  heading:    { fontSize: 22, fontWeight: '800' as const },
+  sectionTitle:{ fontSize: 17, fontWeight: '700' as const },
+  body:       { fontSize: 15, fontWeight: '400' as const },
+  bodyBold:   { fontSize: 15, fontWeight: '700' as const },
+  caption:    { fontSize: 13, fontWeight: '400' as const },
+  captionBold:{ fontSize: 13, fontWeight: '700' as const },
+  label:      { fontSize: 11, fontWeight: '700' as const },
 } as const
 
 // ---------------------------------------------------------------------------
-// Spacing
+// Spacing — 4 pt grid
 // ---------------------------------------------------------------------------
 
 export const Spacing = {
@@ -117,7 +40,7 @@ export const Spacing = {
 } as const
 
 // ---------------------------------------------------------------------------
-// Borders — thicker for bold neo-brutalist outlines
+// Borders — line widths
 // ---------------------------------------------------------------------------
 
 export const Borders = {
@@ -156,23 +79,7 @@ export const Heights = {
 } as const
 
 // ---------------------------------------------------------------------------
-// Reusable StyleSheet fragments
+// Hairline — useful static constant from StyleSheet
 // ---------------------------------------------------------------------------
 
-export const SharedStyles = StyleSheet.create({
-  card: {
-    backgroundColor: Colors.card,
-    borderRadius: Radii.card,
-    borderWidth: Borders.medium,
-    borderColor: Colors.border,
-    ...Shadows.card,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  screenBackground: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-})
+export const hairlineWidth = StyleSheet.hairlineWidth

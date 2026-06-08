@@ -9,13 +9,46 @@ import { resolveToPostcode, type ResolvedLocation } from '@/features/journey/api
 import { apiClient } from '@/api/client'
 import { useAppLocation } from '@/lib/LocationContext'
 import type { Station, StationScreenProps } from '@/navigation/types'
-import { Colors, Heights, Radii, Spacing } from '@/theme'
+import { useTheme, Heights, Spacing } from '@/theme'
 import { PlatformAccessCard } from '@/features/home/components/PlatformAccessCard'
 import { QuickReportGrid, type QuickReportAction } from '@/features/home/components/QuickReportGrid'
 import { ReportsStatus } from '@/features/home/components/ReportsStatus'
 import { StationHeader } from '@/features/home/components/StationHeader'
 
 export const StationScreen = ({ navigation, route }: StationScreenProps) => {
+  const { Colors, Radii } = useTheme()
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        screen: {
+          flex: 1,
+          backgroundColor: Colors.background,
+        },
+        footer: {
+          backgroundColor: Colors.card,
+          paddingTop: Spacing.md,
+          paddingHorizontal: Spacing.xl,
+          borderTopWidth: StyleSheet.hairlineWidth,
+          borderTopColor: Colors.border,
+        },
+        goHereBtn: {
+          backgroundColor: Colors.blue,
+          borderRadius: Radii.button,
+          height: Heights.button,
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+        goHereBtnDisabled: {
+          backgroundColor: Colors.secondaryText,
+        },
+        goHereText: {
+          color: Colors.card,
+          fontSize: 16,
+          fontWeight: '700',
+        },
+      }),
+    [Colors, Radii],
+  )
   const [station, setStation] = useState<Station>(route.params?.station ?? DEFAULT_STATION)
   const [goingHere, setGoingHere] = useState(false)
   const { stations } = useStations()
@@ -126,31 +159,3 @@ export const StationScreen = ({ navigation, route }: StationScreenProps) => {
   )
 }
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  footer: {
-    backgroundColor: Colors.card,
-    paddingTop: Spacing.md,
-    paddingHorizontal: Spacing.xl,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: Colors.border,
-  },
-  goHereBtn: {
-    backgroundColor: Colors.blue,
-    borderRadius: Radii.button,
-    height: Heights.button,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  goHereBtnDisabled: {
-    backgroundColor: Colors.secondaryText,
-  },
-  goHereText: {
-    color: Colors.card,
-    fontSize: 16,
-    fontWeight: '700',
-  },
-})

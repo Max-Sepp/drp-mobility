@@ -36,13 +36,37 @@ import {
 } from '@/features/journey/components/legDisplay'
 import { OutageDetail } from '@/features/journey/components/OutageDetail'
 import { haversineMeters } from '@/lib/geo'
-import { Borders, Colors, Heights, Opacity, Radii } from '@/theme'
+import { useTheme, Borders, Heights, Opacity } from '@/theme'
 
 // Treat the rider as "arrived" within this radius of a leg's arrival point. Wide enough to absorb
 // GPS noise (typically 20–50 m in the open) without firing while the train is still approaching.
 const ARRIVAL_RADIUS_M = 120
 
 export const ActiveJourneyScreen = ({ navigation, route }: ActiveJourneyScreenProps) => {
+  const { Colors, Radii } = useTheme()
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        controlBar: {
+          backgroundColor: Colors.card,
+          borderTopWidth: Borders.thin,
+          borderTopColor: Colors.border,
+        },
+        secondaryButton: {
+          height: Heights.touchTarget,
+          borderRadius: Radii.button,
+          borderWidth: Borders.medium,
+          borderColor: Colors.border,
+          backgroundColor: Colors.card,
+        },
+        primaryButton: {
+          height: Heights.touchTarget,
+          borderRadius: Radii.button,
+          backgroundColor: Colors.blue,
+        },
+      }),
+    [Colors, Radii],
+  )
   const { savedId, journey, from, to, outages = [] } = route.params
   const legs = journey.legs
 
@@ -365,22 +389,3 @@ export const ActiveJourneyScreen = ({ navigation, route }: ActiveJourneyScreenPr
   )
 }
 
-const styles = StyleSheet.create({
-  controlBar: {
-    backgroundColor: Colors.card,
-    borderTopWidth: Borders.thin,
-    borderTopColor: Colors.border,
-  },
-  secondaryButton: {
-    height: Heights.touchTarget,
-    borderRadius: Radii.button,
-    borderWidth: Borders.medium,
-    borderColor: Colors.border,
-    backgroundColor: Colors.card,
-  },
-  primaryButton: {
-    height: Heights.touchTarget,
-    borderRadius: Radii.button,
-    backgroundColor: Colors.blue,
-  },
-})

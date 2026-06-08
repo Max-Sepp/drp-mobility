@@ -32,7 +32,7 @@ import {
 } from '@/features/journey/components/legDisplay'
 import { OutageDetail } from '@/features/journey/components/OutageDetail'
 import type { RootStackParamList } from '@/navigation/types'
-import { Borders, Colors, Heights, Opacity, Radii, Spacing } from '@/theme'
+import { useTheme, Borders, Heights, Opacity, Spacing } from '@/theme'
 
 export type JourneyDetailParams = RootStackParamList['JourneyDetail']
 export type ActiveJourneyParams = RootStackParamList['ActiveJourney']
@@ -47,6 +47,47 @@ type Props = {
 }
 
 export function JourneyDetailSheet({ params, onClose, onStartJourney }: Props) {
+  const { Colors, Radii } = useTheme()
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        header: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingHorizontal: Spacing.lg,
+          paddingBottom: Spacing.md,
+          gap: Spacing.sm,
+        },
+        closeBtn: {
+          width: 32,
+          height: 32,
+          borderRadius: 16,
+          backgroundColor: Colors.searchBg,
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+        content: {
+          paddingHorizontal: Spacing.lg,
+          paddingTop: Spacing.xs,
+          paddingBottom: Spacing.lg,
+        },
+        footer: {
+          paddingHorizontal: Spacing.lg,
+          paddingTop: Spacing.sm,
+          borderTopWidth: StyleSheet.hairlineWidth,
+          borderTopColor: Colors.separator,
+          backgroundColor: Colors.card,
+        },
+        startBtn: {
+          height: Heights.button,
+          borderRadius: Radii.button,
+          backgroundColor: Colors.blue,
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+      }),
+    [Colors, Radii],
+  )
   const insets = useSafeAreaInsets()
   const sheetRef = useRef<BottomSheetRef>(null)
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
@@ -412,39 +453,3 @@ export function JourneyDetailSheet({ params, onClose, onStartJourney }: Props) {
   )
 }
 
-const styles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.md,
-    gap: Spacing.sm,
-  },
-  closeBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: Colors.searchBg,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  content: {
-    paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.xs,
-    paddingBottom: Spacing.lg,
-  },
-  footer: {
-    paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.sm,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: Colors.separator,
-    backgroundColor: Colors.card,
-  },
-  startBtn: {
-    height: Heights.button,
-    borderRadius: Radii.button,
-    backgroundColor: Colors.blue,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-})

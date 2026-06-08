@@ -1,6 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import { useFocusEffect } from '@react-navigation/native'
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { Alert, Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { StationMap, type StationMapHandle } from '@/features/map/components/StationMap'
@@ -25,7 +25,7 @@ import { useAuth } from '@/features/auth'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import type { RootStackParamList } from '@/navigation/types'
 import type { ResolvedLocation } from '@/features/journey/api/geocode'
-import { Colors, Radii, Shadows, Spacing, Typography } from '@/theme'
+import { useTheme, Spacing, Typography } from '@/theme'
 import {
   SearchActionSheet,
   type SearchActionSheetHandle,
@@ -50,7 +50,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'MapHome'>
 function TopIconButton({
   icon,
   onPress,
-  color = Colors.text,
+  color,
   size = 40,
   accessibilityLabel,
 }: {
@@ -60,15 +60,24 @@ function TopIconButton({
   size?: number
   accessibilityLabel?: string
 }) {
+  const { Colors } = useTheme()
+  const topButtonStyle = useMemo(
+    () => ({
+      backgroundColor: Colors.card,
+      alignItems: 'center' as const,
+      justifyContent: 'center' as const,
+    }),
+    [Colors],
+  )
   return (
     <TouchableOpacity
       onPress={onPress}
-      style={[styles.topButton, { width: size, height: size, borderRadius: size / 2 }]}
+      style={[topButtonStyle, { width: size, height: size, borderRadius: size / 2 }]}
       activeOpacity={0.75}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
     >
-      <MaterialIcons name={icon} size={size * 0.55} color={color} />
+      <MaterialIcons name={icon} size={size * 0.55} color={color ?? Colors.text} />
     </TouchableOpacity>
   )
 }
@@ -83,31 +92,80 @@ function ActiveJourneyBanner({
   onResume: () => void
   onEnd: () => void
 }) {
+  const { Colors, Radii, Shadows } = useTheme()
+  const bannerStyles = useMemo(
+    () =>
+      StyleSheet.create({
+        banner: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: Spacing.sm,
+          marginTop: Spacing.sm,
+          marginHorizontal: Spacing.md,
+          paddingVertical: Spacing.sm,
+          paddingHorizontal: Spacing.md,
+          backgroundColor: Colors.card,
+          borderRadius: Radii.card,
+          ...Shadows.card,
+        },
+        bannerPulse: {
+          width: 10,
+          height: 10,
+          borderRadius: 5,
+          backgroundColor: Colors.blue,
+        },
+        bannerTitle: {
+          ...Typography.bodyBold,
+          color: Colors.text,
+        },
+        bannerSubtitle: {
+          ...Typography.caption,
+          color: Colors.secondaryText,
+        },
+        resumeButton: {
+          paddingVertical: 8,
+          paddingHorizontal: Spacing.md,
+          borderRadius: Radii.pill,
+          backgroundColor: Colors.blue,
+        },
+        resumeText: {
+          ...Typography.bodyBold,
+          color: Colors.card,
+        },
+        endButton: {
+          width: 32,
+          height: 32,
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+      }),
+    [Colors, Radii, Shadows],
+  )
   const leg = active.journey.legs[active.currentLegIndex]
   const subtitle = leg
     ? humanizeSummary(leg.instruction.summary, [active.from, active.to])
     : 'Tap to resume'
   return (
-    <View style={styles.banner}>
-      <View style={styles.bannerPulse} />
+    <View style={bannerStyles.banner}>
+      <View style={bannerStyles.bannerPulse} />
       <View style={{ flex: 1 }}>
-        <Text style={styles.bannerTitle}>Journey in progress</Text>
-        <Text style={styles.bannerSubtitle} numberOfLines={1}>
+        <Text style={bannerStyles.bannerTitle}>Journey in progress</Text>
+        <Text style={bannerStyles.bannerSubtitle} numberOfLines={1}>
           {subtitle}
         </Text>
       </View>
       <TouchableOpacity
         onPress={onResume}
-        style={styles.resumeButton}
+        style={bannerStyles.resumeButton}
         activeOpacity={0.85}
         accessibilityRole="button"
         accessibilityLabel="Resume journey"
       >
-        <Text style={styles.resumeText}>Resume</Text>
+        <Text style={bannerStyles.resumeText}>Resume</Text>
       </TouchableOpacity>
       <TouchableOpacity
         onPress={onEnd}
-        style={styles.endButton}
+        style={bannerStyles.endButton}
         activeOpacity={0.7}
         accessibilityRole="button"
         accessibilityLabel="End journey"
@@ -119,6 +177,35 @@ function ActiveJourneyBanner({
 }
 
 export function MapHomeScreen({ navigation }: Props) {
+  const { Colors, Radii, Shadows } = useTheme()
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        screen: {
+          flex: 1,
+          backgroundColor: Colors.mapBg,
+        },
+        topSafe: {
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+        },
+        topButtons: {
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          paddingTop: 8,
+          paddingHorizontal: Spacing.md,
+        },
+        topButton: {
+          backgroundColor: Colors.card,
+          alignItems: 'center',
+          justifyContent: 'center',
+          ...Shadows.card,
+        },
+      }),
+    [Colors, Radii, Shadows],
+  )
   const [saved, setSaved] = useState<SavedJourney[]>([])
   const [active, setActive] = useState<ActiveJourney | null>(null)
   const [savedPlaces, setSavedPlaces] = useState<SavedPlaces>({ custom: [] })
@@ -430,69 +517,3 @@ export function MapHomeScreen({ navigation }: Props) {
   )
 }
 
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: Colors.mapBg,
-  },
-  topSafe: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-  },
-  topButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingTop: 8,
-    paddingHorizontal: Spacing.md,
-  },
-  topButton: {
-    backgroundColor: Colors.card,
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...Shadows.card,
-  },
-  banner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.sm,
-    marginTop: Spacing.sm,
-    marginHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.md,
-    backgroundColor: Colors.card,
-    borderRadius: Radii.card,
-    ...Shadows.card,
-  },
-  bannerPulse: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: Colors.blue,
-  },
-  bannerTitle: {
-    ...Typography.bodyBold,
-    color: Colors.text,
-  },
-  bannerSubtitle: {
-    ...Typography.caption,
-    color: Colors.secondaryText,
-  },
-  resumeButton: {
-    paddingVertical: 8,
-    paddingHorizontal: Spacing.md,
-    borderRadius: Radii.pill,
-    backgroundColor: Colors.blue,
-  },
-  resumeText: {
-    ...Typography.bodyBold,
-    color: Colors.card,
-  },
-  endButton: {
-    width: 32,
-    height: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-})

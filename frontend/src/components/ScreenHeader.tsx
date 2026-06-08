@@ -1,10 +1,11 @@
 import { Ionicons } from '@expo/vector-icons'
 import type { ReactNode } from 'react'
+import { useMemo } from 'react'
 import { StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Text, XStack, YStack } from 'tamagui'
 import { Heading } from '@/components/Heading'
-import { Colors, Opacity, Spacing } from '@/theme'
+import { useTheme, Opacity, Spacing } from '@/theme'
 
 type ScreenHeaderProps = {
   title: string
@@ -22,6 +23,22 @@ export const ScreenHeader = ({
   height = 96,
   right,
 }: ScreenHeaderProps) => {
+  const { Colors } = useTheme()
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        container: {
+          backgroundColor: Colors.card,
+          borderBottomWidth: StyleSheet.hairlineWidth,
+          borderBottomColor: Colors.separator,
+        },
+        inner: {
+          justifyContent: 'center',
+          paddingBottom: Spacing.sm,
+        },
+      }),
+    [Colors],
+  )
   return (
     <SafeAreaView edges={['top']} style={styles.container}>
       <YStack style={[styles.inner, { height }]} px="$5" gap="$1">
@@ -54,14 +71,3 @@ export const ScreenHeader = ({
   )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: Colors.card,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: Colors.separator,
-  },
-  inner: {
-    justifyContent: 'center',
-    paddingBottom: Spacing.sm,
-  },
-})

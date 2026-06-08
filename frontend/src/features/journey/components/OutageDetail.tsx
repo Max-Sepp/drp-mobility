@@ -1,4 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons'
+import { useMemo } from 'react'
 import { Text, XStack, YStack } from 'tamagui'
 import { formatTime, isToday, parseUtc } from '@/lib/datetime'
 import type {
@@ -7,7 +8,7 @@ import type {
   StationRole,
   UnitVerdict,
 } from '@/features/journey/api/outageRelevance'
-import { Borders, Colors, Radii } from '@/theme'
+import { useTheme, Borders } from '@/theme'
 
 type VerdictStyle = {
   icon: keyof typeof MaterialIcons.glyphMap
@@ -15,37 +16,6 @@ type VerdictStyle = {
   background: string
   border: string
   label: string
-}
-
-const VERDICTS: Record<UnitVerdict, VerdictStyle> = {
-  'on-your-platform': {
-    icon: 'error',
-    color: Colors.dangerDark,
-    background: Colors.dangerBg,
-    border: Colors.dangerBorder,
-    label: 'On your route',
-  },
-  'shared-route': {
-    icon: 'warning',
-    color: Colors.warningDark,
-    background: Colors.warningBg,
-    border: Colors.warningBorder,
-    label: 'On your path here',
-  },
-  'other-platform': {
-    icon: 'info',
-    color: Colors.text,
-    background: Colors.searchBg,
-    border: Colors.border,
-    label: 'Likely a different platform',
-  },
-  unknown: {
-    icon: 'help-outline',
-    color: Colors.text,
-    background: Colors.searchBg,
-    border: Colors.border,
-    label: 'Out of service',
-  },
 }
 
 function roleText(role: StationRole, lines: string[]): string | null {
@@ -86,6 +56,40 @@ function verdictDetail(unit: AssessedUnit): string {
 }
 
 export const OutageDetail = ({ assessments }: { assessments: OutageAssessment[] }) => {
+  const { Colors, Radii } = useTheme()
+  const VERDICTS = useMemo<Record<UnitVerdict, VerdictStyle>>(
+    () => ({
+      'on-your-platform': {
+        icon: 'error',
+        color: Colors.dangerDark,
+        background: Colors.dangerBg,
+        border: Colors.dangerBorder,
+        label: 'On your route',
+      },
+      'shared-route': {
+        icon: 'warning',
+        color: Colors.warningDark,
+        background: Colors.warningBg,
+        border: Colors.warningBorder,
+        label: 'On your path here',
+      },
+      'other-platform': {
+        icon: 'info',
+        color: Colors.text,
+        background: Colors.searchBg,
+        border: Colors.border,
+        label: 'Likely a different platform',
+      },
+      unknown: {
+        icon: 'help-outline',
+        color: Colors.text,
+        background: Colors.searchBg,
+        border: Colors.border,
+        label: 'Out of service',
+      },
+    }),
+    [Colors],
+  )
   if (assessments.length === 0) return null
   return (
     <YStack gap="$3">

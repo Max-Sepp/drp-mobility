@@ -2,9 +2,10 @@ import { useEffect } from 'react'
 import { Text, YStack } from 'tamagui'
 import { Heading } from '@/components/Heading'
 import type { SuccessScreenProps } from '@/navigation/types'
-import { Colors, Radii } from '@/theme'
+import { useTheme } from '@/theme'
 
 export const SuccessScreen = ({ navigation, route }: SuccessScreenProps) => {
+  const { Colors, Radii } = useTheme()
   const { station } = route.params
   useEffect(() => {
     const timer = setTimeout(() => {

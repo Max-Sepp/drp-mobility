@@ -40,7 +40,7 @@ import { OutageDetail } from '@/features/journey/components/OutageDetail'
 import { haversineMeters } from '@/lib/geo'
 import type { RootStackParamList } from '@/navigation/types'
 import type { ActiveJourneyParams } from '@/features/home/components/JourneyDetailSheet'
-import { Borders, Colors, Heights, Opacity, Radii, Spacing } from '@/theme'
+import { useTheme, Borders, Heights, Opacity, Spacing } from '@/theme'
 
 const ARRIVAL_RADIUS_M = 120
 const SCREEN_H = Dimensions.get('window').height
@@ -54,6 +54,51 @@ type Props = {
 }
 
 export function ActiveJourneySheet({ params, onComplete, onEnd }: Props) {
+  const { Colors, Radii } = useTheme()
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        compactRow: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingHorizontal: Spacing.lg,
+          paddingBottom: Spacing.md,
+        },
+        content: {
+          paddingHorizontal: Spacing.lg,
+          paddingTop: Spacing.xs,
+          paddingBottom: Spacing.lg,
+        },
+        controlBar: {
+          flexDirection: 'row',
+          gap: Spacing.md,
+          paddingHorizontal: Spacing.lg,
+          paddingTop: Spacing.sm,
+          borderTopWidth: StyleSheet.hairlineWidth,
+          borderTopColor: Colors.border,
+          backgroundColor: Colors.card,
+        },
+        secondaryBtn: {
+          flex: 1,
+          height: Heights.touchTarget,
+          borderRadius: Radii.button,
+          borderWidth: Borders.medium,
+          borderColor: Colors.border,
+          backgroundColor: Colors.card,
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+        primaryBtn: {
+          flex: 1.4,
+          height: Heights.touchTarget,
+          borderRadius: Radii.button,
+          backgroundColor: Colors.blue,
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+      }),
+    [Colors, Radii],
+  )
   const insets = useSafeAreaInsets()
   // Compact snap exactly fits: gorhom handle (~20) + compact row (~56) + footer (8 + 48 + 1 + insets.bottom + 8).
   // No arithmetic relies on screen %, so it works on any device regardless of safe area size.
@@ -430,43 +475,3 @@ export function ActiveJourneySheet({ params, onComplete, onEnd }: Props) {
   )
 }
 
-const styles = StyleSheet.create({
-  compactRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.md,
-  },
-  content: {
-    paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.xs,
-    paddingBottom: Spacing.lg,
-  },
-  controlBar: {
-    flexDirection: 'row',
-    gap: Spacing.md,
-    paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.sm,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: Colors.border,
-    backgroundColor: Colors.card,
-  },
-  secondaryBtn: {
-    flex: 1,
-    height: Heights.touchTarget,
-    borderRadius: Radii.button,
-    borderWidth: Borders.medium,
-    borderColor: Colors.border,
-    backgroundColor: Colors.card,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  primaryBtn: {
-    flex: 1.4,
-    height: Heights.touchTarget,
-    borderRadius: Radii.button,
-    backgroundColor: Colors.blue,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-})

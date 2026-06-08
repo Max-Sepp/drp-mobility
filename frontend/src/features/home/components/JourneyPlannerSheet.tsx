@@ -32,7 +32,7 @@ import { formatDepart, LeaveAtField } from '@/features/journey/components/LeaveA
 import { LocationInput } from '@/features/journey/components/LocationInput'
 import type { RootStackParamList } from '@/navigation/types'
 import type { JourneyDetailParams } from '@/features/home/components/JourneyDetailSheet'
-import { Borders, Colors, Heights, Opacity, Radii, Spacing, Typography } from '@/theme'
+import { useTheme, Borders, Heights, Opacity, Spacing, Typography } from '@/theme'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -69,6 +69,41 @@ const LEVELS: { value: AccessibilityPreference; label: string }[] = [
 // ---------------------------------------------------------------------------
 
 export function JourneyPlannerSheet({ plan, onClose, onJourneySelect }: Props) {
+  const { Colors, Radii } = useTheme()
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        header: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: Spacing.sm,
+          paddingHorizontal: Spacing.lg,
+          paddingBottom: Spacing.md,
+        },
+        savedBtn: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 4,
+          paddingHorizontal: Spacing.sm,
+          paddingVertical: 6,
+          borderRadius: Radii.pill,
+          backgroundColor: Colors.blueBg,
+        },
+        closeBtn: {
+          width: 32,
+          height: 32,
+          borderRadius: 16,
+          backgroundColor: Colors.searchBg,
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+        content: {
+          paddingHorizontal: Spacing.lg,
+          paddingTop: Spacing.xs,
+        },
+      }),
+    [Colors, Radii],
+  )
   const insets = useSafeAreaInsets()
   const sheetRef = useRef<BottomSheetRef>(null)
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
@@ -455,33 +490,3 @@ export function JourneyPlannerSheet({ plan, onClose, onJourneySelect }: Props) {
   )
 }
 
-const styles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.sm,
-    paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.md,
-  },
-  savedBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: 6,
-    borderRadius: Radii.pill,
-    backgroundColor: Colors.blueBg,
-  },
-  closeBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: Colors.searchBg,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  content: {
-    paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.xs,
-  },
-})

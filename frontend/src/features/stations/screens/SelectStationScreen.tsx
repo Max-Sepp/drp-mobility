@@ -4,13 +4,24 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Input, Separator, Text, YStack } from 'tamagui'
 import { ScreenHeader } from '@/components/ScreenHeader'
 import type { SelectStationScreenProps, Station } from '@/navigation/types'
-import { Borders, Colors } from '@/theme'
+import { useTheme, Borders } from '@/theme'
 import { StationListItem } from '@/features/stations/components/StationListItem'
 import { stationPicker } from '@/features/stations/stationPicker'
 import { fuzzyScore } from '@/lib/fuzzy'
 import { stationLines, useStations } from '@/features/stations/useStations'
 
 export const SelectStationScreen = ({ navigation, route }: SelectStationScreenProps) => {
+  const { Colors } = useTheme()
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        searchBar: {
+          borderTopWidth: Borders.thin,
+          borderTopColor: Colors.border,
+        },
+      }),
+    [Colors],
+  )
   const { currentStation } = route.params
   const [query, setQuery] = useState('')
   const [keyboardHeight, setKeyboardHeight] = useState(0)
@@ -102,9 +113,3 @@ export const SelectStationScreen = ({ navigation, route }: SelectStationScreenPr
   )
 }
 
-const styles = StyleSheet.create({
-  searchBar: {
-    borderTopWidth: Borders.thin,
-    borderTopColor: Colors.border,
-  },
-})

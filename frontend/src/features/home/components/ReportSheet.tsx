@@ -5,7 +5,7 @@
 
 import * as ImagePicker from 'expo-image-picker'
 import { MaterialIcons } from '@expo/vector-icons'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, Dimensions, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
 import { Text } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -15,7 +15,7 @@ import type { components } from '@/api/schema.d'
 import { EquipmentPicker } from '@/features/reporting/components/EquipmentPicker'
 import { FormSection } from '@/features/reporting/components/FormSection'
 import { PhotoPicker } from '@/features/reporting/components/PhotoPicker'
-import { Borders, Colors, Heights, Radii, Shadows, Spacing } from '@/theme'
+import { useTheme, Borders, Heights, Spacing } from '@/theme'
 
 type Equipment = components['schemas']['EquipmentSummary']
 type Step = 'type' | 'form' | 'success'
@@ -40,6 +40,109 @@ type Props = {
 }
 
 export function ReportSheet({ station, onClose }: Props) {
+  const { Colors, Radii, Shadows } = useTheme()
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        header: {
+          flexDirection: 'row',
+          alignItems: 'flex-start',
+          gap: Spacing.sm,
+          paddingHorizontal: Spacing.lg,
+          paddingBottom: Spacing.md,
+        },
+        iconBtn: {
+          width: 32,
+          height: 32,
+          borderRadius: 16,
+          backgroundColor: Colors.searchBg,
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginTop: 2,
+        },
+        gridContainer: {
+          paddingHorizontal: Spacing.lg,
+          paddingTop: Spacing.sm,
+        },
+        grid: {
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          gap: Spacing.md,
+          justifyContent: 'space-between',
+        },
+        gridItem: {
+          width: '47%',
+          aspectRatio: 1.3,
+          borderWidth: Borders.thin,
+          borderColor: Colors.border,
+          borderRadius: Radii.button,
+          backgroundColor: Colors.card,
+          alignItems: 'center',
+          justifyContent: 'center',
+          ...Shadows.card,
+        },
+        textArea: {
+          borderWidth: Borders.thin,
+          borderColor: Colors.border,
+          borderRadius: Radii.input,
+          backgroundColor: Colors.searchBg,
+          color: Colors.text,
+          fontSize: 15,
+          paddingHorizontal: Spacing.md,
+          paddingVertical: Spacing.sm,
+          minHeight: 80,
+          textAlignVertical: 'top',
+        },
+        textInput: {
+          borderWidth: Borders.thin,
+          borderColor: Colors.border,
+          borderRadius: Radii.input,
+          backgroundColor: Colors.searchBg,
+          color: Colors.text,
+          fontSize: 15,
+          paddingHorizontal: Spacing.md,
+          paddingVertical: Spacing.sm,
+          height: 44,
+        },
+        submitRow: {
+          paddingHorizontal: Spacing.lg,
+          marginTop: Spacing.xl,
+        },
+        submitBtn: {
+          height: Heights.button,
+          borderRadius: Radii.button,
+          backgroundColor: Colors.blue,
+          alignItems: 'center',
+          justifyContent: 'center',
+          ...Shadows.card,
+        },
+        successContainer: {
+          alignItems: 'center',
+          paddingHorizontal: Spacing.xl,
+          paddingTop: Spacing.xxl,
+        },
+        successCircle: {
+          width: 110,
+          height: 110,
+          borderRadius: 55,
+          borderWidth: 3,
+          borderColor: Colors.successDark,
+          backgroundColor: Colors.successBg,
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+        okBtn: {
+          marginTop: Spacing.xl,
+          paddingVertical: Spacing.md,
+          paddingHorizontal: Spacing.xxl,
+          borderRadius: Radii.pill,
+          borderWidth: Borders.thin,
+          borderColor: Colors.border,
+          backgroundColor: Colors.searchBg,
+        },
+      }),
+    [Colors, Radii, Shadows],
+  )
   const insets = useSafeAreaInsets()
   const sheetRef = useRef<BottomSheetRef>(null)
 
@@ -399,101 +502,3 @@ export function ReportSheet({ station, onClose }: Props) {
   )
 }
 
-const styles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: Spacing.sm,
-    paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.md,
-  },
-  iconBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: Colors.searchBg,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 2,
-  },
-  gridContainer: {
-    paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.sm,
-  },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: Spacing.md,
-    justifyContent: 'space-between',
-  },
-  gridItem: {
-    width: '47%',
-    aspectRatio: 1.3,
-    borderWidth: Borders.thin,
-    borderColor: Colors.border,
-    borderRadius: Radii.button,
-    backgroundColor: Colors.card,
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...Shadows.card,
-  },
-  textArea: {
-    borderWidth: Borders.thin,
-    borderColor: Colors.border,
-    borderRadius: Radii.input,
-    backgroundColor: Colors.searchBg,
-    color: Colors.text,
-    fontSize: 15,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
-    minHeight: 80,
-    textAlignVertical: 'top',
-  },
-  textInput: {
-    borderWidth: Borders.thin,
-    borderColor: Colors.border,
-    borderRadius: Radii.input,
-    backgroundColor: Colors.searchBg,
-    color: Colors.text,
-    fontSize: 15,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
-    height: 44,
-  },
-  submitRow: {
-    paddingHorizontal: Spacing.lg,
-    marginTop: Spacing.xl,
-  },
-  submitBtn: {
-    height: Heights.button,
-    borderRadius: Radii.button,
-    backgroundColor: Colors.blue,
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...Shadows.card,
-  },
-  successContainer: {
-    alignItems: 'center',
-    paddingHorizontal: Spacing.xl,
-    paddingTop: Spacing.xxl,
-  },
-  successCircle: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
-    borderWidth: 3,
-    borderColor: Colors.successDark,
-    backgroundColor: Colors.successBg,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  okBtn: {
-    marginTop: Spacing.xl,
-    paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.xxl,
-    borderRadius: Radii.pill,
-    borderWidth: Borders.thin,
-    borderColor: Colors.border,
-    backgroundColor: Colors.searchBg,
-  },
-})
