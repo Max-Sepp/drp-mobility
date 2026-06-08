@@ -43,22 +43,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let active = true
     ;(async () => {
-      const stored = await loadToken()
-      if (!stored) {
+      try {
+        const stored = await loadToken()
+        if (!stored) {
+          if (active) setStatus('unauthed')
+          return
+        }
+        setAuthToken(stored)
+        const me = await fetchMe()
+        if (!active) return
+        if (me) {
+          setUser(me)
+          setStatus('authed')
+        } else {
+          // Stored token is stale/invalid — drop it.
+          setAuthToken(null)
+          await deleteToken()
+          setStatus('unauthed')
+        }
+      } catch {
+        // Network unreachable on launch (e.g. no backend reachable from device) — treat as
+        // unauthenticated so the UI doesn't stay frozen on 'loading'.
         if (active) setStatus('unauthed')
-        return
-      }
-      setAuthToken(stored)
-      const me = await fetchMe()
-      if (!active) return
-      if (me) {
-        setUser(me)
-        setStatus('authed')
-      } else {
-        // Stored token is stale/invalid — drop it.
-        setAuthToken(null)
-        await deleteToken()
-        setStatus('unauthed')
       }
     })()
     return () => {
