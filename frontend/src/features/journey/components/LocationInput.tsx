@@ -70,6 +70,7 @@ export const LocationInput = ({
   // Keep the ref and the tick in sync when the parent changes the resolved state externally.
   useEffect(() => {
     isResolvedRef.current = isResolvedProp ?? false
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (isResolvedProp !== undefined) setResolved(isResolvedProp)
   }, [isResolvedProp])
 

@@ -166,6 +166,7 @@ export function JourneyPlannerSheet({ plan, onClose, onJourneySelect }: Props) {
 
   useEffect(() => {
     if (plan) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFrom(plan.initialFrom?.label ?? '')
       setTo(plan.initialTo?.label ?? '')
       setFromPostcode(plan.initialFrom?.postcode ?? null)

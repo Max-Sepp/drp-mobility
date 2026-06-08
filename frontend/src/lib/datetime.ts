@@ -15,3 +15,16 @@ export function isToday(iso: string): boolean {
   const now = new Date()
   return d.toDateString() === now.toDateString()
 }
+
+/** Returns "HH:MM today" or "HH:MM on Mon 3 Jun" depending on whether the date is today. */
+export function formatDatetime(iso: string): string {
+  const time = formatTime(iso)
+  if (isToday(iso)) return `${time} today`
+  const d = parseUtc(iso)
+  const dateStr = d.toLocaleDateString('en-GB', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+  })
+  return `${time} on ${dateStr}`
+}

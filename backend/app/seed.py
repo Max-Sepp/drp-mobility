@@ -55,10 +55,18 @@ def seed_defaults(db: Session) -> None:
     for data in stations_data:
         if data["name"] not in stations:
             coords = data.get("coordinates") or {}
+            toilets = data.get("toilets") or []
+            zone_list = data.get("zones") or []
             stations[data["name"]] = Station(
                 name=data["name"],
                 latitude=coords.get("lat"),
                 longitude=coords.get("lng"),
+                wifi=bool(data.get("wifi", False)),
+                zones=",".join(str(z) for z in zone_list) if zone_list else None,
+                has_toilets=bool(toilets),
+                has_accessible_toilets=any(t.get("accessible") for t in toilets),
+                blue_badge_parking=bool(data.get("blueBadgeParking", False)),
+                taxi_rank=bool(data.get("taxiRank", False)),
             )
             db.add(stations[data["name"]])
     db.flush()
