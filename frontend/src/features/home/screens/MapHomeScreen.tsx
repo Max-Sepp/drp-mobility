@@ -212,6 +212,7 @@ export function MapHomeScreen({ navigation }: Props) {
   const [setPlaceModal, setSetPlaceModal] = useState<{ key: 'home' | 'work' } | null>(null)
   const [addCustomPlaceVisible, setAddCustomPlaceVisible] = useState(false)
   const [activeStation, setActiveStation] = useState<string | null>(null)
+  const [stationPausedForJourney, setStationPausedForJourney] = useState(false)
   const [activeReport, setActiveReport] = useState<string | null>(null)
   const [activePlan, setActivePlan] = useState<JourneyPlan | null>(null)
   const [activeDetail, setActiveDetail] = useState<JourneyDetailParams | null>(null)
@@ -395,6 +396,7 @@ export function MapHomeScreen({ navigation }: Props) {
 
   function closeStation() {
     setActiveStation(null)
+    setStationPausedForJourney(false)
     sheetRef.current?.restore()
   }
 
@@ -405,14 +407,69 @@ export function MapHomeScreen({ navigation }: Props) {
 
   function closePlan() {
     setActivePlan(null)
-    sheetRef.current?.restore()
+    setStationPausedForJourney(false)
+    // Only restore home sheet when no station is active; otherwise the station sheet remounts
+    if (!activeStation) {
+      sheetRef.current?.restore()
+    }
   }
 
   return (
     <View style={styles.screen}>
       <StationMap ref={mapRef} onStationPress={openStation} bottomInset={sheetVisibleHeight} />
 
-      {/* Top overlay: icon buttons, then a resume banner when a journey is in progress */}
+      <SearchActionSheet
+        ref={sheetRef}
+        savedJourneys={saved}
+        savedPlaces={savedPlaces}
+        onSavedJourneyPress={openSaved}
+        onStationPress={openStation}
+        onLocationSelect={openJourneyFromTo}
+        onPlacePress={handlePlacePress}
+        onPlaceLongPress={handlePlaceLongPress}
+        onCustomPlacePress={handleCustomPlacePress}
+        onCustomPlaceLongPress={handleCustomPlaceLongPress}
+        onAddCustomPlace={handleAddCustomPlacePress}
+        onSnapChange={setSheetVisibleHeight}
+      />
+
+      <StationSheet
+        station={stationPausedForJourney ? null : activeStation}
+        onClose={closeStation}
+        onReportPress={() => activeStation && setActiveReport(activeStation)}
+        onOpenJourney={(plan) => {
+          setStationPausedForJourney(true)
+          setActivePlan(plan)
+        }}
+      />
+
+      <ReportSheet station={activeReport} onClose={() => setActiveReport(null)} />
+
+      <JourneyPlannerSheet
+        plan={activePlan}
+        onClose={closePlan}
+        onJourneySelect={(params) => setActiveDetail(params)}
+      />
+
+      <JourneyDetailSheet
+        params={activeDetail}
+        onClose={() => setActiveDetail(null)}
+        onStartJourney={(params) => {
+          setActiveDetail(null)
+          setActiveJourneyParams(params)
+        }}
+      />
+
+      <ActiveJourneySheet
+        params={activeJourneyParams}
+        onComplete={() => {
+          setActiveJourneyParams(null)
+          setActive(null)
+        }}
+        onEnd={endActive}
+      />
+
+      {/* Top overlay: rendered after sheets so it sits above all backdrops */}
       <SafeAreaView edges={['top']} style={[styles.topSafe, { pointerEvents: 'box-none' }]}>
         <View style={[styles.topButtons, { pointerEvents: 'box-none' }]}>
           <TopIconButton
@@ -443,57 +500,6 @@ export function MapHomeScreen({ navigation }: Props) {
           />
         )}
       </SafeAreaView>
-
-      <SearchActionSheet
-        ref={sheetRef}
-        savedJourneys={saved}
-        savedPlaces={savedPlaces}
-        onSavedJourneyPress={openSaved}
-        onStationPress={openStation}
-        onLocationSelect={openJourneyFromTo}
-        onPlacePress={handlePlacePress}
-        onPlaceLongPress={handlePlaceLongPress}
-        onCustomPlacePress={handleCustomPlacePress}
-        onCustomPlaceLongPress={handleCustomPlaceLongPress}
-        onAddCustomPlace={handleAddCustomPlacePress}
-        onSnapChange={setSheetVisibleHeight}
-      />
-
-      <StationSheet
-        station={activeStation}
-        onClose={closeStation}
-        onReportPress={() => activeStation && setActiveReport(activeStation)}
-        onOpenJourney={(plan) => {
-          setActivePlan(plan)
-          sheetRef.current?.dismiss()
-        }}
-      />
-
-      <ReportSheet station={activeReport} onClose={() => setActiveReport(null)} />
-
-      <JourneyPlannerSheet
-        plan={activePlan}
-        onClose={closePlan}
-        onJourneySelect={(params) => setActiveDetail(params)}
-      />
-
-      <JourneyDetailSheet
-        params={activeDetail}
-        onClose={() => setActiveDetail(null)}
-        onStartJourney={(params) => {
-          setActiveDetail(null)
-          setActiveJourneyParams(params)
-        }}
-      />
-
-      <ActiveJourneySheet
-        params={activeJourneyParams}
-        onComplete={() => {
-          setActiveJourneyParams(null)
-          setActive(null)
-        }}
-        onEnd={endActive}
-      />
 
       {setPlaceModal && (
         <SetPlaceModal

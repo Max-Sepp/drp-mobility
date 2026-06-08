@@ -225,3 +225,104 @@ export function outageWarning(
     .map((o) => `${o.stationName}: ${o.equipmentTypes.join(', ')} reported out of service`)
     .join(' · ')
 }
+
+// ---------------------------------------------------------------------------
+// Line colours, walking theming, mode chips — shared across result card and detail view
+// ---------------------------------------------------------------------------
+
+/** TfL corporate line colours keyed by lowercase line name. */
+export const LINE_COLORS: Record<string, string> = {
+  bakerloo: '#894E24',
+  central: '#DC241F',
+  circle: '#FFD329',
+  district: '#007229',
+  'hammersmith & city': '#F3A9BB',
+  jubilee: '#A0A5A9',
+  metropolitan: '#9B0056',
+  northern: '#000000',
+  piccadilly: '#003688',
+  victoria: '#0098D4',
+  'waterloo & city': '#95CDBA',
+  'elizabeth line': '#6950A1',
+  dlr: '#00AFAD',
+  overground: '#EE7C0E',
+}
+
+/** Label shown for walking legs in route summaries — change here to rebrand (e.g. for wheelchair theming). */
+export const WALKING_LABEL = 'Walk'
+/** Icon used for walking legs — swap for a wheelchair or custom glyph. */
+export const WALKING_ICON: keyof typeof MaterialIcons.glyphMap = 'directions-walk'
+
+/** Returns the TfL line colour for a transit leg, or a fallback blue. */
+export function legLineColor(leg: Leg, fallback = '#007AFF'): string {
+  const name = leg.routeOptions?.[0]?.name?.toLowerCase() ?? ''
+  return LINE_COLORS[name] ?? fallback
+}
+
+function LegChip({ leg, compact = true }: { leg: Leg; compact?: boolean }) {
+  const { Colors } = useTheme()
+  const icon = modeIcon(leg.mode.name)
+  const isWalking = leg.mode.name === 'walking'
+  const isBus = leg.mode.name === 'bus' || leg.mode.name === 'coach'
+  const routeName = leg.routeOptions?.[0]?.name
+  if (isWalking) {
+    return (
+      <MaterialIcons
+        name={WALKING_ICON}
+        size={compact ? 16 : 20}
+        color={Colors.secondaryText}
+        aria-label={WALKING_LABEL}
+      />
+    )
+  }
+  const badgeColor = isBus
+    ? Colors.searchBg
+    : (LINE_COLORS[routeName?.toLowerCase() ?? ''] ?? Colors.blue)
+  return (
+    <XStack items="center" gap={compact ? 3 : 5}>
+      <MaterialIcons name={icon} size={compact ? 15 : 18} color={Colors.secondaryText} />
+      {routeName && (
+        <XStack
+          px={compact ? 5 : 8}
+          py={compact ? 1 : 3}
+          style={{
+            backgroundColor: badgeColor,
+            borderRadius: 4,
+            borderWidth: isBus ? Borders.thin : 0,
+            borderColor: isBus ? Colors.border : undefined,
+          }}
+        >
+          <Text fontSize={compact ? 10 : 13} fontWeight="700" color={isBus ? Colors.text : 'white'}>
+            {routeName}
+          </Text>
+        </XStack>
+      )}
+    </XStack>
+  )
+}
+
+/**
+ * Chevron-separated summary of all legs: walk icon → bus badge → tube icon → etc.
+ * `compact` (default true) uses smaller icons and badges suitable for list cards.
+ * Pass `compact={false}` for the larger version used in the detail view header.
+ */
+export function ModePipe({ legs, compact = true }: { legs: Leg[]; compact?: boolean }) {
+  const { Colors } = useTheme()
+  return (
+    <XStack flexWrap="wrap" items="center">
+      {legs.map((leg, i) => (
+        <XStack key={i} items="center">
+          {i > 0 && (
+            <MaterialIcons
+              name="chevron-right"
+              size={compact ? 13 : 16}
+              color={Colors.tertiaryText}
+              style={{ marginHorizontal: compact ? 2 : 4 }}
+            />
+          )}
+          <LegChip leg={leg} compact={compact} />
+        </XStack>
+      ))}
+    </XStack>
+  )
+}

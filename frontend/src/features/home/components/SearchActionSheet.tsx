@@ -595,7 +595,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
     const dismiss = useCallback(() => {
       Keyboard.dismiss()
       setQuery('')
-      sheetRef.current?.snapToIndex(SNAP_IDX_PILL)
+      sheetRef.current?.close()
     }, [])
 
     const restore = useCallback(() => {

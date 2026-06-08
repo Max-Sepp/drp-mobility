@@ -8,7 +8,6 @@ import {
   ActiveJourneyScreen,
   JourneyDetailScreen,
   JourneyPlannerScreen,
-  SavedJourneysScreen,
 } from '@/features/journey'
 import { SearchScreen } from '@/features/search/screens/SearchScreen'
 import type { RootStackParamList } from '@/navigation/types'
@@ -22,7 +21,6 @@ export default function RootNavigator() {
       <Stack.Screen name="Search" component={SearchScreen} />
       <Stack.Screen name="JourneyPlanner" component={JourneyPlannerScreen} />
       <Stack.Screen name="JourneyDetail" component={JourneyDetailScreen} />
-      <Stack.Screen name="SavedJourneys" component={SavedJourneysScreen} />
       {/* gestureEnabled off so a swipe-back can't silently abandon a journey — back runs a confirm. */}
       <Stack.Screen
         name="ActiveJourney"
