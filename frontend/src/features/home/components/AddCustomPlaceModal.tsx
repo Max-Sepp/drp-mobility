@@ -201,26 +201,25 @@ export function AddCustomPlaceModal({ visible, existingNames = [], onSave, onDis
   const [query, setQuery] = useState('')
   const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([])
   const [searching, setSearching] = useState(false)
+  const visibleSuggestions = query.length >= 3 ? suggestions : []
+  const isSearching = query.length >= 3 && searching
   const [resolving, setResolving] = useState(false)
   const [resolved, setResolved] = useState<ResolvedAddress | null>(null)
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     if (!visible) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setName('')
       setIcon('star')
       setQuery('')
-      setSuggestions([])
       setResolved(null)
     }
   }, [visible])
 
   useEffect(() => {
-    if (query.length < 3) {
-      setSuggestions([])
-      setSearching(false)
-      return
-    }
+    if (query.length < 3) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSearching(true)
     const timer = setTimeout(async () => {
       const results = await searchLocations(query)
@@ -345,16 +344,16 @@ export function AddCustomPlaceModal({ visible, existingNames = [], onSave, onDis
                 autoCorrect={false}
                 returnKeyType="search"
               />
-              {(searching || resolving) && (
+              {(isSearching || resolving) && (
                 <ActivityIndicator size="small" color={Colors.secondaryText} />
               )}
             </View>
           )}
 
           {/* Inline address suggestions */}
-          {suggestions.length > 0 && (
+          {visibleSuggestions.length > 0 && (
             <View style={styles.suggestionsBox}>
-              {suggestions.map((item, i) => (
+              {visibleSuggestions.map((item, i) => (
                 <View key={i}>
                   <TouchableOpacity
                     onPress={() => handleSelectSuggestion(item)}
@@ -377,7 +376,7 @@ export function AddCustomPlaceModal({ visible, existingNames = [], onSave, onDis
                     </View>
                     <MaterialIcons name="chevron-right" size={16} color={Colors.tertiaryText} />
                   </TouchableOpacity>
-                  {i < suggestions.length - 1 && <View style={styles.separator} />}
+                  {i < visibleSuggestions.length - 1 && <View style={styles.separator} />}
                 </View>
               ))}
             </View>

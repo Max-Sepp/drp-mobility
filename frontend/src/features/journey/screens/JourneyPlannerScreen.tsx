@@ -151,6 +151,7 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
 
   useEffect(() => {
     if (!route.params?.initialFrom) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       handleCurrentLocation(true).catch(() => {})
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps

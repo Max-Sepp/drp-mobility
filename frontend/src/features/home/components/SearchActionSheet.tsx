@@ -559,12 +559,8 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
     // ── Debounced search ──────────────────────────────────────────────────
 
     useEffect(() => {
-      if (query.length < 3) {
-        setStationResults([])
-        setLocationResults([])
-        setSearching(false)
-        return
-      }
+      if (query.length < 3) return
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSearching(true)
       const timer = setTimeout(async () => {
         const matched = stations
@@ -692,7 +688,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
                 onChangeText={setQuery}
               />
             </View>
-            {expanded && searching && (
+            {expanded && hasQuery && searching && (
               <ActivityIndicator size="small" color={Colors.secondaryText} />
             )}
           </TouchableOpacity>
