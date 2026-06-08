@@ -41,6 +41,9 @@ export function usePushNotifications(): void {
     let cancelled = false
 
     async function register() {
+      // Expo push tokens on web require VAPID keys — this app is native-only.
+      if (Platform.OS === 'web') return
+
       if (Platform.OS === 'android') {
         await Notifications.setNotificationChannelAsync('default', {
           name: 'Accessibility alerts',

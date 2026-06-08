@@ -87,7 +87,13 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
   }
 
   async function handleSignOut() {
-    Alert.alert('Log out', `Log out of ${user!.username}?`, [
+    if (Platform.OS === 'web') {
+      if (!window.confirm(`Are you sure you want to log out?`)) return
+      await signOut()
+      navigation.goBack()
+      return
+    }
+    Alert.alert('Log out', `Are you sure you want to log out?`, [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Log out',
