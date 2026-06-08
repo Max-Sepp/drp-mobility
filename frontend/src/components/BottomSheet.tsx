@@ -16,7 +16,7 @@ import GorhomBottomSheet, {
 } from '@gorhom/bottom-sheet'
 import { forwardRef, useCallback } from 'react'
 import { StyleSheet } from 'react-native'
-import { Colors, Radii, Shadows } from '@/theme'
+import { Borders, Colors, Radii } from '@/theme'
 
 export { BottomSheetView, BottomSheetScrollView, BottomSheetFlatList, BottomSheetTextInput }
 
@@ -79,6 +79,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.card,
     borderTopLeftRadius: Radii.card + 4,
     borderTopRightRadius: Radii.card + 4,
-    ...Shadows.top,
+    borderWidth: Borders.medium,
+    borderColor: Colors.border,
   },
 })
