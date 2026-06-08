@@ -107,7 +107,9 @@ export const ReportsStatus = ({ loading, reports }: ReportsStatusProps) => {
             key={failureId}
             reports={group}
             expanded={expandedFailureId === failureId}
-            onToggle={() => setExpandedFailureId(expandedFailureId === failureId ? null : failureId)}
+            onToggle={() =>
+              setExpandedFailureId(expandedFailureId === failureId ? null : failureId)
+            }
             onVerify={
               isTrusted && firstUnverified
                 ? () => handleVerify(failureId, firstUnverified.id)
