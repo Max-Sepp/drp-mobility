@@ -386,7 +386,6 @@ export function MapHomeScreen({ navigation }: Props) {
       level: item.level,
       savedId: item.id,
     })
-    sheetRef.current?.dismiss()
   }
 
   function openStation(stationName: string) {
@@ -449,11 +448,13 @@ export function MapHomeScreen({ navigation }: Props) {
         plan={activePlan}
         onClose={closePlan}
         onJourneySelect={(params) => setActiveDetail(params)}
+        savedPlaces={savedPlaces}
       />
 
       <JourneyDetailSheet
         params={activeDetail}
         onClose={() => setActiveDetail(null)}
+        onSaveChanged={() => loadSavedJourneys().then(setSaved)}
         onStartJourney={(params) => {
           setActiveDetail(null)
           setActiveJourneyParams(params)

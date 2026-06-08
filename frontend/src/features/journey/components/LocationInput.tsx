@@ -9,6 +9,12 @@ import {
 } from '@/features/journey/api/geocode'
 import { useTheme, Borders, Opacity } from '@/theme'
 
+export type PlaceShortcut = {
+  label: string
+  icon: string
+  postcode: string
+}
+
 type LocationInputProps = {
   label: string
   value: string
@@ -19,6 +25,7 @@ type LocationInputProps = {
   textBold?: boolean
   onCurrentLocation?: () => void
   currentLocationLoading?: boolean
+  savedPlaceShortcuts?: PlaceShortcut[]
 }
 
 export const LocationInput = ({
@@ -31,6 +38,7 @@ export const LocationInput = ({
   textBold,
   onCurrentLocation,
   currentLocationLoading,
+  savedPlaceShortcuts,
 }: LocationInputProps) => {
   const { Colors, Radii } = useTheme()
   const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([])
@@ -65,7 +73,12 @@ export const LocationInput = ({
           return
         }
         setSearching(true)
-        const results = await searchLocations(value)
+        let results: LocationSuggestion[] = []
+        try {
+          results = await searchLocations(value)
+        } catch {
+          // Network error — show no suggestions rather than crashing
+        }
         if (!active) return
         setSuggestions(results)
         setSearching(false)
@@ -94,7 +107,12 @@ export const LocationInput = ({
   async function choose(suggestion: LocationSuggestion) {
     setSuggestions([])
     setSearching(true)
-    const postcode = await postcodeForSuggestion(suggestion)
+    let postcode: string | null = null
+    try {
+      postcode = await postcodeForSuggestion(suggestion)
+    } catch {
+      // Network error — leave postcode null
+    }
     setSearching(false)
     if (!postcode) return
     skipNextSearch.current = true
@@ -103,8 +121,17 @@ export const LocationInput = ({
     onChangeText(suggestion.label)
   }
 
+  function chooseSavedPlace(place: PlaceShortcut) {
+    setSuggestions([])
+    skipNextSearch.current = true
+    setResolved(true)
+    onResolved(place.postcode)
+    onChangeText(place.label)
+  }
+
   const showLocationShortcut = Boolean(onCurrentLocation) && focused && value.length === 0
-  const showDropdown = showLocationShortcut || suggestions.length > 0
+  const showSavedShortcuts = focused && value.length === 0 && (savedPlaceShortcuts?.length ?? 0) > 0
+  const showDropdown = showLocationShortcut || showSavedShortcuts || suggestions.length > 0
 
   // Right-side overlay inside the input: spinner → resolved tick → clear button → nothing.
   const showTick = resolved && !focused && !searching
@@ -215,6 +242,33 @@ export const LocationInput = ({
                 )}
               </YStack>
             )}
+
+            {showSavedShortcuts &&
+              savedPlaceShortcuts!.map((place, i) => (
+                <YStack
+                  key={place.postcode + place.label}
+                  px="$4"
+                  justify="center"
+                  pressStyle={{ background: Colors.searchBg }}
+                  onPress={() => chooseSavedPlace(place)}
+                  style={{
+                    minHeight: 56,
+                    borderTopWidth: i === 0 && !showLocationShortcut ? 0 : Borders.thin,
+                    borderTopColor: Colors.border,
+                  }}
+                >
+                  <YStack gap="$2" style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <MaterialIcons
+                      name={place.icon as keyof typeof MaterialIcons.glyphMap}
+                      size={16}
+                      color={Colors.secondaryText}
+                    />
+                    <Text fontSize={15} fontWeight="600" color={Colors.text}>
+                      {place.label}
+                    </Text>
+                  </YStack>
+                </YStack>
+              ))}
 
             {suggestions.map((suggestion, i) => (
               <YStack

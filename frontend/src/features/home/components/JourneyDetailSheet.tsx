@@ -244,9 +244,10 @@ type Props = {
   params: JourneyDetailParams | null
   onClose: () => void
   onStartJourney: (params: ActiveJourneyParams) => void
+  onSaveChanged?: () => void
 }
 
-export function JourneyDetailSheet({ params, onClose, onStartJourney }: Props) {
+export function JourneyDetailSheet({ params, onClose, onStartJourney, onSaveChanged }: Props) {
   const { Colors, Radii } = useTheme()
   const styles = useMemo(
     () =>
@@ -316,7 +317,8 @@ export function JourneyDetailSheet({ params, onClose, onStartJourney }: Props) {
   const sheetRef = useRef<BottomSheetRef>(null)
 
   const [currentSavedId, setCurrentSavedId] = useState<string | null>(null)
-  const [busy, setBusy] = useState(false)
+  const [startBusy, setStartBusy] = useState(false)
+  const [saveBusy, setSaveBusy] = useState(false)
 
   const { stations } = useStations()
 
@@ -328,7 +330,8 @@ export function JourneyDetailSheet({ params, onClose, onStartJourney }: Props) {
       return
     }
     sheetRef.current?.snapToIndex(0)
-    setBusy(false)
+    setStartBusy(false)
+    setSaveBusy(false)
 
     const { savedId, journey, from, to } = params
     if (savedId) {
@@ -359,8 +362,8 @@ export function JourneyDetailSheet({ params, onClose, onStartJourney }: Props) {
   )
 
   async function toggleSave() {
-    if (!params || busy) return
-    setBusy(true)
+    if (!params || saveBusy || startBusy) return
+    setSaveBusy(true)
     try {
       if (currentSavedId) {
         await deleteJourney(currentSavedId)
@@ -375,16 +378,17 @@ export function JourneyDetailSheet({ params, onClose, onStartJourney }: Props) {
         })
         setCurrentSavedId(record.id)
       }
+      onSaveChanged?.()
     } catch {
       Alert.alert('Error', 'Could not update your saved journeys. Please try again.')
     } finally {
-      setBusy(false)
+      setSaveBusy(false)
     }
   }
 
   async function startJourney() {
-    if (!params || busy) return
-    setBusy(true)
+    if (!params || startBusy || saveBusy) return
+    setStartBusy(true)
     try {
       let savedJourneyId = currentSavedId
       if (!savedJourneyId) {
@@ -416,7 +420,7 @@ export function JourneyDetailSheet({ params, onClose, onStartJourney }: Props) {
       })
     } catch {
       Alert.alert('Error', 'Could not start this journey. Please try again.')
-      setBusy(false)
+      setStartBusy(false)
     }
   }
 
@@ -440,6 +444,7 @@ export function JourneyDetailSheet({ params, onClose, onStartJourney }: Props) {
   const { journey, from, to, tags } = params
   const fare = fareLabel(journey, user?.traveller_type, user?.railcard)
   const saved = currentSavedId !== null
+  const anyBusy = startBusy || saveBusy
   const primaryMode =
     journey.legs.find((l) => l.mode.name !== 'walking')?.mode.name ?? 'walking'
   const legTotal = journey.legs.reduce((sum, leg) => sum + leg.duration, 0)
@@ -572,16 +577,16 @@ export function JourneyDetailSheet({ params, onClose, onStartJourney }: Props) {
                 backgroundColor: Colors.blue,
                 borderColor: Colors.blue,
               },
-              busy && { opacity: Opacity.disabledMid },
+              anyBusy && { opacity: Opacity.disabledMid },
             ]}
-            onPress={busy ? undefined : startJourney}
+            onPress={anyBusy ? undefined : startJourney}
             activeOpacity={0.8}
             accessibilityRole="button"
             accessibilityLabel="Start journey"
           >
             <MaterialIcons name="navigation" size={18} color="white" />
             <Text fontSize={15} fontWeight="700" color="white">
-              {busy ? 'Starting…' : 'Start'}
+              {startBusy ? 'Starting…' : 'Start'}
             </Text>
           </TouchableOpacity>
 
@@ -592,9 +597,9 @@ export function JourneyDetailSheet({ params, onClose, onStartJourney }: Props) {
                 backgroundColor: saved ? Colors.searchBg : Colors.card,
                 borderColor: Colors.border,
               },
-              busy && { opacity: Opacity.disabledMid },
+              anyBusy && { opacity: Opacity.disabledMid },
             ]}
-            onPress={busy ? undefined : toggleSave}
+            onPress={anyBusy ? undefined : toggleSave}
             activeOpacity={0.8}
             accessibilityRole="button"
             accessibilityLabel={saved ? 'Remove from saved journeys' : 'Save this journey'}
@@ -605,7 +610,7 @@ export function JourneyDetailSheet({ params, onClose, onStartJourney }: Props) {
               color={Colors.text}
             />
             <Text fontSize={15} fontWeight="600" color={Colors.text}>
-              {saved ? 'Saved' : 'Save'}
+              {saveBusy ? 'Saving…' : saved ? 'Saved' : 'Save'}
             </Text>
           </TouchableOpacity>
         </View>

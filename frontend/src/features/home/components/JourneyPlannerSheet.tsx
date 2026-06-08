@@ -12,6 +12,8 @@ import {
   type StationOutage,
 } from '@/features/journey/api/accessibility'
 import { type ResolvedLocation, resolveToPostcode } from '@/features/journey/api/geocode'
+import { type PlaceShortcut } from '@/features/journey/components/LocationInput'
+import type { SavedPlaces } from '@/features/journey/api/savedPlaces'
 import { useAppLocation } from '@/lib/LocationContext'
 import {
   type AccessibilityPreference,
@@ -45,6 +47,7 @@ type Props = {
   plan: JourneyPlan | null
   onClose: () => void
   onJourneySelect: (params: JourneyDetailParams) => void
+  savedPlaces?: SavedPlaces
 }
 
 // ---------------------------------------------------------------------------
@@ -77,7 +80,7 @@ const PREF_TAG: Record<JourneyPreference, RouteTag> = {
 const SWAP_BTN = 36  // diameter of the floating swap button
 const FROM_TO_GAP = 10  // vertical gap between From and To inputs
 
-export function JourneyPlannerSheet({ plan, onClose, onJourneySelect }: Props) {
+export function JourneyPlannerSheet({ plan, onClose, onJourneySelect, savedPlaces }: Props) {
   const { Colors, Radii } = useTheme()
   const styles = useMemo(
     () =>
@@ -141,6 +144,15 @@ export function JourneyPlannerSheet({ plan, onClose, onJourneySelect }: Props) {
   const cachedCoords = useAppLocation()
   // Measured height of the From input container — used to vertically position the swap button.
   const [fromH, setFromH] = useState(70)
+
+  const placeShortcuts = useMemo<PlaceShortcut[]>(() => {
+    if (!savedPlaces) return []
+    const shortcuts: PlaceShortcut[] = []
+    if (savedPlaces.home) shortcuts.push({ label: 'Home', icon: 'home', postcode: savedPlaces.home.postcode })
+    if (savedPlaces.work) shortcuts.push({ label: 'Work', icon: 'work', postcode: savedPlaces.work.postcode })
+    savedPlaces.custom.forEach((p) => shortcuts.push({ label: p.name, icon: p.icon, postcode: p.postcode }))
+    return shortcuts
+  }, [savedPlaces])
 
   // ── Current-location helper ────────────────────────────────────────────
 
@@ -340,6 +352,7 @@ export function JourneyPlannerSheet({ plan, onClose, onJourneySelect }: Props) {
               textBold={fromIsCurrentLocation}
               onCurrentLocation={handleCurrentLocation}
               currentLocationLoading={gettingLocation}
+              savedPlaceShortcuts={placeShortcuts}
             />
           </View>
 
@@ -357,6 +370,7 @@ export function JourneyPlannerSheet({ plan, onClose, onJourneySelect }: Props) {
             isResolved={toPostcode !== null}
             textColor={toIsNamedPlace ? Colors.blue : undefined}
             textBold={toIsNamedPlace}
+            savedPlaceShortcuts={placeShortcuts}
           />
 
           {/* Swap button — centered on the From/To boundary, pinned to the right */}
