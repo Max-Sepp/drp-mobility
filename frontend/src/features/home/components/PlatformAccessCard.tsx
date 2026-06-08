@@ -8,28 +8,81 @@ type PlatformAccessCardProps = {
   platforms: PlatformDetail[]
 }
 
+function extractDirection(name: string): string {
+  const m = name.match(/^(Northbound|Southbound|Eastbound|Westbound)/i)
+  return m ? m[1] : ''
+}
+
+function labelDirections(dirs: string[]): string {
+  if (dirs.length === 1) return dirs[0]
+  if (dirs.length === 2) return 'Both directions'
+  return 'All directions'
+}
+
+type InterchangeGroup = { label: string; lines: string[] }
+
+/** Produces the list of step-free interchange groups shown in the expanded dropdown. */
+function computeInterchangeGroups(platforms: PlatformDetail[]): InterchangeGroup[] {
+  // --- Shared-platform groups ---
+  // Key = sorted line names; value = set of directions where those lines share a platform.
+  const sharedMap = new Map<string, Set<string>>()
+  for (const p of platforms) {
+    if (p.lines.length >= 2) {
+      const key = [...p.lines].sort().join('|')
+      if (!sharedMap.has(key)) sharedMap.set(key, new Set())
+      const dir = extractDirection(p.name)
+      sharedMap.get(key)!.add(dir || 'Shared platform')
+    }
+  }
+  const groups: InterchangeGroup[] = [...sharedMap.entries()].map(([key, dirs]) => ({
+    label: labelDirections([...dirs]),
+    lines: key.split('|'),
+  }))
+
+  // --- Concourse group ---
+  // Lines accessible from outside that are not already all covered by a single shared group.
+  const lineAccessMap: Record<string, boolean> = {}
+  for (const p of platforms) {
+    const accessible = p.step_free !== 'none'
+    for (const l of p.lines) {
+      lineAccessMap[l] = (lineAccessMap[l] ?? false) || accessible
+    }
+  }
+  const outsideLines = Object.entries(lineAccessMap)
+    .filter(([, v]) => v)
+    .map(([k]) => k)
+
+  if (outsideLines.length >= 2) {
+    const outsideSet = new Set(outsideLines)
+    const coveredBySingle = [...sharedMap.keys()].some((key) => {
+      const sharedLines = key.split('|')
+      return sharedLines.length === outsideLines.length && sharedLines.every((l) => outsideSet.has(l))
+    })
+    if (!coveredBySingle) {
+      groups.push({ label: 'Via concourse', lines: outsideLines })
+    }
+  }
+
+  return groups
+}
+
 /**
- * Determines which lines have step-free interchange at this station.
+ * Determines which lines have step-free interchange at this station (for the summary).
  *
  * Two sources are combined:
- *   A) Lines that share a physical platform can always interchange step-free (walk along
- *      the platform surface — no stairs involved regardless of street accessibility).
- *   B) Lines whose platforms are all accessible from outside (step_free !== 'none') can
- *      interchange via the concourse/ticket hall, but only when there are ≥ 2 such lines.
+ *   A) Lines that share a physical platform can always interchange step-free.
+ *   B) Lines accessible from outside (step_free !== 'none') can interchange via the
+ *      concourse/ticket hall, but only when there are ≥ 2 such lines.
  */
 function computeInterchange(platforms: PlatformDetail[]): {
   interchangeLines: string[]
   totalLines: number
 } {
-  // Source A: lines that co-exist on the same platform
   const sharedPlatformLines = new Set<string>()
   for (const p of platforms) {
-    if (p.lines.length >= 2) {
-      p.lines.forEach((l) => sharedPlatformLines.add(l))
-    }
+    if (p.lines.length >= 2) p.lines.forEach((l) => sharedPlatformLines.add(l))
   }
 
-  // Source B: lines accessible from outside (any platform for that line has step_free !== 'none')
   const lineAccessMap: Record<string, boolean> = {}
   for (const p of platforms) {
     const accessible = p.step_free !== 'none'
@@ -46,10 +99,7 @@ function computeInterchange(platforms: PlatformDetail[]): {
     outsideAccessibleLines.forEach((l) => eligible.add(l))
   }
 
-  return {
-    interchangeLines: [...eligible],
-    totalLines: Object.keys(lineAccessMap).length,
-  }
+  return { interchangeLines: [...eligible], totalLines: Object.keys(lineAccessMap).length }
 }
 
 export const PlatformAccessCard = ({ platforms }: PlatformAccessCardProps) => {
@@ -62,6 +112,10 @@ export const PlatformAccessCard = ({ platforms }: PlatformAccessCardProps) => {
   const hasInterchange = totalLines >= 2 && interchangeLines.length >= 2
   const partialInterchange =
     totalLines >= 2 && interchangeLines.length >= 1 && interchangeLines.length < totalLines
+  const groups = useMemo(() => computeInterchangeGroups(platforms), [platforms])
+  const [interchangeExpanded, setInterchangeExpanded] = useState(false)
+  const isFullInterchange = hasInterchange && interchangeLines.length === totalLines
+  const showDropdown = (hasInterchange || partialInterchange) && !isFullInterchange && groups.length > 0
 
   if (platforms.length === 0) return null
 
@@ -127,13 +181,18 @@ export const PlatformAccessCard = ({ platforms }: PlatformAccessCardProps) => {
       {totalLines >= 2 && (
         <>
           <Separator borderColor={Colors.border} />
-          <XStack items="center" gap="$2">
+          <XStack
+            items="center"
+            gap="$2"
+            onPress={showDropdown ? () => setInterchangeExpanded((v) => !v) : undefined}
+            pressStyle={showDropdown ? { opacity: Opacity.disabledMid } : undefined}
+          >
             <XStack
               style={{
                 width: 28,
                 height: 28,
                 borderRadius: Radii.small,
-                backgroundColor: hasInterchange
+                backgroundColor: isFullInterchange || hasInterchange
                   ? Colors.successBg
                   : partialInterchange
                     ? Colors.warningBg
@@ -146,7 +205,7 @@ export const PlatformAccessCard = ({ platforms }: PlatformAccessCardProps) => {
                 name="accessible"
                 size={16}
                 color={
-                  hasInterchange
+                  isFullInterchange || hasInterchange
                     ? Colors.success
                     : partialInterchange
                       ? Colors.warningDark
@@ -156,25 +215,42 @@ export const PlatformAccessCard = ({ platforms }: PlatformAccessCardProps) => {
             </XStack>
             <YStack flex={1} gap="$0.5">
               <Text fontSize={13} fontWeight="600" color={Colors.text}>
-                {hasInterchange
-                  ? interchangeLines.length === totalLines
-                    ? 'Full step-free interchange'
-                    : 'Step-free interchange'
-                  : partialInterchange
+                {isFullInterchange
+                  ? 'Full step-free interchange'
+                  : hasInterchange || partialInterchange
                     ? 'Step-free interchange'
                     : 'No step-free interchange'}
               </Text>
-              {(hasInterchange || partialInterchange) &&
-                interchangeLines.length < totalLines && (
-                  <XStack gap="$1" items="center" flexWrap="wrap">
-                    <Text fontSize={11} color={Colors.secondaryText}>
-                      Only between
-                    </Text>
-                    <LineChips lines={interchangeLines} />
-                  </XStack>
-                )}
+              {!isFullInterchange && interchangeLines.length > 0 && !interchangeExpanded && (
+                <XStack gap="$1" items="center" flexWrap="wrap">
+                  <Text fontSize={11} color={Colors.secondaryText}>
+                    Only between
+                  </Text>
+                  <LineChips lines={interchangeLines} />
+                </XStack>
+              )}
             </YStack>
+            {showDropdown && (
+              <MaterialIcons
+                name={interchangeExpanded ? 'expand-less' : 'expand-more'}
+                size={20}
+                color={Colors.secondaryText}
+              />
+            )}
           </XStack>
+
+          {interchangeExpanded && (
+            <YStack gap="$2" pl="$1">
+              {groups.map((group) => (
+                <XStack key={group.label} items="center" gap="$2" flexWrap="wrap">
+                  <Text fontSize={12} fontWeight="600" color={Colors.secondaryText} style={{ minWidth: 100 }}>
+                    {group.label}
+                  </Text>
+                  <LineChips lines={group.lines} />
+                </XStack>
+              ))}
+            </YStack>
+          )}
         </>
       )}
     </YStack>
