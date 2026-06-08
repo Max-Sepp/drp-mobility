@@ -2,7 +2,7 @@
 // Fields visible from the start: name → location search → icon picker → save.
 
 import { MaterialIcons } from '@expo/vector-icons'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   ActivityIndicator,
   Alert,
@@ -22,7 +22,7 @@ import {
   type LocationSuggestion,
 } from '@/features/journey/api/geocode'
 import type { CustomPlace } from '@/features/journey/api/savedPlaces'
-import { Colors, Radii, Shadows, Spacing, Typography } from '@/theme'
+import { useTheme, Spacing, Typography } from '@/theme'
 
 type Props = {
   visible: boolean
@@ -47,6 +47,154 @@ const ICONS: { name: keyof typeof MaterialIcons.glyphMap; label: string }[] = [
 ]
 
 export function AddCustomPlaceModal({ visible, existingNames = [], onSave, onDismiss }: Props) {
+  const { Colors, Radii, Shadows } = useTheme()
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        container: {
+          flex: 1,
+          backgroundColor: Colors.card,
+          paddingHorizontal: Spacing.lg,
+          paddingTop: Spacing.lg,
+        },
+        header: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginBottom: Spacing.lg,
+        },
+        headerSpacer: {
+          width: 36,
+        },
+        title: {
+          ...Typography.heading,
+          color: Colors.text,
+          flex: 1,
+          textAlign: 'center',
+        },
+        closeBtn: {
+          width: 36,
+          height: 36,
+          borderRadius: 18,
+          backgroundColor: Colors.searchBg,
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+        scrollContent: {
+          paddingBottom: Spacing.lg,
+        },
+        fieldLabel: {
+          ...Typography.label,
+          color: Colors.secondaryText,
+          letterSpacing: 0.5,
+          marginBottom: Spacing.sm,
+        },
+        inputRow: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          backgroundColor: Colors.searchBg,
+          borderRadius: Radii.input,
+          paddingHorizontal: Spacing.md,
+          paddingVertical: 12,
+          ...Shadows.card,
+        },
+        input: {
+          flex: 1,
+          fontSize: 15,
+          color: Colors.text,
+          padding: 0,
+        },
+        resolvedChip: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: Spacing.sm,
+          backgroundColor: Colors.searchBg,
+          borderRadius: Radii.input,
+          paddingHorizontal: Spacing.md,
+          paddingVertical: 12,
+        },
+        resolvedChipText: {
+          ...Typography.body,
+          color: Colors.text,
+          flex: 1,
+        },
+        suggestionsBox: {
+          marginTop: Spacing.xs,
+          backgroundColor: Colors.card,
+          borderRadius: Radii.button,
+          borderWidth: StyleSheet.hairlineWidth,
+          borderColor: Colors.separator,
+          overflow: 'hidden',
+        },
+        resultRow: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: Spacing.md,
+          paddingVertical: Spacing.sm,
+          paddingHorizontal: Spacing.md,
+        },
+        resultIcon: {
+          width: 30,
+          height: 30,
+          borderRadius: Radii.icon,
+          backgroundColor: Colors.searchBg,
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+        resultLabel: {
+          ...Typography.body,
+          color: Colors.text,
+          fontWeight: '600',
+        },
+        resultSubtitle: {
+          ...Typography.caption,
+          color: Colors.secondaryText,
+        },
+        separator: {
+          height: StyleSheet.hairlineWidth,
+          backgroundColor: Colors.separator,
+          marginLeft: 50,
+        },
+        iconGrid: {
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          gap: Spacing.sm,
+        },
+        iconOption: {
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: 66,
+          paddingVertical: Spacing.sm,
+          borderRadius: Radii.button,
+          backgroundColor: Colors.searchBg,
+          gap: 4,
+        },
+        iconOptionSelected: {
+          backgroundColor: Colors.blue,
+        },
+        iconLabel: {
+          fontSize: 11,
+          color: Colors.blue,
+          fontWeight: '600',
+        },
+        iconLabelSelected: {
+          color: Colors.card,
+        },
+        saveBtn: {
+          marginTop: Spacing.xl,
+          backgroundColor: Colors.text,
+          borderRadius: Radii.button,
+          height: 52,
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+        saveBtnText: {
+          color: Colors.card,
+          fontSize: 16,
+          fontWeight: '700',
+        },
+      }),
+    [Colors, Radii, Shadows],
+  )
   const insets = useSafeAreaInsets()
   const [name, setName] = useState('')
   const [icon, setIcon] = useState<keyof typeof MaterialIcons.glyphMap>('star')
@@ -274,147 +422,3 @@ export function AddCustomPlaceModal({ visible, existingNames = [], onSave, onDis
     </Modal>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.card,
-    paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.lg,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: Spacing.lg,
-  },
-  headerSpacer: {
-    width: 36,
-  },
-  title: {
-    ...Typography.heading,
-    color: Colors.text,
-    flex: 1,
-    textAlign: 'center',
-  },
-  closeBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: Colors.searchBg,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  scrollContent: {
-    paddingBottom: Spacing.lg,
-  },
-  fieldLabel: {
-    ...Typography.label,
-    color: Colors.secondaryText,
-    letterSpacing: 0.5,
-    marginBottom: Spacing.sm,
-  },
-  inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.searchBg,
-    borderRadius: Radii.input,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: 12,
-    ...Shadows.card,
-  },
-  input: {
-    flex: 1,
-    fontSize: 15,
-    color: Colors.text,
-    padding: 0,
-  },
-  resolvedChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.sm,
-    backgroundColor: Colors.searchBg,
-    borderRadius: Radii.input,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: 12,
-  },
-  resolvedChipText: {
-    ...Typography.body,
-    color: Colors.text,
-    flex: 1,
-  },
-  suggestionsBox: {
-    marginTop: Spacing.xs,
-    backgroundColor: Colors.card,
-    borderRadius: Radii.button,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: Colors.separator,
-    overflow: 'hidden',
-  },
-  resultRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.md,
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.md,
-  },
-  resultIcon: {
-    width: 30,
-    height: 30,
-    borderRadius: Radii.icon,
-    backgroundColor: Colors.searchBg,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  resultLabel: {
-    ...Typography.body,
-    color: Colors.text,
-    fontWeight: '600',
-  },
-  resultSubtitle: {
-    ...Typography.caption,
-    color: Colors.secondaryText,
-  },
-  separator: {
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: Colors.separator,
-    marginLeft: 50,
-  },
-  iconGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: Spacing.sm,
-  },
-  iconOption: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 66,
-    paddingVertical: Spacing.sm,
-    borderRadius: Radii.button,
-    backgroundColor: Colors.searchBg,
-    gap: 4,
-  },
-  iconOptionSelected: {
-    backgroundColor: Colors.blue,
-  },
-  iconLabel: {
-    fontSize: 11,
-    color: Colors.blue,
-    fontWeight: '600',
-  },
-  iconLabelSelected: {
-    color: Colors.card,
-  },
-  saveBtn: {
-    marginTop: Spacing.xl,
-    backgroundColor: Colors.text,
-    borderRadius: Radii.button,
-    height: 52,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  saveBtnText: {
-    color: Colors.card,
-    fontSize: 16,
-    fontWeight: '700',
-  },
-})

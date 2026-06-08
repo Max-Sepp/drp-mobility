@@ -28,9 +28,10 @@ import {
 } from '@/features/journey/components/legDisplay'
 import { OutageDetail } from '@/features/journey/components/OutageDetail'
 import { useAuth } from '@/features/auth'
-import { Borders, Colors, Heights, Opacity, Radii } from '@/theme'
+import { useTheme, Borders, Heights, Opacity } from '@/theme'
 
 export const JourneyDetailScreen = ({ navigation, route }: JourneyDetailScreenProps) => {
+  const { Colors, Radii } = useTheme()
   const { journey, from, to, outages = [], level, savedId, tags } = route.params
 
   const [currentSavedId, setCurrentSavedId] = useState<string | null>(savedId ?? null)

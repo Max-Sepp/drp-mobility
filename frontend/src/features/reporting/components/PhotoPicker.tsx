@@ -2,7 +2,7 @@ import * as ImagePicker from 'expo-image-picker'
 import { Alert, Image } from 'react-native'
 import { Text, YStack } from 'tamagui'
 import { FormSection } from '@/features/reporting/components/FormSection'
-import { Borders, Colors, Opacity, Radii } from '@/theme'
+import { useTheme, Borders, Opacity } from '@/theme'
 
 type PhotoPickerProps = {
   photo: ImagePicker.ImagePickerAsset | null
@@ -15,6 +15,7 @@ export const PhotoPicker = ({
   onPicked,
   label = 'Attach photo (optional)',
 }: PhotoPickerProps) => {
+  const { Colors, Radii } = useTheme()
   function pick() {
     Alert.alert('Attach photo', undefined, [
       {

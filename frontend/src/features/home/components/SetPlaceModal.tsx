@@ -2,7 +2,7 @@
 // Mirrors the debounced-search pattern from SearchActionSheet.
 
 import { MaterialIcons } from '@expo/vector-icons'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   ActivityIndicator,
   Alert,
@@ -21,7 +21,7 @@ import {
   searchLocations,
   type LocationSuggestion,
 } from '@/features/journey/api/geocode'
-import { Colors, Radii, Shadows, Spacing, Typography } from '@/theme'
+import { useTheme, Spacing, Typography } from '@/theme'
 
 type Props = {
   visible: boolean
@@ -31,6 +31,83 @@ type Props = {
 }
 
 export function SetPlaceModal({ visible, placeKey, onSave, onDismiss }: Props) {
+  const { Colors, Radii, Shadows } = useTheme()
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        container: {
+          flex: 1,
+          backgroundColor: Colors.card,
+          paddingHorizontal: Spacing.lg,
+          paddingTop: Spacing.lg,
+        },
+        header: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginBottom: Spacing.lg,
+        },
+        title: {
+          ...Typography.heading,
+          color: Colors.text,
+          flex: 1,
+        },
+        closeBtn: {
+          width: 36,
+          height: 36,
+          borderRadius: 18,
+          backgroundColor: Colors.searchBg,
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+        inputRow: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          backgroundColor: Colors.searchBg,
+          borderRadius: Radii.pill,
+          paddingHorizontal: Spacing.md,
+          paddingVertical: 10,
+          marginBottom: Spacing.lg,
+          ...Shadows.card,
+        },
+        input: {
+          flex: 1,
+          fontSize: 15,
+          color: Colors.text,
+          padding: 0,
+        },
+        resultRow: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: Spacing.md,
+          paddingVertical: Spacing.sm,
+        },
+        resultIcon: {
+          width: 34,
+          height: 34,
+          borderRadius: Radii.icon,
+          backgroundColor: Colors.searchBg,
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+        resultLabel: {
+          color: Colors.text,
+          fontWeight: '600',
+        },
+        resultSubtitle: {
+          color: Colors.secondaryText,
+        },
+        emptyState: {
+          paddingTop: Spacing.xl,
+          alignItems: 'center',
+        },
+        separator: {
+          height: StyleSheet.hairlineWidth,
+          backgroundColor: Colors.separator,
+          marginLeft: 50,
+        },
+      }),
+    [Colors, Radii, Shadows],
+  )
   const insets = useSafeAreaInsets()
   const [query, setQuery] = useState('')
   const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([])
@@ -166,76 +243,3 @@ export function SetPlaceModal({ visible, placeKey, onSave, onDismiss }: Props) {
     </Modal>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.card,
-    paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.lg,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: Spacing.lg,
-  },
-  title: {
-    ...Typography.heading,
-    color: Colors.text,
-    flex: 1,
-  },
-  closeBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: Colors.searchBg,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.searchBg,
-    borderRadius: Radii.pill,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: 10,
-    marginBottom: Spacing.lg,
-    ...Shadows.card,
-  },
-  input: {
-    flex: 1,
-    fontSize: 15,
-    color: Colors.text,
-    padding: 0,
-  },
-  resultRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.md,
-    paddingVertical: Spacing.sm,
-  },
-  resultIcon: {
-    width: 34,
-    height: 34,
-    borderRadius: Radii.icon,
-    backgroundColor: Colors.searchBg,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  resultLabel: {
-    color: Colors.text,
-    fontWeight: '600',
-  },
-  resultSubtitle: {
-    color: Colors.secondaryText,
-  },
-  emptyState: {
-    paddingTop: Spacing.xl,
-    alignItems: 'center',
-  },
-  separator: {
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: Colors.separator,
-    marginLeft: 50,
-  },
-})

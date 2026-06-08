@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { KeyboardAvoidingView, Platform } from 'react-native'
 import { ScrollView } from 'tamagui'
-import { Colors } from '@/theme'
+import { useTheme } from '@/theme'
 
 type FormScreenLayoutProps = {
   header: ReactNode
@@ -11,6 +11,7 @@ type FormScreenLayoutProps = {
 
 /** Keyboard-aware scaffold for the report forms: a pinned header, a scrolling body, and a pinned footer. */
 export const FormScreenLayout = ({ header, footer, children }: FormScreenLayoutProps) => {
+  const { Colors } = useTheme()
   // On Android, Expo already resizes the window for the keyboard (adjustResize); adding
   // behavior="height" on top of that double-counts and leaves dead space at the bottom, so
   // we only set a behavior on iOS.

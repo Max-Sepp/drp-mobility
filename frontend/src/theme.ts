@@ -1,110 +1,32 @@
-// Central design tokens for the app.
-// All components should import from here — never hardcode colours, radii, or spacing.
+// Central design tokens.
+// Theme-dependent tokens (Colors, Radii, Shadows) come from useTheme().
+// Everything here is static — layout values that never change between themes.
 
 import { StyleSheet } from 'react-native'
 
-// ---------------------------------------------------------------------------
-// Colors
-// ---------------------------------------------------------------------------
-
-export const Colors = {
-  // Page / background
-  background: '#F2F2F7', // iOS systemGroupedBackground
-  card: '#FFFFFF',
-  searchBg: '#EFEFF4',
-
-  // Map placeholder
-  mapBg: '#DDE8CC', // OSM-style light green
-  mapGrid: '#C8D9B5',
-  mapWater: '#B3D1E0',
-
-  // Text
-  text: '#000000',
-  secondaryText: '#8E8E93', // iOS secondaryLabel
-  tertiaryText: '#C7C7CC',
-  placeholderText: '#AEAEB2',
-
-  // Separator / border
-  separator: '#C6C6C8',
-  border: '#E5E5EA',
-
-  // Brand / interactive
-  blue: '#007AFF', // iOS blue
-  blueDark: '#0062CC',
-
-  // Semantic — base colours
-  success: '#34C759',
-  warning: '#FF9500',
-  danger: '#FF3B30',
-
-  // Semantic — tinted backgrounds and dark variants (for alert boxes, badges)
-  successBg: '#D1FAE5',
-  successDark: '#059669',
-  warningBg: '#FFFBEB',
-  warningDark: '#92400E',
-  warningBorder: '#FCD34D',
-  dangerBg: '#FEF2F2',
-  dangerDark: '#B91C1C',
-  dangerBorder: '#FECACA',
-  blueBg: '#EFF6FF', // very light blue for tags / pill fills
-} as const
+// Re-export the hook and types so components import from one place.
+export { useTheme, useThemeControls, ThemeProvider } from './theme/ThemeContext'
+export { THEMES, DEFAULT_THEME_ID } from './theme/themes'
+export type { Theme, ThemeId, ThemeColors, ThemeRadii, ThemeShadows } from './theme/themes'
 
 // ---------------------------------------------------------------------------
-// Border radii
-// ---------------------------------------------------------------------------
-
-export const Radii = {
-  card: 16,
-  button: 12,
-  input: 12,
-  pill: 999,
-  small: 8,
-  xs: 4,
-  handle: 2, // drag handle bars
-  icon: 17, // circular icon wrappers
-} as const
-
-// ---------------------------------------------------------------------------
-// Shadows
-// ---------------------------------------------------------------------------
-
-export const Shadows = {
-  // boxShadow works on iOS, Android (RN 0.76+), and web — replaces deprecated shadow* props.
-  card: {
-    boxShadow: '0px 2px 8px rgba(0,0,0,0.08)',
-    elevation: 3,
-  },
-  heavy: {
-    boxShadow: '0px 4px 16px rgba(0,0,0,0.14)',
-    elevation: 6,
-  },
-  top: {
-    boxShadow: '0px -2px 8px rgba(0,0,0,0.06)',
-    elevation: 3,
-  },
-  marker: {
-    boxShadow: '0px 1px 4px rgba(0,0,0,0.3)',
-    elevation: 4,
-  },
-} as const
-
-// ---------------------------------------------------------------------------
-// Typography
+// Typography — font size and weight only; colour is always set by the component
+// using its theme's Colors.text / Colors.secondaryText.
 // ---------------------------------------------------------------------------
 
 export const Typography = {
-  largeTitle: { fontSize: 28, fontWeight: '700' as const, color: Colors.text },
-  heading: { fontSize: 22, fontWeight: '700' as const, color: Colors.text },
-  sectionTitle: { fontSize: 17, fontWeight: '600' as const, color: Colors.text },
-  body: { fontSize: 15, fontWeight: '400' as const, color: Colors.text },
-  bodyBold: { fontSize: 15, fontWeight: '600' as const, color: Colors.text },
-  caption: { fontSize: 13, fontWeight: '400' as const, color: Colors.secondaryText },
-  captionBold: { fontSize: 13, fontWeight: '600' as const, color: Colors.secondaryText },
-  label: { fontSize: 11, fontWeight: '600' as const, color: Colors.secondaryText },
+  largeTitle: { fontSize: 28, fontWeight: '800' as const },
+  heading: { fontSize: 22, fontWeight: '800' as const },
+  sectionTitle: { fontSize: 17, fontWeight: '700' as const },
+  body: { fontSize: 15, fontWeight: '400' as const },
+  bodyBold: { fontSize: 15, fontWeight: '700' as const },
+  caption: { fontSize: 13, fontWeight: '400' as const },
+  captionBold: { fontSize: 13, fontWeight: '700' as const },
+  label: { fontSize: 11, fontWeight: '700' as const },
 } as const
 
 // ---------------------------------------------------------------------------
-// Spacing
+// Spacing — 4 pt grid
 // ---------------------------------------------------------------------------
 
 export const Spacing = {
@@ -118,13 +40,13 @@ export const Spacing = {
 } as const
 
 // ---------------------------------------------------------------------------
-// Borders
+// Borders — line widths
 // ---------------------------------------------------------------------------
 
 export const Borders = {
-  thin: 1,
-  medium: 1.5,
-  thick: 2,
+  thin: 1.5,
+  medium: 2,
+  thick: 3,
 } as const
 
 // ---------------------------------------------------------------------------
@@ -132,11 +54,11 @@ export const Borders = {
 // ---------------------------------------------------------------------------
 
 export const Opacity = {
-  disabled: 0.4, // fully disabled, non-interactive items
-  disabledMid: 0.6, // submitting / loading states
-  subtle: 0.5, // minor interactive affordance (e.g. clear button)
-  pressed: 0.7, // standard pressStyle feedback
-  pressedLight: 0.8, // lighter press feedback on dark / primary buttons
+  disabled: 0.35,
+  disabledMid: 0.55,
+  subtle: 0.5,
+  pressed: 0.65,
+  pressedLight: 0.75,
 } as const
 
 // ---------------------------------------------------------------------------
@@ -144,7 +66,7 @@ export const Opacity = {
 // ---------------------------------------------------------------------------
 
 export const Overlays = {
-  backdrop: 'rgba(0,0,0,0.35)', // modal backdrop tint
+  backdrop: 'rgba(0,0,0,0.45)',
 } as const
 
 // ---------------------------------------------------------------------------
@@ -157,21 +79,7 @@ export const Heights = {
 } as const
 
 // ---------------------------------------------------------------------------
-// Reusable StyleSheet fragments
+// Hairline — useful static constant from StyleSheet
 // ---------------------------------------------------------------------------
 
-export const SharedStyles = StyleSheet.create({
-  card: {
-    backgroundColor: Colors.card,
-    borderRadius: Radii.card,
-    ...Shadows.card,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  screenBackground: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-})
+export const hairlineWidth = StyleSheet.hairlineWidth

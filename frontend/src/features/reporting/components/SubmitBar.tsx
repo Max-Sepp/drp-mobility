@@ -1,7 +1,8 @@
+import { useMemo } from 'react'
 import { StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Spinner, Text, YStack } from 'tamagui'
-import { Borders, Colors, Heights, Opacity, Radii } from '@/theme'
+import { useTheme, Borders, Heights, Opacity } from '@/theme'
 
 type SubmitBarProps = {
   onPress: () => void
@@ -10,6 +11,18 @@ type SubmitBarProps = {
 }
 
 export const SubmitBar = ({ onPress, submitting = false, label = 'Submit' }: SubmitBarProps) => {
+  const { Colors, Radii } = useTheme()
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        safe: {
+          backgroundColor: Colors.card,
+          borderTopWidth: Borders.thin,
+          borderTopColor: Colors.border,
+        },
+      }),
+    [Colors],
+  )
   return (
     <SafeAreaView edges={['bottom']} style={styles.safe}>
       <YStack
@@ -33,11 +46,3 @@ export const SubmitBar = ({ onPress, submitting = false, label = 'Submit' }: Sub
     </SafeAreaView>
   )
 }
-
-const styles = StyleSheet.create({
-  safe: {
-    backgroundColor: Colors.card,
-    borderTopWidth: Borders.thin,
-    borderTopColor: Colors.border,
-  },
-})

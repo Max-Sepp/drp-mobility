@@ -1,7 +1,7 @@
 import { Spinner, Text, XStack, YStack } from 'tamagui'
 import type { components } from '@/api/schema.d'
 import { FormSection } from '@/features/reporting/components/FormSection'
-import { Borders, Colors, Opacity, Radii } from '@/theme'
+import { useTheme, Borders, Opacity } from '@/theme'
 
 type Equipment = components['schemas']['EquipmentSummary']
 
@@ -22,6 +22,7 @@ export const EquipmentPicker = ({
   onSelect,
   emptyText,
 }: EquipmentPickerProps) => {
+  const { Colors, Radii } = useTheme()
   return (
     <FormSection label={label}>
       {loading ? (

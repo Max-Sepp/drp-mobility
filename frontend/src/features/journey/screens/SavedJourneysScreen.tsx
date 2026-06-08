@@ -13,7 +13,7 @@ import {
   type SavedJourney,
 } from '@/features/journey/api/savedJourneys'
 import { clockTime } from '@/features/journey/components/legDisplay'
-import { Borders, Colors, Opacity, Radii } from '@/theme'
+import { useTheme, Borders, Opacity } from '@/theme'
 
 function savedAtLabel(iso: string): string {
   const d = parseUtc(iso)
@@ -26,6 +26,7 @@ function savedAtLabel(iso: string): string {
 }
 
 export const SavedJourneysScreen = ({ navigation }: SavedJourneysScreenProps) => {
+  const { Colors, Radii } = useTheme()
   const [saved, setSaved] = useState<SavedJourney[]>([])
   const [loading, setLoading] = useState(true)
   const { status } = useAuth()

@@ -26,7 +26,7 @@ import {
 import { JourneyResultCard } from '@/features/journey/components/JourneyResultCard'
 import { formatDepart, LeaveAtField } from '@/features/journey/components/LeaveAtField'
 import { LocationInput } from '@/features/journey/components/LocationInput'
-import { Borders, Colors, Heights, Opacity, Radii, Typography } from '@/theme'
+import { useTheme, Borders, Heights, Opacity, Typography } from '@/theme'
 
 type Resolved = { from: ResolvedLocation; to: ResolvedLocation }
 type JourneyResult = { journey: Journey; outages: StationOutage[]; tags: RouteTag[] }
@@ -37,6 +37,7 @@ const LEVELS: { value: AccessibilityPreference; label: string }[] = [
 ]
 
 export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreenProps) => {
+  const { Colors, Radii } = useTheme()
   const [from, setFrom] = useState(route.params?.initialFrom?.label ?? '')
   const [to, setTo] = useState(route.params?.initialTo?.label ?? '')
   const [fromPostcode, setFromPostcode] = useState<string | null>(

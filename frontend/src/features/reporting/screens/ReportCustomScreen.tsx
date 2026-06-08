@@ -8,9 +8,10 @@ import { FormScreenLayout } from '@/features/reporting/components/FormScreenLayo
 import { FormSection } from '@/features/reporting/components/FormSection'
 import { PhotoPicker } from '@/features/reporting/components/PhotoPicker'
 import { SubmitBar } from '@/features/reporting/components/SubmitBar'
-import { Colors, Typography } from '@/theme'
+import { useTheme, Typography } from '@/theme'
 
 export const ReportCustomScreen = ({ navigation, route }: ReportCustomScreenProps) => {
+  const { Colors } = useTheme()
   const { station } = route.params
   const [description, setDescription] = useState('')
   const [area, setArea] = useState('')

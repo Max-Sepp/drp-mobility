@@ -13,6 +13,9 @@ module.exports = {
           'Used to take a photo of the broken equipment when reporting an issue.',
         NSLocationWhenInUseUsageDescription:
           'Used to show your position on the map and find nearby stations.',
+        NSMicrophoneUsageDescription:
+          'Used to search by voice — speak a station name or destination.',
+        NSSpeechRecognitionUsageDescription: 'Used to convert your spoken search query into text.',
       },
     },
     android: {

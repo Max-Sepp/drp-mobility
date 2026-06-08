@@ -11,13 +11,14 @@ import { FormScreenLayout } from '@/features/reporting/components/FormScreenLayo
 import { FormSection } from '@/features/reporting/components/FormSection'
 import { PhotoPicker } from '@/features/reporting/components/PhotoPicker'
 import { SubmitBar } from '@/features/reporting/components/SubmitBar'
-import { Colors, Typography } from '@/theme'
+import { useTheme, Typography } from '@/theme'
 
 type Equipment = components['schemas']['EquipmentSummary']
 
 const ALLOWED_MIME = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
 
 export const ReportFormScreen = ({ navigation, route }: ReportFormScreenProps) => {
+  const { Colors } = useTheme()
   const [equipmentType] = useState(route.params.equipmentType)
   const [station] = useState<Station>(route.params.station)
   // Connections come from the equipment rows the backend has for this station and equipment type.

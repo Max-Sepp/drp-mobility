@@ -3,7 +3,7 @@ import { Text, XStack } from 'tamagui'
 import type { ResolvedLocation } from '@/features/journey/api/geocode'
 import type { Journey, Leg, RouteTag } from '@/features/journey/api/tfl'
 import { effectiveDiscount } from '@/features/journey/lib/railcards'
-import { Borders, Colors, Opacity, Radii } from '@/theme'
+import { useTheme, Borders, Opacity } from '@/theme'
 
 export type ResolveStation = (commonName: string) => string | null
 export type StationPressHandler = (stationName: string) => void
@@ -16,6 +16,7 @@ const TAG_LABELS: Record<RouteTag, string> = {
 
 /** Pill chips labelling why a route stands out (e.g. "Fastest", "Least walking"). */
 export function RouteTags({ tags }: { tags?: RouteTag[] }) {
+  const { Colors, Radii } = useTheme()
   if (!tags || tags.length === 0) return null
   return (
     <XStack flexWrap="wrap" gap="$1.5">
@@ -78,6 +79,7 @@ export function LegStations({
   resolveStation: ResolveStation
   onStationPress: StationPressHandler
 }) {
+  const { Colors } = useTheme()
   if (!STATION_MODES.has(leg.mode.name)) return null
   const points = [leg.departurePoint?.commonName, leg.arrivalPoint?.commonName].filter(
     (n): n is string => !!n,

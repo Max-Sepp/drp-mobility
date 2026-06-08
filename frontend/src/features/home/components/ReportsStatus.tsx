@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Spinner, Text, YStack } from 'tamagui'
 import type { components } from '@/api/schema.d'
 import { Heading } from '@/components/Heading'
-import { Colors, Radii } from '@/theme'
+import { useTheme } from '@/theme'
 import { OutageReportCard } from '@/features/home/components/OutageReportCard'
 
 type OutageReport = components['schemas']['OutageReportSummary']
@@ -13,6 +13,7 @@ type ReportsStatusProps = {
 }
 
 export const ReportsStatus = ({ loading, reports }: ReportsStatusProps) => {
+  const { Colors, Radii } = useTheme()
   const [expandedId, setExpandedId] = useState<number | null>(null)
 
   if (loading) {

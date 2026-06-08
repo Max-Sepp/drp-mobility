@@ -2,13 +2,14 @@ import { MaterialIcons } from '@expo/vector-icons'
 import { useState } from 'react'
 import { Separator, Text, XStack, YStack } from 'tamagui'
 import { LineChips, StepFreeBadge, type PlatformDetail } from '@/features/stations'
-import { Borders, Colors, Opacity, Radii, Spacing } from '@/theme'
+import { useTheme, Borders, Opacity, Spacing } from '@/theme'
 
 type PlatformAccessCardProps = {
   platforms: PlatformDetail[]
 }
 
 export const PlatformAccessCard = ({ platforms }: PlatformAccessCardProps) => {
+  const { Colors, Radii } = useTheme()
   const degraded = platforms.filter((p) => p.step_free !== 'full')
   const allFull = degraded.length === 0
   const [expanded, setExpanded] = useState(false)

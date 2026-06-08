@@ -6,13 +6,7 @@ import {
   postcodeForSuggestion,
   searchLocations,
 } from '@/features/journey/api/geocode'
-import { Borders, Colors, Opacity, Radii } from '@/theme'
-
-const fieldStyle = {
-  borderColor: Colors.border,
-  backgroundColor: Colors.searchBg,
-  fontSize: 15,
-}
+import { useTheme, Borders, Opacity } from '@/theme'
 
 type LocationInputProps = {
   label: string
@@ -52,6 +46,12 @@ export const LocationInput = ({
   onCurrentLocation,
   currentLocationLoading,
 }: LocationInputProps) => {
+  const { Colors, Radii } = useTheme()
+  const fieldStyle = {
+    borderColor: Colors.border,
+    backgroundColor: Colors.searchBg,
+    fontSize: 15,
+  }
   const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([])
   const [searching, setSearching] = useState(false)
   const [resolved, setResolved] = useState(isResolvedProp ?? false)
