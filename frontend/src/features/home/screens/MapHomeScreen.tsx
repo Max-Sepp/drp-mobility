@@ -467,7 +467,10 @@ export function MapHomeScreen({ navigation }: Props) {
           setActiveJourneyParams(null)
           setActive(null)
         }}
-        onEnd={endActive}
+        onEnd={() => {
+          setActiveJourneyParams(null)
+          setActive(null)
+        }}
       />
 
       {/* Top overlay: rendered after sheets so it sits above all backdrops */}

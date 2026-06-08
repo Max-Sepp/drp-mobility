@@ -234,7 +234,7 @@ export function ActiveJourneySheet({ params, onComplete, onEnd }: Props) {
           style: 'destructive',
           onPress: async () => {
             await clearActiveJourney()
-            onEnd()
+            sheetRef.current?.close()
           },
         },
       ],
