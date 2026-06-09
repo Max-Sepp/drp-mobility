@@ -16,6 +16,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = ROOT / "temp" / "tfl-stationdata-detailed"
 TUBE_JSON = ROOT / "backend" / "app" / "data" / "stations.json"
+OVERRIDES_JSON = ROOT / "backend" / "app" / "data" / "station_overrides.json"
 
 # stations.json name → CSV UniqueId or CSV Name (for the 8 mismatches)
 NAME_MAP = {
@@ -954,6 +955,37 @@ def build_toilets(station_uid: str, toilets_by_station: dict) -> list[dict]:
     return result
 
 
+def apply_overrides(stations: list[dict]) -> None:
+    """Apply hand-curated corrections from station_overrides.json.
+
+    Runs after all CSV-derived enrichment so manual data wins over automated sources.
+    Schema-comment entries (name == '__schema_comment__') are silently skipped.
+    Unknown station names are reported as warnings.
+    """
+    if not OVERRIDES_JSON.exists():
+        return
+    overrides: list[dict] = json.loads(OVERRIDES_JSON.read_text(encoding="utf-8"))
+    by_name = {s["name"]: s for s in stations}
+    for override in overrides:
+        name = override.get("name", "")
+        if name == "__schema_comment__":
+            continue
+        station = by_name.get(name)
+        if station is None:
+            print(f"WARNING: station_overrides.json references unknown station {name!r}")
+            continue
+        for field in ("lift_units", "escalator_units", "lifts", "escalators"):
+            if field in override:
+                station[field] = override[field]
+        if "platforms_patch" in override:
+            plat_by_id = {p["id"]: p for p in station.get("platforms", [])}
+            for plat_id, patch in override["platforms_patch"].items():
+                if plat_id in plat_by_id:
+                    plat_by_id[plat_id].update(patch)
+                else:
+                    print(f"WARNING: station_overrides.json references unknown platform {plat_id!r} on {name!r}")
+
+
 def main() -> None:
     print("Loading source data…")
     all_stations: list[dict] = json.loads(TUBE_JSON.read_text(encoding="utf-8"))
@@ -1077,6 +1109,9 @@ def main() -> None:
         toilets = build_toilets(uid, toilets_by_station)
         if toilets:
             station["toilets"] = toilets
+
+    # --- Apply hand-curated overrides ----------------------------------------
+    apply_overrides(all_stations)
 
     # --- Report and write ----------------------------------------------------
     print(f"Matched {matched}/{len(all_stations)} stations.")

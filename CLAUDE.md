@@ -23,12 +23,14 @@ Monorepo with two self-contained subprojects. There is no top-level package mana
 
 ## Station data enrichment
 
-All station data lives in `backend/app/data/stations.json` (387 stations, all TfL modes). The script `temp/enrich_tube_stations.py` reads this file and enriches it from TfL's step-free access CSV feed (`temp/tfl-stationdata-detailed/`). Run it whenever the CSV data changes:
+All station data lives in `backend/app/data/stations.json` (387 stations, all TfL modes). The script `backend/seed_stations_data.py` reads this file and enriches it from TfL's step-free access CSV feed (`temp/tfl-stationdata-detailed/`). Run it whenever the CSV data or overrides change:
 
 ```bash
-python3 temp/enrich_tube_stations.py
+python3 backend/seed_stations_data.py
 # then delete backend/dev.db and restart uvicorn to reseed
 ```
+
+`temp/enrich_tube_stations.py` is a legacy copy of the same script kept for reference — do not use it.
 
 ### Enriched fields per station
 
@@ -64,4 +66,4 @@ TfL's step-free feed has no escalator topology data (escalators are not step-fre
 
 Supported fields per entry: `lift_units`, `lifts`, `escalator_units`, `escalators`, `platforms_patch` (map of `{ platform_id: { field: value } }`). The `name` field must match `stations.json` exactly. Unknown names print a warning during enrichment.
 
-After editing the overrides file, re-run `python3 temp/enrich_tube_stations.py` (then delete `backend/dev.db` and restart) to regenerate `stations.json`. For quick fixes that don't need a full re-enrichment, you can patch `stations.json` directly — but keep the overrides file in sync so the next enrichment run doesn't clobber your change.
+After editing the overrides file, re-run `python3 backend/seed_stations_data.py` (then delete `backend/dev.db` and restart) to regenerate `stations.json`. For quick fixes that don't need a full re-enrichment, you can patch `stations.json` directly — but keep the overrides file in sync so the next enrichment run doesn't clobber your change.
