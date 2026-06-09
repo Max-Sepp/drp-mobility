@@ -373,10 +373,12 @@ export function JourneyPlannerSheet({ plan, onClose, onJourneySelect, savedPlace
             savedPlaceShortcuts={placeShortcuts}
           />
 
-          {/* Swap button — centered on the From/To boundary, pinned to the right */}
+          {/* Swap button — centred between the From input's bottom and the To input's top.
+              The To container starts at fromH + FROM_TO_GAP, with ~26 px of label+gap before
+              the actual input, so the visual midpoint is ~fromH + 18 → top = fromH + 18 - 18. */}
           <TouchableOpacity
             onPress={swapLocations}
-            style={[styles.swapBtn, { top: fromH + FROM_TO_GAP / 2 - SWAP_BTN / 2 }]}
+            style={[styles.swapBtn, { top: fromH }]}
             activeOpacity={0.75}
             accessibilityRole="button"
             accessibilityLabel="Swap start and destination"
