@@ -42,6 +42,9 @@ export function AccessibilityPreferenceProvider({ children }: { children: ReactN
 
 export function useAccessibilityPreference(): AccessibilityPreferenceContextValue {
   const ctx = useContext(AccessibilityPreferenceContext)
-  if (!ctx) throw new Error('useAccessibilityPreference must be used within AccessibilityPreferenceProvider')
+  if (!ctx)
+    throw new Error(
+      'useAccessibilityPreference must be used within AccessibilityPreferenceProvider',
+    )
   return ctx
 }

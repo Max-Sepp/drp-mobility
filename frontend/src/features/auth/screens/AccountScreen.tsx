@@ -239,10 +239,22 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
   // Accessibility default picker
   // ---------------------------------------------------------------------------
 
-  const ACCESSIBILITY_OPTIONS: { value: AccessibilityPreference | null; name: string; description: string }[] = [
+  const ACCESSIBILITY_OPTIONS: {
+    value: AccessibilityPreference | null
+    name: string
+    description: string
+  }[] = [
     { value: null, name: 'None', description: 'No accessibility filter applied by default' },
-    { value: 'StepFreeToPlatform', name: 'Step-free to platform', description: 'Routes with step-free access to the platform' },
-    { value: 'StepFreeToVehicle', name: 'Step-free to train', description: 'Routes with step-free access all the way to the train' },
+    {
+      value: 'StepFreeToPlatform',
+      name: 'Step-free to platform',
+      description: 'Routes with step-free access to the platform',
+    },
+    {
+      value: 'StepFreeToVehicle',
+      name: 'Step-free to train',
+      description: 'Routes with step-free access all the way to the train',
+    },
   ]
 
   const currentAccessibilityOption =
@@ -545,7 +557,11 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
       >
         <View style={styles.modalRoot}>
           <Animated.View
-            style={[StyleSheet.absoluteFillObject, styles.backdrop, { opacity: accessibilityBackdropAnim }]}
+            style={[
+              StyleSheet.absoluteFillObject,
+              styles.backdrop,
+              { opacity: accessibilityBackdropAnim },
+            ]}
             pointerEvents="none"
           />
           <TouchableOpacity
@@ -553,7 +569,9 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
             onPress={closeAccessibilityPicker}
             activeOpacity={1}
           />
-          <Animated.View style={[styles.sheet, { transform: [{ translateY: accessibilitySheetAnim }] }]}>
+          <Animated.View
+            style={[styles.sheet, { transform: [{ translateY: accessibilitySheetAnim }] }]}
+          >
             <View style={styles.handle} />
             <RNText style={styles.sheetTitle}>DEFAULT ACCESSIBILITY</RNText>
             <ScrollView
