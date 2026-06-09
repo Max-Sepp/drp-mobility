@@ -145,6 +145,11 @@ export function JourneyPlannerSheet({ plan, onClose, onJourneySelect, savedPlace
   // Measured height of the From input container — used to vertically position the swap button.
   const [fromH, setFromH] = useState(70)
 
+  // Search is only allowed once both fields are resolved to a postcode — i.e. both show
+  // a tick. Typing into a field clears its postcode (LocationInput.handleType), so a
+  // partially-typed address can never satisfy this.
+  const canSearch = fromPostcode !== null && toPostcode !== null
+
   const placeShortcuts = useMemo<PlaceShortcut[]>(() => {
     if (!savedPlaces) return []
     const shortcuts: PlaceShortcut[] = []
@@ -244,35 +249,24 @@ export function JourneyPlannerSheet({ plan, onClose, onJourneySelect, savedPlace
   // ── Journey planning ──────────────────────────────────────────────────
 
   async function run() {
-    if (!from.trim() || !to.trim()) {
-      Alert.alert('Required', 'Please enter both a start and a destination.')
+    // Guarded by the disabled Search button, but re-check here as a safety net: both
+    // fields must be resolved to a postcode before we can plan.
+    if (!canSearch) {
+      Alert.alert('Required', 'Please choose a valid start and destination.')
       return
     }
     setLoading(true)
     setResults([])
     setResolved(null)
 
-    const resolveField = (text: string, postcode: string | null, isNamedPlace?: boolean) =>
-      postcode
-        ? Promise.resolve({ postcode, label: text, isNamedPlace } as ResolvedLocation)
-        : resolveToPostcode(text)
+    const fromLoc: ResolvedLocation = { postcode: fromPostcode!, label: from }
+    const toLoc: ResolvedLocation = {
+      postcode: toPostcode!,
+      label: to,
+      isNamedPlace: toIsNamedPlace || undefined,
+    }
 
     const outagesPromise = fetchStationOutages()
-    const [fromLoc, toLoc] = await Promise.all([
-      resolveField(from, fromPostcode),
-      resolveField(to, toPostcode, toIsNamedPlace || undefined),
-    ])
-
-    if ('error' in fromLoc) {
-      setLoading(false)
-      Alert.alert('Start location', fromLoc.error)
-      return
-    }
-    if ('error' in toLoc) {
-      setLoading(false)
-      Alert.alert('Destination', toLoc.error)
-      return
-    }
     setResolved({ from: fromLoc, to: toLoc })
 
     let optResult: JourneyOptionsResult
@@ -410,11 +404,12 @@ export function JourneyPlannerSheet({ plan, onClose, onJourneySelect, savedPlace
 
         {/* Search button */}
         <TouchableOpacity
-          onPress={loading ? undefined : run}
-          activeOpacity={loading ? 1 : 0.75}
-          style={[styles.searchBtn, { opacity: loading ? Opacity.disabledMid : 1 }]}
+          onPress={loading || !canSearch ? undefined : run}
+          activeOpacity={loading || !canSearch ? 1 : 0.75}
+          style={[styles.searchBtn, { opacity: loading || !canSearch ? Opacity.disabledMid : 1 }]}
           accessibilityRole="button"
           accessibilityLabel="Search for journeys"
+          accessibilityState={{ disabled: loading || !canSearch }}
         >
           {loading ? (
             <Spinner size="small" color={Colors.card} />
