@@ -360,24 +360,6 @@ export function MapHomeScreen({ navigation }: Props) {
     })
   }
 
-  function endActive() {
-    Alert.alert(
-      'End journey?',
-      'This stops following the route. It stays in your saved journeys.',
-      [
-        { text: 'Keep going', style: 'cancel' },
-        {
-          text: 'End journey',
-          style: 'destructive',
-          onPress: async () => {
-            await clearActiveJourney()
-            setActive(null)
-          },
-        },
-      ],
-    )
-  }
-
   // The person icon doubles as the account affordance: log in when anonymous, or show the current
   // user with a log-out option when authenticated. A confirm step guards against an accidental tap.
   function handleAccountPress() {

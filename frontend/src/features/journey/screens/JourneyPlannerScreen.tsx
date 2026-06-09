@@ -1,10 +1,8 @@
 import { MaterialIcons } from '@expo/vector-icons'
-import * as Location from 'expo-location'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Alert, Keyboard, Pressable, StyleSheet, TouchableOpacity } from 'react-native'
 import { Spinner, Text, XStack, YStack } from 'tamagui'
 import { ScreenHeader } from '@/components/ScreenHeader'
-import { useAuth } from '@/features/auth'
 import { useStations } from '@/features/stations'
 import { FormScreenLayout } from '@/features/reporting/components/FormScreenLayout'
 import type { JourneyPlannerScreenProps } from '@/navigation/types'
@@ -22,7 +20,6 @@ import {
   type JourneyOptionsResult,
   planJourneyOptions,
   type RouteTag,
-  type TaggedJourney,
   type TimeConstraint,
 } from '@/features/journey/api/tfl'
 import { JourneyResultCard } from '@/features/journey/components/JourneyResultCard'
@@ -102,10 +99,6 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
   )
   const openStation = (station: string) => navigation.navigate('Station', { station })
 
-  useEffect(() => {
-    if (!route.params?.initialFrom && cachedCoords) handleCurrentLocation()
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
   const handleCurrentLocation = useCallback(async () => {
     if (!cachedCoords) return
     setGettingLocation(true)
@@ -119,6 +112,11 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
       setGettingLocation(false)
     }
   }, [cachedCoords])
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (!route.params?.initialFrom && cachedCoords) handleCurrentLocation()
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   function swapLocations() {
     const tempText = from

@@ -1,6 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker'
-import { useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import {
   ActionSheetIOS,
   Alert,
@@ -102,8 +102,8 @@ export function LeavePill({ value, onChange }: LeavePillProps) {
   const [showModal, setShowModal] = useState(false)
   const [pending, setPending] = useState<Date>(new Date())
   const pendingMode = useRef<'depart' | 'arrive'>('depart')
-  const backdropAnim = useRef(new Animated.Value(0)).current
-  const slideAnim = useRef(new Animated.Value(320)).current
+  const backdropAnim = useMemo(() => new Animated.Value(0), [])
+  const slideAnim = useMemo(() => new Animated.Value(320), [])
 
   const isActive = value !== null
 
@@ -118,6 +118,7 @@ export function LeavePill({ value, onChange }: LeavePillProps) {
 
   function openModal(initial: Date, mode: 'depart' | 'arrive') {
     pendingMode.current = mode
+    setModalTitle(mode === 'depart' ? 'Leave at' : 'Arrive by')
     setPending(initial)
     backdropAnim.setValue(0)
     slideAnim.setValue(320)
@@ -205,7 +206,7 @@ export function LeavePill({ value, onChange }: LeavePillProps) {
     }
   }
 
-  const modalTitle = pendingMode.current === 'depart' ? 'Leave at' : 'Arrive by'
+  const [modalTitle, setModalTitle] = useState<'Leave at' | 'Arrive by'>('Leave at')
 
   return (
     <>

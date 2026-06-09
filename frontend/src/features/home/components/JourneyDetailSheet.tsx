@@ -333,6 +333,7 @@ export function JourneyDetailSheet({
       return
     }
     sheetRef.current?.snapToIndex(0)
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setStartBusy(false)
     setSaveBusy(false)
 

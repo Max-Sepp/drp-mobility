@@ -60,7 +60,6 @@ const SCREEN_H = Dimensions.get('window').height
 // Heights of the visible sheet at each snap point (gorhom convention: height from bottom).
 const SNAP_POINTS = [72, 320, SCREEN_H * 0.82]
 
-const SNAP_IDX_PILL = 0
 const SNAP_IDX_HOME = 1
 const SNAP_IDX_OPEN = 2
 

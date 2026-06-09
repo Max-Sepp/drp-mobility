@@ -21,7 +21,7 @@ type SheetHeaderProps = {
  * subtitle), optional right extras, and always a close button on the far right.
  */
 export function SheetHeader({ title, subtitle, onClose, left, right, modal }: SheetHeaderProps) {
-  const { Colors, Radii } = useTheme()
+  const { Colors } = useTheme()
 
   return (
     <View

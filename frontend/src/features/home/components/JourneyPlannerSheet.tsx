@@ -1,7 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native'
-import { Spinner, Text, XStack, YStack } from 'tamagui'
+import { Spinner, Text, XStack } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import BottomSheet, { BottomSheetScrollView, type BottomSheetRef } from '@/components/BottomSheet'
 import { SheetHeader } from '@/components/SheetHeader'
@@ -20,7 +20,6 @@ import {
   type JourneyOptionsResult,
   planJourneyOptions,
   type RouteTag,
-  type TaggedJourney,
   type TimeConstraint,
 } from '@/features/journey/api/tfl'
 import { JourneyResultCard } from '@/features/journey/components/JourneyResultCard'
