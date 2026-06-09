@@ -260,19 +260,28 @@ export function legLineColor(leg: Leg, fallback = '#007AFF'): string {
 }
 
 function LegChip({ leg, compact = true }: { leg: Leg; compact?: boolean }) {
-  const { Colors } = useTheme()
+  const { Colors, Radii } = useTheme()
   const icon = modeIcon(leg.mode.name)
   const isWalking = leg.mode.name === 'walking'
   const isBus = leg.mode.name === 'bus' || leg.mode.name === 'coach'
   const routeName = leg.routeOptions?.[0]?.name
   if (isWalking) {
+    // Apple Maps-style: walk glyph + duration in a gray bubble.
+    const mins = `${Math.max(1, Math.round(leg.duration))} min`
     return (
-      <MaterialIcons
-        name={WALKING_ICON}
-        size={compact ? 16 : 20}
-        color={Colors.secondaryText}
-        aria-label={WALKING_LABEL}
-      />
+      <XStack
+        items="center"
+        gap={compact ? 3 : 4}
+        px={compact ? 6 : 9}
+        py={compact ? 2 : 4}
+        style={{ backgroundColor: Colors.searchBg, borderRadius: Radii.pill }}
+        aria-label={`${WALKING_LABEL} ${mins}`}
+      >
+        <MaterialIcons name={WALKING_ICON} size={compact ? 14 : 18} color={Colors.secondaryText} />
+        <Text fontSize={compact ? 11 : 13} fontWeight="600" color={Colors.secondaryText}>
+          {mins}
+        </Text>
+      </XStack>
     )
   }
   const badgeColor = isBus
