@@ -1,7 +1,16 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker'
-import { useState } from 'react'
-import { ActionSheetIOS, Alert, Modal, Platform, TouchableOpacity, View } from 'react-native'
+import { useRef, useState } from 'react'
+import {
+  ActionSheetIOS,
+  Alert,
+  Animated,
+  Modal,
+  Platform,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native'
 import { Text, XStack } from 'tamagui'
 import { formatDepart } from '@/features/journey/components/LeaveAtField'
 import { useTheme, Borders, Opacity } from '@/theme'
@@ -91,23 +100,44 @@ export function LeavePill({ value, onChange }: LeavePillProps) {
   const { Colors, Radii } = useTheme()
   const [showModal, setShowModal] = useState(false)
   const [pending, setPending] = useState<Date>(new Date())
+  const backdropAnim = useRef(new Animated.Value(0)).current
+  const slideAnim = useRef(new Animated.Value(320)).current
 
   const isActive = value !== null
   const displayLabel = value ? `Leave ${formatDepart(value)}` : 'Leave now'
 
+  function openModal(initial: Date) {
+    setPending(initial)
+    backdropAnim.setValue(0)
+    slideAnim.setValue(320)
+    setShowModal(true)
+    Animated.parallel([
+      Animated.timing(backdropAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
+      Animated.timing(slideAnim, { toValue: 0, duration: 300, useNativeDriver: true }),
+    ]).start()
+  }
+
+  function closeModal() {
+    Animated.parallel([
+      Animated.timing(backdropAnim, { toValue: 0, duration: 200, useNativeDriver: true }),
+      Animated.timing(slideAnim, { toValue: 320, duration: 250, useNativeDriver: true }),
+    ]).start(() => setShowModal(false))
+  }
+
   function open() {
     const initial = value ?? new Date()
     if (Platform.OS === 'ios') {
-      ActionSheetIOS.showActionSheetWithOptions(
-        { options: ['Leave now', 'Choose time…', 'Cancel'], cancelButtonIndex: 2 },
-        (idx) => {
-          if (idx === 0) onChange(null)
-          else if (idx === 1) {
-            setPending(initial)
-            setShowModal(true)
-          }
-        },
-      )
+      if (!isActive) {
+        openModal(initial)
+      } else {
+        ActionSheetIOS.showActionSheetWithOptions(
+          { options: ['Leave now', 'Change time…', 'Cancel'], cancelButtonIndex: 2 },
+          (idx) => {
+            if (idx === 0) onChange(null)
+            else if (idx === 1) setTimeout(() => openModal(initial), 50)
+          },
+        )
+      }
     } else {
       Alert.alert('Leave at', undefined, [
         { text: 'Leave now', onPress: () => onChange(null) },
@@ -179,22 +209,25 @@ export function LeavePill({ value, onChange }: LeavePillProps) {
         />
       </TouchableOpacity>
 
-      {/* iOS date-time picker in a bottom sheet modal */}
+      {/* iOS date-time picker modal — backdrop fades, card slides up */}
       {Platform.OS === 'ios' && (
         <Modal
           visible={showModal}
           transparent
-          animationType="slide"
-          onRequestClose={() => setShowModal(false)}
+          animationType="none"
+          onRequestClose={closeModal}
         >
-          <View style={{ flex: 1, justifyContent: 'flex-end' }}>
-            <TouchableOpacity
-              style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)' }}
-              activeOpacity={1}
-              onPress={() => setShowModal(false)}
+          <View style={StyleSheet.absoluteFill}>
+            {/* Fading dark backdrop */}
+            <Animated.View
+              style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.4)', opacity: backdropAnim }]}
             />
-            <View
+            {/* Tap above card to dismiss */}
+            <TouchableOpacity style={{ flex: 1 }} activeOpacity={1} onPress={closeModal} />
+            {/* Card slides up from bottom */}
+            <Animated.View
               style={{
+                transform: [{ translateY: slideAnim }],
                 backgroundColor: Colors.card,
                 borderTopLeftRadius: 16,
                 borderTopRightRadius: 16,
@@ -204,35 +237,23 @@ export function LeavePill({ value, onChange }: LeavePillProps) {
               }}
             >
               <XStack justify="space-between" mb="$3">
-                <TouchableOpacity onPress={() => setShowModal(false)}>
-                  <Text fontSize={16} color={Colors.blue}>
-                    Cancel
-                  </Text>
+                <TouchableOpacity onPress={closeModal}>
+                  <Text fontSize={16} color={Colors.blue}>Cancel</Text>
                 </TouchableOpacity>
-                <Text fontSize={16} fontWeight="700" color={Colors.text}>
-                  Leave at
-                </Text>
-                <TouchableOpacity
-                  onPress={() => {
-                    onChange(pending)
-                    setShowModal(false)
-                  }}
-                >
-                  <Text fontSize={16} fontWeight="700" color={Colors.blue}>
-                    Done
-                  </Text>
+                <Text fontSize={16} fontWeight="700" color={Colors.text}>Leave at</Text>
+                <TouchableOpacity onPress={() => { onChange(pending); closeModal() }}>
+                  <Text fontSize={16} fontWeight="700" color={Colors.blue}>Done</Text>
                 </TouchableOpacity>
               </XStack>
               <DateTimePicker
                 value={pending}
                 mode="datetime"
                 display="spinner"
-                onChange={(_, date) => {
-                  if (date) setPending(date)
-                }}
+                themeVariant="light"
+                onChange={(_, date) => { if (date) setPending(date) }}
                 style={{ height: 200 }}
               />
-            </View>
+            </Animated.View>
           </View>
         </Modal>
       )}

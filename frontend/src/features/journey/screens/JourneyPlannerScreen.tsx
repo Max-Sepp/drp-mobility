@@ -20,8 +20,6 @@ import {
   type AccessibilityPreference,
   type Journey,
   type JourneyOptionsResult,
-  type JourneyPreference,
-  planJourney,
   planJourneyOptions,
   type RouteTag,
   type TaggedJourney,
@@ -40,18 +38,6 @@ const STEP_FREE_OPTIONS: { label: string; value: string | null }[] = [
   { label: 'To train (fully step-free)', value: 'StepFreeToVehicle' },
 ]
 
-const PREFERENCE_OPTIONS: { label: string; value: string | null }[] = [
-  { label: 'No preference', value: null },
-  { label: 'Fastest', value: 'LeastTime' },
-  { label: 'Fewest changes', value: 'LeastInterchange' },
-  { label: 'Least walking', value: 'LeastWalking' },
-]
-
-const PREF_TAG: Record<JourneyPreference, RouteTag> = {
-  LeastTime: 'fastest',
-  LeastInterchange: 'fewest-changes',
-  LeastWalking: 'least-walking',
-}
 
 export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreenProps) => {
   const { Colors, Radii } = useTheme()
@@ -102,7 +88,6 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
   )
   const [gettingLocation, setGettingLocation] = useState(false)
   const [level, setLevel] = useState<AccessibilityPreference | null>(null)
-  const [preference, setPreference] = useState<JourneyPreference | null>(null)
   const [departAt, setDepartAt] = useState<Date | null>(null)
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState<JourneyResult[]>([])
@@ -171,28 +156,12 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
     }
     setResolved({ from: fromLoc, to: toLoc })
 
-    let optResult: JourneyOptionsResult
-    if (preference) {
-      const single = await planJourney(
-        fromLoc.postcode,
-        toLoc.postcode,
-        level,
-        departAt,
-        preference,
-      )
-      if (single.kind !== 'journeys') {
-        setLoading(false)
-        Alert.alert('No journey', single.message)
-        return
-      }
-      const tag = PREF_TAG[preference]
-      optResult = {
-        kind: 'journeys',
-        journeys: single.journeys.map((journey): TaggedJourney => ({ journey, tags: [tag] })),
-      }
-    } else {
-      optResult = await planJourneyOptions(fromLoc.postcode, toLoc.postcode, level, departAt)
-    }
+    const optResult: JourneyOptionsResult = await planJourneyOptions(
+      fromLoc.postcode,
+      toLoc.postcode,
+      level,
+      departAt,
+    )
 
     if (optResult.kind !== 'journeys') {
       setLoading(false)
@@ -276,12 +245,6 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
             options={STEP_FREE_OPTIONS}
             value={level}
             onSelect={(v) => setLevel(v as AccessibilityPreference | null)}
-          />
-          <FilterPill
-            label="Preference"
-            options={PREFERENCE_OPTIONS}
-            value={preference}
-            onSelect={(v) => setPreference(v as JourneyPreference | null)}
           />
         </XStack>
 

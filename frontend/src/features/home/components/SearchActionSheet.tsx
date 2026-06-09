@@ -806,7 +806,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
                   <Text
                     style={[
                       Typography.caption,
-                      { color: Colors.secondaryText, paddingVertical: 6 },
+                      { color: Colors.secondaryText, paddingVertical: 6, paddingLeft: Spacing.md },
                     ]}
                   >
                     No saved journeys yet — plan one to save it here.
