@@ -10,6 +10,7 @@ import { Alert, Dimensions, StyleSheet, TextInput, TouchableOpacity, View } from
 import { Text } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import BottomSheet, { BottomSheetScrollView, type BottomSheetRef } from '@/components/BottomSheet'
+import { SheetHeader } from '@/components/SheetHeader'
 import { apiClient } from '@/api/client'
 import type { components } from '@/api/schema.d'
 import { EquipmentPicker } from '@/features/reporting/components/EquipmentPicker'
@@ -22,7 +23,7 @@ type Step = 'type' | 'form' | 'success'
 type IssueType = 'lift' | 'escalator' | 'overcrowding' | 'custom'
 
 const SCREEN_H = Dimensions.get('window').height
-const SNAP_POINTS = [SCREEN_H * 0.55, SCREEN_H * 0.88]
+const TOP_BUTTON_RESERVE = 66
 
 const ALLOWED_MIME = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
 
@@ -37,20 +38,14 @@ const ISSUE_TYPES: { type: IssueType; icon: keyof typeof MaterialIcons.glyphMap;
 type Props = {
   station: string | null
   onClose: () => void
+  onHeightChange?: (height: number) => void
 }
 
-export function ReportSheet({ station, onClose }: Props) {
+export function ReportSheet({ station, onClose, onHeightChange }: Props) {
   const { Colors, Radii, Shadows } = useTheme()
   const styles = useMemo(
     () =>
       StyleSheet.create({
-        header: {
-          flexDirection: 'row',
-          alignItems: 'flex-start',
-          gap: Spacing.sm,
-          paddingHorizontal: Spacing.lg,
-          paddingBottom: Spacing.md,
-        },
         iconBtn: {
           width: 32,
           height: 32,
@@ -144,6 +139,10 @@ export function ReportSheet({ station, onClose }: Props) {
     [Colors, Radii, Shadows],
   )
   const insets = useSafeAreaInsets()
+  const snapPoints = useMemo(
+    () => [SCREEN_H * 0.55, SCREEN_H - insets.top - TOP_BUTTON_RESERVE],
+    [insets.top],
+  )
   const sheetRef = useRef<BottomSheetRef>(null)
 
   const [step, setStep] = useState<Step>('type')
@@ -200,6 +199,7 @@ export function ReportSheet({ station, onClose }: Props) {
   }, [station])
 
   function handleChange(index: number) {
+    onHeightChange?.(index >= 0 ? snapPoints[index] : 0)
     if (index === -1) onClose()
   }
 
@@ -316,33 +316,17 @@ export function ReportSheet({ station, onClose }: Props) {
     <BottomSheet
       ref={sheetRef}
       index={-1}
-      snapPoints={SNAP_POINTS}
+      snapPoints={snapPoints}
       enablePanDownToClose
       onChange={handleChange}
     >
       {step === 'type' && (
         <>
-          <View style={styles.header}>
-            <View style={{ flex: 1 }}>
-              <Text fontSize={18} fontWeight="700" color={Colors.text}>
-                Report issue
-              </Text>
-              {station ? (
-                <Text fontSize={13} color={Colors.secondaryText} mt="$1">
-                  @ {station}
-                </Text>
-              ) : null}
-            </View>
-            <TouchableOpacity
-              onPress={() => sheetRef.current?.close()}
-              style={styles.iconBtn}
-              activeOpacity={0.75}
-              accessibilityRole="button"
-              accessibilityLabel="Close"
-            >
-              <MaterialIcons name="close" size={18} color={Colors.secondaryText} />
-            </TouchableOpacity>
-          </View>
+          <SheetHeader
+            title="Report issue"
+            subtitle={station ? `@ ${station}` : undefined}
+            onClose={() => sheetRef.current?.close()}
+          />
 
           <BottomSheetScrollView
             showsVerticalScrollIndicator={false}
@@ -382,36 +366,22 @@ export function ReportSheet({ station, onClose }: Props) {
 
       {step === 'form' && (
         <>
-          <View style={styles.header}>
-            <TouchableOpacity
-              onPress={goBack}
-              style={styles.iconBtn}
-              activeOpacity={0.75}
-              accessibilityRole="button"
-              accessibilityLabel="Back"
-            >
-              <MaterialIcons name="arrow-back" size={20} color={Colors.text} />
-            </TouchableOpacity>
-            <View style={{ flex: 1 }}>
-              <Text fontSize={18} fontWeight="700" color={Colors.text}>
-                {formTitle}
-              </Text>
-              {station ? (
-                <Text fontSize={13} color={Colors.secondaryText} mt="$1">
-                  {station}
-                </Text>
-              ) : null}
-            </View>
-            <TouchableOpacity
-              onPress={() => sheetRef.current?.close()}
-              style={styles.iconBtn}
-              activeOpacity={0.75}
-              accessibilityRole="button"
-              accessibilityLabel="Close"
-            >
-              <MaterialIcons name="close" size={18} color={Colors.secondaryText} />
-            </TouchableOpacity>
-          </View>
+          <SheetHeader
+            title={formTitle}
+            subtitle={station ?? undefined}
+            onClose={() => sheetRef.current?.close()}
+            left={
+              <TouchableOpacity
+                onPress={goBack}
+                style={styles.iconBtn}
+                activeOpacity={0.75}
+                accessibilityRole="button"
+                accessibilityLabel="Back"
+              >
+                <MaterialIcons name="arrow-back" size={20} color={Colors.text} />
+              </TouchableOpacity>
+            }
+          />
 
           <BottomSheetScrollView
             showsVerticalScrollIndicator={false}

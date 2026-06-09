@@ -1,5 +1,4 @@
 import { MaterialIcons } from '@expo/vector-icons'
-import * as Location from 'expo-location'
 import { useMemo, useState } from 'react'
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { ScrollView } from 'tamagui'
@@ -88,12 +87,10 @@ export const StationScreen = ({ navigation, route }: StationScreenProps) => {
       const to: ResolvedLocation = { postcode: toResult.postcode, label: station }
 
       let from: ResolvedLocation | undefined
-      const { status } = await Location.requestForegroundPermissionsAsync()
-      if (status === 'granted') {
-        const pos =
-          cachedCoords ??
-          (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })).coords
-        const fromResult = await resolveToPostcode(`${pos.latitude},${pos.longitude}`)
+      if (cachedCoords) {
+        const fromResult = await resolveToPostcode(
+          `${cachedCoords.latitude},${cachedCoords.longitude}`,
+        )
         if (!('error' in fromResult)) {
           from = { postcode: fromResult.postcode, label: 'Current location' }
         }

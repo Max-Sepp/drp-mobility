@@ -44,16 +44,16 @@ import { useTheme, Borders, Heights, Opacity, Spacing } from '@/theme'
 
 const ARRIVAL_RADIUS_M = 120
 const SCREEN_H = Dimensions.get('window').height
-const SNAP_FULL = SCREEN_H * 0.88
-// Snap 0 height is computed per-render from insets — see snapPoints memo below.
+const SNAP_HALF = SCREEN_H * 0.52
 
 type Props = {
   params: ActiveJourneyParams | null
   onComplete: () => void
   onEnd: () => void
+  onHeightChange?: (height: number) => void
 }
 
-export function ActiveJourneySheet({ params, onComplete, onEnd }: Props) {
+export function ActiveJourneySheet({ params, onComplete, onEnd, onHeightChange }: Props) {
   const { Colors, Radii } = useTheme()
   const styles = useMemo(
     () =>
@@ -100,9 +100,15 @@ export function ActiveJourneySheet({ params, onComplete, onEnd }: Props) {
     [Colors, Radii],
   )
   const insets = useSafeAreaInsets()
-  // Compact snap exactly fits: gorhom handle (~20) + compact row (~56) + footer (8 + 48 + 1 + insets.bottom + 8).
-  // No arithmetic relies on screen %, so it works on any device regardless of safe area size.
-  const snapPoints = useMemo(() => [20 + 56 + 65 + insets.bottom, SNAP_FULL], [insets.bottom])
+  // Three snaps: compact (handle + summary row + footer), half-screen, near-full.
+  // Handle is 24 px (gorhom default). Summary row has no paddingTop, paddingBottom 12, two text
+  // lines ~38 px, so ~50 px total. Footer = paddingTop 8 + button 48 + border 1 + paddingBottom 8
+  // + insets.bottom = 65 + insets.bottom. Tight fit leaves no gap for scroll content to bleed through.
+  // Full snap matches other sheets: SCREEN_H - insets.top - 66, clearing the top nav buttons.
+  const snapPoints = useMemo(
+    () => [24 + 47 + 65 + insets.bottom, SNAP_HALF, SCREEN_H - insets.top - 66],
+    [insets.top, insets.bottom],
+  )
   const sheetRef = useRef<BottomSheetRef>(null)
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
@@ -123,9 +129,9 @@ export function ActiveJourneySheet({ params, onComplete, onEnd }: Props) {
       sheetRef.current?.close()
       return
     }
-    sheetRef.current?.snapToIndex(1)
+    sheetRef.current?.snapToIndex(0)
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSnapIndex(1)
+    setSnapIndex(0)
     setLegIndex(0)
     setGpsActive(false)
     autoAdvancedFromRef.current = null
@@ -143,6 +149,7 @@ export function ActiveJourneySheet({ params, onComplete, onEnd }: Props) {
 
   function handleChange(index: number) {
     setSnapIndex(index)
+    onHeightChange?.(index >= 0 ? snapPoints[index] : 0)
     if (index === -1) onEnd()
   }
 
@@ -228,7 +235,7 @@ export function ActiveJourneySheet({ params, onComplete, onEnd }: Props) {
           style: 'destructive',
           onPress: async () => {
             await clearActiveJourney()
-            onEnd()
+            sheetRef.current?.close()
           },
         },
       ],

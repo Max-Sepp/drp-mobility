@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react'
-import { KeyboardAvoidingView, Platform } from 'react-native'
-import { ScrollView } from 'tamagui'
+import { KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
 import { useTheme } from '@/theme'
 
 type FormScreenLayoutProps = {
@@ -21,10 +20,10 @@ export const FormScreenLayout = ({ header, footer, children }: FormScreenLayoutP
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollView
-        flex={1}
-        style={{ backgroundColor: Colors.card }}
-        contentContainerStyle={{ paddingBottom: 16 } as any}
+        style={{ flex: 1, backgroundColor: Colors.card }}
+        contentContainerStyle={{ paddingBottom: 16 }}
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
       >
         {header}
         {children}

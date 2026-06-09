@@ -1,38 +1,32 @@
-// Journey planner as a bottom sheet — replaces JourneyPlannerScreen.
-// Two snaps: 75% for the input form, 92% for results.
-// JourneyDetail still navigates on the stack (Phase 6 will sheet-ify it).
-
 import { MaterialIcons } from '@expo/vector-icons'
-import * as Location from 'expo-location'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native'
-import { Text, XStack, YStack } from 'tamagui'
+import { Spinner, Text, XStack } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useNavigation } from '@react-navigation/native'
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import BottomSheet, { BottomSheetScrollView, type BottomSheetRef } from '@/components/BottomSheet'
-import { useStations } from '@/features/stations'
+import { SheetHeader } from '@/components/SheetHeader'
 import {
   fetchStationOutages,
   matchOutages,
-  resolveStationName,
   type StationOutage,
 } from '@/features/journey/api/accessibility'
 import { type ResolvedLocation, resolveToPostcode } from '@/features/journey/api/geocode'
+import { type PlaceShortcut } from '@/features/journey/components/LocationInput'
+import type { SavedPlaces } from '@/features/journey/api/savedPlaces'
 import { useAppLocation } from '@/lib/LocationContext'
-import { loadSavedJourneys } from '@/features/journey/api/savedJourneys'
 import {
   type AccessibilityPreference,
   type Journey,
+  type JourneyOptionsResult,
   planJourneyOptions,
   type RouteTag,
+  type TimeConstraint,
 } from '@/features/journey/api/tfl'
 import { JourneyResultCard } from '@/features/journey/components/JourneyResultCard'
-import { formatDepart, LeaveAtField } from '@/features/journey/components/LeaveAtField'
+import { FilterPill, LeavePill } from '@/features/journey/components/FilterPill'
 import { LocationInput } from '@/features/journey/components/LocationInput'
-import type { RootStackParamList } from '@/navigation/types'
 import type { JourneyDetailParams } from '@/features/home/components/JourneyDetailSheet'
-import { useTheme, Borders, Heights, Opacity, Spacing, Typography } from '@/theme'
+import { useTheme, Borders, Opacity, Spacing } from '@/theme'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -47,66 +41,80 @@ export type JourneyPlan = {
 }
 
 type Props = {
-  plan: JourneyPlan | null // null = closed
+  plan: JourneyPlan | null
   onClose: () => void
   onJourneySelect: (params: JourneyDetailParams) => void
+  savedPlaces?: SavedPlaces
+  onHeightChange?: (height: number) => void
 }
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
 
-const SCREEN_H = Dimensions.get('window').height
-const SNAP_POINTS = [SCREEN_H * 0.75, SCREEN_H * 0.92]
-
-const LEVELS: { value: AccessibilityPreference; label: string }[] = [
-  { value: 'StepFreeToVehicle', label: 'Step-free to train' },
-  { value: 'StepFreeToPlatform', label: 'Step-free to platform' },
+const STEP_FREE_OPTIONS: { label: string; value: string | null }[] = [
+  { label: 'No preference', value: null },
+  { label: 'To platform', value: 'StepFreeToPlatform' },
+  { label: 'To train (fully step-free)', value: 'StepFreeToVehicle' },
 ]
 
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
-export function JourneyPlannerSheet({ plan, onClose, onJourneySelect }: Props) {
+const SWAP_BTN = 36 // diameter of the floating swap button
+const FROM_TO_GAP = 10 // vertical gap between From and To inputs
+
+export function JourneyPlannerSheet({
+  plan,
+  onClose,
+  onJourneySelect,
+  savedPlaces,
+  onHeightChange,
+}: Props) {
   const { Colors, Radii } = useTheme()
   const styles = useMemo(
     () =>
       StyleSheet.create({
-        header: {
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: Spacing.sm,
-          paddingHorizontal: Spacing.lg,
-          paddingBottom: Spacing.md,
-        },
-        savedBtn: {
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: 4,
-          paddingHorizontal: Spacing.sm,
-          paddingVertical: 6,
-          borderRadius: Radii.pill,
-          backgroundColor: Colors.blueBg,
-        },
-        closeBtn: {
-          width: 32,
-          height: 32,
-          borderRadius: 16,
-          backgroundColor: Colors.searchBg,
-          alignItems: 'center',
-          justifyContent: 'center',
-        },
         content: {
           paddingHorizontal: Spacing.lg,
-          paddingTop: Spacing.xs,
+          paddingTop: Spacing.md,
+        },
+        // Floating swap button hovering between From and To on the right side.
+        swapBtn: {
+          width: SWAP_BTN,
+          height: SWAP_BTN,
+          borderRadius: SWAP_BTN / 2,
+          borderWidth: Borders.thin,
+          borderColor: Colors.border,
+          backgroundColor: Colors.card,
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'absolute',
+          right: 0,
+          zIndex: 15,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.08,
+          shadowRadius: 4,
+          elevation: 4,
+        },
+        searchBtn: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 6,
+          height: 42,
+          borderRadius: Radii.button,
+          backgroundColor: Colors.text,
+          marginTop: Spacing.sm,
         },
       }),
     [Colors, Radii],
   )
+
   const insets = useSafeAreaInsets()
   const sheetRef = useRef<BottomSheetRef>(null)
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const [from, setFrom] = useState('')
   const [to, setTo] = useState('')
@@ -116,56 +124,56 @@ export function JourneyPlannerSheet({ plan, onClose, onJourneySelect }: Props) {
   const [toIsNamedPlace, setToIsNamedPlace] = useState(false)
   const [gettingLocation, setGettingLocation] = useState(false)
   const [level, setLevel] = useState<AccessibilityPreference | null>(null)
-  const [departAt, setDepartAt] = useState<Date | null>(null)
+  const [timeConstraint, setTimeConstraint] = useState<TimeConstraint | null>(null)
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState<JourneyResult[]>([])
   const [resolved, setResolved] = useState<Resolved | null>(null)
-  const [editing, setEditing] = useState(false)
-  const [savedCount, setSavedCount] = useState(0)
+  // True after the close button is tapped so handleChange(-1) doesn't fire onClose() again.
+  const closedByButton = useRef(false)
 
-  const showInputs = results.length === 0 || editing
-
-  const { stations } = useStations()
-  const stationNames = useMemo(() => stations.map((s) => s.name), [stations])
   const cachedCoords = useAppLocation()
-  const resolveStation = useCallback(
-    (name: string) => resolveStationName(name, stationNames),
-    [stationNames],
-  )
+  // Measured height of the From input container — used to vertically position the swap button.
+  const [fromH, setFromH] = useState(70)
+
+  // Search is only allowed once both fields are resolved to a postcode — i.e. both show
+  // a tick. Typing into a field clears its postcode (LocationInput.handleType), so a
+  // partially-typed address can never satisfy this.
+  const canSearch = fromPostcode !== null && toPostcode !== null
+
+  const placeShortcuts = useMemo<PlaceShortcut[]>(() => {
+    if (!savedPlaces) return []
+    const shortcuts: PlaceShortcut[] = []
+    if (savedPlaces.home)
+      shortcuts.push({ label: 'Home', icon: 'home', postcode: savedPlaces.home.postcode })
+    if (savedPlaces.work)
+      shortcuts.push({ label: 'Work', icon: 'work', postcode: savedPlaces.work.postcode })
+    savedPlaces.custom.forEach((p) =>
+      shortcuts.push({ label: p.name, icon: p.icon, postcode: p.postcode }),
+    )
+    return shortcuts
+  }, [savedPlaces])
 
   // ── Current-location helper ────────────────────────────────────────────
 
-  const handleCurrentLocation = useCallback(
-    async (silent = false) => {
-      setGettingLocation(true)
-      try {
-        const { status } = await Location.requestForegroundPermissionsAsync()
-        if (status !== 'granted') {
-          if (!silent) Alert.alert('Location required', 'Enable location access in Settings.')
-          return
-        }
-        const pos =
-          cachedCoords ??
-          (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })).coords
-        const result = await resolveToPostcode(`${pos.latitude},${pos.longitude}`)
-        if ('error' in result) {
-          if (!silent) Alert.alert('Location error', result.error)
-          return
-        }
-        setFrom('Current location')
-        setFromPostcode(result.postcode)
-        setFromIsCurrentLocation(true)
-      } finally {
-        setGettingLocation(false)
-      }
-    },
-    [cachedCoords],
-  )
+  const handleCurrentLocation = useCallback(async () => {
+    if (!cachedCoords) return
+    setGettingLocation(true)
+    try {
+      const result = await resolveToPostcode(`${cachedCoords.latitude},${cachedCoords.longitude}`)
+      if ('error' in result) return
+      setFrom('Current location')
+      setFromPostcode(result.postcode)
+      setFromIsCurrentLocation(true)
+    } finally {
+      setGettingLocation(false)
+    }
+  }, [cachedCoords])
 
   // ── Open/close driven by plan prop ────────────────────────────────────
 
   useEffect(() => {
     if (plan) {
+      closedByButton.current = false
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setFrom(plan.initialFrom?.label ?? '')
       setTo(plan.initialTo?.label ?? '')
@@ -174,134 +182,134 @@ export function JourneyPlannerSheet({ plan, onClose, onJourneySelect }: Props) {
       setFromIsCurrentLocation(plan.initialFrom?.label === 'Current location')
       setToIsNamedPlace(Boolean(plan.initialTo?.isNamedPlace))
       setLevel(null)
-      setDepartAt(null)
+      setTimeConstraint(null)
       setResults([])
       setResolved(null)
-      setEditing(false)
       setGettingLocation(false)
       setLoading(false)
-      sheetRef.current?.snapToIndex(0)
-      loadSavedJourneys().then((s) => setSavedCount(s.length))
-      if (!plan.initialFrom) {
-        handleCurrentLocation(true)
-      }
-    } else {
+      sheetRef.current?.snapToIndex(1)
+      if (!plan.initialFrom && cachedCoords) handleCurrentLocation()
+    } else if (!closedByButton.current) {
+      // Programmatic close (parent cleared plan) — animate the sheet away.
+      // If closedByButton is true, close() was already called from the button handler.
       sheetRef.current?.close()
     }
   }, [plan]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Advance to results snap when results arrive
   useEffect(() => {
-    if (results.length > 0) sheetRef.current?.snapToIndex(1)
+    if (results.length > 0) sheetRef.current?.snapToIndex(2)
   }, [results])
 
-  // Return to form snap when editing
+  // Auto-search the moment both postcodes become resolved — covers opening from a saved place
+  // (where current location fills in async) and the general case of resolving the second field.
+  const prevHadBoth = useRef(false)
   useEffect(() => {
-    if (editing) sheetRef.current?.snapToIndex(0)
-  }, [editing])
+    const hasBoth = fromPostcode !== null && toPostcode !== null
+    if (hasBoth && !prevHadBoth.current && !loading) run()
+    prevHadBoth.current = hasBoth
+  }, [fromPostcode, toPostcode]) // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleChange(index: number) {
-    if (index === -1) onClose()
+    onHeightChange?.(index >= 0 ? snapPoints[index] : 0)
+    if (index === -1) {
+      if (!closedByButton.current) onClose()
+      closedByButton.current = false
+    }
+  }
+
+  // ── Swap From ↔ To ────────────────────────────────────────────────────
+
+  function swapLocations() {
+    const tempText = from
+    const tempPostcode = fromPostcode
+    setFrom(to)
+    setFromPostcode(toPostcode)
+    setFromIsCurrentLocation(false)
+    setTo(tempText)
+    setToPostcode(tempPostcode)
+    setToIsNamedPlace(false)
   }
 
   // ── Journey planning ──────────────────────────────────────────────────
 
   async function run() {
-    if (!from.trim() || !to.trim()) {
-      Alert.alert('Required', 'Please enter both a start and a destination.')
+    // Guarded by the disabled Search button, but re-check here as a safety net: both
+    // fields must be resolved to a postcode before we can plan.
+    if (!canSearch) {
+      Alert.alert('Required', 'Please choose a valid start and destination.')
       return
     }
     setLoading(true)
     setResults([])
     setResolved(null)
 
-    const resolveField = (text: string, postcode: string | null, isNamedPlace?: boolean) =>
-      postcode
-        ? Promise.resolve({ postcode, label: text, isNamedPlace } as ResolvedLocation)
-        : resolveToPostcode(text)
+    const fromLoc: ResolvedLocation = { postcode: fromPostcode!, label: from }
+    const toLoc: ResolvedLocation = {
+      postcode: toPostcode!,
+      label: to,
+      isNamedPlace: toIsNamedPlace || undefined,
+    }
 
     const outagesPromise = fetchStationOutages()
-    const [fromLoc, toLoc] = await Promise.all([
-      resolveField(from, fromPostcode),
-      resolveField(to, toPostcode, toIsNamedPlace || undefined),
-    ])
-
-    if ('error' in fromLoc) {
-      setLoading(false)
-      Alert.alert('Start location', fromLoc.error)
-      return
-    }
-    if ('error' in toLoc) {
-      setLoading(false)
-      Alert.alert('Destination', toLoc.error)
-      return
-    }
     setResolved({ from: fromLoc, to: toLoc })
 
-    const result = await planJourneyOptions(fromLoc.postcode, toLoc.postcode, level, departAt)
-    if (result.kind !== 'journeys') {
+    const optResult: JourneyOptionsResult = await planJourneyOptions(
+      fromLoc.postcode,
+      toLoc.postcode,
+      level,
+      timeConstraint,
+    )
+
+    if (optResult.kind !== 'journeys') {
       setLoading(false)
-      Alert.alert('No journey', result.message)
+      Alert.alert('No journey', optResult.message)
       return
     }
 
     const outages = await outagesPromise
-    const flagged = result.journeys.map(({ journey, tags }) => ({
+    const flagged = optResult.journeys.map(({ journey, tags }) => ({
       journey,
       tags,
       outages: matchOutages(journey, outages),
     }))
     flagged.sort((a, b) => Number(a.outages.length > 0) - Number(b.outages.length > 0))
     setResults(flagged)
-    setEditing(false)
     setLoading(false)
   }
 
   // ── Render ────────────────────────────────────────────────────────────
 
+  // Three snaps: collapsed (title bar only), form, full results.
+  // No enablePanDownToClose — swiping down collapses to the title bar instead of closing.
+  const COLLAPSED_H = 76
+  const snapPoints = useMemo(() => {
+    const h = Dimensions.get('window').height
+    return [COLLAPSED_H, h * 0.75, h - insets.top - 66]
+  }, [insets.top])
+
   return (
-    <BottomSheet
-      ref={sheetRef}
-      index={-1}
-      snapPoints={SNAP_POINTS}
-      enablePanDownToClose
-      onChange={handleChange}
-    >
+    <BottomSheet ref={sheetRef} index={-1} snapPoints={snapPoints} onChange={handleChange}>
+      {/* Outside the scroll view so it never gets double-padded */}
+      <SheetHeader
+        title="Plan a journey"
+        onClose={() => {
+          closedByButton.current = true
+          onClose()
+          sheetRef.current?.close()
+        }}
+      />
+
       <BottomSheetScrollView
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + Spacing.xl }]}
       >
-        {/* Header scrolls with content so it disappears naturally when reading results */}
-        <View style={styles.header}>
-          <Text fontSize={18} fontWeight="700" color={Colors.text} style={{ flex: 1 }}>
-            Plan a journey
-          </Text>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('SavedJourneys')}
-            style={styles.savedBtn}
-            activeOpacity={0.75}
-            accessibilityRole="button"
-            accessibilityLabel={`Saved journeys${savedCount > 0 ? `, ${savedCount}` : ''}`}
+        {/* Citymapper-style: inputs fill full width, swap button floats between them on the right */}
+        <View style={{ position: 'relative', zIndex: 20 }}>
+          <View
+            onLayout={(e) => setFromH(e.nativeEvent.layout.height)}
+            style={{ zIndex: 10, position: 'relative' }}
           >
-            <MaterialIcons name="bookmark" size={15} color={Colors.blue} />
-            <Text fontSize={13} fontWeight="600" color={Colors.blue}>
-              Saved{savedCount > 0 ? ` (${savedCount})` : ''}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => sheetRef.current?.close()}
-            style={styles.closeBtn}
-            activeOpacity={0.75}
-            accessibilityRole="button"
-            accessibilityLabel="Close journey planner"
-          >
-            <MaterialIcons name="close" size={18} color={Colors.secondaryText} />
-          </TouchableOpacity>
-        </View>
-
-        {showInputs ? (
-          <YStack gap="$3">
             <LocationInput
               label="From"
               value={from}
@@ -313,167 +321,80 @@ export function JourneyPlannerSheet({ plan, onClose, onJourneySelect }: Props) {
               isResolved={fromPostcode !== null}
               textColor={fromIsCurrentLocation ? Colors.blue : undefined}
               textBold={fromIsCurrentLocation}
-              onCurrentLocation={handleCurrentLocation}
+              onCurrentLocation={cachedCoords ? handleCurrentLocation : undefined}
               currentLocationLoading={gettingLocation}
+              savedPlaceShortcuts={placeShortcuts}
             />
-            <LocationInput
-              label="To"
-              value={to}
-              onChangeText={(text) => {
-                setTo(text)
-                setToIsNamedPlace(false)
-              }}
-              onResolved={setToPostcode}
-              isResolved={toPostcode !== null}
-              textColor={toIsNamedPlace ? Colors.blue : undefined}
-              textBold={toIsNamedPlace}
-            />
+          </View>
 
-            <YStack gap="$1.5">
-              <Text
-                fontSize={Typography.body.fontSize}
-                fontWeight="600"
-                color={Colors.secondaryText}
-              >
-                Accessibility (optional)
-              </Text>
-              <XStack gap="$2">
-                {LEVELS.map(({ value, label }) => {
-                  const selected = level === value
-                  return (
-                    <YStack
-                      key={value}
-                      flex={1}
-                      items="center"
-                      justify="center"
-                      pressStyle={{ opacity: Opacity.pressedLight }}
-                      onPress={() => setLevel((prev) => (prev === value ? null : value))}
-                      style={{
-                        minHeight: Heights.touchTarget,
-                        borderRadius: Radii.button,
-                        borderWidth: Borders.medium,
-                        borderColor: selected ? Colors.text : Colors.border,
-                        backgroundColor: selected ? Colors.text : Colors.searchBg,
-                      }}
-                    >
-                      <Text
-                        fontSize={14}
-                        fontWeight="600"
-                        color={selected ? Colors.card : Colors.text}
-                      >
-                        {label}
-                      </Text>
-                    </YStack>
-                  )
-                })}
-              </XStack>
-            </YStack>
+          {/* Gap row */}
+          <View style={{ height: FROM_TO_GAP }} />
 
-            <LeaveAtField value={departAt} onChange={setDepartAt} />
+          <LocationInput
+            label="To"
+            value={to}
+            onChangeText={(text) => {
+              setTo(text)
+              setToIsNamedPlace(false)
+            }}
+            onResolved={setToPostcode}
+            isResolved={toPostcode !== null}
+            textColor={toIsNamedPlace ? Colors.blue : undefined}
+            textBold={toIsNamedPlace}
+            savedPlaceShortcuts={placeShortcuts}
+          />
 
-            <YStack
-              mt="$2"
-              items="center"
-              justify="center"
-              pressStyle={{ opacity: Opacity.pressedLight }}
-              onPress={loading ? undefined : run}
-              opacity={loading ? Opacity.disabledMid : 1}
-              style={{
-                backgroundColor: Colors.text,
-                borderRadius: Radii.button,
-                height: Heights.button,
-              }}
-            >
-              <Text color={Colors.card} fontSize={16} fontWeight="700">
-                {loading ? 'Planning…' : 'Plan journey'}
-              </Text>
-            </YStack>
-          </YStack>
-        ) : (
-          resolved && (
-            <XStack
-              mb="$2"
-              p="$3"
-              items="center"
-              gap="$3"
-              pressStyle={{ opacity: Opacity.pressed }}
-              onPress={() => setEditing(true)}
-              style={{
-                borderWidth: Borders.medium,
-                borderColor: Colors.border,
-                borderRadius: Radii.button,
-                backgroundColor: Colors.searchBg,
-              }}
-            >
-              <YStack flex={1} gap="$1">
-                <XStack gap="$2" items="center">
-                  <MaterialIcons
-                    name="trip-origin"
-                    size={14}
-                    color={Colors.secondaryText}
-                    style={{ width: 18 }}
-                  />
-                  <Text
-                    fontSize={14}
-                    color={resolved.from.isNamedPlace ? Colors.blue : Colors.text}
-                    fontWeight={resolved.from.isNamedPlace ? '700' : '400'}
-                    flex={1}
-                    numberOfLines={1}
-                  >
-                    {resolved.from.label}
-                  </Text>
-                </XStack>
-                <XStack gap="$2" items="center">
-                  <MaterialIcons
-                    name="place"
-                    size={16}
-                    color={Colors.secondaryText}
-                    style={{ width: 18 }}
-                  />
-                  <Text
-                    fontSize={14}
-                    color={resolved.to.isNamedPlace ? Colors.blue : Colors.text}
-                    fontWeight={resolved.to.isNamedPlace ? '700' : '400'}
-                    flex={1}
-                    numberOfLines={1}
-                  >
-                    {resolved.to.label}
-                  </Text>
-                </XStack>
-                {departAt && (
-                  <XStack gap="$2" items="center">
-                    <MaterialIcons
-                      name="schedule"
-                      size={14}
-                      color={Colors.secondaryText}
-                      style={{ width: 18 }}
-                    />
-                    <Text fontSize={14} color={Colors.secondaryText} flex={1} numberOfLines={1}>
-                      Leaving {formatDepart(departAt)}
-                    </Text>
-                  </XStack>
-                )}
-              </YStack>
-              <XStack items="center" gap="$1">
-                <MaterialIcons name="edit" size={16} color={Colors.blue} />
-                <Text fontSize={14} fontWeight="600" color={Colors.blue}>
-                  Edit
-                </Text>
-              </XStack>
-            </XStack>
-          )
-        )}
+          {/* Swap button — centred between the From input's bottom and the To input's top.
+              The To container starts at fromH + FROM_TO_GAP, with ~26 px of label+gap before
+              the actual input, so the visual midpoint is ~fromH + 18 → top = fromH + 18 - 18. */}
+          <TouchableOpacity
+            onPress={swapLocations}
+            style={[styles.swapBtn, { top: fromH }]}
+            activeOpacity={0.75}
+            accessibilityRole="button"
+            accessibilityLabel="Swap start and destination"
+          >
+            <MaterialIcons name="swap-vert" size={18} color={Colors.secondaryText} />
+          </TouchableOpacity>
+        </View>
 
+        {/* Filter row */}
+        <XStack gap="$2" mt="$2">
+          <LeavePill value={timeConstraint} onChange={setTimeConstraint} />
+          <FilterPill
+            label="Step-free"
+            options={STEP_FREE_OPTIONS}
+            value={level}
+            onSelect={(v) => setLevel(v as AccessibilityPreference | null)}
+          />
+        </XStack>
+
+        {/* Search button */}
+        <TouchableOpacity
+          onPress={loading || !canSearch ? undefined : run}
+          activeOpacity={loading || !canSearch ? 1 : 0.75}
+          style={[styles.searchBtn, { opacity: loading || !canSearch ? Opacity.disabledMid : 1 }]}
+          accessibilityRole="button"
+          accessibilityLabel="Search for journeys"
+          accessibilityState={{ disabled: loading || !canSearch }}
+        >
+          {loading ? (
+            <Spinner size="small" color={Colors.card} />
+          ) : (
+            <MaterialIcons name="search" size={18} color={Colors.card} />
+          )}
+          <Text color={Colors.card} fontSize={15} fontWeight="700">
+            {loading ? 'Searching…' : 'Search'}
+          </Text>
+        </TouchableOpacity>
+
+        {/* Results */}
         {results.map(({ journey, outages, tags }, i) => (
           <JourneyResultCard
             key={i}
             journey={journey}
             outages={outages}
             tags={tags}
-            from={resolved?.from}
-            to={resolved?.to}
-            resolveStation={resolveStation}
-            onStationPress={(station) => navigation.navigate('Station', { station })}
             onPress={() =>
               onJourneySelect({
                 journey,
