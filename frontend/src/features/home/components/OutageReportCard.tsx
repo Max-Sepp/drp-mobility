@@ -5,6 +5,7 @@ import { BASE_URL } from '@/api/client'
 import type { components } from '@/api/schema.d'
 import { formatDatetime } from '@/lib/datetime'
 import { useTheme, Borders, Spacing } from '@/theme'
+import { reportSeverity } from '@/features/outages/severity'
 
 type OutageReport = components['schemas']['OutageReportSummary']
 
@@ -21,6 +22,8 @@ type OutageReportCardProps = {
 
 function alertLabel(report: OutageReport): string {
   const equipment = report.failure.equipment
+  if (equipment.equipment_type.name === 'overcrowding') return 'Overcrowding reported'
+  if (equipment.equipment_type.name === 'custom') return 'Custom issue reported'
   const type = equipment.equipment_type.name === 'lift' ? 'Lift' : 'Escalator'
   return `${type} broken – ${equipment.connection}`
 }
@@ -36,25 +39,30 @@ export const OutageReportCard = ({
 }: OutageReportCardProps) => {
   const { Colors, Radii } = useTheme()
 
+  const severity = reports[0] ? reportSeverity(reports[0]) : 'danger'
+  const bgColor = severity === 'warning' ? Colors.warningBg : Colors.dangerBg
+  const darkColor = severity === 'warning' ? Colors.warningDark : Colors.dangerDark
+  const borderColor = severity === 'warning' ? Colors.warningBorder : Colors.dangerBorder
+
   const times = reports.map((r) => r.breakdown_time).sort()
   const firstReported = times[0]
   const lastReported = times[times.length - 1]
   const reportCount = reports.length
   const hasTrustedReporter = reports.some((r) => r.reporter_role === 'trusted')
   const hasAnyContent = reports.some((r) => !!r.description || !!r.image_content_type)
-  const hasUnverified = reports.some((r) => !r.verified)
+  const hasUnverified = reports.some((r) => !(r as OutageReport & { verified?: boolean }).verified)
   const showActions = (onVerify && hasUnverified) || !!onResolve
 
   const styles = StyleSheet.create({
     card: {
-      backgroundColor: Colors.dangerBg,
+      backgroundColor: bgColor,
       borderRadius: Radii.button,
       borderWidth: Borders.thin,
       borderColor: Colors.border,
     },
     divider: {
       height: StyleSheet.hairlineWidth,
-      backgroundColor: Colors.dangerBorder,
+      backgroundColor: borderColor,
       opacity: 0.5,
     },
   })
@@ -118,7 +126,7 @@ export const OutageReportCard = ({
             width: 32,
             height: 32,
             borderRadius: Radii.small,
-            backgroundColor: Colors.dangerDark,
+            backgroundColor: darkColor,
             alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0,
@@ -130,10 +138,10 @@ export const OutageReportCard = ({
         </YStack>
 
         <YStack flex={1} gap="$0.5">
-          <Text fontSize={14} fontWeight="700" color={Colors.dangerDark} numberOfLines={2}>
+          <Text fontSize={14} fontWeight="700" color={darkColor} numberOfLines={2}>
             {alertLabel(reports[0])}
           </Text>
-          <Text fontSize={12} color={Colors.dangerDark}>
+          <Text fontSize={12} color={darkColor}>
             first reported {formatDatetime(firstReported)}
           </Text>
           {hasTrustedReporter && (
@@ -148,14 +156,14 @@ export const OutageReportCard = ({
 
         <YStack items="flex-end" gap="$1" style={{ flexShrink: 0 }}>
           {reportCount > 1 && (
-            <Text fontSize={11} fontWeight="700" color={Colors.dangerDark}>
+            <Text fontSize={11} fontWeight="700" color={darkColor}>
               {reportCount} reports
             </Text>
           )}
           <MaterialIcons
             name={expanded ? 'expand-less' : 'expand-more'}
             size={22}
-            color={Colors.dangerDark}
+            color={darkColor}
           />
         </YStack>
       </XStack>
@@ -168,28 +176,28 @@ export const OutageReportCard = ({
             {/* Timing summary */}
             <YStack gap="$1">
               <XStack gap="$2">
-                <Text fontSize={12} fontWeight="700" color={Colors.dangerDark}>
+                <Text fontSize={12} fontWeight="700" color={darkColor}>
                   First reported:
                 </Text>
-                <Text fontSize={12} color={Colors.dangerDark}>
+                <Text fontSize={12} color={darkColor}>
                   {formatDatetime(firstReported)}
                 </Text>
               </XStack>
               {reportCount > 1 && (
                 <XStack gap="$2">
-                  <Text fontSize={12} fontWeight="700" color={Colors.dangerDark}>
+                  <Text fontSize={12} fontWeight="700" color={darkColor}>
                     Last reported:
                   </Text>
-                  <Text fontSize={12} color={Colors.dangerDark}>
+                  <Text fontSize={12} color={darkColor}>
                     {formatDatetime(lastReported)}
                   </Text>
                 </XStack>
               )}
               <XStack gap="$2">
-                <Text fontSize={12} fontWeight="700" color={Colors.dangerDark}>
+                <Text fontSize={12} fontWeight="700" color={darkColor}>
                   Total reports:
                 </Text>
-                <Text fontSize={12} color={Colors.dangerDark}>
+                <Text fontSize={12} color={darkColor}>
                   {reportCount}
                 </Text>
               </XStack>
@@ -203,7 +211,7 @@ export const OutageReportCard = ({
                   <YStack key={report.id} gap="$2" mt="$1">
                     <YStack style={[styles.divider, { marginVertical: 2 }]} />
                     {report.description && (
-                      <Text fontSize={13} color={Colors.dangerDark} fontStyle="italic">
+                      <Text fontSize={13} color={darkColor} fontStyle="italic">
                         &quot;{report.description}&quot;
                       </Text>
                     )}
@@ -215,7 +223,7 @@ export const OutageReportCard = ({
                       />
                     )}
                     <XStack items="center" gap="$2">
-                      <Text fontSize={11} color={Colors.dangerDark} style={{ opacity: 0.7 }}>
+                      <Text fontSize={11} color={darkColor} style={{ opacity: 0.7 }}>
                         Reported {formatDatetime(report.breakdown_time)}
                       </Text>
                       {report.reporter_role === 'trusted' && (

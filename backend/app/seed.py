@@ -31,7 +31,7 @@ from app.repositories.user import UserRepository
 #   lift_units: [{ name, connection }] or lifts: <int> (count-only, synthesised)
 
 _DATA_PATH = Path(__file__).resolve().parent / "data" / "stations.json"
-_EQUIPMENT_TYPES = ["lift", "escalator"]
+_EQUIPMENT_TYPES = ["lift", "escalator", "overcrowding", "custom"]
 
 
 def _load_station_data() -> list[dict]:
@@ -142,6 +142,8 @@ def seed_defaults(db: Session) -> None:
 
     lift_type_id = types["lift"].id
     escalator_type_id = types["escalator"].id
+    overcrowding_type_id = types["overcrowding"].id
+    custom_type_id = types["custom"].id
     for data in stations_data:
         station = stations[data["name"]]
         station_platforms = [platforms[(station.id, p["name"])] for p in data["platforms"]]
@@ -182,6 +184,12 @@ def seed_defaults(db: Session) -> None:
                     f"Escalator {i + 1}: street → {target}",
                     platform.id if platform else None,
                 )
+
+        # Overcrowding: one virtual equipment row per station used to attach overcrowding reports.
+        add_equipment(station.id, overcrowding_type_id, "General overcrowding", None)
+
+        # Custom: one virtual equipment row per station used to attach freeform custom reports.
+        add_equipment(station.id, custom_type_id, "Custom issue", None)
     db.commit()
 
     # Demo trusted account ---------------------------------------------------

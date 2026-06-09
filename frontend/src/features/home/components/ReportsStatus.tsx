@@ -101,7 +101,9 @@ export const ReportsStatus = ({ loading, reports }: ReportsStatusProps) => {
   return (
     <YStack mx="$4" mt="$4" gap="$2">
       {issueGroups.map(({ failureId, reports: group }) => {
-        const firstUnverified = group.find((r) => !r.verified)
+        const firstUnverified = group.find(
+          (r) => !(r as OutageReport & { verified?: boolean }).verified,
+        )
         return (
           <OutageReportCard
             key={failureId}
