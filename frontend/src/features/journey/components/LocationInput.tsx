@@ -153,7 +153,12 @@ export const LocationInput = ({
 
   const showLocationShortcut = Boolean(onCurrentLocation) && focused && value.length === 0
   const showSavedShortcuts = focused && value.length === 0 && (savedPlaceShortcuts?.length ?? 0) > 0
-  const showDropdown = showLocationShortcut || showSavedShortcuts || suggestions.length > 0
+  const matchedSavedPlaces =
+    focused && value.length > 0 && !resolved && (savedPlaceShortcuts?.length ?? 0) > 0
+      ? savedPlaceShortcuts!.filter((p) => p.label.toLowerCase().includes(value.toLowerCase()))
+      : []
+  const showDropdown =
+    showLocationShortcut || showSavedShortcuts || matchedSavedPlaces.length > 0 || suggestions.length > 0
 
   // Right-side overlay inside the input: spinner → resolved tick → clear button → nothing.
   const showTick = resolved && !focused && !searching
@@ -294,6 +299,32 @@ export const LocationInput = ({
                 </YStack>
               ))}
 
+            {matchedSavedPlaces.map((place, i) => (
+              <YStack
+                key={place.postcode + place.label}
+                px="$4"
+                justify="center"
+                pressStyle={{ background: Colors.searchBg }}
+                onPress={() => chooseSavedPlace(place)}
+                style={{
+                  minHeight: 56,
+                  borderTopWidth: i === 0 ? 0 : Borders.thin,
+                  borderTopColor: Colors.border,
+                }}
+              >
+                <YStack gap="$2" style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <MaterialIcons
+                    name={place.icon as keyof typeof MaterialIcons.glyphMap}
+                    size={16}
+                    color={Colors.secondaryText}
+                  />
+                  <Text fontSize={15} fontWeight="600" color={Colors.text}>
+                    {place.label}
+                  </Text>
+                </YStack>
+              </YStack>
+            ))}
+
             {suggestions.map((suggestion, i) => (
               <YStack
                 key={`${suggestion.lat},${suggestion.lon}-${i}`}
@@ -303,7 +334,7 @@ export const LocationInput = ({
                 onPress={() => choose(suggestion)}
                 style={{
                   minHeight: 56,
-                  borderTopWidth: i === 0 ? 0 : Borders.thin,
+                  borderTopWidth: i === 0 && matchedSavedPlaces.length === 0 ? 0 : Borders.thin,
                   borderTopColor: Colors.border,
                 }}
               >
