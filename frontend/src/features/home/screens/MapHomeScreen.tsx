@@ -177,7 +177,7 @@ function ActiveJourneyBanner({
 }
 
 export function MapHomeScreen({ navigation }: Props) {
-  const { Colors, Radii, Shadows } = useTheme()
+  const { Colors, Shadows } = useTheme()
   const styles = useMemo(
     () =>
       StyleSheet.create({
@@ -212,6 +212,7 @@ export function MapHomeScreen({ navigation }: Props) {
   const [setPlaceModal, setSetPlaceModal] = useState<{ key: 'home' | 'work' } | null>(null)
   const [addCustomPlaceVisible, setAddCustomPlaceVisible] = useState(false)
   const [activeStation, setActiveStation] = useState<string | null>(null)
+  const [stationPausedForJourney, setStationPausedForJourney] = useState(false)
   const [activeReport, setActiveReport] = useState<string | null>(null)
   const [activePlan, setActivePlan] = useState<JourneyPlan | null>(null)
   const [activeDetail, setActiveDetail] = useState<JourneyDetailParams | null>(null)
@@ -220,9 +221,20 @@ export function MapHomeScreen({ navigation }: Props) {
   const mapRef = useRef<StationMapHandle>(null)
   const { status, user } = useAuth()
   const coords = useAppLocation()
-  // Tracks the visible height of the sheet so the map can pad its camera correctly.
-  const [sheetVisibleHeight, setSheetVisibleHeight] = useState(
-    Dimensions.get('window').height * 0.5,
+  // Each sheet reports its current snap height; the map uses the tallest one as its bottom inset.
+  const [searchHeight, setSearchHeight] = useState(Dimensions.get('window').height * 0.5)
+  const [stationHeight, setStationHeight] = useState(0)
+  const [reportHeight, setReportHeight] = useState(0)
+  const [plannerHeight, setPlannerHeight] = useState(0)
+  const [detailHeight, setDetailHeight] = useState(0)
+  const [activeJourneyHeight, setActiveJourneyHeight] = useState(0)
+  const mapBottomInset = Math.max(
+    searchHeight,
+    stationHeight,
+    reportHeight,
+    plannerHeight,
+    detailHeight,
+    activeJourneyHeight,
   )
 
   // Refresh on focus so the banner reflects progress made on the active screen and survives a
@@ -348,24 +360,6 @@ export function MapHomeScreen({ navigation }: Props) {
     })
   }
 
-  function endActive() {
-    Alert.alert(
-      'End journey?',
-      'This stops following the route. It stays in your saved journeys.',
-      [
-        { text: 'Keep going', style: 'cancel' },
-        {
-          text: 'End journey',
-          style: 'destructive',
-          onPress: async () => {
-            await clearActiveJourney()
-            setActive(null)
-          },
-        },
-      ],
-    )
-  }
-
   // The person icon doubles as the account affordance: log in when anonymous, or show the current
   // user with a log-out option when authenticated. A confirm step guards against an accidental tap.
   function handleAccountPress() {
@@ -385,7 +379,6 @@ export function MapHomeScreen({ navigation }: Props) {
       level: item.level,
       savedId: item.id,
     })
-    sheetRef.current?.dismiss()
   }
 
   function openStation(stationName: string) {
@@ -395,6 +388,7 @@ export function MapHomeScreen({ navigation }: Props) {
 
   function closeStation() {
     setActiveStation(null)
+    setStationPausedForJourney(false)
     sheetRef.current?.restore()
   }
 
@@ -405,14 +399,86 @@ export function MapHomeScreen({ navigation }: Props) {
 
   function closePlan() {
     setActivePlan(null)
-    sheetRef.current?.restore()
+    setStationPausedForJourney(false)
+    // Only restore home sheet when no station is active; otherwise the station sheet remounts
+    if (!activeStation) {
+      sheetRef.current?.restore()
+    }
   }
 
   return (
     <View style={styles.screen}>
-      <StationMap ref={mapRef} onStationPress={openStation} bottomInset={sheetVisibleHeight} />
+      <StationMap ref={mapRef} onStationPress={openStation} bottomInset={mapBottomInset} />
 
-      {/* Top overlay: icon buttons, then a resume banner when a journey is in progress */}
+      <SearchActionSheet
+        ref={sheetRef}
+        savedJourneys={saved}
+        savedPlaces={savedPlaces}
+        onSavedJourneyPress={openSaved}
+        onStationPress={openStation}
+        onLocationSelect={openJourneyFromTo}
+        onPlacePress={handlePlacePress}
+        onPlaceLongPress={handlePlaceLongPress}
+        onCustomPlacePress={handleCustomPlacePress}
+        onCustomPlaceLongPress={handleCustomPlaceLongPress}
+        onAddCustomPlace={handleAddCustomPlacePress}
+        onSnapChange={setSearchHeight}
+      />
+
+      <StationSheet
+        station={stationPausedForJourney ? null : activeStation}
+        onClose={closeStation}
+        onReportPress={() => activeStation && setActiveReport(activeStation)}
+        onOpenJourney={(plan) => {
+          setStationPausedForJourney(true)
+          setActivePlan(plan)
+        }}
+        onHeightChange={setStationHeight}
+      />
+
+      <ReportSheet
+        station={activeReport}
+        onClose={() => setActiveReport(null)}
+        onHeightChange={setReportHeight}
+      />
+
+      <JourneyPlannerSheet
+        plan={activePlan}
+        onClose={closePlan}
+        onJourneySelect={(params) => setActiveDetail(params)}
+        savedPlaces={savedPlaces}
+        onHeightChange={setPlannerHeight}
+      />
+
+      <JourneyDetailSheet
+        params={activeDetail}
+        onClose={() => setActiveDetail(null)}
+        onSaveChanged={() => loadSavedJourneys().then(setSaved)}
+        onStartJourney={(params) => {
+          setActiveDetail(null)
+          setActivePlan(null)
+          sheetRef.current?.dismiss()
+          setActiveJourneyParams(params)
+        }}
+        onHeightChange={setDetailHeight}
+      />
+
+      <ActiveJourneySheet
+        params={activeJourneyParams}
+        onComplete={() => {
+          setActiveJourneyParams(null)
+          setActive(null)
+          sheetRef.current?.restore()
+        }}
+        onEnd={() => {
+          setActiveJourneyParams(null)
+          setActive(null)
+          sheetRef.current?.restore()
+        }}
+        onHeightChange={setActiveJourneyHeight}
+      />
+
+      {/* Top overlay: rendered after sheets so it sits above all backdrops */}
       <SafeAreaView edges={['top']} style={[styles.topSafe, { pointerEvents: 'box-none' }]}>
         <View style={[styles.topButtons, { pointerEvents: 'box-none' }]}>
           <TopIconButton
@@ -443,57 +509,6 @@ export function MapHomeScreen({ navigation }: Props) {
           />
         )}
       </SafeAreaView>
-
-      <SearchActionSheet
-        ref={sheetRef}
-        savedJourneys={saved}
-        savedPlaces={savedPlaces}
-        onSavedJourneyPress={openSaved}
-        onStationPress={openStation}
-        onLocationSelect={openJourneyFromTo}
-        onPlacePress={handlePlacePress}
-        onPlaceLongPress={handlePlaceLongPress}
-        onCustomPlacePress={handleCustomPlacePress}
-        onCustomPlaceLongPress={handleCustomPlaceLongPress}
-        onAddCustomPlace={handleAddCustomPlacePress}
-        onSnapChange={setSheetVisibleHeight}
-      />
-
-      <StationSheet
-        station={activeStation}
-        onClose={closeStation}
-        onReportPress={() => activeStation && setActiveReport(activeStation)}
-        onOpenJourney={(plan) => {
-          setActivePlan(plan)
-          sheetRef.current?.dismiss()
-        }}
-      />
-
-      <ReportSheet station={activeReport} onClose={() => setActiveReport(null)} />
-
-      <JourneyPlannerSheet
-        plan={activePlan}
-        onClose={closePlan}
-        onJourneySelect={(params) => setActiveDetail(params)}
-      />
-
-      <JourneyDetailSheet
-        params={activeDetail}
-        onClose={() => setActiveDetail(null)}
-        onStartJourney={(params) => {
-          setActiveDetail(null)
-          setActiveJourneyParams(params)
-        }}
-      />
-
-      <ActiveJourneySheet
-        params={activeJourneyParams}
-        onComplete={() => {
-          setActiveJourneyParams(null)
-          setActive(null)
-        }}
-        onEnd={endActive}
-      />
 
       {setPlaceModal && (
         <SetPlaceModal

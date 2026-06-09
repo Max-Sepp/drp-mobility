@@ -3,14 +3,16 @@
 // Reporting opens ReportSheet (sibling in MapHomeScreen). JourneyPlanner navigates on the stack.
 
 import { MaterialIcons } from '@expo/vector-icons'
-import * as Location from 'expo-location'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { Text } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import BottomSheet, { BottomSheetScrollView, type BottomSheetRef } from '@/components/BottomSheet'
+import { SheetHeader } from '@/components/SheetHeader'
 import { PlatformAccessCard } from '@/features/home/components/PlatformAccessCard'
 import { ReportsStatus } from '@/features/home/components/ReportsStatus'
+import { StationAdditionalInfoCard } from '@/features/home/components/StationAdditionalInfoCard'
+import { StationInfoCard } from '@/features/home/components/StationInfoCard'
 import { useOutages } from '@/features/outages'
 import { useStations } from '@/features/stations'
 import { resolveToPostcode, type ResolvedLocation } from '@/features/journey/api/geocode'
@@ -19,35 +21,29 @@ import type { JourneyPlan } from '@/features/home/components/JourneyPlannerSheet
 import { useTheme, Heights, Spacing } from '@/theme'
 
 const SCREEN_H = Dimensions.get('window').height
-const SNAP_POINTS = [SCREEN_H * 0.52, SCREEN_H * 0.82]
+const COLLAPSED_H = 84
+// 8 (paddingTop) + 50 (button height) + 8 (gap) = 66 reserved for top buttons
+const TOP_BUTTON_RESERVE = 66
 
 type Props = {
   station: string | null
   onClose: () => void
   onReportPress: () => void
   onOpenJourney: (plan: JourneyPlan) => void
+  onHeightChange?: (height: number) => void
 }
 
-export function StationSheet({ station, onClose, onReportPress, onOpenJourney }: Props) {
+export function StationSheet({
+  station,
+  onClose,
+  onReportPress,
+  onOpenJourney,
+  onHeightChange,
+}: Props) {
   const { Colors, Radii, Shadows } = useTheme()
   const styles = useMemo(
     () =>
       StyleSheet.create({
-        header: {
-          flexDirection: 'row',
-          alignItems: 'flex-start',
-          paddingHorizontal: Spacing.lg,
-          paddingBottom: Spacing.md,
-        },
-        closeBtn: {
-          width: 32,
-          height: 32,
-          borderRadius: 16,
-          backgroundColor: Colors.searchBg,
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginTop: 2,
-        },
         actionsRow: {
           flexDirection: 'row',
           gap: Spacing.md,
@@ -81,10 +77,16 @@ export function StationSheet({ station, onClose, onReportPress, onOpenJourney }:
     [Colors, Radii, Shadows],
   )
   const insets = useSafeAreaInsets()
+  const snapPoints = useMemo(
+    () => [COLLAPSED_H, SCREEN_H * 0.52, SCREEN_H - insets.top - TOP_BUTTON_RESERVE],
+    [insets.top],
+  )
   const cachedCoords = useAppLocation()
   const [goingHere, setGoingHere] = useState(false)
   const [snapIndex, setSnapIndex] = useState(-1)
   const sheetRef = useRef<BottomSheetRef>(null)
+  // Suppresses onClose when the sheet is hidden programmatically (not by the user).
+  const programmaticClose = useRef(false)
 
   const { stations } = useStations()
   const stationDetail = useMemo(() => stations.find((s) => s.name === station), [stations, station])
@@ -94,23 +96,22 @@ export function StationSheet({ station, onClose, onReportPress, onOpenJourney }:
     () => allReports.filter((r) => r.failure.equipment.station.name === station),
     [allReports, station],
   )
-
-  // Imperatively open or close the sheet when the station prop changes.
-  // The index prop alone is unreliable for re-triggering gorhom after mount.
   useEffect(() => {
     if (station) {
-      sheetRef.current?.snapToIndex(0)
+      programmaticClose.current = false
+      sheetRef.current?.snapToIndex(1)
     } else {
+      programmaticClose.current = true
       sheetRef.current?.close()
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setGoingHere(false)
   }, [station])
 
-  // Track snap index so we can disable the inner scroll until the sheet is fully open.
-  // onChange(-1) is also the single place we notify the parent the sheet is gone.
   function handleChange(index: number) {
     setSnapIndex(index)
-    if (index === -1) onClose()
+    onHeightChange?.(index >= 0 ? snapPoints[index] : 0)
+    if (index === -1 && !programmaticClose.current) onClose()
   }
 
   async function handleGoHere() {
@@ -128,12 +129,10 @@ export function StationSheet({ station, onClose, onReportPress, onOpenJourney }:
       const to: ResolvedLocation = { postcode: toResult.postcode, label: station }
 
       let from: ResolvedLocation | undefined
-      const { status } = await Location.requestForegroundPermissionsAsync()
-      if (status === 'granted') {
-        const pos =
-          cachedCoords ??
-          (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })).coords
-        const fromResult = await resolveToPostcode(`${pos.latitude},${pos.longitude}`)
+      if (cachedCoords) {
+        const fromResult = await resolveToPostcode(
+          `${cachedCoords.latitude},${cachedCoords.longitude}`,
+        )
         if (!('error' in fromResult)) {
           from = { postcode: fromResult.postcode, label: 'Current location' }
         }
@@ -146,33 +145,12 @@ export function StationSheet({ station, onClose, onReportPress, onOpenJourney }:
   }
 
   return (
-    <BottomSheet
-      ref={sheetRef}
-      index={-1}
-      snapPoints={SNAP_POINTS}
-      enablePanDownToClose
-      onChange={handleChange}
-    >
-      {/* Header: station name + close button */}
-      <View style={styles.header}>
-        <View style={{ flex: 1 }}>
-          <Text fontSize={20} fontWeight="700" color={Colors.text} numberOfLines={1}>
-            {station ?? ''}
-          </Text>
-          <Text fontSize={13} color={Colors.secondaryText} mt="$1">
-            Underground station
-          </Text>
-        </View>
-        <TouchableOpacity
-          onPress={() => sheetRef.current?.close()}
-          style={styles.closeBtn}
-          activeOpacity={0.75}
-          accessibilityRole="button"
-          accessibilityLabel="Close station info"
-        >
-          <MaterialIcons name="close" size={18} color={Colors.secondaryText} />
-        </TouchableOpacity>
-      </View>
+    <BottomSheet ref={sheetRef} index={-1} snapPoints={snapPoints} onChange={handleChange}>
+      <SheetHeader
+        title={station ?? ''}
+        subtitle="Underground station"
+        onClose={() => sheetRef.current?.close()}
+      />
 
       {/* Action buttons row */}
       <View style={styles.actionsRow}>
@@ -209,13 +187,14 @@ export function StationSheet({ station, onClose, onReportPress, onOpenJourney }:
       {/* scrollEnabled is false when the sheet is not fully open so any scroll
           gesture is passed up to the sheet, which snaps to index 1 first. */}
       <BottomSheetScrollView
-        scrollEnabled={snapIndex >= 1}
+        scrollEnabled={snapIndex >= 2}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: insets.bottom + Spacing.xl }}
       >
+        {stationDetail && <StationInfoCard station={stationDetail} />}
         {stationDetail && <PlatformAccessCard key={station} platforms={stationDetail.platforms} />}
-
         <ReportsStatus loading={loading} reports={reports} />
+        {stationDetail && <StationAdditionalInfoCard station={stationDetail} />}
       </BottomSheetScrollView>
     </BottomSheet>
   )

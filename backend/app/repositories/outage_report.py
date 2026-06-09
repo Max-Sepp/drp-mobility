@@ -21,6 +21,9 @@ _REPORT_JOINEDLOAD = [
     joinedload(OutageReport.failure)
     .joinedload(Failure.equipment)
     .joinedload(Equipment.equipment_type),
+    # Each report's embedded failure carries the failure's verification records (used for the
+    # client's merged report/verification timeline). selectinload keeps it a separate query.
+    joinedload(OutageReport.failure).selectinload(Failure.verifications),
 ]
 
 

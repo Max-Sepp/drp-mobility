@@ -31,7 +31,7 @@ from app.repositories.user import UserRepository
 #   lift_units: [{ name, connection }] or lifts: <int> (count-only, synthesised)
 
 _DATA_PATH = Path(__file__).resolve().parent / "data" / "stations.json"
-_EQUIPMENT_TYPES = ["lift", "escalator"]
+_EQUIPMENT_TYPES = ["lift", "escalator", "overcrowding", "custom"]
 
 
 def _load_station_data() -> list[dict]:
@@ -55,10 +55,18 @@ def seed_defaults(db: Session) -> None:
     for data in stations_data:
         if data["name"] not in stations:
             coords = data.get("coordinates") or {}
+            toilets = data.get("toilets") or []
+            zone_list = data.get("zones") or []
             stations[data["name"]] = Station(
                 name=data["name"],
                 latitude=coords.get("lat"),
                 longitude=coords.get("lng"),
+                wifi=bool(data.get("wifi", False)),
+                zones=",".join(str(z) for z in zone_list) if zone_list else None,
+                has_toilets=bool(toilets),
+                has_accessible_toilets=any(t.get("accessible") for t in toilets),
+                blue_badge_parking=bool(data.get("blueBadgeParking", False)),
+                taxi_rank=bool(data.get("taxiRank", False)),
             )
             db.add(stations[data["name"]])
     db.flush()
@@ -134,6 +142,8 @@ def seed_defaults(db: Session) -> None:
 
     lift_type_id = types["lift"].id
     escalator_type_id = types["escalator"].id
+    overcrowding_type_id = types["overcrowding"].id
+    custom_type_id = types["custom"].id
     for data in stations_data:
         station = stations[data["name"]]
         station_platforms = [platforms[(station.id, p["name"])] for p in data["platforms"]]
@@ -174,6 +184,12 @@ def seed_defaults(db: Session) -> None:
                     f"Escalator {i + 1}: street → {target}",
                     platform.id if platform else None,
                 )
+
+        # Overcrowding: one virtual equipment row per station used to attach overcrowding reports.
+        add_equipment(station.id, overcrowding_type_id, "General overcrowding", None)
+
+        # Custom: one virtual equipment row per station used to attach freeform custom reports.
+        add_equipment(station.id, custom_type_id, "Custom issue", None)
     db.commit()
 
     # Demo trusted account ---------------------------------------------------

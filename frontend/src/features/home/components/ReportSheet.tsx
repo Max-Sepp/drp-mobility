@@ -10,6 +10,7 @@ import { Alert, Dimensions, StyleSheet, TextInput, TouchableOpacity, View } from
 import { Text } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import BottomSheet, { BottomSheetScrollView, type BottomSheetRef } from '@/components/BottomSheet'
+import { SheetHeader } from '@/components/SheetHeader'
 import { apiClient } from '@/api/client'
 import type { components } from '@/api/schema.d'
 import { EquipmentPicker } from '@/features/reporting/components/EquipmentPicker'
@@ -22,7 +23,7 @@ type Step = 'type' | 'form' | 'success'
 type IssueType = 'lift' | 'escalator' | 'overcrowding' | 'custom'
 
 const SCREEN_H = Dimensions.get('window').height
-const SNAP_POINTS = [SCREEN_H * 0.55, SCREEN_H * 0.88]
+const TOP_BUTTON_RESERVE = 66
 
 const ALLOWED_MIME = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
 
@@ -31,26 +32,20 @@ const ISSUE_TYPES: { type: IssueType; icon: keyof typeof MaterialIcons.glyphMap;
     { type: 'lift', icon: 'elevator', label: 'Lift\nBroken' },
     { type: 'escalator', icon: 'escalator', label: 'Escalator\nBroken' },
     { type: 'overcrowding', icon: 'groups', label: 'Overcrowding' },
-    { type: 'custom', icon: 'edit-note', label: 'Other' },
+    { type: 'custom', icon: 'edit-note', label: 'Custom\nIssue' },
   ]
 
 type Props = {
   station: string | null
   onClose: () => void
+  onHeightChange?: (height: number) => void
 }
 
-export function ReportSheet({ station, onClose }: Props) {
+export function ReportSheet({ station, onClose, onHeightChange }: Props) {
   const { Colors, Radii, Shadows } = useTheme()
   const styles = useMemo(
     () =>
       StyleSheet.create({
-        header: {
-          flexDirection: 'row',
-          alignItems: 'flex-start',
-          gap: Spacing.sm,
-          paddingHorizontal: Spacing.lg,
-          paddingBottom: Spacing.md,
-        },
         iconBtn: {
           width: 32,
           height: 32,
@@ -144,6 +139,10 @@ export function ReportSheet({ station, onClose }: Props) {
     [Colors, Radii, Shadows],
   )
   const insets = useSafeAreaInsets()
+  const snapPoints = useMemo(
+    () => [SCREEN_H * 0.55, SCREEN_H - insets.top - TOP_BUTTON_RESERVE],
+    [insets.top],
+  )
   const sheetRef = useRef<BottomSheetRef>(null)
 
   const [step, setStep] = useState<Step>('type')
@@ -155,6 +154,8 @@ export function ReportSheet({ station, onClose }: Props) {
   const [area, setArea] = useState('')
   const [photo, setPhoto] = useState<ImagePicker.ImagePickerAsset | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [hasLifts, setHasLifts] = useState<boolean | undefined>(undefined)
+  const [hasEscalators, setHasEscalators] = useState<boolean | undefined>(undefined)
 
   function resetForm() {
     setIssueType(null)
@@ -165,20 +166,47 @@ export function ReportSheet({ station, onClose }: Props) {
     setArea('')
     setPhoto(null)
     setSubmitting(false)
+    setHasLifts(undefined)
+    setHasEscalators(undefined)
   }
 
   useEffect(() => {
     if (station) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       resetForm()
       setStep('type')
-      sheetRef.current?.snapToIndex(0)
+      let active = true
+      // Fetch equipment availability BEFORE opening the sheet so tiles are already
+      // grey/enabled the moment the sheet becomes visible.
+      apiClient.GET('/equipment').then(({ data }) => {
+        if (!active) return
+        if (data) {
+          setHasLifts(
+            data.some((e) => e.station.name === station && e.equipment_type.name === 'lift'),
+          )
+          setHasEscalators(
+            data.some((e) => e.station.name === station && e.equipment_type.name === 'escalator'),
+          )
+        }
+        sheetRef.current?.snapToIndex(0)
+      })
+      return () => {
+        active = false
+      }
     } else {
       sheetRef.current?.close()
     }
   }, [station])
 
   function handleChange(index: number) {
+    onHeightChange?.(index >= 0 ? snapPoints[index] : 0)
     if (index === -1) onClose()
+  }
+
+  function isTypeDisabled(type: IssueType): boolean {
+    if (type === 'lift') return hasLifts === false
+    if (type === 'escalator') return hasEscalators === false
+    return false
   }
 
   async function selectType(type: IssueType) {
@@ -189,15 +217,25 @@ export function ReportSheet({ station, onClose }: Props) {
     setStep('form')
     sheetRef.current?.snapToIndex(1)
 
-    if ((type === 'lift' || type === 'escalator') && station) {
+    if (station) {
       setLoadingEquipment(true)
       const { data } = await apiClient.GET('/equipment')
       if (data) {
-        setEquipment(
-          data
-            .filter((e) => e.station.name === station && e.equipment_type.name === type)
-            .sort((a, b) => a.connection.localeCompare(b.connection, undefined, { numeric: true })),
-        )
+        if (type === 'lift' || type === 'escalator') {
+          setEquipment(
+            data
+              .filter((e) => e.station.name === station && e.equipment_type.name === type)
+              .sort((a, b) =>
+                a.connection.localeCompare(b.connection, undefined, { numeric: true }),
+              ),
+          )
+        } else {
+          // overcrowding and custom: auto-select the single station-level equipment row
+          const equip = data.find(
+            (e) => e.station.name === station && e.equipment_type.name === type,
+          )
+          if (equip) setEquipmentId(equip.id)
+        }
       }
       setLoadingEquipment(false)
     }
@@ -210,17 +248,6 @@ export function ReportSheet({ station, onClose }: Props) {
 
   async function submit() {
     if (!station) return
-
-    // Custom / overcrowding: validate description then go straight to success
-    // (no equipment_id, backend support pending)
-    if (issueType === 'overcrowding' || issueType === 'custom') {
-      if (!description.trim()) {
-        Alert.alert('Required', 'Please describe the issue.')
-        return
-      }
-      setStep('success')
-      return
-    }
 
     if (!equipmentId) {
       Alert.alert('Required', `Please select which ${issueType} is broken.`)
@@ -240,11 +267,14 @@ export function ReportSheet({ station, onClose }: Props) {
 
     setSubmitting(true)
     try {
+      const descParts = [description.trim(), area.trim() ? `Area: ${area.trim()}` : ''].filter(
+        Boolean,
+      )
       const { data, error } = await apiClient.POST('/outage-reports', {
         body: {
           equipment_id: equipmentId,
           breakdown_time: new Date().toISOString(),
-          description: description.trim() || null,
+          description: descParts.join('\n') || null,
         },
       })
       if (error || !data) {
@@ -286,33 +316,17 @@ export function ReportSheet({ station, onClose }: Props) {
     <BottomSheet
       ref={sheetRef}
       index={-1}
-      snapPoints={SNAP_POINTS}
+      snapPoints={snapPoints}
       enablePanDownToClose
       onChange={handleChange}
     >
       {step === 'type' && (
         <>
-          <View style={styles.header}>
-            <View style={{ flex: 1 }}>
-              <Text fontSize={18} fontWeight="700" color={Colors.text}>
-                Report issue
-              </Text>
-              {station ? (
-                <Text fontSize={13} color={Colors.secondaryText} mt="$1">
-                  @ {station}
-                </Text>
-              ) : null}
-            </View>
-            <TouchableOpacity
-              onPress={() => sheetRef.current?.close()}
-              style={styles.iconBtn}
-              activeOpacity={0.75}
-              accessibilityRole="button"
-              accessibilityLabel="Close"
-            >
-              <MaterialIcons name="close" size={18} color={Colors.secondaryText} />
-            </TouchableOpacity>
-          </View>
+          <SheetHeader
+            title="Report issue"
+            subtitle={station ? `@ ${station}` : undefined}
+            onClose={() => sheetRef.current?.close()}
+          />
 
           <BottomSheetScrollView
             showsVerticalScrollIndicator={false}
@@ -322,27 +336,29 @@ export function ReportSheet({ station, onClose }: Props) {
             ]}
           >
             <View style={styles.grid}>
-              {ISSUE_TYPES.map(({ type, icon, label }) => (
-                <TouchableOpacity
-                  key={type}
-                  style={styles.gridItem}
-                  onPress={() => selectType(type)}
-                  activeOpacity={0.75}
-                  accessibilityRole="button"
-                  accessibilityLabel={label.replace('\n', ' ')}
-                >
-                  <MaterialIcons name={icon} size={36} color={Colors.text} />
-                  <Text
-                    fontSize={14}
-                    fontWeight="600"
-                    color={Colors.text}
-                    mt="$1.5"
-                    style={{ textAlign: 'center' }}
+              {ISSUE_TYPES.filter(({ type }) => !isTypeDisabled(type)).map(
+                ({ type, icon, label }) => (
+                  <TouchableOpacity
+                    key={type}
+                    style={styles.gridItem}
+                    onPress={() => selectType(type)}
+                    activeOpacity={0.75}
+                    accessibilityRole="button"
+                    accessibilityLabel={label.replace('\n', ' ')}
                   >
-                    {label}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+                    <MaterialIcons name={icon} size={36} color={Colors.text} />
+                    <Text
+                      fontSize={14}
+                      fontWeight="600"
+                      color={Colors.text}
+                      mt="$1.5"
+                      style={{ textAlign: 'center' }}
+                    >
+                      {label}
+                    </Text>
+                  </TouchableOpacity>
+                ),
+              )}
             </View>
           </BottomSheetScrollView>
         </>
@@ -350,36 +366,22 @@ export function ReportSheet({ station, onClose }: Props) {
 
       {step === 'form' && (
         <>
-          <View style={styles.header}>
-            <TouchableOpacity
-              onPress={goBack}
-              style={styles.iconBtn}
-              activeOpacity={0.75}
-              accessibilityRole="button"
-              accessibilityLabel="Back"
-            >
-              <MaterialIcons name="arrow-back" size={20} color={Colors.text} />
-            </TouchableOpacity>
-            <View style={{ flex: 1 }}>
-              <Text fontSize={18} fontWeight="700" color={Colors.text}>
-                {formTitle}
-              </Text>
-              {station ? (
-                <Text fontSize={13} color={Colors.secondaryText} mt="$1">
-                  {station}
-                </Text>
-              ) : null}
-            </View>
-            <TouchableOpacity
-              onPress={() => sheetRef.current?.close()}
-              style={styles.iconBtn}
-              activeOpacity={0.75}
-              accessibilityRole="button"
-              accessibilityLabel="Close"
-            >
-              <MaterialIcons name="close" size={18} color={Colors.secondaryText} />
-            </TouchableOpacity>
-          </View>
+          <SheetHeader
+            title={formTitle}
+            subtitle={station ?? undefined}
+            onClose={() => sheetRef.current?.close()}
+            left={
+              <TouchableOpacity
+                onPress={goBack}
+                style={styles.iconBtn}
+                activeOpacity={0.75}
+                accessibilityRole="button"
+                accessibilityLabel="Back"
+              >
+                <MaterialIcons name="arrow-back" size={20} color={Colors.text} />
+              </TouchableOpacity>
+            }
+          />
 
           <BottomSheetScrollView
             showsVerticalScrollIndicator={false}

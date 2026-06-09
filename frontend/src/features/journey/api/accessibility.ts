@@ -8,6 +8,8 @@ import type { Journey } from '@/features/journey/api/tfl'
 
 /** One specific broken piece of equipment at a station, with its reported detail. */
 export type OutageUnit = {
+  /** The failure (outage incident) this unit belongs to — used to fetch its event timeline. */
+  failureId: number
   /** "lift" or "escalator". */
   equipmentType: string
   /** The full connection description, e.g. "Lift A: Booking Hall → Railway platform 1". */
@@ -17,6 +19,9 @@ export type OutageUnit = {
   platformEndpoints: string[]
   reportCount: number
   lastReported: string | null
+  /** Whether a trusted worker has confirmed this outage on-site, and how many times. */
+  verified: boolean
+  verificationCount: number
   /** Escalator topology is not published by TfL, so escalator connections are estimates. */
   estimated: boolean
 }
@@ -107,11 +112,14 @@ export async function fetchStationOutages(): Promise<StationOutage[]> {
     const type = equipment.equipment_type.name
     const units = byStation.get(station) ?? []
     units.push({
+      failureId: failure.id,
       equipmentType: type,
       connection: equipment.connection,
       platformEndpoints: platformEndpoints(equipment.connection),
       reportCount: failure.report_count,
       lastReported: failure.last_reported,
+      verified: failure.verified,
+      verificationCount: failure.verifications.length,
       estimated: type === 'escalator',
     })
     byStation.set(station, units)

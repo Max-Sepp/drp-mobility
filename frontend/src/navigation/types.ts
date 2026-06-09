@@ -24,8 +24,6 @@ export type RootStackParamList = {
     savedId?: string
     tags?: RouteTag[]
   }
-  // The list of journeys saved to the device.
-  SavedJourneys: undefined
   // The follow/execute screen for an in-progress journey. Mirrors JourneyDetail's payload plus
   // the savedId every active journey is anchored to (the detail screen saves before starting).
   ActiveJourney: {
@@ -54,7 +52,6 @@ export type MapHomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Map
 export type SearchScreenProps = NativeStackScreenProps<RootStackParamList, 'Search'>
 export type JourneyPlannerScreenProps = NativeStackScreenProps<RootStackParamList, 'JourneyPlanner'>
 export type JourneyDetailScreenProps = NativeStackScreenProps<RootStackParamList, 'JourneyDetail'>
-export type SavedJourneysScreenProps = NativeStackScreenProps<RootStackParamList, 'SavedJourneys'>
 export type ActiveJourneyScreenProps = NativeStackScreenProps<RootStackParamList, 'ActiveJourney'>
 export type StationScreenProps = NativeStackScreenProps<RootStackParamList, 'Station'>
 export type SelectStationScreenProps = NativeStackScreenProps<RootStackParamList, 'SelectStation'>
