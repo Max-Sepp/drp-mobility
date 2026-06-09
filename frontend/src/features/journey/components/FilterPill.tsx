@@ -13,6 +13,7 @@ import {
 } from 'react-native'
 import { Text, XStack } from 'tamagui'
 import { formatDepart } from '@/features/journey/components/LeaveAtField'
+import { type TimeConstraint } from '@/features/journey/api/tfl'
 import { useTheme, Borders, Opacity } from '@/theme'
 
 // ---------------------------------------------------------------------------
@@ -73,7 +74,7 @@ export function FilterPill({ label, options, value, onSelect }: FilterPillProps)
       <Text
         fontSize={12}
         fontWeight="600"
-        color={isActive ? Colors.card : Colors.text}
+        color={isActive ? Colors.card : Colors.secondaryText}
         numberOfLines={1}
       >
         {displayLabel}
@@ -88,25 +89,35 @@ export function FilterPill({ label, options, value, onSelect }: FilterPillProps)
 }
 
 // ---------------------------------------------------------------------------
-// Leave-at pill — opens native date + time picker
+// Leave-at / Arrive-by pill — opens native date + time picker
 // ---------------------------------------------------------------------------
 
 type LeavePillProps = {
-  value: Date | null
-  onChange: (v: Date | null) => void
+  value: TimeConstraint | null
+  onChange: (v: TimeConstraint | null) => void
 }
 
 export function LeavePill({ value, onChange }: LeavePillProps) {
   const { Colors, Radii } = useTheme()
   const [showModal, setShowModal] = useState(false)
   const [pending, setPending] = useState<Date>(new Date())
+  const pendingMode = useRef<'depart' | 'arrive'>('depart')
   const backdropAnim = useRef(new Animated.Value(0)).current
   const slideAnim = useRef(new Animated.Value(320)).current
 
   const isActive = value !== null
-  const displayLabel = value ? `Leave ${formatDepart(value)}` : 'Leave now'
 
-  function openModal(initial: Date) {
+  let displayLabel: string
+  if (!value) {
+    displayLabel = 'Leave now'
+  } else if (value.mode === 'depart') {
+    displayLabel = `Leave ${formatDepart(value.at)}`
+  } else {
+    displayLabel = `Arrive by ${formatDepart(value.by)}`
+  }
+
+  function openModal(initial: Date, mode: 'depart' | 'arrive') {
+    pendingMode.current = mode
     setPending(initial)
     backdropAnim.setValue(0)
     slideAnim.setValue(320)
@@ -124,28 +135,34 @@ export function LeavePill({ value, onChange }: LeavePillProps) {
     ]).start(() => setShowModal(false))
   }
 
-  function open() {
-    const initial = value ?? new Date()
-    if (Platform.OS === 'ios') {
-      if (!isActive) {
-        openModal(initial)
-      } else {
-        ActionSheetIOS.showActionSheetWithOptions(
-          { options: ['Leave now', 'Change time…', 'Cancel'], cancelButtonIndex: 2 },
-          (idx) => {
-            if (idx === 0) onChange(null)
-            else if (idx === 1) setTimeout(() => openModal(initial), 50)
-          },
-        )
-      }
+  function confirmModal() {
+    if (pendingMode.current === 'depart') {
+      onChange({ mode: 'depart', at: pending })
     } else {
-      Alert.alert('Leave at', undefined, [
+      onChange({ mode: 'arrive', by: pending })
+    }
+    closeModal()
+  }
+
+  function open() {
+    const currentTime = value ? (value.mode === 'depart' ? value.at : value.by) : new Date()
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        { options: ['Leave now', 'Leave at…', 'Arrive by…', 'Cancel'], cancelButtonIndex: 3 },
+        (idx) => {
+          if (idx === 0) onChange(null)
+          else if (idx === 1) setTimeout(() => openModal(currentTime, 'depart'), 50)
+          else if (idx === 2) setTimeout(() => openModal(currentTime, 'arrive'), 50)
+        },
+      )
+    } else {
+      Alert.alert('Journey time', undefined, [
         { text: 'Leave now', onPress: () => onChange(null) },
         {
-          text: 'Choose time…',
+          text: 'Leave at…',
           onPress: () =>
             DateTimePickerAndroid.open({
-              value: initial,
+              value: currentTime,
               mode: 'date',
               is24Hour: true,
               onChange: (event, date) => {
@@ -156,7 +173,28 @@ export function LeavePill({ value, onChange }: LeavePillProps) {
                   is24Hour: true,
                   onChange: (timeEvent, dateTime) => {
                     if (timeEvent.type !== 'set' || !dateTime) return
-                    onChange(dateTime)
+                    onChange({ mode: 'depart', at: dateTime })
+                  },
+                })
+              },
+            }),
+        },
+        {
+          text: 'Arrive by…',
+          onPress: () =>
+            DateTimePickerAndroid.open({
+              value: currentTime,
+              mode: 'date',
+              is24Hour: true,
+              onChange: (event, date) => {
+                if (event.type !== 'set' || !date) return
+                DateTimePickerAndroid.open({
+                  value: date,
+                  mode: 'time',
+                  is24Hour: true,
+                  onChange: (timeEvent, dateTime) => {
+                    if (timeEvent.type !== 'set' || !dateTime) return
+                    onChange({ mode: 'arrive', by: dateTime })
                   },
                 })
               },
@@ -166,6 +204,8 @@ export function LeavePill({ value, onChange }: LeavePillProps) {
       ])
     }
   }
+
+  const modalTitle = pendingMode.current === 'depart' ? 'Leave at' : 'Arrive by'
 
   return (
     <>
@@ -197,7 +237,7 @@ export function LeavePill({ value, onChange }: LeavePillProps) {
         <Text
           fontSize={12}
           fontWeight="600"
-          color={isActive ? Colors.card : Colors.text}
+          color={isActive ? Colors.card : Colors.secondaryText}
           numberOfLines={1}
         >
           {displayLabel}
@@ -240,8 +280,8 @@ export function LeavePill({ value, onChange }: LeavePillProps) {
                 <TouchableOpacity onPress={closeModal}>
                   <Text fontSize={16} color={Colors.blue}>Cancel</Text>
                 </TouchableOpacity>
-                <Text fontSize={16} fontWeight="700" color={Colors.text}>Leave at</Text>
-                <TouchableOpacity onPress={() => { onChange(pending); closeModal() }}>
+                <Text fontSize={16} fontWeight="700" color={Colors.text}>{modalTitle}</Text>
+                <TouchableOpacity onPress={confirmModal}>
                   <Text fontSize={16} fontWeight="700" color={Colors.blue}>Done</Text>
                 </TouchableOpacity>
               </XStack>

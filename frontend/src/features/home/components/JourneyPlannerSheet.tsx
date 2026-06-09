@@ -21,6 +21,7 @@ import {
   planJourneyOptions,
   type RouteTag,
   type TaggedJourney,
+  type TimeConstraint,
 } from '@/features/journey/api/tfl'
 import { JourneyResultCard } from '@/features/journey/components/JourneyResultCard'
 import { FilterPill, LeavePill } from '@/features/journey/components/FilterPill'
@@ -119,7 +120,7 @@ export function JourneyPlannerSheet({ plan, onClose, onJourneySelect, savedPlace
   const [toIsNamedPlace, setToIsNamedPlace] = useState(false)
   const [gettingLocation, setGettingLocation] = useState(false)
   const [level, setLevel] = useState<AccessibilityPreference | null>(null)
-  const [departAt, setDepartAt] = useState<Date | null>(null)
+  const [timeConstraint, setTimeConstraint] = useState<TimeConstraint | null>(null)
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState<JourneyResult[]>([])
   const [resolved, setResolved] = useState<Resolved | null>(null)
@@ -177,7 +178,7 @@ export function JourneyPlannerSheet({ plan, onClose, onJourneySelect, savedPlace
       setFromIsCurrentLocation(plan.initialFrom?.label === 'Current location')
       setToIsNamedPlace(Boolean(plan.initialTo?.isNamedPlace))
       setLevel(null)
-      setDepartAt(null)
+      setTimeConstraint(null)
       setResults([])
       setResolved(null)
       setGettingLocation(false)
@@ -243,7 +244,7 @@ export function JourneyPlannerSheet({ plan, onClose, onJourneySelect, savedPlace
       fromLoc.postcode,
       toLoc.postcode,
       level,
-      departAt,
+      timeConstraint,
     )
 
     if (optResult.kind !== 'journeys') {
@@ -343,7 +344,7 @@ export function JourneyPlannerSheet({ plan, onClose, onJourneySelect, savedPlace
 
         {/* Filter row */}
         <XStack gap="$2" mt="$2">
-          <LeavePill value={departAt} onChange={setDepartAt} />
+          <LeavePill value={timeConstraint} onChange={setTimeConstraint} />
           <FilterPill
             label="Step-free"
             options={STEP_FREE_OPTIONS}

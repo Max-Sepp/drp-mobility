@@ -70,16 +70,17 @@ export type JourneyPlanResult =
   | { kind: 'journeys'; journeys: Journey[] }
   | { kind: 'error'; message: string }
 
-/**
- * TfL's `date` (yyyyMMdd) + `time` (HHmm) query params for a departure time. TfL works in
- * London local time and our times are device-local (we assume a London device, as elsewhere),
- * so read the wall-clock components straight off the Date.
- */
-function departureParams(departAt: Date): string[] {
+/** A time constraint for journey planning — either a specific departure or arrival time. */
+export type TimeConstraint =
+  | { mode: 'depart'; at: Date }
+  | { mode: 'arrive'; by: Date }
+
+function timeQueryParams(time: TimeConstraint): string[] {
   const pad = (n: number) => String(n).padStart(2, '0')
-  const date = `${departAt.getFullYear()}${pad(departAt.getMonth() + 1)}${pad(departAt.getDate())}`
-  const time = `${pad(departAt.getHours())}${pad(departAt.getMinutes())}`
-  return [`date=${date}`, `time=${time}`, 'timeIs=Departing']
+  const d = time.mode === 'depart' ? time.at : time.by
+  const date = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}`
+  const t = `${pad(d.getHours())}${pad(d.getMinutes())}`
+  return [`date=${date}`, `time=${t}`, `timeIs=${time.mode === 'depart' ? 'Departing' : 'Arriving'}`]
 }
 
 /**
@@ -87,19 +88,19 @@ function departureParams(departAt: Date): string[] {
  * `resolveToPostcode`), which TfL resolves uniquely — so we never hit the ambiguous-text
  * "did you mean?" path. `accessibility` asks TfL to return only step-free routes; pass
  * `null`/omit it to apply no accessibility filtering (TfL then returns all modes, e.g. tube).
- * `departAt` plans for leaving at that time; omit/`null` to leave now. `preference` asks TfL to
+ * `time` constrains when to depart or arrive; omit/`null` to leave now. `preference` asks TfL to
  * optimise for a particular criterion (see `planJourneyOptions`).
  */
 export async function planJourney(
   from: string,
   to: string,
   accessibility?: AccessibilityPreference | null,
-  departAt?: Date | null,
+  time?: TimeConstraint | null,
   preference?: JourneyPreference | null,
 ): Promise<JourneyPlanResult> {
   const params: string[] = []
   if (accessibility) params.push(`accessibilityPreference=${accessibility}`)
-  if (departAt) params.push(...departureParams(departAt))
+  if (time) params.push(...timeQueryParams(time))
   if (preference) params.push(`journeyPreference=${preference}`)
   const query = params.length > 0 ? `?${params.join('&')}` : ''
   const url = `${TFL_BASE}/Journey/JourneyResults/${encodeURIComponent(from)}/to/${encodeURIComponent(to)}${query}`
@@ -181,10 +182,10 @@ export async function planJourneyOptions(
   from: string,
   to: string,
   accessibility?: AccessibilityPreference | null,
-  departAt?: Date | null,
+  time?: TimeConstraint | null,
 ): Promise<JourneyOptionsResult> {
   const results = await Promise.all(
-    PREFERENCES.map(({ preference }) => planJourney(from, to, accessibility, departAt, preference)),
+    PREFERENCES.map(({ preference }) => planJourney(from, to, accessibility, time, preference)),
   )
 
   // Merge in preference order, de-duplicating by route signature. The first criterion to surface a
