@@ -14,6 +14,7 @@ import { ReportsStatus } from '@/features/home/components/ReportsStatus'
 import { StationAdditionalInfoCard } from '@/features/home/components/StationAdditionalInfoCard'
 import { StationInfoCard } from '@/features/home/components/StationInfoCard'
 import { useOutages } from '@/features/outages'
+import { overallSeverity } from '@/features/outages/severity'
 import { StepFreeBadge, useStations } from '@/features/stations'
 import { resolveToPostcode, type ResolvedLocation } from '@/features/journey/api/geocode'
 import { useAppLocation } from '@/lib/LocationContext'
@@ -96,6 +97,7 @@ export function StationSheet({ station, onClose, onReportPress, onOpenJourney }:
     () => allReports.filter((r) => r.failure.equipment.station.name === station),
     [allReports, station],
   )
+  const badgeSeverity = useMemo(() => overallSeverity(reports), [reports])
 
   // Imperatively open or close the sheet when the station prop changes.
   // The index prop alone is unreliable for re-triggering gorhom after mount.
@@ -170,10 +172,21 @@ export function StationSheet({ station, onClose, onReportPress, onOpenJourney }:
                 gap="$1.5"
                 px="$2"
                 py="$1"
-                style={{ backgroundColor: Colors.dangerBg, borderRadius: 6 }}
+                style={{
+                  backgroundColor: badgeSeverity === 'warning' ? Colors.warningBg : Colors.dangerBg,
+                  borderRadius: 6,
+                }}
               >
-                <MaterialIcons name="warning" size={16} color={Colors.dangerDark} />
-                <Text fontSize={13} fontWeight="600" color={Colors.dangerDark}>
+                <MaterialIcons
+                  name="warning"
+                  size={16}
+                  color={badgeSeverity === 'warning' ? Colors.warningDark : Colors.dangerDark}
+                />
+                <Text
+                  fontSize={13}
+                  fontWeight="600"
+                  color={badgeSeverity === 'warning' ? Colors.warningDark : Colors.dangerDark}
+                >
                   Issues reported
                 </Text>
               </XStack>

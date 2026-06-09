@@ -5,6 +5,7 @@ import type { components } from '@/api/schema.d'
 import { OutageTimeline } from '@/features/outages/OutageTimeline'
 import { formatDatetime } from '@/lib/datetime'
 import { useTheme, Borders, Spacing } from '@/theme'
+import { reportSeverity } from '@/features/outages/severity'
 
 type OutageReport = components['schemas']['OutageReportSummary']
 
@@ -21,6 +22,8 @@ type OutageReportCardProps = {
 
 function alertLabel(report: OutageReport, resolved: boolean): string {
   const equipment = report.failure.equipment
+  if (equipment.equipment_type.name === 'overcrowding') return 'Overcrowding reported'
+  if (equipment.equipment_type.name === 'custom') return 'Custom issue reported'
   const type = equipment.equipment_type.name === 'lift' ? 'Lift' : 'Escalator'
   const status = resolved ? 'resolved' : 'broken'
   return `${type} ${status} – ${equipment.connection}`
@@ -37,11 +40,15 @@ export const OutageReportCard = ({
 }: OutageReportCardProps) => {
   const { Colors, Radii } = useTheme()
 
+  const severity = reports[0] ? reportSeverity(reports[0]) : 'danger'
+  const bgColor = severity === 'warning' ? Colors.warningBg : Colors.dangerBg
+  const darkColor = severity === 'warning' ? Colors.warningDark : Colors.dangerDark
+  const borderColor = severity === 'warning' ? Colors.warningBorder : Colors.dangerBorder
+
   const times = reports.map((r) => r.breakdown_time).sort()
   const firstReported = times[0]
   const reportCount = reports.length
   const hasTrustedReporter = reports.some((r) => r.reporter_role === 'trusted')
-
   // Verification and resolution are failure-scoped, so every report under this group carries the
   // same failure state.
   const failure = reports[0].failure
@@ -49,9 +56,10 @@ export const OutageReportCard = ({
   const verified = verifications.length > 0
   const resolved = failure.resolved
 
-  // When resolved, the card chrome switches to the success palette to signal it's fixed.
-  const accent = resolved ? Colors.successDark : Colors.dangerDark
-  const cardBg = resolved ? Colors.successBg : Colors.dangerBg
+  // When resolved, the card chrome switches to the success palette to signal it's fixed; otherwise
+  // it follows the report severity (amber for warnings, red for step-free-blocking failures).
+  const accent = resolved ? Colors.successDark : darkColor
+  const cardBg = resolved ? Colors.successBg : bgColor
 
   // A resolved outage can no longer be verified or resolved again.
   const showActions = !resolved && (!!onVerify || !!onResolve)
@@ -65,7 +73,7 @@ export const OutageReportCard = ({
     },
     divider: {
       height: StyleSheet.hairlineWidth,
-      backgroundColor: resolved ? Colors.successDark : Colors.dangerBorder,
+      backgroundColor: resolved ? Colors.successDark : borderColor,
       opacity: 0.5,
     },
   })

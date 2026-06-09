@@ -1,24 +1,24 @@
+import { MaterialIcons } from '@expo/vector-icons'
 import * as Location from 'expo-location'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { ScrollView } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { DEFAULT_STATION, stationPicker, useStations } from '@/features/stations'
 import { useOutages } from '@/features/outages'
 import { resolveToPostcode, type ResolvedLocation } from '@/features/journey/api/geocode'
-import { apiClient } from '@/api/client'
 import { useAppLocation } from '@/lib/LocationContext'
 import type { Station, StationScreenProps } from '@/navigation/types'
 import { useTheme, Heights, Spacing } from '@/theme'
 import { PlatformAccessCard } from '@/features/home/components/PlatformAccessCard'
-import { QuickReportGrid, type QuickReportAction } from '@/features/home/components/QuickReportGrid'
+import { ReportSheet } from '@/features/home/components/ReportSheet'
 import { ReportsStatus } from '@/features/home/components/ReportsStatus'
 import { StationHeader } from '@/features/home/components/StationHeader'
 import { StationAdditionalInfoCard } from '@/features/home/components/StationAdditionalInfoCard'
 import { StationInfoCard } from '@/features/home/components/StationInfoCard'
 
 export const StationScreen = ({ navigation, route }: StationScreenProps) => {
-  const { Colors, Radii } = useTheme()
+  const { Colors, Radii, Shadows } = useTheme()
   const styles = useMemo(
     () =>
       StyleSheet.create({
@@ -29,53 +29,40 @@ export const StationScreen = ({ navigation, route }: StationScreenProps) => {
         footer: {
           backgroundColor: Colors.card,
           paddingTop: Spacing.md,
-          paddingHorizontal: Spacing.xl,
+          paddingHorizontal: Spacing.lg,
           borderTopWidth: StyleSheet.hairlineWidth,
           borderTopColor: Colors.border,
+          flexDirection: 'row',
+          gap: Spacing.md,
         },
-        goHereBtn: {
-          backgroundColor: Colors.blue,
-          borderRadius: Radii.button,
-          height: Heights.button,
+        btn: {
+          flex: 1,
+          flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'center',
+          height: Heights.button,
+          borderRadius: Radii.button,
+          backgroundColor: Colors.blue,
+          ...Shadows.card,
         },
-        goHereBtnDisabled: {
+        btnOutline: {
+          backgroundColor: Colors.searchBg,
+        },
+        btnDisabled: {
           backgroundColor: Colors.secondaryText,
         },
-        goHereText: {
-          color: Colors.card,
-          fontSize: 16,
-          fontWeight: '700',
-        },
       }),
-    [Colors, Radii],
+    [Colors, Radii, Shadows],
   )
+
   const [station, setStation] = useState<Station>(route.params?.station ?? DEFAULT_STATION)
   const [goingHere, setGoingHere] = useState(false)
+  const [reportOpen, setReportOpen] = useState(false)
   const { stations } = useStations()
   const stationDetail = useMemo(() => stations.find((s) => s.name === station), [stations, station])
   const insets = useSafeAreaInsets()
   const cachedCoords = useAppLocation()
-  const [hasLifts, setHasLifts] = useState<boolean | undefined>(undefined)
-  const [hasEscalators, setHasEscalators] = useState<boolean | undefined>(undefined)
 
-  useEffect(() => {
-    if (!stationDetail) return
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setHasLifts(undefined)
-    setHasEscalators(undefined)
-    apiClient
-      .GET('/equipment', { params: { query: { station_id: stationDetail.id } } })
-      .then(({ data }) => {
-        if (!data) return
-        setHasLifts(data.some((e) => e.equipment_type.name === 'lift'))
-        setHasEscalators(data.some((e) => e.equipment_type.name === 'escalator'))
-      })
-  }, [stationDetail])
-
-  // Live feed of outage reports, filtered to this station. Updates in real time as reports are
-  // created, resolved or deleted — no manual refetch on focus.
   const { reports: allReports, loading } = useOutages()
   const reports = useMemo(
     () => allReports.filter((r) => r.failure.equipment.station.name === station),
@@ -87,15 +74,7 @@ export const StationScreen = ({ navigation, route }: StationScreenProps) => {
     navigation.navigate('SelectStation', { currentStation: station })
   }
 
-  function quickReport(action: QuickReportAction) {
-    if (action.route === 'ReportForm') {
-      navigation.navigate('ReportForm', { equipmentType: action.equipmentType, station })
-    } else {
-      navigation.navigate('ReportCustom', { station })
-    }
-  }
-
-  async function handleGoHere() {
+  async function handleDirections() {
     setGoingHere(true)
     try {
       const toResult = await resolveToPostcode(station)
@@ -108,8 +87,6 @@ export const StationScreen = ({ navigation, route }: StationScreenProps) => {
       }
       const to: ResolvedLocation = { postcode: toResult.postcode, label: station }
 
-      // Attempt to resolve current location for "from", but don't block
-      // navigation if unavailable — the journey planner handles an empty from.
       let from: ResolvedLocation | undefined
       const { status } = await Location.requestForegroundPermissionsAsync()
       if (status === 'granted') {
@@ -145,21 +122,37 @@ export const StationScreen = ({ navigation, route }: StationScreenProps) => {
         {stationDetail && <PlatformAccessCard key={station} platforms={stationDetail.platforms} />}
         <ReportsStatus loading={loading} reports={reports} />
         {stationDetail && <StationAdditionalInfoCard station={stationDetail} />}
-        <QuickReportGrid onSelect={quickReport} hasLifts={hasLifts} hasEscalators={hasEscalators} />
       </ScrollView>
 
-      {/* Sticky "Go here" footer */}
+      {/* Sticky footer — Directions + Report issue */}
       <View style={[styles.footer, { paddingBottom: insets.bottom + 12 }]}>
         <TouchableOpacity
-          style={[styles.goHereBtn, goingHere && styles.goHereBtnDisabled]}
-          onPress={goingHere ? undefined : handleGoHere}
-          activeOpacity={0.85}
+          style={[styles.btn, goingHere && styles.btnDisabled]}
+          onPress={goingHere ? undefined : handleDirections}
+          activeOpacity={0.8}
         >
-          <Text style={styles.goHereText}>
-            {goingHere ? 'Getting location…' : `Go to ${station}`}
+          <MaterialIcons
+            name="directions"
+            size={18}
+            color={Colors.card}
+            style={{ marginRight: 6 }}
+          />
+          <Text style={{ color: Colors.card, fontSize: 14, fontWeight: '700' }}>
+            {goingHere ? 'Getting location…' : 'Directions'}
           </Text>
         </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.btn, styles.btnOutline]}
+          onPress={() => setReportOpen(true)}
+          activeOpacity={0.8}
+        >
+          <MaterialIcons name="flag" size={18} color={Colors.text} style={{ marginRight: 6 }} />
+          <Text style={{ color: Colors.text, fontSize: 14, fontWeight: '700' }}>Report issue</Text>
+        </TouchableOpacity>
       </View>
+
+      <ReportSheet station={reportOpen ? station : null} onClose={() => setReportOpen(false)} />
     </View>
   )
 }
