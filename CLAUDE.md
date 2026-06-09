@@ -53,3 +53,15 @@ Each platform carries: `id`, `name`, `direction`, `lines[]`, `stepFreeAccess`, `
 ### Escalator data is mocked
 
 TfL's step-free feed has no escalator topology data (escalators are not step-free routes). `escalator_units` are synthesised by distributing the escalator count round-robin across customer-facing platforms. Every unit is tagged `"mocked": true`. **This data is estimated and must be replaced with hand-curated data before treating as authoritative.**
+
+### Hand-curated overrides
+
+`backend/app/data/station_overrides.json` contains manual corrections applied **after** all CSV enrichment, so entries here always win over automated sources. Use it for:
+
+- Lifts that exist physically but are absent from TfL's step-free feed (e.g. lifts at non-step-free stations such as Gloucester Road)
+- Correcting wrong `stepFreeAccess` values on individual platforms (`platforms_patch`)
+- Eventually replacing mocked escalator data with real topology
+
+Supported fields per entry: `lift_units`, `lifts`, `escalator_units`, `escalators`, `platforms_patch` (map of `{ platform_id: { field: value } }`). The `name` field must match `stations.json` exactly. Unknown names print a warning during enrichment.
+
+After editing the overrides file, re-run `python3 temp/enrich_tube_stations.py` (then delete `backend/dev.db` and restart) to regenerate `stations.json`. For quick fixes that don't need a full re-enrichment, you can patch `stations.json` directly — but keep the overrides file in sync so the next enrichment run doesn't clobber your change.
