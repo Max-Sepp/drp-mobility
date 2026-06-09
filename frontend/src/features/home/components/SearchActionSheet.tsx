@@ -551,6 +551,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
     )
     const insets = useSafeAreaInsets()
     const [expanded, setExpanded] = useState(false)
+    const [inputFocused, setInputFocused] = useState(false)
     const [query, setQuery] = useState('')
     const [stationResults, setStationResults] = useState<StationDetail[]>([])
     const [locationResults, setLocationResults] = useState<LocationSuggestion[]>([])
@@ -559,6 +560,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
 
     const inputRef = useRef<TextInput>(null)
     const sheetRef = useRef<BottomSheetRef>(null)
+    const shouldFocusOnOpen = useRef(false)
 
     const { stations } = useStations()
     const cachedCoords = useAppLocation()
@@ -587,6 +589,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
     // ── Snap helpers ──────────────────────────────────────────────────────
 
     const expand = useCallback(() => {
+      shouldFocusOnOpen.current = true
       setExpanded(true)
       sheetRef.current?.snapToIndex(SNAP_IDX_OPEN)
     }, [])
@@ -613,7 +616,10 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
     function handleSheetChange(index: number) {
       if (index === SNAP_IDX_OPEN) {
         setExpanded(true)
-        inputRef.current?.focus()
+        if (shouldFocusOnOpen.current) {
+          inputRef.current?.focus()
+        }
+        shouldFocusOnOpen.current = false
       } else {
         setExpanded(false)
         setQuery('')
@@ -688,6 +694,8 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
                 returnKeyType="search"
                 value={query}
                 onChangeText={setQuery}
+                onFocus={() => setInputFocused(true)}
+                onBlur={() => setInputFocused(false)}
                 onSubmitEditing={() => {
                   if (stationResults.length > 0) {
                     collapse()
@@ -703,7 +711,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
             )}
           </TouchableOpacity>
 
-          {expanded && (
+          {(inputFocused || hasQuery) && (
             <TouchableOpacity
               onPress={collapse}
               style={styles.cancelBtn}
