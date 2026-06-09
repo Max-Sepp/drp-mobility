@@ -93,6 +93,7 @@ export const LocationInput = ({
   }, [value])
 
   function handleType(text: string) {
+    if (text.includes('\n')) return
     setResolved(false)
     onResolved(null)
     onChangeText(text)
@@ -157,10 +158,12 @@ export const LocationInput = ({
             onChangeText={handleType}
             onFocus={() => setFocused(true)}
             onBlur={() => setTimeout(() => setFocused(false), 150)}
+            onSubmitEditing={() => { if (suggestions.length > 0) choose(suggestions[0]) }}
             selection={focused ? undefined : { start: 0, end: 0 }}
             placeholder="Address, postcode, or lat,long"
             placeholderTextColor="$gray9"
             autoCapitalize="none"
+            returnKeyType="search"
             style={{
               borderColor: Colors.border,
               backgroundColor: Colors.searchBg,

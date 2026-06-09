@@ -694,6 +694,14 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
                 returnKeyType="search"
                 value={query}
                 onChangeText={setQuery}
+                onSubmitEditing={() => {
+                  if (stationResults.length > 0) {
+                    collapse()
+                    onStationPress(stationResults[0].name)
+                  } else if (locationResults.length > 0) {
+                    handleLocationSelect(locationResults[0])
+                  }
+                }}
               />
             </View>
             {expanded && hasQuery && searching && (
