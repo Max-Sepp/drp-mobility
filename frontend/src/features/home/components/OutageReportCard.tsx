@@ -5,6 +5,7 @@ import { BASE_URL } from '@/api/client'
 import type { components } from '@/api/schema.d'
 import { formatDatetime } from '@/lib/datetime'
 import { useTheme, Borders, Spacing } from '@/theme'
+import { reportSeverity } from '@/features/outages/severity'
 
 type OutageReport = components['schemas']['OutageReportSummary']
 
@@ -37,10 +38,10 @@ export const OutageReportCard = ({
 }: OutageReportCardProps) => {
   const { Colors, Radii } = useTheme()
 
-  const isOvercrowding = reports[0]?.failure.equipment.equipment_type.name === 'overcrowding'
-  const bgColor = isOvercrowding ? Colors.warningBg : Colors.dangerBg
-  const darkColor = isOvercrowding ? Colors.warningDark : Colors.dangerDark
-  const borderColor = isOvercrowding ? Colors.warningBorder : Colors.dangerBorder
+  const severity = reports[0] ? reportSeverity(reports[0]) : 'danger'
+  const bgColor = severity === 'warning' ? Colors.warningBg : Colors.dangerBg
+  const darkColor = severity === 'warning' ? Colors.warningDark : Colors.dangerDark
+  const borderColor = severity === 'warning' ? Colors.warningBorder : Colors.dangerBorder
 
   const times = reports.map((r) => r.breakdown_time).sort()
   const firstReported = times[0]
