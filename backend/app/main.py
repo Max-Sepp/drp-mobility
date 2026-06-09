@@ -23,8 +23,10 @@ from app.models import saved_journey as _saved_journey  # noqa: F401
 from app.models import saved_place as _saved_place  # noqa: F401
 from app.models import session as _session  # noqa: F401
 from app.models import station as _station  # noqa: F401
+from app.models import station_alert as _station_alert  # noqa: F401
 from app.models import user as _user  # noqa: F401
 from app.routers import (
+    admin,
     auth,
     equipment,
     equipment_types,
@@ -32,10 +34,12 @@ from app.routers import (
     journeys,
     outage_reports,
     saved_places,
+    station_alerts,
     stations,
     users,
 )
 from app.seed import seed_defaults
+from app.services.tfl_ingest import ingest_once
 
 # Surface our app's INFO logs (uvicorn configures its own loggers, but not the root logger
 # our app modules log through). Honour an optional LOG_LEVEL env var, defaulting to INFO.
@@ -51,11 +55,41 @@ with SessionLocal() as session:
     seed_defaults(session)
 
 
+_log = logging.getLogger(__name__)
+
+
+async def _tfl_poll_loop(interval: float) -> None:
+    """Periodically run the TfL ingest in a worker thread (the ingest is sync/DB-bound).
+
+    Every error is swallowed so an offline or empty TfL feed never kills the loop."""
+    while True:
+        try:
+            await asyncio.to_thread(ingest_once)
+        except Exception:
+            _log.exception("TfL poll loop iteration failed")
+        await asyncio.sleep(interval)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Capture the running loop so the event broker can publish from sync (threadpool) endpoints.
     broker.bind_loop(asyncio.get_running_loop())
-    yield
+
+    poll_task: asyncio.Task | None = None
+    if os.getenv("TFL_POLL_ENABLED", "true").lower() == "true":
+        interval = float(os.getenv("TFL_POLL_INTERVAL", "600"))
+        _log.info("Starting TfL poll loop (interval=%.0fs)", interval)
+        poll_task = asyncio.create_task(_tfl_poll_loop(interval))
+
+    try:
+        yield
+    finally:
+        if poll_task is not None:
+            poll_task.cancel()
+            try:
+                await poll_task
+            except asyncio.CancelledError:
+                pass
 
 
 app = FastAPI(lifespan=lifespan)
@@ -82,5 +116,7 @@ app.include_router(saved_places.router)
 app.include_router(outage_reports.router)
 app.include_router(failures.router)
 app.include_router(stations.router)
+app.include_router(station_alerts.router)
 app.include_router(equipment_types.router)
 app.include_router(equipment.router)
+app.include_router(admin.router)

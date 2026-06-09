@@ -56,7 +56,8 @@ def resolve_failure(
     failure = repo.get(failure_id)
     if failure is None:
         raise HTTPException(status_code=404, detail="Failure not found")
-    failure = repo.resolve(failure)
+    # A trusted human's close is authoritative: the TfL poller must never reopen it.
+    failure = repo.resolve(failure, authoritative=True)
     # Tell live clients to drop this failure's reports from the open feed.
     broker.publish(sse_event("resolved", {"failure_id": failure_id}))
     reports = repo.list_active_reports(failure_id)

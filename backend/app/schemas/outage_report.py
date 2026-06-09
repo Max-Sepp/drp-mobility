@@ -27,6 +27,8 @@ class OutageReportSummary(BaseModel):
     image_content_type: str | None = None
     reporter_role: str
     verified: bool
+    # "user" or "tfl" — lets clients badge officially-sourced reports.
+    source: str
 
 
 # FailureDetail.reports references OutageReportSummary by string; resolve it now.

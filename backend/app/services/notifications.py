@@ -4,16 +4,14 @@ Called as a FastAPI BackgroundTask after the first outage report for a given pie
 equipment is submitted. Finds every authenticated user whose saved journeys touch the
 affected station and sends them an Expo push notification.
 
-Station-name matching mirrors the normalisation in the frontend's ``normaliseStationName``
-(frontend/src/features/journey/api/accessibility.ts): lower-case, strip apostrophes/dots,
-strip a trailing "… station" suffix, collapse whitespace. This lets our terse station names
-("King's Cross") match TfL's verbose ``commonName`` values
+Station-name matching uses the shared ``normalise_station_name`` helper
+(app/services/station_matching.py), which mirrors the frontend's ``normaliseStationName``.
+This lets our terse station names ("King's Cross") match TfL's verbose ``commonName`` values
 ("King's Cross St. Pancras Underground Station") via substring containment.
 """
 
 import json
 import logging
-import re
 from collections import defaultdict
 
 import httpx
@@ -23,21 +21,11 @@ from app.database import SessionLocal
 from app.models.equipment import Equipment
 from app.models.failure import Failure
 from app.repositories.push_token import PushTokenRepository
+from app.services.station_matching import normalise_station_name as _normalise
 
 _log = logging.getLogger(__name__)
 
 EXPO_PUSH_URL = "https://exp.host/--/api/v2/push/send"
-
-_STATION_SUFFIX_RE = re.compile(
-    r"\s+(?:underground|overground|rail|dlr|bus|elizabeth\s+line)?\s*station$",
-    re.IGNORECASE,
-)
-
-
-def _normalise(name: str) -> str:
-    name = name.lower().replace("'", "").replace(".", "")
-    name = _STATION_SUFFIX_RE.sub("", name)
-    return re.sub(r"\s+", " ", name).strip()
 
 
 def _journey_touches_station(payload_json: str, station_name: str) -> bool:

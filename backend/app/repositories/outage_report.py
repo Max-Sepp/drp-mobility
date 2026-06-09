@@ -77,6 +77,53 @@ class OutageReportRepository:
         return self._db.query(exists().where(OutageReportDeletion.report_id == report_id)).scalar()
 
     # ------------------------------------------------------------------
+    # TfL ingest queries
+    # ------------------------------------------------------------------
+
+    def find_open_tfl_report(self, external_ref: str) -> OutageReport | None:
+        """Return an active TfL report with this disruption id under an *open* failure.
+
+        Used by the poller to dedupe: if one exists, the disruption is already recorded and we
+        skip creating another report for this poll cycle."""
+        return (
+            self._db.query(OutageReport)
+            .join(Failure, OutageReport.failure_id == Failure.id)
+            .filter(
+                OutageReport.source == "tfl",
+                OutageReport.external_ref == external_ref,
+                Failure.resolved.is_(False),
+                _ACTIVE_FILTER,
+            )
+            .first()
+        )
+
+    def list_open_tfl_reports(self) -> list[OutageReport]:
+        """Return all active TfL reports under unresolved failures (drives clear reconciliation)."""
+        return (
+            self._db.query(OutageReport)
+            .join(Failure, OutageReport.failure_id == Failure.id)
+            .filter(
+                OutageReport.source == "tfl",
+                Failure.resolved.is_(False),
+                _ACTIVE_FILTER,
+            )
+            .all()
+        )
+
+    def is_ref_authoritatively_resolved(self, external_ref: str) -> bool:
+        """True if any report with this disruption id sits under a failure a trusted human closed.
+
+        The poller checks this before creating a report so a human-closed issue is never reopened,
+        even while TfL's feed still reports it."""
+        return self._db.query(
+            exists().where(
+                OutageReport.external_ref == external_ref,
+                OutageReport.failure_id == Failure.id,
+                Failure.resolved_authoritative.is_(True),
+            )
+        ).scalar()
+
+    # ------------------------------------------------------------------
     # Mutations
     # ------------------------------------------------------------------
 
@@ -100,6 +147,37 @@ class OutageReportRepository:
             breakdown_time=payload.breakdown_time,
             description=payload.description,
             reporter_role=reporter_role,
+        )
+        self._db.add(report)
+        self._db.commit()
+        return self.get_active(report.id), new_failure_id
+
+    def create_tfl(
+        self,
+        equipment_id: int,
+        breakdown_time: datetime,
+        external_ref: str,
+        description: str | None = None,
+    ) -> tuple["OutageReport", int | None]:
+        """Persist a report synthesised from TfL's official feed.
+
+        Like ``create`` but tagged ``source="tfl"``, pre-verified, and stamped with the upstream
+        disruption id so re-polls can dedupe and clears can be reconciled. Returns
+        ``(report, new_failure_id)`` with the same semantics as ``create``."""
+        if self._db.get(Equipment, equipment_id) is None:
+            raise ValueError(f"equipment_id {equipment_id} not found")
+
+        failure, is_new_failure = self._find_or_create_failure(equipment_id)
+        new_failure_id: int | None = failure.id if is_new_failure else None
+
+        report = OutageReport(
+            failure_id=failure.id,
+            breakdown_time=breakdown_time,
+            description=description,
+            reporter_role=UserRole.TFL.value,
+            verified=True,
+            source="tfl",
+            external_ref=external_ref,
         )
         self._db.add(report)
         self._db.commit()

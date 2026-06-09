@@ -82,10 +82,31 @@ class FailureRepository:
             .all()
         )
 
-    def resolve(self, failure: Failure) -> Failure:
+    def active_reports_all_tfl(self, failure_id: int) -> bool:
+        """True if no active (non-deleted) report under this failure was submitted by a human.
+
+        Drives the poller's clear rule: an automated TfL clear may resolve a failure only when no
+        human evidence remains. (Vacuously true when there are no active reports.)"""
+        non_tfl = (
+            self._db.query(OutageReport.id)
+            .filter(
+                OutageReport.failure_id == failure_id,
+                OutageReport.source != "tfl",
+                _ACTIVE_FILTER,
+            )
+            .first()
+        )
+        return non_tfl is None
+
+    def resolve(self, failure: Failure, authoritative: bool = False) -> Failure:
         """Mark a failure as resolved; subsequent reports on the same equipment will
-        open a new Failure."""
+        open a new Failure.
+
+        ``authoritative=True`` records that a trusted human closed it, which the automated TfL
+        poller must never reopen."""
         failure.resolved = True
+        if authoritative:
+            failure.resolved_authoritative = True
         self._db.commit()
         self._db.refresh(failure)
         return failure

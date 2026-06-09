@@ -22,6 +22,14 @@ class OutageReport(Base):
     # not linked to a specific user — only this role is copied over at creation time.
     reporter_role: Mapped[str] = mapped_column(default=UserRole.UNTRUSTED.value)
     verified: Mapped[bool] = mapped_column(default=False)
+    # Provenance of this report: "user" for app submissions, "tfl" for rows synthesised by the
+    # TfL disruption poller (see services/tfl_ingest.py). The automated "tfl" source ranks below
+    # a trusted human — see FailureRepository.resolve / resolved_authoritative.
+    source: Mapped[str] = mapped_column(default="user")
+    # Stable TfL disruption id for poller-created reports; lets re-polls dedupe and lets clears be
+    # reconciled. Indexed but deliberately *not* unique: a cleared-then-recurring disruption may
+    # reuse the same id and must be able to open a fresh failure.
+    external_ref: Mapped[str | None] = mapped_column(index=True, default=None)
 
     failure: Mapped["Failure"] = relationship("Failure", back_populates="reports")
     deletion: Mapped["OutageReportDeletion | None"] = relationship(
