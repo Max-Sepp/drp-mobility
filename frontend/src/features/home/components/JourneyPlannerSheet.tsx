@@ -196,6 +196,15 @@ export function JourneyPlannerSheet({ plan, onClose, onJourneySelect, savedPlace
     if (results.length > 0) sheetRef.current?.snapToIndex(2)
   }, [results])
 
+  // Auto-search the moment both postcodes become resolved — covers opening from a saved place
+  // (where current location fills in async) and the general case of resolving the second field.
+  const prevHadBoth = useRef(false)
+  useEffect(() => {
+    const hasBoth = fromPostcode !== null && toPostcode !== null
+    if (hasBoth && !prevHadBoth.current && !loading) run()
+    prevHadBoth.current = hasBoth
+  }, [fromPostcode, toPostcode]) // eslint-disable-line react-hooks/exhaustive-deps
+
   function handleChange(index: number) {
     onHeightChange?.(index >= 0 ? snapPoints[index] : 0)
     if (index === -1) {
