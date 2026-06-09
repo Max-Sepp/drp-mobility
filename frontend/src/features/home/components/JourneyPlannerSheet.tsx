@@ -343,8 +343,8 @@ export function JourneyPlannerSheet({ plan, onClose, onJourneySelect, savedPlace
         contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + Spacing.xl }]}
       >
         {/* Citymapper-style: inputs fill full width, swap button floats between them on the right */}
-        <View style={{ position: 'relative' }}>
-          <View onLayout={(e) => setFromH(e.nativeEvent.layout.height)}>
+        <View style={{ position: 'relative', zIndex: 20 }}>
+          <View onLayout={(e) => setFromH(e.nativeEvent.layout.height)} style={{ zIndex: 10, position: 'relative' }}>
             <LocationInput
               label="From"
               value={from}
