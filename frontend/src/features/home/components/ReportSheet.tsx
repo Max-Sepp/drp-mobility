@@ -189,15 +189,22 @@ export function ReportSheet({ station, onClose }: Props) {
     setStep('form')
     sheetRef.current?.snapToIndex(1)
 
-    if ((type === 'lift' || type === 'escalator') && station) {
+    if ((type === 'lift' || type === 'escalator' || type === 'overcrowding') && station) {
       setLoadingEquipment(true)
       const { data } = await apiClient.GET('/equipment')
       if (data) {
-        setEquipment(
-          data
-            .filter((e) => e.station.name === station && e.equipment_type.name === type)
-            .sort((a, b) => a.connection.localeCompare(b.connection, undefined, { numeric: true })),
-        )
+        if (type === 'overcrowding') {
+          const equip = data.find(
+            (e) => e.station.name === station && e.equipment_type.name === 'overcrowding',
+          )
+          if (equip) setEquipmentId(equip.id)
+        } else {
+          setEquipment(
+            data
+              .filter((e) => e.station.name === station && e.equipment_type.name === type)
+              .sort((a, b) => a.connection.localeCompare(b.connection, undefined, { numeric: true })),
+          )
+        }
       }
       setLoadingEquipment(false)
     }
@@ -211,9 +218,8 @@ export function ReportSheet({ station, onClose }: Props) {
   async function submit() {
     if (!station) return
 
-    // Custom / overcrowding: validate description then go straight to success
-    // (no equipment_id, backend support pending)
-    if (issueType === 'overcrowding' || issueType === 'custom') {
+    // Custom: no backend support yet, just show success
+    if (issueType === 'custom') {
       if (!description.trim()) {
         Alert.alert('Required', 'Please describe the issue.')
         return
@@ -240,11 +246,14 @@ export function ReportSheet({ station, onClose }: Props) {
 
     setSubmitting(true)
     try {
+      const descParts = [description.trim(), area.trim() ? `Area: ${area.trim()}` : ''].filter(
+        Boolean,
+      )
       const { data, error } = await apiClient.POST('/outage-reports', {
         body: {
           equipment_id: equipmentId,
           breakdown_time: new Date().toISOString(),
-          description: description.trim() || null,
+          description: descParts.join('\n') || null,
         },
       })
       if (error || !data) {

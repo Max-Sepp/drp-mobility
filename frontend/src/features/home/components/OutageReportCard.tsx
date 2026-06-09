@@ -17,6 +17,7 @@ type OutageReportCardProps = {
 
 function alertLabel(report: OutageReport): string {
   const equipment = report.failure.equipment
+  if (equipment.equipment_type.name === 'overcrowding') return 'OVERCROWDING REPORTED'
   const conn = equipment.connection.toUpperCase()
   const type = equipment.equipment_type.name === 'lift' ? 'LIFT' : 'ESCALATOR'
   return `${type} BROKEN – ${conn}`
@@ -25,6 +26,9 @@ function alertLabel(report: OutageReport): string {
 export const OutageReportCard = ({ report, expanded, onToggle }: OutageReportCardProps) => {
   const { Colors, Radii } = useTheme()
   const hasPhoto = !!report.image_content_type
+  const isOvercrowding = report.failure.equipment.equipment_type.name === 'overcrowding'
+  const bgColor = isOvercrowding ? Colors.warningBg : Colors.dangerBg
+  const darkColor = isOvercrowding ? Colors.warningDark : Colors.dangerDark
 
   const header = (
     <XStack p="$4" items="center" gap="$3">
@@ -33,7 +37,7 @@ export const OutageReportCard = ({ report, expanded, onToggle }: OutageReportCar
           width: 36,
           height: 36,
           borderRadius: Radii.pill,
-          backgroundColor: Colors.dangerDark,
+          backgroundColor: darkColor,
           alignItems: 'center',
           justifyContent: 'center',
         }}
@@ -43,10 +47,10 @@ export const OutageReportCard = ({ report, expanded, onToggle }: OutageReportCar
         </Text>
       </YStack>
       <YStack flex={1}>
-        <Heading fontSize={14} color={Colors.dangerDark}>
+        <Heading fontSize={14} color={darkColor}>
           {alertLabel(report)}
         </Heading>
-        <Text fontSize={12} color={Colors.dangerDark} mt="$1">
+        <Text fontSize={12} color={darkColor} mt="$1">
           reported at {formatTime(report.breakdown_time)}
           {isToday(report.breakdown_time) ? ' today' : ''}
         </Text>
@@ -60,7 +64,7 @@ export const OutageReportCard = ({ report, expanded, onToggle }: OutageReportCar
         )}
       </YStack>
       {hasPhoto && (
-        <Text fontSize={12} color={Colors.dangerDark}>
+        <Text fontSize={12} color={darkColor}>
           {expanded ? '▲' : '▼'}
         </Text>
       )}
@@ -69,11 +73,11 @@ export const OutageReportCard = ({ report, expanded, onToggle }: OutageReportCar
 
   if (!hasPhoto) {
     return (
-      <YStack style={{ backgroundColor: Colors.dangerBg, borderRadius: Radii.button }}>
+      <YStack style={{ backgroundColor: bgColor, borderRadius: Radii.button }}>
         {header}
         {report.description ? (
           <YStack px="$4" pb="$4">
-            <Text fontSize={13} color={Colors.dangerDark}>
+            <Text fontSize={13} color={darkColor}>
               {report.description}
             </Text>
           </YStack>
@@ -84,12 +88,12 @@ export const OutageReportCard = ({ report, expanded, onToggle }: OutageReportCar
 
   return (
     <Pressable onPress={onToggle}>
-      <YStack style={{ backgroundColor: Colors.dangerBg, borderRadius: Radii.button }}>
+      <YStack style={{ backgroundColor: bgColor, borderRadius: Radii.button }}>
         {header}
         {expanded && (
           <YStack px="$4" pb="$4" gap="$3">
             {report.description ? (
-              <Text fontSize={13} color={Colors.dangerDark}>
+              <Text fontSize={13} color={darkColor}>
                 {report.description}
               </Text>
             ) : null}
