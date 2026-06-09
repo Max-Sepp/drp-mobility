@@ -1,4 +1,3 @@
-import * as Location from 'expo-location'
 import { useEffect, useMemo, useState } from 'react'
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { ScrollView } from 'tamagui'
@@ -108,15 +107,10 @@ export const StationScreen = ({ navigation, route }: StationScreenProps) => {
       }
       const to: ResolvedLocation = { postcode: toResult.postcode, label: station }
 
-      // Attempt to resolve current location for "from", but don't block
-      // navigation if unavailable — the journey planner handles an empty from.
+      // Use already-cached coords if available; don't block on a GPS request.
       let from: ResolvedLocation | undefined
-      const { status } = await Location.requestForegroundPermissionsAsync()
-      if (status === 'granted') {
-        const pos =
-          cachedCoords ??
-          (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })).coords
-        const fromResult = await resolveToPostcode(`${pos.latitude},${pos.longitude}`)
+      if (cachedCoords) {
+        const fromResult = await resolveToPostcode(`${cachedCoords.latitude},${cachedCoords.longitude}`)
         if (!('error' in fromResult)) {
           from = { postcode: fromResult.postcode, label: 'Current location' }
         }

@@ -8,7 +8,6 @@
 // @gorhom/bottom-sheet — no PanResponder or Animated wiring needed here.
 
 import { MaterialIcons } from '@expo/vector-icons'
-import * as Location from 'expo-location'
 import {
   forwardRef,
   useCallback,
@@ -638,13 +637,8 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
         const to: ResolvedLocation = { postcode: toPostcode, label: suggestion.label }
 
         let from: ResolvedLocation | undefined
-        const { status } = await Location.requestForegroundPermissionsAsync()
-        if (status === 'granted') {
-          const pos =
-            cachedCoords ??
-            (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }))
-              .coords
-          const fromResult = await resolveToPostcode(`${pos.latitude},${pos.longitude}`)
+        if (cachedCoords) {
+          const fromResult = await resolveToPostcode(`${cachedCoords.latitude},${cachedCoords.longitude}`)
           if (!('error' in fromResult)) {
             from = { postcode: fromResult.postcode, label: 'Current location' }
           }

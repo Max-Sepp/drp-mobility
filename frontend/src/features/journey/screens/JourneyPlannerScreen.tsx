@@ -117,44 +117,19 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
   )
   const openStation = (station: string) => navigation.navigate('Station', { station })
 
-  const handleCurrentLocation = useCallback(
-    async (silent = false) => {
-      setGettingLocation(true)
-      try {
-        const { status } = await Location.requestForegroundPermissionsAsync()
-        if (status !== 'granted') {
-          if (!silent) {
-            Alert.alert(
-              'Location required',
-              'Enable location access in Settings to use this feature.',
-            )
-          }
-          return
-        }
-        const pos =
-          cachedCoords ??
-          (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })).coords
-        const result = await resolveToPostcode(`${pos.latitude},${pos.longitude}`)
-        if ('error' in result) {
-          if (!silent) Alert.alert('Location error', result.error)
-          return
-        }
-        setFrom('Current location')
-        setFromPostcode(result.postcode)
-        setFromIsCurrentLocation(true)
-      } finally {
-        setGettingLocation(false)
-      }
-    },
-    [cachedCoords],
-  )
-
-  useEffect(() => {
-    if (!route.params?.initialFrom) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      handleCurrentLocation(true).catch(() => {})
+  const handleCurrentLocation = useCallback(async () => {
+    if (!cachedCoords) return
+    setGettingLocation(true)
+    try {
+      const result = await resolveToPostcode(`${cachedCoords.latitude},${cachedCoords.longitude}`)
+      if ('error' in result) return
+      setFrom('Current location')
+      setFromPostcode(result.postcode)
+      setFromIsCurrentLocation(true)
+    } finally {
+      setGettingLocation(false)
     }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [cachedCoords])
 
   function swapLocations() {
     const tempText = from
@@ -261,7 +236,7 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
           isResolved={fromPostcode !== null}
           textColor={fromIsCurrentLocation ? Colors.blue : undefined}
           textBold={fromIsCurrentLocation}
-          onCurrentLocation={handleCurrentLocation}
+          onCurrentLocation={cachedCoords ? handleCurrentLocation : undefined}
           currentLocationLoading={gettingLocation}
         />
 

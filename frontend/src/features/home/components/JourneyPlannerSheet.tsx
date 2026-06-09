@@ -1,5 +1,4 @@
 import { MaterialIcons } from '@expo/vector-icons'
-import * as Location from 'expo-location'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { Spinner, Text, XStack, YStack } from 'tamagui'
@@ -165,32 +164,19 @@ export function JourneyPlannerSheet({ plan, onClose, onJourneySelect, savedPlace
 
   // ── Current-location helper ────────────────────────────────────────────
 
-  const handleCurrentLocation = useCallback(
-    async (silent = false) => {
-      setGettingLocation(true)
-      try {
-        const { status } = await Location.requestForegroundPermissionsAsync()
-        if (status !== 'granted') {
-          if (!silent) Alert.alert('Location required', 'Enable location access in Settings.')
-          return
-        }
-        const pos =
-          cachedCoords ??
-          (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })).coords
-        const result = await resolveToPostcode(`${pos.latitude},${pos.longitude}`)
-        if ('error' in result) {
-          if (!silent) Alert.alert('Location error', result.error)
-          return
-        }
-        setFrom('Current location')
-        setFromPostcode(result.postcode)
-        setFromIsCurrentLocation(true)
-      } finally {
-        setGettingLocation(false)
-      }
-    },
-    [cachedCoords],
-  )
+  const handleCurrentLocation = useCallback(async () => {
+    if (!cachedCoords) return
+    setGettingLocation(true)
+    try {
+      const result = await resolveToPostcode(`${cachedCoords.latitude},${cachedCoords.longitude}`)
+      if ('error' in result) return
+      setFrom('Current location')
+      setFromPostcode(result.postcode)
+      setFromIsCurrentLocation(true)
+    } finally {
+      setGettingLocation(false)
+    }
+  }, [cachedCoords])
 
   // ── Open/close driven by plan prop ────────────────────────────────────
 
@@ -212,9 +198,6 @@ export function JourneyPlannerSheet({ plan, onClose, onJourneySelect, savedPlace
       setGettingLocation(false)
       setLoading(false)
       sheetRef.current?.snapToIndex(1)
-      if (!plan.initialFrom) {
-        handleCurrentLocation(true)
-      }
     } else if (!closedByButton.current) {
       // Programmatic close (parent cleared plan) — animate the sheet away.
       // If closedByButton is true, close() was already called from the button handler.
@@ -350,7 +333,7 @@ export function JourneyPlannerSheet({ plan, onClose, onJourneySelect, savedPlace
               isResolved={fromPostcode !== null}
               textColor={fromIsCurrentLocation ? Colors.blue : undefined}
               textBold={fromIsCurrentLocation}
-              onCurrentLocation={handleCurrentLocation}
+              onCurrentLocation={cachedCoords ? handleCurrentLocation : undefined}
               currentLocationLoading={gettingLocation}
               savedPlaceShortcuts={placeShortcuts}
             />

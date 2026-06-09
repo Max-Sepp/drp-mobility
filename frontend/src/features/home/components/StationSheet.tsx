@@ -3,7 +3,6 @@
 // Reporting opens ReportSheet (sibling in MapHomeScreen). JourneyPlanner navigates on the stack.
 
 import { MaterialIcons } from '@expo/vector-icons'
-import * as Location from 'expo-location'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { Text, XStack } from 'tamagui'
@@ -123,12 +122,8 @@ export function StationSheet({ station, onClose, onReportPress, onOpenJourney }:
       const to: ResolvedLocation = { postcode: toResult.postcode, label: station }
 
       let from: ResolvedLocation | undefined
-      const { status } = await Location.requestForegroundPermissionsAsync()
-      if (status === 'granted') {
-        const pos =
-          cachedCoords ??
-          (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced })).coords
-        const fromResult = await resolveToPostcode(`${pos.latitude},${pos.longitude}`)
+      if (cachedCoords) {
+        const fromResult = await resolveToPostcode(`${cachedCoords.latitude},${cachedCoords.longitude}`)
         if (!('error' in fromResult)) {
           from = { postcode: fromResult.postcode, label: 'Current location' }
         }
