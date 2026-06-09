@@ -227,14 +227,14 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
     if (issueType !== 'lift' && issueType !== 'escalator') return new Set<number>()
     const stationDetail = stations.find((s) => s.name === station)
     if (!activeJourney || !stationDetail || !station) return new Set<number>()
-    const platforms = journeyPlatformsAtStation(
+    const relevant = journeyPlatformsAtStation(
       activeJourney.journey,
       station,
       stationDetail.platforms,
     )
-    if (platforms.size === 0) return new Set<number>()
+    if (relevant.onJourney.size === 0) return new Set<number>()
     return new Set(
-      equipment.filter((e) => isEquipmentOnJourney(e.connection, platforms)).map((e) => e.id),
+      equipment.filter((e) => isEquipmentOnJourney(e.connection, relevant)).map((e) => e.id),
     )
   }, [activeJourney, stations, station, equipment, issueType])
 

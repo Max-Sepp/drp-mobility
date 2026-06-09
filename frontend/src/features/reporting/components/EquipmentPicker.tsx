@@ -1,5 +1,6 @@
 import { Spinner, Text, XStack, YStack } from 'tamagui'
 import type { components } from '@/api/schema.d'
+import { formatConnection } from '@/lib/connection'
 import { FormSection } from '@/features/reporting/components/FormSection'
 import { useTheme, Borders, Opacity } from '@/theme'
 
@@ -79,7 +80,7 @@ export const EquipmentPicker = ({
                 )}
               </YStack>
               <Text flex={1} fontSize={15} color={Colors.text}>
-                {e.connection}
+                {formatConnection(e.connection, e.equipment_type.name)}
               </Text>
               {highlighted && (
                 <Text
