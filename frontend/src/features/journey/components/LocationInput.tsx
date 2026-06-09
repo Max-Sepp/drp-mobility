@@ -183,7 +183,10 @@ export const LocationInput = ({
             onChangeText={handleType}
             onFocus={() => setFocused(true)}
             onBlur={() => setTimeout(() => setFocused(false), 150)}
-            onSubmitEditing={() => { if (suggestions.length > 0) choose(suggestions[0]) }}
+            onSubmitEditing={() => {
+              if (matchedSavedPlaces.length > 0) chooseSavedPlace(matchedSavedPlaces[0])
+              else if (suggestions.length > 0) choose(suggestions[0])
+            }}
             selection={focused ? undefined : { start: 0, end: 0 }}
             placeholder="Address, postcode, or lat,long"
             placeholderTextColor="$gray9"
