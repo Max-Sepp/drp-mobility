@@ -221,11 +221,12 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
     }
   }, [station])
 
+  const stationDetail = useMemo(() => stations.find((s) => s.name === station), [stations, station])
+
   // Ids of the equipment connecting to a platform on the line the rider is using at this station,
   // for the current journey. Empty unless a journey is underway and passes through here.
   const highlightedIds = useMemo(() => {
     if (issueType !== 'lift' && issueType !== 'escalator') return new Set<number>()
-    const stationDetail = stations.find((s) => s.name === station)
     if (!activeJourney || !stationDetail || !station) return new Set<number>()
     const relevant = journeyPlatformsAtStation(
       activeJourney.journey,
@@ -236,7 +237,7 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
     return new Set(
       equipment.filter((e) => isEquipmentOnJourney(e.connection, relevant)).map((e) => e.id),
     )
-  }, [activeJourney, stations, station, equipment, issueType])
+  }, [activeJourney, stationDetail, station, equipment, issueType])
 
   // Surface the on-route equipment first while preserving the alphabetical order within each group
   // (Array.prototype.sort is stable). No reordering when nothing is highlighted.
