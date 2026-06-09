@@ -1,11 +1,17 @@
 import * as ImagePicker from 'expo-image-picker'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Alert } from 'react-native'
 import { TextArea } from 'tamagui'
 import { apiClient } from '@/api/client'
 import type { components } from '@/api/schema.d'
 import { ScreenHeader } from '@/components/ScreenHeader'
 import type { ReportFormScreenProps, Station } from '@/navigation/types'
+import { loadActiveJourney, type ActiveJourney } from '@/features/journey/api/activeJourney'
+import {
+  isEquipmentOnJourney,
+  journeyPlatformsAtStation,
+} from '@/features/journey/api/journeyLifts'
+import { useStations } from '@/features/stations'
 import { EquipmentPicker } from '@/features/reporting/components/EquipmentPicker'
 import { FormScreenLayout } from '@/features/reporting/components/FormScreenLayout'
 import { FormSection } from '@/features/reporting/components/FormSection'
@@ -29,6 +35,10 @@ export const ReportFormScreen = ({ navigation, route }: ReportFormScreenProps) =
   const [description, setDescription] = useState('')
   const [photo, setPhoto] = useState<ImagePicker.ImagePickerAsset | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  // The in-progress journey (if any), used to surface the equipment on the rider's current route
+  // first. Null when no journey is underway — the list then keeps its plain alphabetical order.
+  const [activeJourney, setActiveJourney] = useState<ActiveJourney | null>(null)
+  const { stations } = useStations()
 
   const title = equipmentType === 'lift' ? 'Report a broken lift' : 'Report a broken escalator'
   const which = equipmentType === 'lift' ? 'Which lift?' : 'Which escalator?'
@@ -51,6 +61,41 @@ export const ReportFormScreen = ({ navigation, route }: ReportFormScreenProps) =
       active = false
     }
   }, [station, equipmentType])
+
+  useEffect(() => {
+    let active = true
+    loadActiveJourney().then((journey) => {
+      if (active) setActiveJourney(journey)
+    })
+    return () => {
+      active = false
+    }
+  }, [])
+
+  // Ids of the equipment that connect to a platform on the line the rider is using at this station,
+  // for the current journey. Empty unless a journey is underway and passes through here.
+  const highlightedIds = useMemo(() => {
+    const stationDetail = stations.find((s) => s.name === station)
+    if (!activeJourney || !stationDetail) return new Set<number>()
+    const platforms = journeyPlatformsAtStation(
+      activeJourney.journey,
+      station,
+      stationDetail.platforms,
+    )
+    if (platforms.size === 0) return new Set<number>()
+    return new Set(
+      equipment.filter((e) => isEquipmentOnJourney(e.connection, platforms)).map((e) => e.id),
+    )
+  }, [activeJourney, stations, station, equipment])
+
+  // Surface the on-route equipment first while preserving the alphabetical order within each group
+  // (Array.prototype.sort is stable). No reordering when nothing is highlighted.
+  const orderedEquipment = useMemo(() => {
+    if (highlightedIds.size === 0) return equipment
+    return [...equipment].sort(
+      (a, b) => Number(highlightedIds.has(b.id)) - Number(highlightedIds.has(a.id)),
+    )
+  }, [equipment, highlightedIds])
 
   async function submit() {
     if (!equipmentId) {
@@ -111,10 +156,11 @@ export const ReportFormScreen = ({ navigation, route }: ReportFormScreenProps) =
       <EquipmentPicker
         label={which}
         loading={loadingEquipment}
-        equipment={equipment}
+        equipment={orderedEquipment}
         selectedId={equipmentId}
         onSelect={setEquipmentId}
         emptyText={`No ${equipmentType}s registered at ${station}.`}
+        highlightedIds={highlightedIds}
       />
 
       <PhotoPicker photo={photo} onPicked={setPhoto} />

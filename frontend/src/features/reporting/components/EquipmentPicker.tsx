@@ -12,6 +12,9 @@ type EquipmentPickerProps = {
   selectedId: number | null
   onSelect: (id: number) => void
   emptyText: string
+  // Equipment ids relevant to the rider's current journey (the lines they're using at this
+  // station). Marked rows get an "On your route" badge; ordering is handled by the caller.
+  highlightedIds?: Set<number>
 }
 
 export const EquipmentPicker = ({
@@ -21,6 +24,7 @@ export const EquipmentPicker = ({
   selectedId,
   onSelect,
   emptyText,
+  highlightedIds,
 }: EquipmentPickerProps) => {
   const { Colors, Radii } = useTheme()
   return (
@@ -34,6 +38,7 @@ export const EquipmentPicker = ({
       ) : (
         equipment.map((e) => {
           const selected = selectedId === e.id
+          const highlighted = highlightedIds?.has(e.id) ?? false
           return (
             <XStack
               key={e.id}
@@ -45,8 +50,12 @@ export const EquipmentPicker = ({
               style={{
                 paddingVertical: 12,
                 paddingHorizontal: 14,
-                borderWidth: Borders.thin,
-                borderColor: selected ? Colors.successDark : Colors.border,
+                borderWidth: highlighted && !selected ? Borders.medium : Borders.thin,
+                borderColor: selected
+                  ? Colors.successDark
+                  : highlighted
+                    ? Colors.blue
+                    : Colors.border,
                 borderRadius: Radii.small,
                 backgroundColor: selected ? Colors.successBg : Colors.card,
               }}
@@ -72,6 +81,22 @@ export const EquipmentPicker = ({
               <Text flex={1} fontSize={15} color={Colors.text}>
                 {e.connection}
               </Text>
+              {highlighted && (
+                <Text
+                  fontSize={12}
+                  fontWeight="700"
+                  color={Colors.card}
+                  style={{
+                    backgroundColor: Colors.blue,
+                    paddingVertical: 3,
+                    paddingHorizontal: 8,
+                    borderRadius: Radii.pill,
+                    overflow: 'hidden',
+                  }}
+                >
+                  On your route
+                </Text>
+              )}
             </XStack>
           )
         })
