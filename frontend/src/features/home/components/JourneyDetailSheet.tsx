@@ -241,9 +241,10 @@ type Props = {
   onClose: () => void
   onStartJourney: (params: ActiveJourneyParams) => void
   onSaveChanged?: () => void
+  onHeightChange?: (height: number) => void
 }
 
-export function JourneyDetailSheet({ params, onClose, onStartJourney, onSaveChanged }: Props) {
+export function JourneyDetailSheet({ params, onClose, onStartJourney, onSaveChanged, onHeightChange }: Props) {
   const { Colors, Radii } = useTheme()
   const styles = useMemo(
     () =>
@@ -349,6 +350,7 @@ export function JourneyDetailSheet({ params, onClose, onStartJourney, onSaveChan
   }, [params])
 
   function handleChange(index: number) {
+    onHeightChange?.(index >= 0 ? snapPoints[index] : 0)
     if (index === -1) onClose()
   }
 

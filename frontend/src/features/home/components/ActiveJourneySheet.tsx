@@ -51,9 +51,10 @@ type Props = {
   params: ActiveJourneyParams | null
   onComplete: () => void
   onEnd: () => void
+  onHeightChange?: (height: number) => void
 }
 
-export function ActiveJourneySheet({ params, onComplete, onEnd }: Props) {
+export function ActiveJourneySheet({ params, onComplete, onEnd, onHeightChange }: Props) {
   const { Colors, Radii } = useTheme()
   const styles = useMemo(
     () =>
@@ -143,6 +144,7 @@ export function ActiveJourneySheet({ params, onComplete, onEnd }: Props) {
 
   function handleChange(index: number) {
     setSnapIndex(index)
+    onHeightChange?.(index >= 0 ? snapPoints[index] : 0)
     if (index === -1) onEnd()
   }
 

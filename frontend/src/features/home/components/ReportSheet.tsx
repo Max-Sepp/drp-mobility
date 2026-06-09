@@ -38,9 +38,10 @@ const ISSUE_TYPES: { type: IssueType; icon: keyof typeof MaterialIcons.glyphMap;
 type Props = {
   station: string | null
   onClose: () => void
+  onHeightChange?: (height: number) => void
 }
 
-export function ReportSheet({ station, onClose }: Props) {
+export function ReportSheet({ station, onClose, onHeightChange }: Props) {
   const { Colors, Radii, Shadows } = useTheme()
   const styles = useMemo(
     () =>
@@ -177,6 +178,7 @@ export function ReportSheet({ station, onClose }: Props) {
   }, [station])
 
   function handleChange(index: number) {
+    onHeightChange?.(index >= 0 ? snapPoints[index] : 0)
     if (index === -1) onClose()
   }
 

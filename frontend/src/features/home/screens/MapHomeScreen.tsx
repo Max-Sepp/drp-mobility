@@ -221,9 +221,20 @@ export function MapHomeScreen({ navigation }: Props) {
   const mapRef = useRef<StationMapHandle>(null)
   const { status, user } = useAuth()
   const coords = useAppLocation()
-  // Tracks the visible height of the sheet so the map can pad its camera correctly.
-  const [sheetVisibleHeight, setSheetVisibleHeight] = useState(
-    Dimensions.get('window').height * 0.5,
+  // Each sheet reports its current snap height; the map uses the tallest one as its bottom inset.
+  const [searchHeight, setSearchHeight] = useState(Dimensions.get('window').height * 0.5)
+  const [stationHeight, setStationHeight] = useState(0)
+  const [reportHeight, setReportHeight] = useState(0)
+  const [plannerHeight, setPlannerHeight] = useState(0)
+  const [detailHeight, setDetailHeight] = useState(0)
+  const [activeJourneyHeight, setActiveJourneyHeight] = useState(0)
+  const mapBottomInset = Math.max(
+    searchHeight,
+    stationHeight,
+    reportHeight,
+    plannerHeight,
+    detailHeight,
+    activeJourneyHeight,
   )
 
   // Refresh on focus so the banner reflects progress made on the active screen and survives a
@@ -415,7 +426,7 @@ export function MapHomeScreen({ navigation }: Props) {
 
   return (
     <View style={styles.screen}>
-      <StationMap ref={mapRef} onStationPress={openStation} bottomInset={sheetVisibleHeight} />
+      <StationMap ref={mapRef} onStationPress={openStation} bottomInset={mapBottomInset} />
 
       <SearchActionSheet
         ref={sheetRef}
@@ -429,7 +440,7 @@ export function MapHomeScreen({ navigation }: Props) {
         onCustomPlacePress={handleCustomPlacePress}
         onCustomPlaceLongPress={handleCustomPlaceLongPress}
         onAddCustomPlace={handleAddCustomPlacePress}
-        onSnapChange={setSheetVisibleHeight}
+        onSnapChange={setSearchHeight}
       />
 
       <StationSheet
@@ -440,15 +451,17 @@ export function MapHomeScreen({ navigation }: Props) {
           setStationPausedForJourney(true)
           setActivePlan(plan)
         }}
+        onHeightChange={setStationHeight}
       />
 
-      <ReportSheet station={activeReport} onClose={() => setActiveReport(null)} />
+      <ReportSheet station={activeReport} onClose={() => setActiveReport(null)} onHeightChange={setReportHeight} />
 
       <JourneyPlannerSheet
         plan={activePlan}
         onClose={closePlan}
         onJourneySelect={(params) => setActiveDetail(params)}
         savedPlaces={savedPlaces}
+        onHeightChange={setPlannerHeight}
       />
 
       <JourneyDetailSheet
@@ -459,6 +472,7 @@ export function MapHomeScreen({ navigation }: Props) {
           setActiveDetail(null)
           setActiveJourneyParams(params)
         }}
+        onHeightChange={setDetailHeight}
       />
 
       <ActiveJourneySheet
@@ -471,6 +485,7 @@ export function MapHomeScreen({ navigation }: Props) {
           setActiveJourneyParams(null)
           setActive(null)
         }}
+        onHeightChange={setActiveJourneyHeight}
       />
 
       {/* Top overlay: rendered after sheets so it sits above all backdrops */}

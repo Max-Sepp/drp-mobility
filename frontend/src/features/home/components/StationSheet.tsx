@@ -30,9 +30,10 @@ type Props = {
   onClose: () => void
   onReportPress: () => void
   onOpenJourney: (plan: JourneyPlan) => void
+  onHeightChange?: (height: number) => void
 }
 
-export function StationSheet({ station, onClose, onReportPress, onOpenJourney }: Props) {
+export function StationSheet({ station, onClose, onReportPress, onOpenJourney, onHeightChange }: Props) {
   const { Colors, Radii, Shadows } = useTheme()
   const styles = useMemo(
     () =>
@@ -104,6 +105,7 @@ export function StationSheet({ station, onClose, onReportPress, onOpenJourney }:
 
   function handleChange(index: number) {
     setSnapIndex(index)
+    onHeightChange?.(index >= 0 ? snapPoints[index] : 0)
     if (index === -1 && !programmaticClose.current) onClose()
   }
 

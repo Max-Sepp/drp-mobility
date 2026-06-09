@@ -47,6 +47,7 @@ type Props = {
   onClose: () => void
   onJourneySelect: (params: JourneyDetailParams) => void
   savedPlaces?: SavedPlaces
+  onHeightChange?: (height: number) => void
 }
 
 // ---------------------------------------------------------------------------
@@ -79,7 +80,7 @@ const PREF_TAG: Record<JourneyPreference, RouteTag> = {
 const SWAP_BTN = 36 // diameter of the floating swap button
 const FROM_TO_GAP = 10 // vertical gap between From and To inputs
 
-export function JourneyPlannerSheet({ plan, onClose, onJourneySelect, savedPlaces }: Props) {
+export function JourneyPlannerSheet({ plan, onClose, onJourneySelect, savedPlaces, onHeightChange }: Props) {
   const { Colors, Radii } = useTheme()
   const styles = useMemo(
     () =>
@@ -210,6 +211,7 @@ export function JourneyPlannerSheet({ plan, onClose, onJourneySelect, savedPlace
   }, [results])
 
   function handleChange(index: number) {
+    onHeightChange?.(index >= 0 ? snapPoints[index] : 0)
     if (index === -1) {
       if (!closedByButton.current) onClose()
       closedByButton.current = false
