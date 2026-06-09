@@ -30,12 +30,33 @@ import {
   WALKING_LABEL,
 } from '@/features/journey/components/legDisplay'
 import { OutageDetail } from '@/features/journey/components/OutageDetail'
-import type { RootStackParamList } from '@/navigation/types'
 import { useTheme, Borders, Heights, Opacity, Spacing } from '@/theme'
-import type { Leg } from '@/features/journey/api/tfl'
+import type { AccessibilityPreference, Journey, Leg, RouteTag } from '@/features/journey/api/tfl'
+import type { ResolvedLocation } from '@/features/journey/api/geocode'
+import type { StationOutage } from '@/features/journey/api/accessibility'
 
-export type JourneyDetailParams = RootStackParamList['JourneyDetail']
-export type ActiveJourneyParams = RootStackParamList['ActiveJourney']
+// The expanded view of a single journey. `savedId` is set when opened from the saved list, so
+// the sheet can show Remove instead of Save. The journey and its context are plain JSON.
+export type JourneyDetailParams = {
+  journey: Journey
+  from?: ResolvedLocation
+  to?: ResolvedLocation
+  outages?: StationOutage[]
+  level?: AccessibilityPreference | null
+  savedId?: string
+  tags?: RouteTag[]
+}
+
+// The follow/execute payload for an in-progress journey. Mirrors JourneyDetailParams plus the
+// savedId every active journey is anchored to (the detail sheet saves before starting).
+export type ActiveJourneyParams = {
+  savedId: string
+  journey: Journey
+  from?: ResolvedLocation
+  to?: ResolvedLocation
+  outages?: StationOutage[]
+  level?: AccessibilityPreference | null
+}
 
 const SCREEN_H = Dimensions.get('window').height
 // Width of the left gutter column containing the vertical timeline line and waypoint dots.
