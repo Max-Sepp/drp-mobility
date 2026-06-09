@@ -169,7 +169,7 @@ export const OutageReportCard = ({
         </YStack>
 
         <YStack items="flex-end" gap="$1" style={{ flexShrink: 0 }}>
-          {reportCount > 1 && (
+          {!official && reportCount > 1 && (
             <Text fontSize={11} fontWeight="700" color={darkColor}>
               {reportCount} reports
             </Text>
@@ -187,35 +187,38 @@ export const OutageReportCard = ({
         <YStack>
           <YStack style={[styles.divider, { marginHorizontal: Spacing.lg }]} />
           <YStack px="$4" pt="$3" pb="$4" gap="$2">
-            {/* Timing summary */}
-            <YStack gap="$1">
-              <XStack gap="$2">
-                <Text fontSize={12} fontWeight="700" color={darkColor}>
-                  First reported:
-                </Text>
-                <Text fontSize={12} color={darkColor}>
-                  {formatDatetime(firstReported)}
-                </Text>
-              </XStack>
-              {reportCount > 1 && (
+            {/* Timing summary — omitted for official TfL data, where "reports" framing
+                doesn't apply. */}
+            {!official && (
+              <YStack gap="$1">
                 <XStack gap="$2">
                   <Text fontSize={12} fontWeight="700" color={darkColor}>
-                    Last reported:
+                    First reported:
                   </Text>
                   <Text fontSize={12} color={darkColor}>
-                    {formatDatetime(lastReported)}
+                    {formatDatetime(firstReported)}
                   </Text>
                 </XStack>
-              )}
-              <XStack gap="$2">
-                <Text fontSize={12} fontWeight="700" color={darkColor}>
-                  Total reports:
-                </Text>
-                <Text fontSize={12} color={darkColor}>
-                  {reportCount}
-                </Text>
-              </XStack>
-            </YStack>
+                {reportCount > 1 && (
+                  <XStack gap="$2">
+                    <Text fontSize={12} fontWeight="700" color={darkColor}>
+                      Last reported:
+                    </Text>
+                    <Text fontSize={12} color={darkColor}>
+                      {formatDatetime(lastReported)}
+                    </Text>
+                  </XStack>
+                )}
+                <XStack gap="$2">
+                  <Text fontSize={12} fontWeight="700" color={darkColor}>
+                    Total reports:
+                  </Text>
+                  <Text fontSize={12} color={darkColor}>
+                    {reportCount}
+                  </Text>
+                </XStack>
+              </YStack>
+            )}
 
             {/* Individual report descriptions and images */}
             {hasAnyContent &&
