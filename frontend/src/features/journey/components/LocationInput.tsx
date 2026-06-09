@@ -1,6 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import { useEffect, useRef, useState } from 'react'
-import { View } from 'react-native'
+import { Keyboard, Platform, View } from 'react-native'
 import { Input, Spinner, Text, YStack } from 'tamagui'
 import {
   type LocationSuggestion,
@@ -20,6 +20,8 @@ type LocationInputProps = {
   value: string
   onChangeText: (text: string) => void
   onResolved: (postcode: string | null) => void
+  /** Called when a suggestion or saved place is selected; use this instead of onChangeText to avoid clearing the postcode on programmatic text updates. */
+  onSelect?: (label: string, postcode: string) => void
   isResolved?: boolean
   textColor?: string
   textBold?: boolean
@@ -33,6 +35,7 @@ export const LocationInput = ({
   value,
   onChangeText,
   onResolved,
+  onSelect,
   isResolved: isResolvedProp,
   textColor,
   textBold,
@@ -92,6 +95,15 @@ export const LocationInput = ({
     }
   }, [value])
 
+  useEffect(() => {
+    const event = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide'
+    const sub = Keyboard.addListener(event, () => {
+      setFocused(false)
+      setSuggestions([])
+    })
+    return () => sub.remove()
+  }, [])
+
   function handleType(text: string) {
     if (text.includes('\n')) return
     setResolved(false)
@@ -119,16 +131,24 @@ export const LocationInput = ({
     if (!postcode) return
     skipNextSearch.current = true
     setResolved(true)
-    onResolved(postcode)
-    onChangeText(suggestion.label)
+    if (onSelect) {
+      onSelect(suggestion.label, postcode)
+    } else {
+      onResolved(postcode)
+      onChangeText(suggestion.label)
+    }
   }
 
   function chooseSavedPlace(place: PlaceShortcut) {
     setSuggestions([])
     skipNextSearch.current = true
     setResolved(true)
-    onResolved(place.postcode)
-    onChangeText(place.label)
+    if (onSelect) {
+      onSelect(place.label, place.postcode)
+    } else {
+      onResolved(place.postcode)
+      onChangeText(place.label)
+    }
   }
 
   const showLocationShortcut = Boolean(onCurrentLocation) && focused && value.length === 0

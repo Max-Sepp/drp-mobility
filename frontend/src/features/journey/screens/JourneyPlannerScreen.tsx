@@ -1,7 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import * as Location from 'expo-location'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Alert, StyleSheet, TouchableOpacity } from 'react-native'
+import { Alert, Keyboard, Pressable, StyleSheet, TouchableOpacity } from 'react-native'
 import { Spinner, Text, XStack, YStack } from 'tamagui'
 import { ScreenHeader } from '@/components/ScreenHeader'
 import { useAuth } from '@/features/auth'
@@ -168,10 +168,7 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
   }
 
   async function run() {
-    if (!from.trim() || !to.trim()) {
-      Alert.alert('Required', 'Please enter both a start and a destination.')
-      return
-    }
+    if (!fromPostcode || !toPostcode) return
     setLoading(true)
     setResults([])
     setResolved(null)
@@ -244,6 +241,7 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
       header={<ScreenHeader title="Plan a journey" onBack={() => navigation.goBack()} />}
       footer={null}
     >
+      <Pressable onPress={Keyboard.dismiss} style={{ flex: 1 }}>
       <YStack px="$5" mt="$4" gap="$2">
         {/* Location inputs with swap */}
         <LocationInput
@@ -252,8 +250,14 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
           onChangeText={(text) => {
             setFrom(text)
             setFromIsCurrentLocation(false)
+            setFromPostcode(null)
           }}
           onResolved={setFromPostcode}
+          onSelect={(label, postcode) => {
+            setFrom(label)
+            setFromPostcode(postcode)
+            setFromIsCurrentLocation(false)
+          }}
           isResolved={fromPostcode !== null}
           textColor={fromIsCurrentLocation ? Colors.blue : undefined}
           textBold={fromIsCurrentLocation}
@@ -277,8 +281,13 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
           onChangeText={(text) => {
             setTo(text)
             setToIsNamedPlace(false)
+            setToPostcode(null)
           }}
           onResolved={setToPostcode}
+          onSelect={(label, postcode) => {
+            setTo(label)
+            setToPostcode(postcode)
+          }}
           isResolved={toPostcode !== null}
           textColor={toIsNamedPlace ? Colors.blue : undefined}
           textBold={toIsNamedPlace}
@@ -303,9 +312,9 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
 
         {/* Search button */}
         <TouchableOpacity
-          onPress={loading ? undefined : run}
-          activeOpacity={loading ? 1 : 0.75}
-          style={[styles.searchBtn, { opacity: loading ? Opacity.disabledMid : 1 }]}
+          onPress={loading || !fromPostcode || !toPostcode ? undefined : run}
+          activeOpacity={loading || !fromPostcode || !toPostcode ? 1 : 0.75}
+          style={[styles.searchBtn, { opacity: loading || !fromPostcode || !toPostcode ? Opacity.disabledMid : 1 }]}
           accessibilityRole="button"
           accessibilityLabel="Search for journeys"
         >
@@ -341,6 +350,7 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
           }
         />
       ))}
+      </Pressable>
     </FormScreenLayout>
   )
 }
