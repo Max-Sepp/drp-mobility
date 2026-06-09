@@ -1,6 +1,8 @@
 import { MaterialIcons } from '@expo/vector-icons'
-import { useMemo } from 'react'
-import { Text, XStack, YStack } from 'tamagui'
+import { useMemo, useState } from 'react'
+import { Spinner, Text, XStack, YStack } from 'tamagui'
+import { apiClient } from '@/api/client'
+import type { components } from '@/api/schema.d'
 import { formatTime, isToday, parseUtc } from '@/lib/datetime'
 import type {
   AssessedUnit,
@@ -8,7 +10,10 @@ import type {
   StationRole,
   UnitVerdict,
 } from '@/features/journey/api/outageRelevance'
+import { OutageTimeline } from '@/features/outages/OutageTimeline'
 import { useTheme, Borders } from '@/theme'
+
+type FailureDetail = components['schemas']['FailureDetail']
 
 type VerdictStyle = {
   icon: keyof typeof MaterialIcons.glyphMap
@@ -57,6 +62,26 @@ function verdictDetail(unit: AssessedUnit): string {
 
 export const OutageDetail = ({ assessments }: { assessments: OutageAssessment[] }) => {
   const { Colors, Radii } = useTheme()
+  // Lazily-fetched event timeline per failure, opened via the per-problem dropdown.
+  const [expandedFailureId, setExpandedFailureId] = useState<number | null>(null)
+  const [details, setDetails] = useState<Record<number, FailureDetail>>({})
+  const [loadingFailureId, setLoadingFailureId] = useState<number | null>(null)
+
+  async function toggleTimeline(failureId: number) {
+    if (expandedFailureId === failureId) {
+      setExpandedFailureId(null)
+      return
+    }
+    setExpandedFailureId(failureId)
+    if (details[failureId]) return
+    setLoadingFailureId(failureId)
+    const { data } = await apiClient.GET('/failures/{failure_id}', {
+      params: { path: { failure_id: failureId } },
+    })
+    if (data) setDetails((prev) => ({ ...prev, [failureId]: data }))
+    setLoadingFailureId(null)
+  }
+
   const VERDICTS = useMemo<Record<UnitVerdict, VerdictStyle>>(
     () => ({
       'on-your-platform': {
@@ -146,10 +171,50 @@ export const OutageDetail = ({ assessments }: { assessments: OutageAssessment[] 
                   <Text fontSize={13} style={{ color: v.color }}>
                     {verdictDetail(unit)}
                   </Text>
+                  {unit.verified && (
+                    <XStack items="center" gap="$1">
+                      <MaterialIcons name="verified" size={13} color="#1d4ed8" />
+                      <Text fontSize={12} fontWeight="600" color="#1d4ed8">
+                        Verified on-site
+                        {unit.verificationCount > 1 ? ` (${unit.verificationCount}×)` : ''}
+                      </Text>
+                    </XStack>
+                  )}
                   <Text fontSize={12} color={Colors.secondaryText}>
                     {reportMeta(unit)}
                     {unit.estimated ? ' · location estimated' : ''}
                   </Text>
+
+                  {/* Per-problem dropdown: lazily loads and shows the full event timeline. */}
+                  <XStack
+                    items="center"
+                    gap="$1"
+                    mt="$0.5"
+                    onPress={() => toggleTimeline(unit.failureId)}
+                    pressStyle={{ opacity: 0.6 }}
+                  >
+                    <Text fontSize={12} fontWeight="600" style={{ color: v.color }}>
+                      {expandedFailureId === unit.failureId ? 'Hide timeline' : 'View timeline'}
+                    </Text>
+                    <MaterialIcons
+                      name={expandedFailureId === unit.failureId ? 'expand-less' : 'expand-more'}
+                      size={16}
+                      color={v.color}
+                    />
+                  </XStack>
+                  {expandedFailureId === unit.failureId &&
+                    (loadingFailureId === unit.failureId ? (
+                      <Spinner color={Colors.secondaryText} />
+                    ) : details[unit.failureId] ? (
+                      <YStack pt="$1">
+                        <OutageTimeline
+                          reports={details[unit.failureId].reports}
+                          verifications={details[unit.failureId].verifications}
+                          resolvedAt={details[unit.failureId].resolved_at}
+                          resolutionDescription={details[unit.failureId].resolution_description}
+                        />
+                      </YStack>
+                    ) : null)}
                 </YStack>
               )
             })}
