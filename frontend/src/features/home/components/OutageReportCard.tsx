@@ -3,11 +3,16 @@ import { Image, Pressable, StyleSheet } from 'react-native'
 import { Spinner, Text, XStack, YStack } from 'tamagui'
 import { BASE_URL } from '@/api/client'
 import type { components } from '@/api/schema.d'
+import { TflBadge } from '@/components/TflBadge'
 import { formatDatetime } from '@/lib/datetime'
 import { useTheme, Borders, Spacing } from '@/theme'
 import { reportSeverity } from '@/features/outages/severity'
 
 type OutageReport = components['schemas']['OutageReportSummary']
+
+function isTfl(report: OutageReport): boolean {
+  return (report as OutageReport & { source?: string }).source === 'tfl'
+}
 
 type OutageReportCardProps = {
   /** All active reports under the same failure, sorted oldest-first. */
@@ -25,7 +30,9 @@ function alertLabel(report: OutageReport): string {
   if (equipment.equipment_type.name === 'overcrowding') return 'Overcrowding reported'
   if (equipment.equipment_type.name === 'custom') return 'Custom issue reported'
   const type = equipment.equipment_type.name === 'lift' ? 'Lift' : 'Escalator'
-  return `${type} broken – ${equipment.connection}`
+  // TfL data reports an official outage; user reports describe something "broken".
+  const verb = isTfl(report) ? 'out of service' : 'broken'
+  return `${type} ${verb} – ${equipment.connection}`
 }
 
 export const OutageReportCard = ({
@@ -48,6 +55,7 @@ export const OutageReportCard = ({
   const firstReported = times[0]
   const lastReported = times[times.length - 1]
   const reportCount = reports.length
+  const official = reports.some(isTfl)
   const hasTrustedReporter = reports.some((r) => r.reporter_role === 'trusted')
   const hasAnyContent = reports.some((r) => !!r.description || !!r.image_content_type)
   const hasUnverified = reports.some((r) => !(r as OutageReport & { verified?: boolean }).verified)
@@ -142,15 +150,21 @@ export const OutageReportCard = ({
             {alertLabel(reports[0])}
           </Text>
           <Text fontSize={12} color={darkColor}>
-            first reported {formatDatetime(firstReported)}
+            {official ? 'Published by TfL' : 'first reported'} {formatDatetime(firstReported)}
           </Text>
-          {hasTrustedReporter && (
-            <XStack items="center" gap="$1" mt="$0.5">
-              <Ionicons name="shield-checkmark" size={11} color="#15803d" />
-              <Text fontSize={11} fontWeight="600" color="#15803d">
-                Trusted reporter
-              </Text>
+          {official ? (
+            <XStack mt="$0.5">
+              <TflBadge label="Official · TfL" />
             </XStack>
+          ) : (
+            hasTrustedReporter && (
+              <XStack items="center" gap="$1" mt="$0.5">
+                <Ionicons name="shield-checkmark" size={11} color="#15803d" />
+                <Text fontSize={11} fontWeight="600" color="#15803d">
+                  Trusted reporter
+                </Text>
+              </XStack>
+            )
           )}
         </YStack>
 
@@ -224,15 +238,20 @@ export const OutageReportCard = ({
                     )}
                     <XStack items="center" gap="$2">
                       <Text fontSize={11} color={darkColor} style={{ opacity: 0.7 }}>
-                        Reported {formatDatetime(report.breakdown_time)}
+                        {isTfl(report) ? 'From TfL' : 'Reported'}{' '}
+                        {formatDatetime(report.breakdown_time)}
                       </Text>
-                      {report.reporter_role === 'trusted' && (
-                        <XStack items="center" gap="$1">
-                          <Ionicons name="shield-checkmark" size={10} color="#15803d" />
-                          <Text fontSize={11} fontWeight="600" color="#15803d">
-                            Trusted
-                          </Text>
-                        </XStack>
+                      {isTfl(report) ? (
+                        <TflBadge />
+                      ) : (
+                        report.reporter_role === 'trusted' && (
+                          <XStack items="center" gap="$1">
+                            <Ionicons name="shield-checkmark" size={10} color="#15803d" />
+                            <Text fontSize={11} fontWeight="600" color="#15803d">
+                              Trusted
+                            </Text>
+                          </XStack>
+                        )
                       )}
                     </XStack>
                   </YStack>
