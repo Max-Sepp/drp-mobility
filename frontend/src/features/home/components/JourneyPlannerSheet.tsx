@@ -183,6 +183,7 @@ export function JourneyPlannerSheet({ plan, onClose, onJourneySelect, savedPlace
       setGettingLocation(false)
       setLoading(false)
       sheetRef.current?.snapToIndex(1)
+      if (!plan.initialFrom && cachedCoords) handleCurrentLocation()
     } else if (!closedByButton.current) {
       // Programmatic close (parent cleared plan) — animate the sheet away.
       // If closedByButton is true, close() was already called from the button handler.

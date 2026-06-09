@@ -102,6 +102,10 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
   )
   const openStation = (station: string) => navigation.navigate('Station', { station })
 
+  useEffect(() => {
+    if (!route.params?.initialFrom && cachedCoords) handleCurrentLocation()
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleCurrentLocation = useCallback(async () => {
     if (!cachedCoords) return
     setGettingLocation(true)
