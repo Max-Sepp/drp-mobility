@@ -12794,7 +12794,7 @@
   },
   {
     "name": "Gloucester Road",
-    "lifts": 0,
+    "lifts": 1,
     "escalators": 0,
     "platforms": [
       {
@@ -12869,7 +12869,15 @@
     "coordinates": {
       "lat": 51.494315,
       "lng": -0.182658
-    }
+    },
+    "lift_units": [
+      {
+        "id": "940GZZLUGTR-Lift-1",
+        "name": "Lift 1",
+        "from": "Street",
+        "to": "Eastbound Platform 5, Westbound Platform 4"
+      }
+    ]
   },
   {
     "name": "Golders Green",
