@@ -23,6 +23,7 @@ type OutageReportCardProps = {
 function alertLabel(report: OutageReport): string {
   const equipment = report.failure.equipment
   if (equipment.equipment_type.name === 'overcrowding') return 'Overcrowding reported'
+  if (equipment.equipment_type.name === 'custom') return 'Custom issue reported'
   const type = equipment.equipment_type.name === 'lift' ? 'Lift' : 'Escalator'
   return `${type} broken – ${equipment.connection}`
 }

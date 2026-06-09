@@ -16,6 +16,7 @@ export type IssueSeverity = 'warning' | 'danger'
  */
 const SEVERITY_MAP: Record<string, IssueSeverity> = {
   overcrowding: 'warning',
+  custom: 'warning',
 }
 
 export function reportSeverity(report: OutageReport): IssueSeverity {

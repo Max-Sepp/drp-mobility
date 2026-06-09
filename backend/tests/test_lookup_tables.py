@@ -34,7 +34,7 @@ def test_list_equipment_types_returns_seeded_types(client: TestClient) -> None:
 
     assert response.status_code == 200
     names = {t["name"] for t in response.json()}
-    assert names == {"lift", "escalator", "overcrowding"}
+    assert names == {"lift", "escalator", "overcrowding", "custom"}
 
 
 def test_list_equipment_types_have_ids(client: TestClient) -> None:

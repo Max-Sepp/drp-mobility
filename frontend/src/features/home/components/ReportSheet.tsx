@@ -31,7 +31,7 @@ const ISSUE_TYPES: { type: IssueType; icon: keyof typeof MaterialIcons.glyphMap;
     { type: 'lift', icon: 'elevator', label: 'Lift\nBroken' },
     { type: 'escalator', icon: 'escalator', label: 'Escalator\nBroken' },
     { type: 'overcrowding', icon: 'groups', label: 'Overcrowding' },
-    { type: 'custom', icon: 'edit-note', label: 'Other' },
+    { type: 'custom', icon: 'edit-note', label: 'Custom\nIssue' },
   ]
 
 type Props = {
@@ -190,21 +190,22 @@ export function ReportSheet({ station, onClose }: Props) {
     setStep('form')
     sheetRef.current?.snapToIndex(1)
 
-    if ((type === 'lift' || type === 'escalator' || type === 'overcrowding') && station) {
+    if (station) {
       setLoadingEquipment(true)
       const { data } = await apiClient.GET('/equipment')
       if (data) {
-        if (type === 'overcrowding') {
-          const equip = data.find(
-            (e) => e.station.name === station && e.equipment_type.name === 'overcrowding',
-          )
-          if (equip) setEquipmentId(equip.id)
-        } else {
+        if (type === 'lift' || type === 'escalator') {
           setEquipment(
             data
               .filter((e) => e.station.name === station && e.equipment_type.name === type)
               .sort((a, b) => a.connection.localeCompare(b.connection, undefined, { numeric: true })),
           )
+        } else {
+          // overcrowding and custom: auto-select the single station-level equipment row
+          const equip = data.find(
+            (e) => e.station.name === station && e.equipment_type.name === type,
+          )
+          if (equip) setEquipmentId(equip.id)
         }
       }
       setLoadingEquipment(false)
@@ -218,16 +219,6 @@ export function ReportSheet({ station, onClose }: Props) {
 
   async function submit() {
     if (!station) return
-
-    // Custom: no backend support yet, just show success
-    if (issueType === 'custom') {
-      if (!description.trim()) {
-        Alert.alert('Required', 'Please describe the issue.')
-        return
-      }
-      setStep('success')
-      return
-    }
 
     if (!equipmentId) {
       Alert.alert('Required', `Please select which ${issueType} is broken.`)
