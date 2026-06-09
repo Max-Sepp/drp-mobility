@@ -1,5 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, Keyboard, Pressable, StyleSheet, TouchableOpacity } from 'react-native'
 import { Spinner, Text, XStack, YStack } from 'tamagui'
 import { ScreenHeader } from '@/components/ScreenHeader'
@@ -14,6 +14,7 @@ import {
 } from '@/features/journey/api/accessibility'
 import { type ResolvedLocation, resolveToPostcode } from '@/features/journey/api/geocode'
 import { useAppLocation } from '@/lib/LocationContext'
+import { useAccessibilityPreference } from '@/lib/AccessibilityPreferenceContext'
 import {
   type AccessibilityPreference,
   type Journey,
@@ -38,6 +39,7 @@ const STEP_FREE_OPTIONS: { label: string; value: string | null }[] = [
 
 export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreenProps) => {
   const { Colors, Radii } = useTheme()
+  const { defaultLevel } = useAccessibilityPreference()
   const styles = useMemo(
     () =>
       StyleSheet.create({
@@ -84,7 +86,11 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
     Boolean(route.params?.initialTo?.isNamedPlace),
   )
   const [gettingLocation, setGettingLocation] = useState(false)
-  const [level, setLevel] = useState<AccessibilityPreference | null>(null)
+  const [level, setLevel] = useState<AccessibilityPreference | null>(defaultLevel)
+  const levelSetByUser = useRef(false)
+  useEffect(() => {
+    if (!levelSetByUser.current) setLevel(defaultLevel)
+  }, [defaultLevel])
   const [timeConstraint, setTimeConstraint] = useState<TimeConstraint | null>(null)
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState<JourneyResult[]>([])
@@ -246,7 +252,10 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
               label="Step-free"
               options={STEP_FREE_OPTIONS}
               value={level}
-              onSelect={(v) => setLevel(v as AccessibilityPreference | null)}
+              onSelect={(v) => {
+                levelSetByUser.current = true
+                setLevel(v as AccessibilityPreference | null)
+              }}
             />
           </XStack>
 
