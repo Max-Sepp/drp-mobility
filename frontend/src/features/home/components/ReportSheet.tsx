@@ -155,6 +155,8 @@ export function ReportSheet({ station, onClose }: Props) {
   const [area, setArea] = useState('')
   const [photo, setPhoto] = useState<ImagePicker.ImagePickerAsset | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [hasLifts, setHasLifts] = useState<boolean | undefined>(undefined)
+  const [hasEscalators, setHasEscalators] = useState<boolean | undefined>(undefined)
 
   function resetForm() {
     setIssueType(null)
@@ -165,6 +167,8 @@ export function ReportSheet({ station, onClose }: Props) {
     setArea('')
     setPhoto(null)
     setSubmitting(false)
+    setHasLifts(undefined)
+    setHasEscalators(undefined)
   }
 
   useEffect(() => {
@@ -172,7 +176,24 @@ export function ReportSheet({ station, onClose }: Props) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       resetForm()
       setStep('type')
-      sheetRef.current?.snapToIndex(0)
+      let active = true
+      // Fetch equipment availability BEFORE opening the sheet so tiles are already
+      // grey/enabled the moment the sheet becomes visible.
+      apiClient.GET('/equipment').then(({ data }) => {
+        if (!active) return
+        if (data) {
+          setHasLifts(
+            data.some((e) => e.station.name === station && e.equipment_type.name === 'lift'),
+          )
+          setHasEscalators(
+            data.some((e) => e.station.name === station && e.equipment_type.name === 'escalator'),
+          )
+        }
+        sheetRef.current?.snapToIndex(0)
+      })
+      return () => {
+        active = false
+      }
     } else {
       sheetRef.current?.close()
     }
@@ -180,6 +201,12 @@ export function ReportSheet({ station, onClose }: Props) {
 
   function handleChange(index: number) {
     if (index === -1) onClose()
+  }
+
+  function isTypeDisabled(type: IssueType): boolean {
+    if (type === 'lift') return hasLifts === false
+    if (type === 'escalator') return hasEscalators === false
+    return false
   }
 
   async function selectType(type: IssueType) {
@@ -323,7 +350,7 @@ export function ReportSheet({ station, onClose }: Props) {
             ]}
           >
             <View style={styles.grid}>
-              {ISSUE_TYPES.map(({ type, icon, label }) => (
+              {ISSUE_TYPES.filter(({ type }) => !isTypeDisabled(type)).map(({ type, icon, label }) => (
                 <TouchableOpacity
                   key={type}
                   style={styles.gridItem}
