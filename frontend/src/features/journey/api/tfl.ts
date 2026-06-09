@@ -71,16 +71,18 @@ export type JourneyPlanResult =
   | { kind: 'error'; message: string }
 
 /** A time constraint for journey planning — either a specific departure or arrival time. */
-export type TimeConstraint =
-  | { mode: 'depart'; at: Date }
-  | { mode: 'arrive'; by: Date }
+export type TimeConstraint = { mode: 'depart'; at: Date } | { mode: 'arrive'; by: Date }
 
 function timeQueryParams(time: TimeConstraint): string[] {
   const pad = (n: number) => String(n).padStart(2, '0')
   const d = time.mode === 'depart' ? time.at : time.by
   const date = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}`
   const t = `${pad(d.getHours())}${pad(d.getMinutes())}`
-  return [`date=${date}`, `time=${t}`, `timeIs=${time.mode === 'depart' ? 'Departing' : 'Arriving'}`]
+  return [
+    `date=${date}`,
+    `time=${t}`,
+    `timeIs=${time.mode === 'depart' ? 'Departing' : 'Arriving'}`,
+  ]
 }
 
 /**

@@ -244,7 +244,13 @@ type Props = {
   onHeightChange?: (height: number) => void
 }
 
-export function JourneyDetailSheet({ params, onClose, onStartJourney, onSaveChanged, onHeightChange }: Props) {
+export function JourneyDetailSheet({
+  params,
+  onClose,
+  onStartJourney,
+  onSaveChanged,
+  onHeightChange,
+}: Props) {
   const { Colors, Radii } = useTheme()
   const styles = useMemo(
     () =>

@@ -251,16 +251,14 @@ export function LeavePill({ value, onChange }: LeavePillProps) {
 
       {/* iOS date-time picker modal — backdrop fades, card slides up */}
       {Platform.OS === 'ios' && (
-        <Modal
-          visible={showModal}
-          transparent
-          animationType="none"
-          onRequestClose={closeModal}
-        >
+        <Modal visible={showModal} transparent animationType="none" onRequestClose={closeModal}>
           <View style={StyleSheet.absoluteFill}>
             {/* Fading dark backdrop */}
             <Animated.View
-              style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.4)', opacity: backdropAnim }]}
+              style={[
+                StyleSheet.absoluteFill,
+                { backgroundColor: 'rgba(0,0,0,0.4)', opacity: backdropAnim },
+              ]}
             />
             {/* Tap above card to dismiss */}
             <TouchableOpacity style={{ flex: 1 }} activeOpacity={1} onPress={closeModal} />
@@ -278,11 +276,17 @@ export function LeavePill({ value, onChange }: LeavePillProps) {
             >
               <XStack justify="space-between" mb="$3">
                 <TouchableOpacity onPress={closeModal}>
-                  <Text fontSize={16} color={Colors.blue}>Cancel</Text>
+                  <Text fontSize={16} color={Colors.blue}>
+                    Cancel
+                  </Text>
                 </TouchableOpacity>
-                <Text fontSize={16} fontWeight="700" color={Colors.text}>{modalTitle}</Text>
+                <Text fontSize={16} fontWeight="700" color={Colors.text}>
+                  {modalTitle}
+                </Text>
                 <TouchableOpacity onPress={confirmModal}>
-                  <Text fontSize={16} fontWeight="700" color={Colors.blue}>Done</Text>
+                  <Text fontSize={16} fontWeight="700" color={Colors.blue}>
+                    Done
+                  </Text>
                 </TouchableOpacity>
               </XStack>
               <DateTimePicker
@@ -290,7 +294,9 @@ export function LeavePill({ value, onChange }: LeavePillProps) {
                 mode="datetime"
                 display="spinner"
                 themeVariant="light"
-                onChange={(_, date) => { if (date) setPending(date) }}
+                onChange={(_, date) => {
+                  if (date) setPending(date)
+                }}
                 style={{ height: 200 }}
               />
             </Animated.View>

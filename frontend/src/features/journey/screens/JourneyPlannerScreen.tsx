@@ -39,7 +39,6 @@ const STEP_FREE_OPTIONS: { label: string; value: string | null }[] = [
   { label: 'To train (fully step-free)', value: 'StepFreeToVehicle' },
 ]
 
-
 export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreenProps) => {
   const { Colors, Radii } = useTheme()
   const styles = useMemo(
@@ -191,108 +190,111 @@ export const JourneyPlannerScreen = ({ navigation, route }: JourneyPlannerScreen
       footer={null}
     >
       <Pressable onPress={Keyboard.dismiss} style={{ flex: 1 }}>
-      <YStack px="$5" mt="$4" gap="$2">
-        {/* Location inputs with swap */}
-        <LocationInput
-          label="From"
-          value={from}
-          onChangeText={(text) => {
-            setFrom(text)
-            setFromIsCurrentLocation(false)
-            setFromPostcode(null)
-          }}
-          onResolved={setFromPostcode}
-          onSelect={(label, postcode) => {
-            setFrom(label)
-            setFromPostcode(postcode)
-            setFromIsCurrentLocation(false)
-          }}
-          isResolved={fromPostcode !== null}
-          textColor={fromIsCurrentLocation ? Colors.blue : undefined}
-          textBold={fromIsCurrentLocation}
-          onCurrentLocation={cachedCoords ? handleCurrentLocation : undefined}
-          currentLocationLoading={gettingLocation}
-        />
-
-        <TouchableOpacity
-          onPress={swapLocations}
-          style={styles.swapBtn}
-          activeOpacity={0.75}
-          accessibilityRole="button"
-          accessibilityLabel="Swap start and destination"
-        >
-          <MaterialIcons name="swap-vert" size={18} color={Colors.secondaryText} />
-        </TouchableOpacity>
-
-        <LocationInput
-          label="To"
-          value={to}
-          onChangeText={(text) => {
-            setTo(text)
-            setToIsNamedPlace(false)
-            setToPostcode(null)
-          }}
-          onResolved={setToPostcode}
-          onSelect={(label, postcode) => {
-            setTo(label)
-            setToPostcode(postcode)
-          }}
-          isResolved={toPostcode !== null}
-          textColor={toIsNamedPlace ? Colors.blue : undefined}
-          textBold={toIsNamedPlace}
-        />
-
-        {/* Filter row */}
-        <XStack gap="$2" mt="$1">
-          <LeavePill value={timeConstraint} onChange={setTimeConstraint} />
-          <FilterPill
-            label="Step-free"
-            options={STEP_FREE_OPTIONS}
-            value={level}
-            onSelect={(v) => setLevel(v as AccessibilityPreference | null)}
+        <YStack px="$5" mt="$4" gap="$2">
+          {/* Location inputs with swap */}
+          <LocationInput
+            label="From"
+            value={from}
+            onChangeText={(text) => {
+              setFrom(text)
+              setFromIsCurrentLocation(false)
+              setFromPostcode(null)
+            }}
+            onResolved={setFromPostcode}
+            onSelect={(label, postcode) => {
+              setFrom(label)
+              setFromPostcode(postcode)
+              setFromIsCurrentLocation(false)
+            }}
+            isResolved={fromPostcode !== null}
+            textColor={fromIsCurrentLocation ? Colors.blue : undefined}
+            textBold={fromIsCurrentLocation}
+            onCurrentLocation={cachedCoords ? handleCurrentLocation : undefined}
+            currentLocationLoading={gettingLocation}
           />
-        </XStack>
 
-        {/* Search button */}
-        <TouchableOpacity
-          onPress={loading || !fromPostcode || !toPostcode ? undefined : run}
-          activeOpacity={loading || !fromPostcode || !toPostcode ? 1 : 0.75}
-          style={[styles.searchBtn, { opacity: loading || !fromPostcode || !toPostcode ? Opacity.disabledMid : 1 }]}
-          accessibilityRole="button"
-          accessibilityLabel="Search for journeys"
-        >
-          {loading ? (
-            <Spinner size="small" color={Colors.card} />
-          ) : (
-            <MaterialIcons name="search" size={18} color={Colors.card} />
-          )}
-          <Text color={Colors.card} fontSize={15} fontWeight="700">
-            {loading ? 'Searching…' : 'Search'}
-          </Text>
-        </TouchableOpacity>
-      </YStack>
+          <TouchableOpacity
+            onPress={swapLocations}
+            style={styles.swapBtn}
+            activeOpacity={0.75}
+            accessibilityRole="button"
+            accessibilityLabel="Swap start and destination"
+          >
+            <MaterialIcons name="swap-vert" size={18} color={Colors.secondaryText} />
+          </TouchableOpacity>
 
-      {/* Results */}
-      {results.map(({ journey, outages, tags }, i) => (
-        <JourneyResultCard
-          key={i}
-          journey={journey}
-          outages={outages}
-          tags={tags}
-          resolveStation={resolveStation}
-          onStationPress={openStation}
-          onPress={() =>
-            navigation.navigate('JourneyDetail', {
-              journey,
-              from: resolved?.from,
-              to: resolved?.to,
-              outages,
-              level,
-              tags,
-            })
-          }
-        />
-      ))}
+          <LocationInput
+            label="To"
+            value={to}
+            onChangeText={(text) => {
+              setTo(text)
+              setToIsNamedPlace(false)
+              setToPostcode(null)
+            }}
+            onResolved={setToPostcode}
+            onSelect={(label, postcode) => {
+              setTo(label)
+              setToPostcode(postcode)
+            }}
+            isResolved={toPostcode !== null}
+            textColor={toIsNamedPlace ? Colors.blue : undefined}
+            textBold={toIsNamedPlace}
+          />
+
+          {/* Filter row */}
+          <XStack gap="$2" mt="$1">
+            <LeavePill value={timeConstraint} onChange={setTimeConstraint} />
+            <FilterPill
+              label="Step-free"
+              options={STEP_FREE_OPTIONS}
+              value={level}
+              onSelect={(v) => setLevel(v as AccessibilityPreference | null)}
+            />
+          </XStack>
+
+          {/* Search button */}
+          <TouchableOpacity
+            onPress={loading || !fromPostcode || !toPostcode ? undefined : run}
+            activeOpacity={loading || !fromPostcode || !toPostcode ? 1 : 0.75}
+            style={[
+              styles.searchBtn,
+              { opacity: loading || !fromPostcode || !toPostcode ? Opacity.disabledMid : 1 },
+            ]}
+            accessibilityRole="button"
+            accessibilityLabel="Search for journeys"
+          >
+            {loading ? (
+              <Spinner size="small" color={Colors.card} />
+            ) : (
+              <MaterialIcons name="search" size={18} color={Colors.card} />
+            )}
+            <Text color={Colors.card} fontSize={15} fontWeight="700">
+              {loading ? 'Searching…' : 'Search'}
+            </Text>
+          </TouchableOpacity>
+        </YStack>
+
+        {/* Results */}
+        {results.map(({ journey, outages, tags }, i) => (
+          <JourneyResultCard
+            key={i}
+            journey={journey}
+            outages={outages}
+            tags={tags}
+            resolveStation={resolveStation}
+            onStationPress={openStation}
+            onPress={() =>
+              navigation.navigate('JourneyDetail', {
+                journey,
+                from: resolved?.from,
+                to: resolved?.to,
+                outages,
+                level,
+                tags,
+              })
+            }
+          />
+        ))}
       </Pressable>
     </FormScreenLayout>
   )

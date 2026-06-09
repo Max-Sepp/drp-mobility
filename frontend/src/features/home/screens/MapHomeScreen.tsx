@@ -454,7 +454,11 @@ export function MapHomeScreen({ navigation }: Props) {
         onHeightChange={setStationHeight}
       />
 
-      <ReportSheet station={activeReport} onClose={() => setActiveReport(null)} onHeightChange={setReportHeight} />
+      <ReportSheet
+        station={activeReport}
+        onClose={() => setActiveReport(null)}
+        onHeightChange={setReportHeight}
+      />
 
       <JourneyPlannerSheet
         plan={activePlan}

@@ -158,7 +158,10 @@ export const LocationInput = ({
       ? savedPlaceShortcuts!.filter((p) => p.label.toLowerCase().includes(value.toLowerCase()))
       : []
   const showDropdown =
-    showLocationShortcut || showSavedShortcuts || matchedSavedPlaces.length > 0 || suggestions.length > 0
+    showLocationShortcut ||
+    showSavedShortcuts ||
+    matchedSavedPlaces.length > 0 ||
+    suggestions.length > 0
 
   // Right-side overlay inside the input: spinner → resolved tick → clear button → nothing.
   const showTick = resolved && !focused && !searching

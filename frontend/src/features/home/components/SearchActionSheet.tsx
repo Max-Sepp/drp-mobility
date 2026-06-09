@@ -644,7 +644,9 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
 
         let from: ResolvedLocation | undefined
         if (cachedCoords) {
-          const fromResult = await resolveToPostcode(`${cachedCoords.latitude},${cachedCoords.longitude}`)
+          const fromResult = await resolveToPostcode(
+            `${cachedCoords.latitude},${cachedCoords.longitude}`,
+          )
           if (!('error' in fromResult)) {
             from = { postcode: fromResult.postcode, label: 'Current location' }
           }

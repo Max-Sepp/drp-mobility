@@ -59,7 +59,6 @@ const STEP_FREE_OPTIONS: { label: string; value: string | null }[] = [
   { label: 'To train (fully step-free)', value: 'StepFreeToVehicle' },
 ]
 
-
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -67,7 +66,13 @@ const STEP_FREE_OPTIONS: { label: string; value: string | null }[] = [
 const SWAP_BTN = 36 // diameter of the floating swap button
 const FROM_TO_GAP = 10 // vertical gap between From and To inputs
 
-export function JourneyPlannerSheet({ plan, onClose, onJourneySelect, savedPlaces, onHeightChange }: Props) {
+export function JourneyPlannerSheet({
+  plan,
+  onClose,
+  onJourneySelect,
+  savedPlaces,
+  onHeightChange,
+}: Props) {
   const { Colors, Radii } = useTheme()
   const styles = useMemo(
     () =>
@@ -302,7 +307,10 @@ export function JourneyPlannerSheet({ plan, onClose, onJourneySelect, savedPlace
       >
         {/* Citymapper-style: inputs fill full width, swap button floats between them on the right */}
         <View style={{ position: 'relative', zIndex: 20 }}>
-          <View onLayout={(e) => setFromH(e.nativeEvent.layout.height)} style={{ zIndex: 10, position: 'relative' }}>
+          <View
+            onLayout={(e) => setFromH(e.nativeEvent.layout.height)}
+            style={{ zIndex: 10, position: 'relative' }}
+          >
             <LocationInput
               label="From"
               value={from}

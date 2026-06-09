@@ -33,7 +33,13 @@ type Props = {
   onHeightChange?: (height: number) => void
 }
 
-export function StationSheet({ station, onClose, onReportPress, onOpenJourney, onHeightChange }: Props) {
+export function StationSheet({
+  station,
+  onClose,
+  onReportPress,
+  onOpenJourney,
+  onHeightChange,
+}: Props) {
   const { Colors, Radii, Shadows } = useTheme()
   const styles = useMemo(
     () =>
@@ -124,7 +130,9 @@ export function StationSheet({ station, onClose, onReportPress, onOpenJourney, o
 
       let from: ResolvedLocation | undefined
       if (cachedCoords) {
-        const fromResult = await resolveToPostcode(`${cachedCoords.latitude},${cachedCoords.longitude}`)
+        const fromResult = await resolveToPostcode(
+          `${cachedCoords.latitude},${cachedCoords.longitude}`,
+        )
         if (!('error' in fromResult)) {
           from = { postcode: fromResult.postcode, label: 'Current location' }
         }
