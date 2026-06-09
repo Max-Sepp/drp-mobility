@@ -21,6 +21,9 @@ _REPORT_JOINEDLOAD = [
     joinedload(OutageReport.failure)
     .joinedload(Failure.equipment)
     .joinedload(Equipment.equipment_type),
+    # Each report's embedded failure carries the failure's verification records (used for the
+    # client's merged report/verification timeline). selectinload keeps it a separate query.
+    joinedload(OutageReport.failure).selectinload(Failure.verifications),
 ]
 
 
@@ -115,13 +118,6 @@ class OutageReportRepository:
         )
         self._db.add(deletion)
         self._db.commit()
-
-    def verify(self, report: OutageReport) -> OutageReport:
-        """Mark a report as verified by a trusted worker. Idempotent."""
-        report.verified = True
-        self._db.commit()
-        self._db.refresh(report)
-        return self.get_active(report.id)
 
     def set_image(self, report: OutageReport, image: bytes, content_type: str) -> OutageReport:
         """Attach or replace the image bytes stored on a report row."""

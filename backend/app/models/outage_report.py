@@ -21,7 +21,6 @@ class OutageReport(Base):
     # The role of whoever submitted this report (anonymous submissions are untrusted). Reports are
     # not linked to a specific user — only this role is copied over at creation time.
     reporter_role: Mapped[str] = mapped_column(default=UserRole.UNTRUSTED.value)
-    verified: Mapped[bool] = mapped_column(default=False)
 
     failure: Mapped["Failure"] = relationship("Failure", back_populates="reports")
     deletion: Mapped["OutageReportDeletion | None"] = relationship(

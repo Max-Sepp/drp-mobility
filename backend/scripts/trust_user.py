@@ -13,6 +13,23 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from app.database import SessionLocal  # noqa: E402
+
+# Import every model so SQLAlchemy can resolve the User mapper's relationships (sessions, journeys,
+# etc.) before we query. Keep this list in sync with app/main.py — there is no models/__init__.py
+# that imports them.
+from app.models import equipment as _equipment  # noqa: E402, F401
+from app.models import equipment_type as _equipment_type  # noqa: E402, F401
+from app.models import failure as _failure  # noqa: E402, F401
+from app.models import line as _line  # noqa: E402, F401
+from app.models import outage_report as _outage_report  # noqa: E402, F401
+from app.models import outage_report_deletion as _outage_report_deletion  # noqa: E402, F401
+from app.models import outage_report_verification as _outage_report_verification  # noqa: E402, F401
+from app.models import platform as _platform  # noqa: E402, F401
+from app.models import push_token as _push_token  # noqa: E402, F401
+from app.models import saved_journey as _saved_journey  # noqa: E402, F401
+from app.models import saved_place as _saved_place  # noqa: E402, F401
+from app.models import session as _session  # noqa: E402, F401
+from app.models import station as _station  # noqa: E402, F401
 from app.models.user import User, UserRole  # noqa: E402
 
 
