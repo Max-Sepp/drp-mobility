@@ -112,23 +112,22 @@ export function SetPlaceModal({ visible, placeKey, onSave, onDismiss }: Props) {
   const [query, setQuery] = useState('')
   const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([])
   const [searching, setSearching] = useState(false)
+  const visibleSuggestions = query.length >= 3 ? suggestions : []
+  const isSearching = query.length >= 3 && searching
   const [saving, setSaving] = useState(false)
 
   const title = placeKey === 'home' ? 'Set Home address' : 'Set Work address'
 
   useEffect(() => {
     if (!visible) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setQuery('')
-      setSuggestions([])
     }
   }, [visible])
 
   useEffect(() => {
-    if (query.length < 3) {
-      setSuggestions([])
-      setSearching(false)
-      return
-    }
+    if (query.length < 3) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSearching(true)
     const timer = setTimeout(async () => {
       const results = await searchLocations(query)
@@ -190,13 +189,13 @@ export function SetPlaceModal({ visible, placeKey, onSave, onDismiss }: Props) {
             autoCorrect={false}
             returnKeyType="search"
           />
-          {searching && <ActivityIndicator size="small" color={Colors.secondaryText} />}
+          {isSearching && <ActivityIndicator size="small" color={Colors.secondaryText} />}
           {saving && <ActivityIndicator size="small" color={Colors.blue} />}
         </View>
 
         {/* Results */}
         <FlatList
-          data={suggestions}
+          data={visibleSuggestions}
           keyExtractor={(_, i) => String(i)}
           keyboardShouldPersistTaps="handled"
           renderItem={({ item }) => (
@@ -224,7 +223,7 @@ export function SetPlaceModal({ visible, placeKey, onSave, onDismiss }: Props) {
           )}
           ItemSeparatorComponent={() => <View style={styles.separator} />}
           ListEmptyComponent={
-            query.length >= 3 && !searching ? (
+            query.length >= 3 && !isSearching ? (
               <View style={styles.emptyState}>
                 <Text style={[Typography.caption, { color: Colors.secondaryText }]}>
                   {`No results for "${query}"`}

@@ -5,7 +5,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, UploadFi
 from fastapi.responses import Response
 from sse_starlette import EventSourceResponse
 
-from app.dependencies.auth import get_optional_user
+from app.dependencies.auth import get_optional_user, get_trusted_user
 from app.events import broker, sse_event
 from app.models.user import User, UserRole
 from app.repositories.outage_report import OutageReportRepository, get_repo
@@ -138,6 +138,21 @@ def delete_outage_report(
         raise HTTPException(status_code=404, detail="Outage report not found")
     repo.soft_delete(report, reason=reason)
     broker.publish(sse_event("deleted", {"id": report_id}))
+
+
+@router.patch("/{report_id}/verify", response_model=OutageReportSummary)
+def verify_outage_report(
+    report_id: int,
+    repo: OutageReportRepository = Depends(get_repo),
+    _current_user: User = Depends(get_trusted_user),
+) -> OutageReportSummary:
+    """Mark an outage report as physically verified by a trusted worker. Idempotent."""
+    report = repo.get_active(report_id)
+    if report is None:
+        raise HTTPException(status_code=404, detail="Outage report not found")
+    report = repo.verify(report)
+    broker.publish(sse_event("verified", _report_payload(report)))
+    return report
 
 
 # ---------------------------------------------------------------------------

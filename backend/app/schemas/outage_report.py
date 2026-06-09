@@ -26,6 +26,7 @@ class OutageReportSummary(BaseModel):
     description: str | None = None
     image_content_type: str | None = None
     reporter_role: str
+    verified: bool
 
 
 # FailureDetail.reports references OutageReportSummary by string; resolve it now.

@@ -169,6 +169,7 @@ export function ReportSheet({ station, onClose }: Props) {
 
   useEffect(() => {
     if (station) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       resetForm()
       setStep('type')
       sheetRef.current?.snapToIndex(0)

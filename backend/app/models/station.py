@@ -1,6 +1,6 @@
 import enum
 
-from sqlalchemy import Float
+from sqlalchemy import Boolean, Float, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -44,6 +44,12 @@ class Station(Base):
     name: Mapped[str] = mapped_column(unique=True)
     latitude: Mapped[float | None] = mapped_column(Float, nullable=True)
     longitude: Mapped[float | None] = mapped_column(Float, nullable=True)
+    wifi: Mapped[bool] = mapped_column(Boolean, default=False)
+    zones: Mapped[str | None] = mapped_column(String, nullable=True)
+    has_toilets: Mapped[bool] = mapped_column(Boolean, default=False)
+    has_accessible_toilets: Mapped[bool] = mapped_column(Boolean, default=False)
+    blue_badge_parking: Mapped[bool] = mapped_column(Boolean, default=False)
+    taxi_rank: Mapped[bool] = mapped_column(Boolean, default=False)
 
     platforms: Mapped[list[Platform]] = relationship(Platform, back_populates="station")
 

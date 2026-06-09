@@ -110,6 +110,7 @@ export function JourneyDetailSheet({ params, onClose, onStartJourney }: Props) {
       return
     }
     sheetRef.current?.snapToIndex(0)
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setBusy(false)
 
     const { savedId, journey, from, to } = params

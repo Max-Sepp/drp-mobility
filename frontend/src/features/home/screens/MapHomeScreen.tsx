@@ -177,7 +177,7 @@ function ActiveJourneyBanner({
 }
 
 export function MapHomeScreen({ navigation }: Props) {
-  const { Colors, Radii, Shadows } = useTheme()
+  const { Colors, Shadows } = useTheme()
   const styles = useMemo(
     () =>
       StyleSheet.create({

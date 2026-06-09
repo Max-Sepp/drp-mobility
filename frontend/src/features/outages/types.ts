@@ -8,7 +8,7 @@ export type OutageReport = components['schemas']['OutageReportSummary']
  * (SSE isn't modelled there), so the payload shapes below are declared by hand. `snapshot` and
  * `created` carry generated `OutageReport` shapes; `deleted`/`resolved` carry small ad-hoc payloads.
  */
-export type OutageStreamEvent = 'snapshot' | 'created' | 'deleted' | 'resolved'
+export type OutageStreamEvent = 'snapshot' | 'created' | 'deleted' | 'resolved' | 'verified'
 
 export type SnapshotData = { reports: OutageReport[] }
 export type DeletedData = { id: number }

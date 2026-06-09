@@ -54,6 +54,12 @@ class UserRepository:
         self._db.refresh(user)
         return user
 
+    def update_role(self, user: User, role: str) -> User:
+        user.role = role
+        self._db.commit()
+        self._db.refresh(user)
+        return user
+
     # ------------------------------------------------------------------
     # Sessions
     # ------------------------------------------------------------------
