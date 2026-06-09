@@ -3,7 +3,6 @@ import { AccountScreen, LoginScreen, SignupScreen } from '@/features/auth'
 import { StationScreen } from '@/features/home'
 import { MapHomeScreen } from '@/features/home/screens/MapHomeScreen'
 import { SelectStationScreen } from '@/features/stations'
-import { ReportCustomScreen, ReportFormScreen, SuccessScreen } from '@/features/reporting'
 import { ActiveJourneyScreen, JourneyDetailScreen, JourneyPlannerScreen } from '@/features/journey'
 import { SearchScreen } from '@/features/search/screens/SearchScreen'
 import type { RootStackParamList } from '@/navigation/types'
@@ -25,9 +24,6 @@ export default function RootNavigator() {
       />
       <Stack.Screen name="Station" component={StationScreen} />
       <Stack.Screen name="SelectStation" component={SelectStationScreen} />
-      <Stack.Screen name="ReportForm" component={ReportFormScreen} />
-      <Stack.Screen name="ReportCustom" component={ReportCustomScreen} />
-      <Stack.Screen name="Success" component={SuccessScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Signup" component={SignupScreen} />
       <Stack.Screen name="Account" component={AccountScreen} />

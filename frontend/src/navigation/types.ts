@@ -3,11 +3,9 @@ import type { StationOutage } from '@/features/journey/api/accessibility'
 import type { ResolvedLocation } from '@/features/journey/api/geocode'
 import type { AccessibilityPreference, Journey, RouteTag } from '@/features/journey/api/tfl'
 
-// Stations and equipment types are backend rows (GET /stations, GET /equipment-types). Navigation
-// only carries the human-readable station name and the kind of equipment being reported; the
-// concrete equipment row (and its id) is resolved on the report screen.
+// Stations are backend rows (GET /stations). Navigation only carries the human-readable station
+// name; the concrete station row is resolved on screen.
 export type Station = string
-export type EquipmentType = 'lift' | 'escalator'
 
 export type RootStackParamList = {
   MapHome: undefined
@@ -38,9 +36,6 @@ export type RootStackParamList = {
   // tapping a station in a planned journey; `station` is optional so it can also open standalone.
   Station: { station?: Station }
   SelectStation: { currentStation: Station }
-  ReportForm: { equipmentType: EquipmentType; station: Station }
-  ReportCustom: { station: Station }
-  Success: { station: Station }
   // Auth is optional: these are pushed on top of the normal stack (e.g. from the header) and
   // dismissed with goBack on success or cancel — there is no login wall.
   Login: undefined
@@ -55,9 +50,6 @@ export type JourneyDetailScreenProps = NativeStackScreenProps<RootStackParamList
 export type ActiveJourneyScreenProps = NativeStackScreenProps<RootStackParamList, 'ActiveJourney'>
 export type StationScreenProps = NativeStackScreenProps<RootStackParamList, 'Station'>
 export type SelectStationScreenProps = NativeStackScreenProps<RootStackParamList, 'SelectStation'>
-export type ReportFormScreenProps = NativeStackScreenProps<RootStackParamList, 'ReportForm'>
-export type ReportCustomScreenProps = NativeStackScreenProps<RootStackParamList, 'ReportCustom'>
-export type SuccessScreenProps = NativeStackScreenProps<RootStackParamList, 'Success'>
 export type LoginScreenProps = NativeStackScreenProps<RootStackParamList, 'Login'>
 export type SignupScreenProps = NativeStackScreenProps<RootStackParamList, 'Signup'>
 export type AccountScreenProps = NativeStackScreenProps<RootStackParamList, 'Account'>
