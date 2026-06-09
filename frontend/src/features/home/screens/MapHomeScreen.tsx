@@ -470,6 +470,8 @@ export function MapHomeScreen({ navigation }: Props) {
         onSaveChanged={() => loadSavedJourneys().then(setSaved)}
         onStartJourney={(params) => {
           setActiveDetail(null)
+          setActivePlan(null)
+          sheetRef.current?.dismiss()
           setActiveJourneyParams(params)
         }}
         onHeightChange={setDetailHeight}
@@ -480,10 +482,12 @@ export function MapHomeScreen({ navigation }: Props) {
         onComplete={() => {
           setActiveJourneyParams(null)
           setActive(null)
+          sheetRef.current?.restore()
         }}
         onEnd={() => {
           setActiveJourneyParams(null)
           setActive(null)
+          sheetRef.current?.restore()
         }}
         onHeightChange={setActiveJourneyHeight}
       />
