@@ -17,6 +17,7 @@ from app.models import failure as _failure  # noqa: F401
 from app.models import line as _line  # noqa: F401
 from app.models import outage_report as _outage_report  # noqa: F401
 from app.models import outage_report_deletion as _outage_report_deletion  # noqa: F401
+from app.models import outage_report_verification as _outage_report_verification  # noqa: F401
 from app.models import platform as _platform  # noqa: F401
 from app.models import push_token as _push_token  # noqa: F401
 from app.models import saved_journey as _saved_journey  # noqa: F401

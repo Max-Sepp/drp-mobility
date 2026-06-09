@@ -90,7 +90,6 @@ export function StationSheet({ station, onClose, onReportPress, onOpenJourney, o
     () => allReports.filter((r) => r.failure.equipment.station.name === station),
     [allReports, station],
   )
-
   useEffect(() => {
     if (station) {
       programmaticClose.current = false

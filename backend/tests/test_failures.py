@@ -387,3 +387,191 @@ def test_resolve_failure_trusted_user_succeeds(
 
     assert response.status_code == 200
     assert response.json()["resolved"] is True
+
+
+def test_resolve_failure_persists_description(
+    client: TestClient, db_session: Session, auth_headers_factory: Callable
+) -> None:
+    r = client.post("/outage-reports", json=_base_payload(db_session))
+    failure_id = r.json()["failure_id"]
+
+    response = client.patch(
+        f"/failures/{failure_id}/resolve",
+        json={"description": "Lift repaired and tested"},
+        headers=auth_headers_factory(UserRole.TRUSTED),
+    )
+    assert response.status_code == 200
+
+    detail = client.get(f"/failures/{failure_id}").json()
+    assert detail["resolution_description"] == "Lift repaired and tested"
+    assert detail["resolved_at"] is not None
+
+
+def test_resolve_failure_description_optional(
+    client: TestClient, db_session: Session, auth_headers_factory: Callable
+) -> None:
+    r = client.post("/outage-reports", json=_base_payload(db_session))
+    failure_id = r.json()["failure_id"]
+
+    response = client.patch(
+        f"/failures/{failure_id}/resolve", headers=auth_headers_factory(UserRole.TRUSTED)
+    )
+    assert response.status_code == 200
+
+    detail = client.get(f"/failures/{failure_id}").json()
+    assert detail["resolution_description"] is None
+    # resolved_at is stamped even when no reason is given.
+    assert detail["resolved_at"] is not None
+
+
+def test_failure_unresolved_has_no_resolution_fields(
+    client: TestClient, db_session: Session
+) -> None:
+    r = client.post("/outage-reports", json=_base_payload(db_session))
+    failure_id = r.json()["failure_id"]
+
+    detail = client.get(f"/failures/{failure_id}").json()
+    assert detail["resolved_at"] is None
+    assert detail["resolution_description"] is None
+
+
+# ---------------------------------------------------------------------------
+# PATCH /failures/{id}/verify
+# ---------------------------------------------------------------------------
+
+
+def test_verify_failure_unauthenticated_returns_401(
+    client: TestClient, db_session: Session
+) -> None:
+    r = client.post("/outage-reports", json=_base_payload(db_session))
+    failure_id = r.json()["failure_id"]
+
+    response = client.patch(f"/failures/{failure_id}/verify")
+
+    assert response.status_code == 401
+
+
+def test_verify_failure_untrusted_user_returns_403(
+    client: TestClient, db_session: Session, auth_headers_factory: Callable
+) -> None:
+    r = client.post("/outage-reports", json=_base_payload(db_session))
+    failure_id = r.json()["failure_id"]
+
+    response = client.patch(
+        f"/failures/{failure_id}/verify", headers=auth_headers_factory(UserRole.UNTRUSTED)
+    )
+
+    assert response.status_code == 403
+
+
+def test_verify_failure_trusted_user_marks_verified(
+    client: TestClient, db_session: Session, auth_headers_factory: Callable
+) -> None:
+    r = client.post("/outage-reports", json=_base_payload(db_session))
+    failure_id = r.json()["failure_id"]
+
+    response = client.patch(
+        f"/failures/{failure_id}/verify", headers=auth_headers_factory(UserRole.TRUSTED)
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["id"] == failure_id
+    assert body["verified"] is True
+    assert len(body["verifications"]) == 1
+    assert body["verifications"][0]["verified_at"] is not None
+
+
+def test_verify_failure_not_found_returns_404(
+    client: TestClient, auth_headers_factory: Callable
+) -> None:
+    response = client.patch("/failures/999/verify", headers=auth_headers_factory(UserRole.TRUSTED))
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Failure not found"}
+
+
+def test_verify_failure_twice_creates_two_verifications(
+    client: TestClient, db_session: Session, auth_headers_factory: Callable
+) -> None:
+    r = client.post("/outage-reports", json=_base_payload(db_session))
+    failure_id = r.json()["failure_id"]
+    headers = auth_headers_factory(UserRole.TRUSTED)
+
+    first = client.patch(f"/failures/{failure_id}/verify", headers=headers)
+    second = client.patch(f"/failures/{failure_id}/verify", headers=headers)
+
+    assert first.status_code == 200
+    assert second.status_code == 200
+    verifications = second.json()["verifications"]
+    assert len(verifications) == 2
+    # Returned oldest-first, so the timeline reads chronologically.
+    assert verifications[0]["id"] < verifications[1]["id"]
+
+
+def test_verify_failure_persists_description(
+    client: TestClient, db_session: Session, auth_headers_factory: Callable
+) -> None:
+    r = client.post("/outage-reports", json=_base_payload(db_session))
+    failure_id = r.json()["failure_id"]
+
+    response = client.patch(
+        f"/failures/{failure_id}/verify",
+        json={"description": "Engineer on site, lift confirmed down"},
+        headers=auth_headers_factory(UserRole.TRUSTED),
+    )
+
+    assert response.status_code == 200
+    assert (
+        response.json()["verifications"][0]["description"]
+        == "Engineer on site, lift confirmed down"
+    )
+
+
+def test_verify_failure_description_optional(
+    client: TestClient, db_session: Session, auth_headers_factory: Callable
+) -> None:
+    r = client.post("/outage-reports", json=_base_payload(db_session))
+    failure_id = r.json()["failure_id"]
+
+    response = client.patch(
+        f"/failures/{failure_id}/verify", headers=auth_headers_factory(UserRole.TRUSTED)
+    )
+
+    assert response.status_code == 200
+    assert response.json()["verifications"][0]["description"] is None
+
+
+def test_failure_unverified_by_default(client: TestClient, db_session: Session) -> None:
+    r = client.post("/outage-reports", json=_base_payload(db_session))
+    failure_id = r.json()["failure_id"]
+
+    response = client.get(f"/failures/{failure_id}")
+
+    assert response.status_code == 200
+    assert response.json()["verified"] is False
+    assert response.json()["verifications"] == []
+
+
+def test_list_failures_includes_verified_field(client: TestClient, db_session: Session) -> None:
+    client.post("/outage-reports", json=_base_payload(db_session))
+
+    response = client.get("/failures")
+
+    assert response.status_code == 200
+    assert response.json()[0]["verified"] is False
+
+
+def test_report_summary_exposes_failure_verification(
+    client: TestClient, db_session: Session, auth_headers_factory: Callable
+) -> None:
+    r = client.post("/outage-reports", json=_base_payload(db_session))
+    failure_id = r.json()["failure_id"]
+    client.patch(f"/failures/{failure_id}/verify", headers=auth_headers_factory(UserRole.TRUSTED))
+
+    response = client.get("/outage-reports")
+
+    assert response.status_code == 200
+    failure = response.json()[0]["failure"]
+    assert failure["verified"] is True
+    assert len(failure["verifications"]) == 1

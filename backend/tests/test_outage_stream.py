@@ -241,7 +241,9 @@ def test_stream_pushes_resolved_event(db_session: Session) -> None:
         resolve_failure(failure_id, repo=FailureRepository(db_session))
 
         data = await _next_event(generator, "resolved")
-        assert data == {"failure_id": failure_id}
+        assert data["failure_id"] == failure_id
+        assert data["description"] is None
+        assert data["resolved_at"] is not None
         await generator.aclose()
 
     asyncio.run(scenario())

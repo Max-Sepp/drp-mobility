@@ -1,32 +1,39 @@
+from datetime import datetime, timezone
+
 from fastapi import Depends
 from sqlalchemy import exists, func, select
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session, joinedload, selectinload
 
 from app.database import get_db
 from app.models.equipment import Equipment
 from app.models.failure import Failure
 from app.models.outage_report import OutageReport
 from app.models.outage_report_deletion import OutageReportDeletion
+from app.models.outage_report_verification import OutageReportVerification
 
 # Excludes reports that have a corresponding OutageReportDeletion row (soft-deleted).
 _ACTIVE_FILTER = ~exists().where(OutageReportDeletion.report_id == OutageReport.id)
 
 # Eager-load options for Failure queries: pulls equipment + its station and type in one round trip,
 # so callers can read failure.equipment.station / .equipment_type without triggering
-# lazy-load SELECTs.
+# lazy-load SELECTs. Verifications use selectinload (a separate query) rather than joinedload so the
+# collection join can't multiply the outer rows — important for list_all_with_stats, whose
+# per-failure scalar aggregates would otherwise be duplicated.
 _EQUIPMENT_JOINEDLOAD = [
     joinedload(Failure.equipment).joinedload(Equipment.station),
     joinedload(Failure.equipment).joinedload(Equipment.equipment_type),
+    selectinload(Failure.verifications),
 ]
 
 # Same idea, but for queries starting from OutageReport: walks
-# report → failure → equipment → station/type eagerly to avoid N+1 SELECTs when
+# report → failure → equipment → station/type (+ verifications) eagerly to avoid N+1 SELECTs when
 # serializing a list of reports.
 _REPORT_JOINEDLOAD = [
     joinedload(OutageReport.failure).joinedload(Failure.equipment).joinedload(Equipment.station),
     joinedload(OutageReport.failure)
     .joinedload(Failure.equipment)
     .joinedload(Equipment.equipment_type),
+    joinedload(OutageReport.failure).selectinload(Failure.verifications),
 ]
 
 
@@ -82,13 +89,35 @@ class FailureRepository:
             .all()
         )
 
-    def resolve(self, failure: Failure) -> Failure:
-        """Mark a failure as resolved; subsequent reports on the same equipment will
-        open a new Failure."""
+    def resolve(self, failure: Failure, description: str | None = None) -> Failure:
+        """Mark a failure as resolved, stamping the time and an optional reason; subsequent reports
+        on the same equipment will open a new Failure."""
         failure.resolved = True
+        failure.resolved_at = datetime.now(tz=timezone.utc)
+        failure.resolution_description = description
         self._db.commit()
         self._db.refresh(failure)
         return failure
+
+    def add_verification(
+        self, failure: Failure, description: str | None = None
+    ) -> OutageReportVerification:
+        """Record an on-site verification of this failure. Not idempotent — each call appends a new
+        record, so a failure can accrue multiple verifications over time."""
+        verification = OutageReportVerification(failure_id=failure.id, description=description)
+        self._db.add(verification)
+        self._db.commit()
+        self._db.refresh(verification)
+        return verification
+
+    def list_verifications(self, failure_id: int) -> list[OutageReportVerification]:
+        """Return a failure's verifications, oldest first (chronological for the timeline)."""
+        return (
+            self._db.query(OutageReportVerification)
+            .filter(OutageReportVerification.failure_id == failure_id)
+            .order_by(OutageReportVerification.id)
+            .all()
+        )
 
 
 def get_failure_repo(db: Session = Depends(get_db)) -> FailureRepository:
