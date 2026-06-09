@@ -225,7 +225,9 @@ export function ReportSheet({ station, onClose }: Props) {
           setEquipment(
             data
               .filter((e) => e.station.name === station && e.equipment_type.name === type)
-              .sort((a, b) => a.connection.localeCompare(b.connection, undefined, { numeric: true })),
+              .sort((a, b) =>
+                a.connection.localeCompare(b.connection, undefined, { numeric: true }),
+              ),
           )
         } else {
           // overcrowding and custom: auto-select the single station-level equipment row
@@ -350,27 +352,29 @@ export function ReportSheet({ station, onClose }: Props) {
             ]}
           >
             <View style={styles.grid}>
-              {ISSUE_TYPES.filter(({ type }) => !isTypeDisabled(type)).map(({ type, icon, label }) => (
-                <TouchableOpacity
-                  key={type}
-                  style={styles.gridItem}
-                  onPress={() => selectType(type)}
-                  activeOpacity={0.75}
-                  accessibilityRole="button"
-                  accessibilityLabel={label.replace('\n', ' ')}
-                >
-                  <MaterialIcons name={icon} size={36} color={Colors.text} />
-                  <Text
-                    fontSize={14}
-                    fontWeight="600"
-                    color={Colors.text}
-                    mt="$1.5"
-                    style={{ textAlign: 'center' }}
+              {ISSUE_TYPES.filter(({ type }) => !isTypeDisabled(type)).map(
+                ({ type, icon, label }) => (
+                  <TouchableOpacity
+                    key={type}
+                    style={styles.gridItem}
+                    onPress={() => selectType(type)}
+                    activeOpacity={0.75}
+                    accessibilityRole="button"
+                    accessibilityLabel={label.replace('\n', ' ')}
                   >
-                    {label}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+                    <MaterialIcons name={icon} size={36} color={Colors.text} />
+                    <Text
+                      fontSize={14}
+                      fontWeight="600"
+                      color={Colors.text}
+                      mt="$1.5"
+                      style={{ textAlign: 'center' }}
+                    >
+                      {label}
+                    </Text>
+                  </TouchableOpacity>
+                ),
+              )}
             </View>
           </BottomSheetScrollView>
         </>

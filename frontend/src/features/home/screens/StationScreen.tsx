@@ -131,7 +131,12 @@ export const StationScreen = ({ navigation, route }: StationScreenProps) => {
           onPress={goingHere ? undefined : handleDirections}
           activeOpacity={0.8}
         >
-          <MaterialIcons name="directions" size={18} color={Colors.card} style={{ marginRight: 6 }} />
+          <MaterialIcons
+            name="directions"
+            size={18}
+            color={Colors.card}
+            style={{ marginRight: 6 }}
+          />
           <Text style={{ color: Colors.card, fontSize: 14, fontWeight: '700' }}>
             {goingHere ? 'Getting location…' : 'Directions'}
           </Text>

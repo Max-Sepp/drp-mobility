@@ -173,8 +173,7 @@ export function StationSheet({ station, onClose, onReportPress, onOpenJourney }:
                 px="$2"
                 py="$1"
                 style={{
-                  backgroundColor:
-                    badgeSeverity === 'warning' ? Colors.warningBg : Colors.dangerBg,
+                  backgroundColor: badgeSeverity === 'warning' ? Colors.warningBg : Colors.dangerBg,
                   borderRadius: 6,
                 }}
               >
