@@ -12794,7 +12794,7 @@
   },
   {
     "name": "Gloucester Road",
-    "lifts": 0,
+    "lifts": 1,
     "escalators": 0,
     "platforms": [
       {
@@ -12869,7 +12869,15 @@
     "coordinates": {
       "lat": 51.494315,
       "lng": -0.182658
-    }
+    },
+    "lift_units": [
+      {
+        "id": "940GZZLUGTR-Lift-1",
+        "name": "Lift 1",
+        "from": "Street",
+        "to": "Eastbound Platform 5, Westbound Platform 4"
+      }
+    ]
   },
   {
     "name": "Golders Green",
@@ -14628,235 +14636,6 @@
     }
   },
   {
-    "name": "Hammersmith",
-    "lifts": 2,
-    "escalators": 0,
-    "platforms": [
-      {
-        "id": "HUBHMS-Plat01-EB-circle|hammersmith-city",
-        "name": "Eastbound Platform 1",
-        "direction": "Eastbound",
-        "lines": [
-          "Circle",
-          "Hammersmith & City"
-        ],
-        "stepFreeAccess": "Full",
-        "boardingRamp": false,
-        "levelAccess": true,
-        "interchangeTo": [
-          {
-            "to": "Westbound Platform 1",
-            "distanceM": 520
-          },
-          {
-            "to": "Westbound Platform 2",
-            "distanceM": 520
-          },
-          {
-            "to": "Eastbound Platform 3",
-            "distanceM": 520
-          },
-          {
-            "to": "Eastbound Platform 4",
-            "distanceM": 520
-          }
-        ]
-      },
-      {
-        "id": "HUBHMS-Plat01-WB-district",
-        "name": "Westbound Platform 1",
-        "direction": "Westbound",
-        "lines": [
-          "District"
-        ],
-        "stepFreeAccess": "Full",
-        "boardingRamp": false,
-        "levelAccess": true,
-        "interchangeTo": [
-          {
-            "to": "Eastbound Platform 1",
-            "distanceM": 520
-          },
-          {
-            "to": "Eastbound Platform 2",
-            "distanceM": 520
-          },
-          {
-            "to": "Eastbound Platform 3",
-            "distanceM": 520
-          }
-        ]
-      },
-      {
-        "id": "HUBHMS-Plat02-EB-circle|hammersmith-city",
-        "name": "Eastbound Platform 2",
-        "direction": "Eastbound",
-        "lines": [
-          "Circle",
-          "Hammersmith & City"
-        ],
-        "stepFreeAccess": "Full",
-        "boardingRamp": false,
-        "levelAccess": true,
-        "interchangeTo": [
-          {
-            "to": "Westbound Platform 1",
-            "distanceM": 520
-          },
-          {
-            "to": "Westbound Platform 2",
-            "distanceM": 520
-          },
-          {
-            "to": "Eastbound Platform 3",
-            "distanceM": 520
-          },
-          {
-            "to": "Eastbound Platform 4",
-            "distanceM": 520
-          }
-        ]
-      },
-      {
-        "id": "HUBHMS-Plat02-WB-piccadilly",
-        "name": "Westbound Platform 2",
-        "direction": "Westbound",
-        "lines": [
-          "Piccadilly"
-        ],
-        "stepFreeAccess": "Full",
-        "boardingRamp": false,
-        "levelAccess": true,
-        "interchangeTo": [
-          {
-            "to": "Eastbound Platform 1",
-            "distanceM": 520
-          },
-          {
-            "to": "Eastbound Platform 2",
-            "distanceM": 520
-          },
-          {
-            "to": "Eastbound Platform 3",
-            "distanceM": 520
-          }
-        ]
-      },
-      {
-        "id": "HUBHMS-Plat03-EB-circle|hammersmith-city",
-        "name": "Eastbound Platform 3",
-        "direction": "Eastbound",
-        "lines": [
-          "Circle",
-          "Hammersmith & City"
-        ],
-        "stepFreeAccess": "Full",
-        "boardingRamp": false,
-        "levelAccess": true,
-        "interchangeTo": [
-          {
-            "to": "Westbound Platform 1",
-            "distanceM": 520
-          },
-          {
-            "to": "Westbound Platform 2",
-            "distanceM": 520
-          },
-          {
-            "to": "Eastbound Platform 3",
-            "distanceM": 520
-          },
-          {
-            "to": "Eastbound Platform 4",
-            "distanceM": 520
-          }
-        ]
-      },
-      {
-        "id": "HUBHMS-Plat03-EB-piccadilly",
-        "name": "Eastbound Platform 3",
-        "direction": "Eastbound",
-        "lines": [
-          "Piccadilly"
-        ],
-        "stepFreeAccess": "Full",
-        "boardingRamp": false,
-        "levelAccess": true,
-        "interchangeTo": [
-          {
-            "to": "Eastbound Platform 1",
-            "distanceM": 520
-          },
-          {
-            "to": "Eastbound Platform 2",
-            "distanceM": 520
-          },
-          {
-            "to": "Eastbound Platform 3",
-            "distanceM": 520
-          }
-        ]
-      },
-      {
-        "id": "HUBHMS-Plat04-EB-district",
-        "name": "Eastbound Platform 4",
-        "direction": "Eastbound",
-        "lines": [
-          "District"
-        ],
-        "stepFreeAccess": "Full",
-        "boardingRamp": false,
-        "levelAccess": true,
-        "interchangeTo": [
-          {
-            "to": "Eastbound Platform 1",
-            "distanceM": 520
-          },
-          {
-            "to": "Eastbound Platform 2",
-            "distanceM": 520
-          },
-          {
-            "to": "Eastbound Platform 3",
-            "distanceM": 520
-          }
-        ]
-      }
-    ],
-    "lift_units": [
-      {
-        "id": "HUBHMS-Lift-1",
-        "name": "Lift 1",
-        "from": "Westbound hall",
-        "to": "Eastbound Platform 4, Eastbound Platform 3",
-        "limitedCapacity": false
-      },
-      {
-        "id": "HUBHMS-Lift-2",
-        "name": "Lift 2",
-        "from": "Westbound hall",
-        "to": "Westbound Platform 1, Westbound Platform 2",
-        "limitedCapacity": false
-      }
-    ],
-    "id": "HUBHMS",
-    "zones": [
-      2
-    ],
-    "wifi": true,
-    "blueBadgeParking": false,
-    "taxiRank": false,
-    "interchange": {
-      "nationalRail": "None",
-      "bus": "Full",
-      "pier": "None"
-    },
-    "coordinates": {
-      "lat": 51.492299,
-      "lng": -0.22362
-    }
-  },
-  {
     "name": "Hampstead",
     "lifts": 4,
     "escalators": 0,
@@ -15852,255 +15631,6 @@
         "opensWithStation": false,
         "managedByTfL": true,
         "location": "Located on platform 4"
-      }
-    ]
-  },
-  {
-    "name": "Heathrow Airport Terminal 4",
-    "lifts": 2,
-    "escalators": 0,
-    "platforms": [
-      {
-        "id": "HUBHX4-Plat01-WB-elizabeth",
-        "name": "Westbound Platform 1",
-        "direction": "Westbound",
-        "lines": [
-          "Elizabeth"
-        ],
-        "stepFreeAccess": "Full",
-        "boardingRamp": false,
-        "levelAccess": true
-      },
-      {
-        "id": "HUBHX4-Plat02-WB-elizabeth",
-        "name": "Westbound Platform 2",
-        "direction": "Westbound",
-        "lines": [
-          "Elizabeth"
-        ],
-        "stepFreeAccess": "Full",
-        "boardingRamp": false,
-        "levelAccess": true
-      },
-      {
-        "id": "HUBHX4-Plat01-EB-piccadilly",
-        "name": "Eastbound",
-        "direction": "Eastbound",
-        "lines": [
-          "Piccadilly"
-        ],
-        "stepFreeAccess": "Full",
-        "boardingRamp": false,
-        "levelAccess": true
-      }
-    ],
-    "lift_units": [
-      {
-        "id": "HUBHX4-Lift-1",
-        "name": "Lift 1",
-        "from": "Booking Hall",
-        "to": "Terminal access",
-        "limitedCapacity": false
-      },
-      {
-        "id": "HUBHX4-Lift-2",
-        "name": "Lift 2",
-        "from": "Railway platform",
-        "to": "Terminal access",
-        "limitedCapacity": false
-      }
-    ],
-    "id": "HUBHX4",
-    "zones": [
-      6
-    ],
-    "wifi": true,
-    "blueBadgeParking": false,
-    "taxiRank": true,
-    "interchange": {
-      "nationalRail": "None",
-      "bus": "None",
-      "pier": "None"
-    },
-    "coordinates": {
-      "lat": 51.458522,
-      "lng": -0.445771
-    },
-    "toilets": [
-      {
-        "type": "Male",
-        "accessible": false,
-        "babyChanging": false,
-        "insideGateline": false,
-        "feeCharged": false,
-        "radarKey": false,
-        "opensWithStation": false,
-        "managedByTfL": false,
-        "location": "Located in airport"
-      },
-      {
-        "type": "Female",
-        "accessible": false,
-        "babyChanging": false,
-        "insideGateline": false,
-        "feeCharged": false,
-        "radarKey": false,
-        "opensWithStation": false,
-        "managedByTfL": false,
-        "location": "Located in airport"
-      },
-      {
-        "type": "Unisex",
-        "accessible": true,
-        "babyChanging": false,
-        "insideGateline": false,
-        "feeCharged": false,
-        "radarKey": false,
-        "opensWithStation": false,
-        "managedByTfL": false,
-        "location": "Located in airport"
-      }
-    ]
-  },
-  {
-    "name": "Heathrow Airport Terminal 5",
-    "lifts": 2,
-    "escalators": 2,
-    "platforms": [
-      {
-        "id": "HUBHX5-Plat03-EB-elizabeth|national-rail",
-        "name": "Eastbound Platform 3",
-        "direction": "Eastbound",
-        "lines": [
-          "Elizabeth",
-          "National Rail"
-        ],
-        "stepFreeAccess": "Full",
-        "boardingRamp": false,
-        "levelAccess": true
-      },
-      {
-        "id": "HUBHX5-Plat04-EB-elizabeth|national-rail",
-        "name": "Eastbound Platform 4",
-        "direction": "Eastbound",
-        "lines": [
-          "Elizabeth",
-          "National Rail"
-        ],
-        "stepFreeAccess": "Full",
-        "boardingRamp": false,
-        "levelAccess": true
-      },
-      {
-        "id": "HUBHX5-Plat05-EB-piccadilly",
-        "name": "Eastbound Platform 5",
-        "direction": "Eastbound",
-        "lines": [
-          "Piccadilly"
-        ],
-        "stepFreeAccess": "Full",
-        "gapMm": 94,
-        "stepMm": 22,
-        "boardingRamp": true,
-        "levelAccess": false,
-        "levelAccessLocation": "2 centre doors on car 5"
-      },
-      {
-        "id": "HUBHX5-Plat06-EB-piccadilly",
-        "name": "Eastbound Platform 6",
-        "direction": "Eastbound",
-        "lines": [
-          "Piccadilly"
-        ],
-        "stepFreeAccess": "Full",
-        "gapMm": 94,
-        "stepMm": 22,
-        "boardingRamp": true,
-        "levelAccess": false,
-        "levelAccessLocation": "2 centre doors on car 5"
-      }
-    ],
-    "lift_units": [
-      {
-        "id": "HUBHX5-Lift-1",
-        "name": "Lift 1",
-        "from": "Terminal 5 access",
-        "to": "Piccadilly line",
-        "limitedCapacity": false
-      },
-      {
-        "id": "HUBHX5-Lift-2",
-        "name": "Lift 2",
-        "from": "Terminal 5 access",
-        "to": "Railway platform",
-        "limitedCapacity": false
-      }
-    ],
-    "id": "HUBHX5",
-    "zones": [
-      6
-    ],
-    "wifi": false,
-    "blueBadgeParking": false,
-    "taxiRank": true,
-    "interchange": {
-      "nationalRail": "None",
-      "bus": "None",
-      "pier": "None"
-    },
-    "coordinates": {
-      "lat": 51.471414,
-      "lng": -0.489579
-    },
-    "toilets": [
-      {
-        "type": "Male",
-        "accessible": false,
-        "babyChanging": false,
-        "insideGateline": true,
-        "feeCharged": false,
-        "radarKey": false,
-        "opensWithStation": false,
-        "managedByTfL": false,
-        "location": "Located on lower concourse"
-      },
-      {
-        "type": "Female",
-        "accessible": false,
-        "babyChanging": true,
-        "insideGateline": true,
-        "feeCharged": false,
-        "radarKey": false,
-        "opensWithStation": false,
-        "managedByTfL": false,
-        "location": "Located on lower concourse"
-      },
-      {
-        "type": "Unisex",
-        "accessible": true,
-        "babyChanging": false,
-        "insideGateline": true,
-        "feeCharged": false,
-        "radarKey": false,
-        "opensWithStation": false,
-        "managedByTfL": false,
-        "location": "Located on lower concourse"
-      }
-    ],
-    "escalator_units": [
-      {
-        "id": "HUBHX5-Escalator-1",
-        "name": "Escalator 1",
-        "from": "Street",
-        "to": "Eastbound Platform 3",
-        "mocked": true
-      },
-      {
-        "id": "HUBHX5-Escalator-2",
-        "name": "Escalator 2",
-        "from": "Street",
-        "to": "Eastbound Platform 4",
-        "mocked": true
       }
     ]
   },
@@ -24430,7 +23960,7 @@
         "limitedCapacity": false
       }
     ],
-    "id": "HUBNGW",
+    "id": "940GZZLUNGW",
     "zones": [
       2,
       3
@@ -29088,7 +28618,7 @@
         "limitedCapacity": false
       }
     ],
-    "id": "HUBRVC",
+    "id": "940GZZDLRVC",
     "zones": [
       3
     ],
@@ -38149,7 +37679,7 @@
         "connection": "Entrance → Eastbound platform"
       }
     ],
-    "id": "HUBWHD",
+    "id": "940GZZLUWHP",
     "zones": [
       2
     ],
@@ -38242,7 +37772,7 @@
         "limitedCapacity": false
       }
     ],
-    "id": "HUBWHD",
+    "id": "910GWHMPSTM",
     "zones": [
       2
     ],
