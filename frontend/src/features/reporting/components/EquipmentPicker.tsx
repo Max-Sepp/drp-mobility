@@ -55,7 +55,7 @@ export const EquipmentPicker = ({
                 style={{
                   width: 22,
                   height: 22,
-                  borderRadius: Radii.xs,
+                  borderRadius: Radii.circle,
                   borderWidth: Borders.thick,
                   borderColor: selected ? Colors.blue : Colors.placeholderText,
                   backgroundColor: selected ? Colors.blue : 'transparent',
