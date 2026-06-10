@@ -141,7 +141,7 @@ export function ActiveJourneySheet({
 
     let active = true
     loadActiveJourney().then((record) => {
-      if (active && record && record.savedId === params.savedId) {
+      if (active && record && params.savedId && record.savedId === params.savedId) {
         setLegIndex(record.currentLegIndex)
       }
     })
@@ -230,7 +230,7 @@ export function ActiveJourneySheet({
   function endJourney() {
     Alert.alert(
       'End journey?',
-      'This stops following the route. It stays in your saved journeys.',
+      'This stops following the route.',
       [
         { text: 'Keep going', style: 'cancel' },
         {

@@ -13,9 +13,7 @@ import type { AccessibilityPreference, Journey } from '@/features/journey/api/tf
 const STORAGE_KEY = '@drp/active-journey'
 
 export type ActiveJourney = {
-  // The SavedJourney this follow session is anchored to. Every active journey corresponds to a
-  // persisted saved journey (the detail screen saves before starting).
-  savedId: string
+  savedId?: string
   // Self-contained snapshot so the active screen renders even if the saved entry is removed.
   journey: Journey
   from?: ResolvedLocation

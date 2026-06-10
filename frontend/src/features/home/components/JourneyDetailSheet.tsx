@@ -47,10 +47,8 @@ export type JourneyDetailParams = {
   tags?: RouteTag[]
 }
 
-// The follow/execute payload for an in-progress journey. Mirrors JourneyDetailParams plus the
-// savedId every active journey is anchored to (the detail sheet saves before starting).
 export type ActiveJourneyParams = {
-  savedId: string
+  savedId?: string
   journey: Journey
   from?: ResolvedLocation
   to?: ResolvedLocation
@@ -416,20 +414,8 @@ export function JourneyDetailSheet({
     if (!params || startBusy || saveBusy) return
     setStartBusy(true)
     try {
-      let savedJourneyId = currentSavedId
-      if (!savedJourneyId) {
-        const record = await saveJourney({
-          from: params.from,
-          to: params.to,
-          level: params.level ?? null,
-          outages: params.outages ?? [],
-          journey: params.journey,
-        })
-        savedJourneyId = record.id
-        setCurrentSavedId(record.id)
-      }
       await startActiveJourney({
-        savedId: savedJourneyId,
+        savedId: currentSavedId ?? undefined,
         journey: params.journey,
         from: params.from,
         to: params.to,
@@ -437,7 +423,7 @@ export function JourneyDetailSheet({
         level: params.level ?? null,
       })
       onStartJourney({
-        savedId: savedJourneyId,
+        savedId: currentSavedId ?? undefined,
         journey: params.journey,
         from: params.from,
         to: params.to,
