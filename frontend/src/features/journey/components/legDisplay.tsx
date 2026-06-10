@@ -288,7 +288,7 @@ export function outageWarning(
     return (
       <Text key={i}>
         {sep}
-        {o.stationName}: {liftNode}
+        <Text fontWeight="700">{o.stationName}:</Text> {liftNode}
         {otherParts ? (liftNode ? `, ${otherParts}` : otherParts) : null}
       </Text>
     )
