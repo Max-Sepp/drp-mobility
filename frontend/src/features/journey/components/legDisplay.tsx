@@ -1,3 +1,4 @@
+import React from 'react'
 import { MaterialIcons } from '@expo/vector-icons'
 import { Text, XStack } from 'tamagui'
 import type { ResolvedLocation } from '@/features/journey/api/geocode'
@@ -254,33 +255,46 @@ export function outageWarning(
     totalByType: Record<string, number>
     journeyRelevantLifts?: { broken: number; total: number }
   }[],
-): string {
-  return outages
-    .map((o) => {
-      let liftPart: string | null = null
-      if (o.journeyRelevantLifts && o.journeyRelevantLifts.broken > 0) {
-        const { broken, total } = o.journeyRelevantLifts
-        liftPart =
-          total > 1
-            ? `${broken}/${total} lifts on your route broken`
-            : 'lift on your route broken'
-      } else {
-        const brokenLifts = o.units.filter((u) => u.equipmentType === 'lift').length
-        const totalLifts = o.totalByType['lift'] ?? 0
-        liftPart =
-          brokenLifts > 0 && totalLifts > 1
-            ? `${brokenLifts}/${totalLifts} lifts broken`
-            : brokenLifts > 0
-              ? 'lift reported out of service'
-              : null
-      }
-      const otherTypes = o.equipmentTypes
-        .filter((t) => t !== 'lift')
-        .map((t) => `${t} reported out of service`)
-      const parts = [liftPart, ...otherTypes].filter(Boolean)
-      return `${o.stationName}: ${parts.join(', ')}`
-    })
-    .join(' · ')
+): React.ReactNode {
+  const segments = outages.map((o, i) => {
+    const brokenLifts = o.units.filter((u) => u.equipmentType === 'lift').length
+    let liftNode: React.ReactNode = null
+
+    if (o.journeyRelevantLifts && o.journeyRelevantLifts.broken > 0) {
+      const { broken, total } = o.journeyRelevantLifts
+      liftNode =
+        total > 1 ? `${broken}/${total} lifts on your route broken` : 'lift on your route broken'
+    } else if (o.journeyRelevantLifts && brokenLifts > 0) {
+      const totalLifts = o.totalByType['lift'] ?? brokenLifts
+      const count = totalLifts > 1 ? `${brokenLifts}/${totalLifts} lifts broken ` : 'lift broken '
+      liftNode = (
+        <>
+          {count}
+          <Text fontWeight="700">(not on your route)</Text>
+        </>
+      )
+    } else if (brokenLifts > 0) {
+      const totalLifts = o.totalByType['lift'] ?? 0
+      liftNode =
+        totalLifts > 1 ? `${brokenLifts}/${totalLifts} lifts broken` : 'lift reported out of service'
+    }
+
+    const otherParts = o.equipmentTypes
+      .filter((t) => t !== 'lift')
+      .map((t) => `${t} reported out of service`)
+      .join(', ')
+
+    const sep = i > 0 ? ' · ' : ''
+    return (
+      <Text key={i}>
+        {sep}
+        {o.stationName}: {liftNode}
+        {otherParts ? (liftNode ? `, ${otherParts}` : otherParts) : null}
+      </Text>
+    )
+  })
+
+  return <>{segments}</>
 }
 
 // ---------------------------------------------------------------------------

@@ -116,6 +116,18 @@ export const OutageDetail = ({ assessments }: { assessments: OutageAssessment[] 
     [Colors],
   )
   if (assessments.length === 0) return null
+
+  const onRoute = (u: AssessedUnit) => u.verdict === 'on-your-platform' || u.verdict === 'shared-route'
+  const offRoute = (u: AssessedUnit) => !onRoute(u)
+
+  function offRouteSummary(units: AssessedUnit[]): string | null {
+    const broken = units.filter((u) => offRoute(u) && u.equipmentType === 'lift').length
+    if (broken === 0) return null
+    return broken === 1
+      ? '1 lift broken (not on your route)'
+      : `${broken} lifts broken (not on your route)`
+  }
+
   return (
     <YStack gap="$3">
       <Text fontSize={16} fontWeight="700" color={Colors.text}>
@@ -123,6 +135,33 @@ export const OutageDetail = ({ assessments }: { assessments: OutageAssessment[] 
       </Text>
       {assessments.map((station) => {
         const role = roleText(station.role, station.journeyLines)
+        const routeUnits = station.units.filter(onRoute)
+        const summary = offRouteSummary(station.units)
+
+        // Station has no on-route issues — show a compact amber card.
+        if (routeUnits.length === 0) {
+          return summary ? (
+            <XStack
+              key={station.stationName}
+              gap="$2"
+              px="$3"
+              py="$2.5"
+              items="center"
+              style={{
+                backgroundColor: Colors.warningBg,
+                borderWidth: Borders.medium,
+                borderColor: Colors.warningBorder,
+                borderRadius: Radii.button,
+              }}
+            >
+              <MaterialIcons name="warning-amber" size={15} color={Colors.warningDark} />
+              <Text fontSize={13} color={Colors.warningDark} flex={1}>
+                <Text fontWeight="700">{station.stationName}:</Text> {summary}
+              </Text>
+            </XStack>
+          ) : null
+        }
+
         return (
           <YStack
             key={station.stationName}
@@ -145,7 +184,7 @@ export const OutageDetail = ({ assessments }: { assessments: OutageAssessment[] 
               )}
             </YStack>
 
-            {station.units.map((unit, i) => {
+            {routeUnits.map((unit, i) => {
               const v = VERDICTS[unit.verdict]
               return (
                 <YStack
@@ -185,7 +224,6 @@ export const OutageDetail = ({ assessments }: { assessments: OutageAssessment[] 
                     {unit.estimated ? ' · location estimated' : ''}
                   </Text>
 
-                  {/* Per-problem dropdown: lazily loads and shows the full event timeline. */}
                   <XStack
                     items="center"
                     gap="$1"
@@ -218,6 +256,16 @@ export const OutageDetail = ({ assessments }: { assessments: OutageAssessment[] 
                 </YStack>
               )
             })}
+
+            {/* Off-route broken lifts — collapsed to a single footnote line. */}
+            {summary && (
+              <XStack gap="$2" items="center" pt="$0.5">
+                <MaterialIcons name="info-outline" size={13} color={Colors.secondaryText} />
+                <Text fontSize={12} color={Colors.secondaryText}>
+                  {summary}
+                </Text>
+              </XStack>
+            )}
           </YStack>
         )
       })}
