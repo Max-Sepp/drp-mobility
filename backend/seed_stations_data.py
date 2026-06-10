@@ -1123,9 +1123,12 @@ def main() -> None:
 
         matched += 1
         uid = csv_row["UniqueId"]
-        hub_code = (csv_row.get("HubNaptanCode") or "").strip()
 
-        station["id"] = hub_code or uid
+        # Use the station's own NaPTAN UniqueId rather than the hub code.
+        # Hub codes are shared across multiple physical stations at the same
+        # interchange (e.g. HUBWHD covers both West Hampstead Jubilee and
+        # West Hampstead Thameslink), so using them as IDs causes collisions.
+        station["id"] = uid
         station["zones"] = parse_zones(csv_row.get("FareZones", ""))
         station["wifi"] = parse_bool(csv_row.get("Wifi", "False"))
         station["blueBadgeParking"] = parse_bool(csv_row.get("BlueBadgeCarParking", "False"))
@@ -1172,6 +1175,20 @@ def main() -> None:
 
     # --- Apply hand-curated overrides ----------------------------------------
     apply_overrides(all_stations)
+
+    # --- Deduplicate by id (last writer wins, but warn) ----------------------
+    seen_ids: dict[str, int] = {}
+    dedup: list[dict] = []
+    for s in all_stations:
+        sid = s.get("id")
+        if sid and sid in seen_ids:
+            print(f"WARNING: duplicate id {sid!r} ({s['name']!r} vs {dedup[seen_ids[sid]]['name']!r}) — keeping last")
+            dedup[seen_ids[sid]] = s
+        else:
+            if sid:
+                seen_ids[sid] = len(dedup)
+            dedup.append(s)
+    all_stations = dedup
 
     # --- Report and write ----------------------------------------------------
     print(f"Matched {matched}/{len(all_stations)} stations.")
