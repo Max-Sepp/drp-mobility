@@ -44,6 +44,8 @@ import {
 import { useStations, type StationDetail } from '@/features/stations/useStations'
 import { fuzzyScore } from '@/lib/fuzzy'
 import { useAppLocation } from '@/lib/LocationContext'
+import { useWorkShift } from '@/lib/WorkShiftContext'
+import { useAuth } from '@/features/auth'
 import { useTheme, Spacing, Typography } from '@/theme'
 import BottomSheet, {
   BottomSheetScrollView,
@@ -563,6 +565,10 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
 
     const { stations } = useStations()
     const cachedCoords = useAppLocation()
+    const { workStation } = useWorkShift()
+    const { user } = useAuth()
+    // For staff on shift, the origin is their station (GPS is unreliable underground).
+    const shiftStation = user?.role === 'trusted' && workStation ? workStation : null
 
     // ── Debounced search ──────────────────────────────────────────────────
 
@@ -642,7 +648,15 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
         const to: ResolvedLocation = { postcode: toPostcode, label: suggestion.label }
 
         let from: ResolvedLocation | undefined
-        if (cachedCoords) {
+        const shiftDetail = shiftStation ? stations.find((s) => s.name === shiftStation) : undefined
+        if (shiftDetail?.latitude != null && shiftDetail?.longitude != null) {
+          const fromResult = await resolveToPostcode(
+            `${shiftDetail.latitude},${shiftDetail.longitude}`,
+          )
+          if (!('error' in fromResult)) {
+            from = { postcode: fromResult.postcode, label: `On shift: ${shiftDetail.name}` }
+          }
+        } else if (cachedCoords) {
           const fromResult = await resolveToPostcode(
             `${cachedCoords.latitude},${cachedCoords.longitude}`,
           )
