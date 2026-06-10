@@ -52,6 +52,11 @@ class Station(Base):
     taxi_rank: Mapped[bool] = mapped_column(Boolean, default=False)
 
     platforms: Mapped[list[Platform]] = relationship(Platform, back_populates="station")
+    equipment: Mapped[list["Equipment"]] = relationship("Equipment", back_populates="station")
+
+    @property
+    def lifts(self) -> list["Equipment"]:
+        return [e for e in self.equipment if e.equipment_type.name == "lift"]
 
     @property
     def step_free(self) -> StepFree:

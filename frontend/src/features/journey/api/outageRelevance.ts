@@ -9,9 +9,24 @@
 //      specific platform reliably.
 
 import type { StationDetail } from '@/features/stations'
-import { normaliseStationName, resolveStationName } from '@/features/journey/api/accessibility'
+import {
+  normaliseStationName,
+  resolveStationName,
+} from '@/features/journey/api/accessibility'
 import type { OutageUnit, StationOutage } from '@/features/journey/api/accessibility'
 import type { Journey } from '@/features/journey/api/tfl'
+
+/** Extract platform-like endpoints from a connection string (mirrors platformEndpoints in accessibility.ts). */
+function liftPlatformEndpoints(connection: string): string[] {
+  const afterName = connection.includes(':') ? connection.slice(connection.indexOf(':') + 1) : connection
+  return afterName
+    .split('→')
+    .map((p) => p.trim())
+    .filter(Boolean)
+    .filter((p) => /platform/i.test(p))
+    .flatMap((p) => p.split(',').map((x) => x.trim()))
+    .filter(Boolean)
+}
 
 // Train modes whose legs board/alight at a station we can reason about. Mirrors the set used to
 // make stations tappable; walking/bus/etc. don't put the rider on a platform.
@@ -45,6 +60,11 @@ export type OutageAssessment = {
   /** The lines the journey runs on through this station, for display ("your Victoria service"). */
   journeyLines: string[]
   units: AssessedUnit[]
+  /**
+   * How many lifts on this journey's specific path are broken, and how many exist in total on
+   * that path. "On your path" means verdict on-your-platform or shared-route.
+   */
+  journeyRelevantLifts: { broken: number; total: number }
 }
 
 /** The line a train leg runs on: TfL's route name, else the mode (e.g. "DLR"). */
@@ -112,6 +132,29 @@ function verdictFor(
 }
 
 /**
+ * Count all lifts at a station that are on the user's journey path: shared-route connectors
+ * (no platform endpoint — everyone uses them) plus platform-specific lifts whose platform
+ * serves a line the journey uses. Lifts with platform endpoints that we can't match to any line
+ * (unknown) are excluded (strict mode).
+ */
+function journeyRelevantLiftCount(station: StationDetail | undefined, journeyLines: string[]): number {
+  if (!station?.lifts) return 0
+  let count = 0
+  for (const lift of station.lifts) {
+    const endpoints = liftPlatformEndpoints(lift.connection)
+    if (endpoints.length === 0) {
+      // shared-route: street ↔ booking hall etc. — always on the path
+      count++
+      continue
+    }
+    const lines = endpoints.flatMap((p) => servedLines(station, p))
+    if (lines.length === 0) continue // unknown — exclude (strict)
+    if (journeyLines.length > 0 && linesOverlap(lines, journeyLines)) count++
+  }
+  return count
+}
+
+/**
  * Assess every flagged station on the journey, turning each broken unit into a verdict on whether
  * it's actually on the rider's route. `stations` is our full station list (for platform lines).
  */
@@ -126,11 +169,20 @@ export function assessOutages(
     const station = stations.find(
       (s) => normaliseStationName(s.name) === normaliseStationName(outage.stationName),
     )
+    const assessedUnits = outage.units.map((unit) => ({
+      ...unit,
+      verdict: verdictFor(unit, station, lines),
+    }))
+    const journeyBroken = assessedUnits.filter(
+      (u) => u.equipmentType === 'lift' && (u.verdict === 'on-your-platform' || u.verdict === 'shared-route'),
+    ).length
+    const journeyTotal = journeyRelevantLiftCount(station, lines)
     return {
       stationName: outage.stationName,
       role,
       journeyLines: lines,
-      units: outage.units.map((unit) => ({ ...unit, verdict: verdictFor(unit, station, lines) })),
+      units: assessedUnits,
+      journeyRelevantLifts: { broken: journeyBroken, total: journeyTotal },
     }
   })
 }

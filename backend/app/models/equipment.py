@@ -23,7 +23,7 @@ class Equipment(Base):
     # A station has at most one piece of equipment of a given type serving a given connection.
     __table_args__ = (UniqueConstraint("station_id", "equipment_type_id", "connection"),)
 
-    station: Mapped["Station"] = relationship("Station")
+    station: Mapped["Station"] = relationship("Station", back_populates="equipment")
     equipment_type: Mapped["EquipmentType"] = relationship("EquipmentType")
     platform: Mapped["Platform | None"] = relationship("Platform")
     failures: Mapped[list["Failure"]] = relationship("Failure", back_populates="equipment")

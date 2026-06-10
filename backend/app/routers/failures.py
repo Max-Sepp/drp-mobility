@@ -34,6 +34,7 @@ def _failure_detail(repo: FailureRepository, failure) -> FailureDetail:
 @router.get("", response_model=list[FailureSummary])
 def list_failures(repo: FailureRepository = Depends(get_failure_repo)) -> list[FailureSummary]:
     """Return all failures with computed first_reported and active report count."""
+    counts = repo.equipment_counts_by_station_and_type()
     return [
         FailureSummary(
             id=failure.id,
@@ -43,6 +44,9 @@ def list_failures(repo: FailureRepository = Depends(get_failure_repo)) -> list[F
             last_reported=last_reported,
             report_count=report_count,
             verifications=failure.verifications,
+            station_total_same_type_count=counts.get(
+                (failure.equipment.station_id, failure.equipment.equipment_type_id), 1
+            ),
         )
         for failure, first_reported, last_reported, report_count in repo.list_all_with_stats()
     ]

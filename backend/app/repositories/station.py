@@ -2,6 +2,7 @@ from fastapi import Depends
 from sqlalchemy.orm import Session, selectinload
 
 from app.database import get_db
+from app.models.equipment import Equipment
 from app.models.platform import Platform
 from app.models.station import Station
 from app.repositories.cache import cached_list
@@ -22,7 +23,10 @@ class StationRepository:
         # breakdown don't trigger per-station queries while serialising.
         rows = (
             self._db.query(Station)
-            .options(selectinload(Station.platforms).selectinload(Platform.lines))
+            .options(
+                selectinload(Station.platforms).selectinload(Platform.lines),
+                selectinload(Station.equipment).selectinload(Equipment.equipment_type),
+            )
             .order_by(Station.name)
             .all()
         )

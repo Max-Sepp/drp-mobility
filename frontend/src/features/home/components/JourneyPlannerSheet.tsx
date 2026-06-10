@@ -10,6 +10,8 @@ import {
   matchOutages,
   type StationOutage,
 } from '@/features/journey/api/accessibility'
+import { assessOutages } from '@/features/journey/api/outageRelevance'
+import { useStations } from '@/features/stations'
 import { type ResolvedLocation, resolveToPostcode } from '@/features/journey/api/geocode'
 import { type PlaceShortcut } from '@/features/journey/components/LocationInput'
 import type { SavedPlaces } from '@/features/journey/api/savedPlaces'
@@ -75,6 +77,7 @@ export function JourneyPlannerSheet({
 }: Props) {
   const { Colors, Radii } = useTheme()
   const { defaultLevel } = useAccessibilityPreference()
+  const { stations } = useStations()
   const styles = useMemo(
     () =>
       StyleSheet.create({
@@ -269,11 +272,15 @@ export function JourneyPlannerSheet({
     }
 
     const outages = await outagesPromise
-    const flagged = optResult.journeys.map(({ journey, tags }) => ({
-      journey,
-      tags,
-      outages: matchOutages(journey, outages),
-    }))
+    const flagged = optResult.journeys.map(({ journey, tags }) => {
+      const matched = matchOutages(journey, outages)
+      const assessments = assessOutages(journey, matched, stations)
+      const enriched = matched.map((outage, i) => ({
+        ...outage,
+        journeyRelevantLifts: assessments[i].journeyRelevantLifts,
+      }))
+      return { journey, tags, outages: enriched }
+    })
     flagged.sort((a, b) => Number(a.outages.length > 0) - Number(b.outages.length > 0))
     setResults(flagged)
     setLoading(false)

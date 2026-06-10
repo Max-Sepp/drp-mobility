@@ -217,12 +217,64 @@ export function humanizeSummary(
   return out
 }
 
-/** "Victoria: lift, escalator reported out of service" for each affected station. */
+/**
+ * True when every lift on the user's journey path at a station is broken. Uses journey-relevant
+ * counts when available (populated by assessOutages), falls back to station-level total.
+ */
+export function allLiftsDown(outage: {
+  units: { equipmentType: string }[]
+  totalByType: Record<string, number>
+  journeyRelevantLifts?: { broken: number; total: number }
+}): boolean {
+  if (outage.journeyRelevantLifts) {
+    const { broken, total } = outage.journeyRelevantLifts
+    return broken > 0 && total > 0 && broken >= total
+  }
+  const brokenLifts = outage.units.filter((u) => u.equipmentType === 'lift').length
+  const totalLifts = outage.totalByType['lift'] ?? brokenLifts
+  return brokenLifts > 0 && brokenLifts >= totalLifts
+}
+
+/**
+ * True when any station on the journey has all its lifts down, meaning step-free
+ * access is completely blocked there.
+ */
+export function anyStationAllLiftsDown(
+  outages: { units: { equipmentType: string }[]; totalByType: Record<string, number> }[],
+): boolean {
+  return outages.some(allLiftsDown)
+}
+
+/** "Victoria: lift (1/2), escalator reported out of service" for each affected station. */
 export function outageWarning(
-  outages: { stationName: string; equipmentTypes: string[] }[],
+  outages: {
+    stationName: string
+    equipmentTypes: string[]
+    units: { equipmentType: string }[]
+    totalByType: Record<string, number>
+    journeyRelevantLifts?: { broken: number; total: number }
+  }[],
 ): string {
   return outages
-    .map((o) => `${o.stationName}: ${o.equipmentTypes.join(', ')} reported out of service`)
+    .map((o) => {
+      let liftPart: string | null = null
+      if (o.journeyRelevantLifts && o.journeyRelevantLifts.broken > 0) {
+        const { broken, total } = o.journeyRelevantLifts
+        liftPart = total > 1 ? `lift (${broken}/${total})` : 'lift'
+      } else {
+        const brokenLifts = o.units.filter((u) => u.equipmentType === 'lift').length
+        const totalLifts = o.totalByType['lift'] ?? 0
+        liftPart =
+          brokenLifts > 0 && totalLifts > 1
+            ? `lift (${brokenLifts}/${totalLifts})`
+            : brokenLifts > 0
+              ? 'lift'
+              : null
+      }
+      const otherTypes = o.equipmentTypes.filter((t) => t !== 'lift')
+      const parts = [liftPart, ...otherTypes].filter(Boolean)
+      return `${o.stationName}: ${parts.join(', ')} reported out of service`
+    })
     .join(' · ')
 }
 

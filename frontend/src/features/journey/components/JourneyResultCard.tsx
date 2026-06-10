@@ -3,6 +3,7 @@ import type { StationOutage } from '@/features/journey/api/accessibility'
 import type { ResolvedLocation } from '@/features/journey/api/geocode'
 import type { Journey, RouteTag } from '@/features/journey/api/tfl'
 import {
+  anyStationAllLiftsDown,
   clockTime,
   fareLabel,
   ModePipe,
@@ -32,6 +33,7 @@ export const JourneyResultCard = ({
   const { Colors, Radii } = useTheme()
   const { user } = useAuth()
   const fare = fareLabel(journey, user?.traveller_type, user?.railcard)
+  const critical = anyStationAllLiftsDown(outages)
 
   return (
     <YStack
@@ -56,13 +58,13 @@ export const JourneyResultCard = ({
           py="$2"
           items="flex-start"
           style={{
-            backgroundColor: Colors.warningBg,
+            backgroundColor: critical ? Colors.dangerBg : Colors.warningBg,
             borderBottomWidth: Borders.thin,
-            borderBottomColor: Colors.warningBorder,
+            borderBottomColor: critical ? Colors.dangerBorder : Colors.warningBorder,
           }}
         >
           <Text fontSize={13}>⚠️</Text>
-          <Text fontSize={12} color={Colors.warningDark} flex={1}>
+          <Text fontSize={12} color={critical ? Colors.dangerDark : Colors.warningDark} flex={1}>
             {outageWarning(outages)}
           </Text>
         </XStack>

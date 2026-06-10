@@ -4,6 +4,15 @@ from app.models.station import StepFree
 from app.schemas.platform import PlatformSchema
 
 
+class StationLift(BaseModel):
+    """Minimal lift descriptor — just enough for the client to classify a lift against a journey."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    connection: str
+
+
 class StationSchema(BaseModel):
     """Public representation of a Station row. Kept lean because it is embedded in other
     payloads (e.g. equipment / outage reports); use StationDetail for the platform breakdown."""
@@ -23,6 +32,7 @@ class StationDetail(StationSchema):
     latitude: float | None = None
     longitude: float | None = None
     platforms: list[PlatformSchema]
+    lifts: list[StationLift] = []
     wifi: bool = False
     zones: list[int] = []
     has_toilets: bool = False
