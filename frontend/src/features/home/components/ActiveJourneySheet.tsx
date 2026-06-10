@@ -228,21 +228,17 @@ export function ActiveJourneySheet({
   }, [params, legs])
 
   function endJourney() {
-    Alert.alert(
-      'End journey?',
-      'This stops following the route.',
-      [
-        { text: 'Keep going', style: 'cancel' },
-        {
-          text: 'End journey',
-          style: 'destructive',
-          onPress: async () => {
-            await clearActiveJourney()
-            sheetRef.current?.close()
-          },
+    Alert.alert('End journey?', 'This stops following the route.', [
+      { text: 'Keep going', style: 'cancel' },
+      {
+        text: 'End journey',
+        style: 'destructive',
+        onPress: async () => {
+          await clearActiveJourney()
+          sheetRef.current?.close()
         },
-      ],
-    )
+      },
+    ])
   }
 
   const onArrived = useCallback(() => {
