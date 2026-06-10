@@ -1182,7 +1182,8 @@ def main() -> None:
     for s in all_stations:
         sid = s.get("id")
         if sid and sid in seen_ids:
-            print(f"WARNING: duplicate id {sid!r} ({s['name']!r} vs {dedup[seen_ids[sid]]['name']!r}) — keeping last")
+            prev = dedup[seen_ids[sid]]["name"]
+            print(f"WARNING: duplicate id {sid!r} ({s['name']!r} vs {prev!r}) — keeping last")
             dedup[seen_ids[sid]] = s
         else:
             if sid:
