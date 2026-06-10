@@ -60,6 +60,23 @@ const STEP_FREE_OPTIONS: { label: string; value: string | null }[] = [
 ]
 
 // ---------------------------------------------------------------------------
+// Journey options cache
+// ---------------------------------------------------------------------------
+
+type CachedOptions = { journey: Journey; tags: RouteTag[] }[]
+// Module-level so the cache survives sheet close/reopen within the same app session.
+const journeyOptionsCache = new Map<string, CachedOptions>()
+
+function optionsCacheKey(
+  from: string,
+  to: string,
+  level: AccessibilityPreference | null,
+  time: TimeConstraint | null,
+): string {
+  return JSON.stringify([from, to, level, time])
+}
+
+// ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
@@ -265,21 +282,30 @@ export function JourneyPlannerSheet({
     const outagesPromise = fetchStationOutages()
     setResolved({ from: fromLoc, to: toLoc })
 
-    const optResult: JourneyOptionsResult = await planJourneyOptions(
-      fromLoc.postcode,
-      toLoc.postcode,
-      level,
-      timeConstraint,
-    )
+    const cacheKey = optionsCacheKey(fromLoc.postcode, toLoc.postcode, level, timeConstraint)
+    const cached = journeyOptionsCache.get(cacheKey)
 
-    if (optResult.kind !== 'journeys') {
-      setLoading(false)
-      Alert.alert('No journey', optResult.message)
-      return
+    let journeyOptions: CachedOptions
+    if (cached) {
+      journeyOptions = cached
+    } else {
+      const optResult: JourneyOptionsResult = await planJourneyOptions(
+        fromLoc.postcode,
+        toLoc.postcode,
+        level,
+        timeConstraint,
+      )
+      if (optResult.kind !== 'journeys') {
+        setLoading(false)
+        Alert.alert('No journey', optResult.message)
+        return
+      }
+      journeyOptions = optResult.journeys
+      journeyOptionsCache.set(cacheKey, journeyOptions)
     }
 
     const outages = await outagesPromise
-    const flagged = optResult.journeys.map(({ journey, tags }) => ({
+    const flagged = journeyOptions.map(({ journey, tags }) => ({
       journey,
       tags,
       outages: matchOutages(journey, outages),
