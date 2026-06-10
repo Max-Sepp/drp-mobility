@@ -22,7 +22,6 @@ type VerdictStyle = {
   label: string
 }
 
-
 function reportMeta(unit: AssessedUnit): string {
   const count = `Reported ${unit.reportCount}×`
   if (!unit.lastReported) return count
@@ -58,7 +57,11 @@ export const OutageDetail = ({ assessments }: { assessments: OutageAssessment[] 
   function toggleStation(name: string) {
     setExpandedStations((prev) => {
       const next = new Set(prev)
-      if (next.has(name)) { next.delete(name) } else { next.add(name) }
+      if (next.has(name)) {
+        next.delete(name)
+      } else {
+        next.add(name)
+      }
       return next
     })
   }
@@ -113,7 +116,8 @@ export const OutageDetail = ({ assessments }: { assessments: OutageAssessment[] 
   )
   if (assessments.length === 0) return null
 
-  const onRoute = (u: AssessedUnit) => u.verdict === 'on-your-platform' || u.verdict === 'shared-route'
+  const onRoute = (u: AssessedUnit) =>
+    u.verdict === 'on-your-platform' || u.verdict === 'shared-route'
   const offRoute = (u: AssessedUnit) => !onRoute(u)
 
   function offRouteSummary(units: AssessedUnit[]): string | null {
@@ -162,8 +166,7 @@ export const OutageDetail = ({ assessments }: { assessments: OutageAssessment[] 
               >
                 <MaterialIcons name="warning-amber" size={15} color={Colors.warningDark} />
                 <Text fontSize={13} color={Colors.warningDark} flex={1}>
-                  <Text fontWeight="700">{station.stationName}:</Text>{' '}
-                  {offLabel}
+                  <Text fontWeight="700">{station.stationName}:</Text> {offLabel}
                   <Text fontWeight="700">(not on your route)</Text>
                 </Text>
                 <MaterialIcons
@@ -221,10 +224,14 @@ export const OutageDetail = ({ assessments }: { assessments: OutageAssessment[] 
                           pressStyle={{ opacity: 0.6 }}
                         >
                           <Text fontSize={12} fontWeight="600" style={{ color: v.color }}>
-                            {expandedFailureId === unit.failureId ? 'Hide timeline' : 'View timeline'}
+                            {expandedFailureId === unit.failureId
+                              ? 'Hide timeline'
+                              : 'View timeline'}
                           </Text>
                           <MaterialIcons
-                            name={expandedFailureId === unit.failureId ? 'expand-less' : 'expand-more'}
+                            name={
+                              expandedFailureId === unit.failureId ? 'expand-less' : 'expand-more'
+                            }
                             size={16}
                             color={v.color}
                           />
@@ -238,7 +245,9 @@ export const OutageDetail = ({ assessments }: { assessments: OutageAssessment[] 
                                 reports={details[unit.failureId].reports}
                                 verifications={details[unit.failureId].verifications}
                                 resolvedAt={details[unit.failureId].resolved_at}
-                                resolutionDescription={details[unit.failureId].resolution_description}
+                                resolutionDescription={
+                                  details[unit.failureId].resolution_description
+                                }
                               />
                             </YStack>
                           ) : null)}
@@ -298,88 +307,90 @@ export const OutageDetail = ({ assessments }: { assessments: OutageAssessment[] 
             {/* Full unit detail — shown when expanded */}
             {isExpanded && (
               <YStack gap="$2.5" p="$3">
-            {routeUnits.map((unit, i) => {
-              const v = VERDICTS[unit.verdict]
-              return (
-                <YStack
-                  key={i}
-                  gap="$1.5"
-                  p="$2.5"
-                  style={{
-                    backgroundColor: Colors.card,
-                    borderWidth: Borders.thin,
-                    borderColor: v.border,
-                    borderRadius: Radii.small,
-                  }}
-                >
-                  <XStack gap="$2" items="center">
-                    <MaterialIcons name={v.icon} size={16} color={v.color} />
-                    <Text fontSize={13} fontWeight="700" flex={1} style={{ color: v.color }}>
-                      {v.label}
-                    </Text>
-                  </XStack>
-                  <Text fontSize={14} color={Colors.text}>
-                    {unit.connection}
-                  </Text>
-                  <Text fontSize={13} style={{ color: v.color }}>
-                    {verdictDetail(unit)}
-                  </Text>
-                  {unit.verified && (
-                    <XStack items="center" gap="$1">
-                      <MaterialIcons name="verified" size={13} color="#1d4ed8" />
-                      <Text fontSize={12} fontWeight="600" color="#1d4ed8">
-                        Verified on-site
-                        {unit.verificationCount > 1 ? ` (${unit.verificationCount}×)` : ''}
+                {routeUnits.map((unit, i) => {
+                  const v = VERDICTS[unit.verdict]
+                  return (
+                    <YStack
+                      key={i}
+                      gap="$1.5"
+                      p="$2.5"
+                      style={{
+                        backgroundColor: Colors.card,
+                        borderWidth: Borders.thin,
+                        borderColor: v.border,
+                        borderRadius: Radii.small,
+                      }}
+                    >
+                      <XStack gap="$2" items="center">
+                        <MaterialIcons name={v.icon} size={16} color={v.color} />
+                        <Text fontSize={13} fontWeight="700" flex={1} style={{ color: v.color }}>
+                          {v.label}
+                        </Text>
+                      </XStack>
+                      <Text fontSize={14} color={Colors.text}>
+                        {unit.connection}
                       </Text>
-                    </XStack>
-                  )}
-                  <Text fontSize={12} color={Colors.secondaryText}>
-                    {reportMeta(unit)}
-                    {unit.estimated ? ' · location estimated' : ''}
-                  </Text>
+                      <Text fontSize={13} style={{ color: v.color }}>
+                        {verdictDetail(unit)}
+                      </Text>
+                      {unit.verified && (
+                        <XStack items="center" gap="$1">
+                          <MaterialIcons name="verified" size={13} color="#1d4ed8" />
+                          <Text fontSize={12} fontWeight="600" color="#1d4ed8">
+                            Verified on-site
+                            {unit.verificationCount > 1 ? ` (${unit.verificationCount}×)` : ''}
+                          </Text>
+                        </XStack>
+                      )}
+                      <Text fontSize={12} color={Colors.secondaryText}>
+                        {reportMeta(unit)}
+                        {unit.estimated ? ' · location estimated' : ''}
+                      </Text>
 
-                  <XStack
-                    items="center"
-                    gap="$1"
-                    mt="$0.5"
-                    onPress={() => toggleTimeline(unit.failureId)}
-                    pressStyle={{ opacity: 0.6 }}
-                  >
-                    <Text fontSize={12} fontWeight="600" style={{ color: v.color }}>
-                      {expandedFailureId === unit.failureId ? 'Hide timeline' : 'View timeline'}
-                    </Text>
-                    <MaterialIcons
-                      name={expandedFailureId === unit.failureId ? 'expand-less' : 'expand-more'}
-                      size={16}
-                      color={v.color}
-                    />
-                  </XStack>
-                  {expandedFailureId === unit.failureId &&
-                    (loadingFailureId === unit.failureId ? (
-                      <Spinner color={Colors.secondaryText} />
-                    ) : details[unit.failureId] ? (
-                      <YStack pt="$1">
-                        <OutageTimeline
-                          reports={details[unit.failureId].reports}
-                          verifications={details[unit.failureId].verifications}
-                          resolvedAt={details[unit.failureId].resolved_at}
-                          resolutionDescription={details[unit.failureId].resolution_description}
+                      <XStack
+                        items="center"
+                        gap="$1"
+                        mt="$0.5"
+                        onPress={() => toggleTimeline(unit.failureId)}
+                        pressStyle={{ opacity: 0.6 }}
+                      >
+                        <Text fontSize={12} fontWeight="600" style={{ color: v.color }}>
+                          {expandedFailureId === unit.failureId ? 'Hide timeline' : 'View timeline'}
+                        </Text>
+                        <MaterialIcons
+                          name={
+                            expandedFailureId === unit.failureId ? 'expand-less' : 'expand-more'
+                          }
+                          size={16}
+                          color={v.color}
                         />
-                      </YStack>
-                    ) : null)}
-                </YStack>
-              )
-            })}
+                      </XStack>
+                      {expandedFailureId === unit.failureId &&
+                        (loadingFailureId === unit.failureId ? (
+                          <Spinner color={Colors.secondaryText} />
+                        ) : details[unit.failureId] ? (
+                          <YStack pt="$1">
+                            <OutageTimeline
+                              reports={details[unit.failureId].reports}
+                              verifications={details[unit.failureId].verifications}
+                              resolvedAt={details[unit.failureId].resolved_at}
+                              resolutionDescription={details[unit.failureId].resolution_description}
+                            />
+                          </YStack>
+                        ) : null)}
+                    </YStack>
+                  )
+                })}
 
-            {/* Off-route broken lifts — collapsed to a single footnote line. */}
-            {summary && (
-              <XStack gap="$2" items="center" pt="$0.5">
-                <MaterialIcons name="info-outline" size={13} color={Colors.secondaryText} />
-                <Text fontSize={12} color={Colors.secondaryText}>
-                  {summary}
-                </Text>
-              </XStack>
-            )}
+                {/* Off-route broken lifts — collapsed to a single footnote line. */}
+                {summary && (
+                  <XStack gap="$2" items="center" pt="$0.5">
+                    <MaterialIcons name="info-outline" size={13} color={Colors.secondaryText} />
+                    <Text fontSize={12} color={Colors.secondaryText}>
+                      {summary}
+                    </Text>
+                  </XStack>
+                )}
               </YStack>
             )}
           </YStack>

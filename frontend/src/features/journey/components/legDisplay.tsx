@@ -276,7 +276,9 @@ export function outageWarning(
     } else if (brokenLifts > 0) {
       const totalLifts = o.totalByType['lift'] ?? 0
       liftNode =
-        totalLifts > 1 ? `${brokenLifts}/${totalLifts} lifts broken` : 'lift reported out of service'
+        totalLifts > 1
+          ? `${brokenLifts}/${totalLifts} lifts broken`
+          : 'lift reported out of service'
     }
 
     const otherParts = o.equipmentTypes

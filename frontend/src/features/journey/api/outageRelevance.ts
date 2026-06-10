@@ -9,10 +9,7 @@
 //      specific platform reliably.
 
 import type { StationDetail } from '@/features/stations'
-import {
-  normaliseStationName,
-  resolveStationName,
-} from '@/features/journey/api/accessibility'
+import { normaliseStationName, resolveStationName } from '@/features/journey/api/accessibility'
 import type { OutageUnit, StationOutage } from '@/features/journey/api/accessibility'
 import type { Journey } from '@/features/journey/api/tfl'
 
@@ -23,7 +20,9 @@ import type { Journey } from '@/features/journey/api/tfl'
  * doesn't mention the word "platform".
  */
 function allLiftEndpoints(connection: string): string[] {
-  const afterName = connection.includes(':') ? connection.slice(connection.indexOf(':') + 1) : connection
+  const afterName = connection.includes(':')
+    ? connection.slice(connection.indexOf(':') + 1)
+    : connection
   return afterName
     .split('→')
     .flatMap((part) => part.split(','))
@@ -167,7 +166,10 @@ function verdictFor(
  * serves a line the journey uses. Lifts with platform endpoints that we can't match to any line
  * (unknown) are excluded (strict mode).
  */
-function journeyRelevantLiftCount(station: StationDetail | undefined, journeyLines: string[]): number {
+function journeyRelevantLiftCount(
+  station: StationDetail | undefined,
+  journeyLines: string[],
+): number {
   if (!station?.lifts) return 0
   let count = 0
   for (const lift of station.lifts) {
@@ -204,7 +206,9 @@ export function assessOutages(
       verdict: verdictFor(unit, station, lines),
     }))
     const journeyBroken = assessedUnits.filter(
-      (u) => u.equipmentType === 'lift' && (u.verdict === 'on-your-platform' || u.verdict === 'shared-route'),
+      (u) =>
+        u.equipmentType === 'lift' &&
+        (u.verdict === 'on-your-platform' || u.verdict === 'shared-route'),
     ).length
     const journeyTotal = journeyRelevantLiftCount(station, lines)
     return {
