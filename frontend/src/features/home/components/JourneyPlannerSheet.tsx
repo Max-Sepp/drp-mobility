@@ -132,6 +132,8 @@ export function JourneyPlannerSheet({
   const [resolved, setResolved] = useState<Resolved | null>(null)
   // True after the close button is tapped so handleChange(-1) doesn't fire onClose() again.
   const closedByButton = useRef(false)
+  // True once a successful search has been performed; resets when the planner re-opens.
+  const hasSearched = useRef(false)
 
   const cachedCoords = useAppLocation()
   // Measured height of the From input container — used to vertically position the swap button.
@@ -189,6 +191,7 @@ export function JourneyPlannerSheet({
       setResolved(null)
       setGettingLocation(false)
       setLoading(false)
+      hasSearched.current = false
       sheetRef.current?.snapToIndex(1)
       if (!plan.initialFrom && cachedCoords) handleCurrentLocation()
     } else if (!closedByButton.current) {
@@ -210,6 +213,13 @@ export function JourneyPlannerSheet({
     if (hasBoth && !prevHadBoth.current && !loading) run()
     prevHadBoth.current = hasBoth
   }, [fromPostcode, toPostcode]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Re-run automatically when the step-free preference or time constraint changes, but only
+  // after an initial search has already been performed (so the first open doesn't double-fire).
+  useEffect(() => {
+    if (!hasSearched.current || !canSearch || loading) return
+    run()
+  }, [level, timeConstraint]) // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleChange(index: number) {
     onHeightChange?.(index >= 0 ? snapPoints[index] : 0)
@@ -277,6 +287,7 @@ export function JourneyPlannerSheet({
     flagged.sort((a, b) => Number(a.outages.length > 0) - Number(b.outages.length > 0))
     setResults(flagged)
     setLoading(false)
+    hasSearched.current = true
   }
 
   // ── Render ────────────────────────────────────────────────────────────
