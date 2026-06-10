@@ -6,11 +6,17 @@
   {
     "name": "Gloucester Road",
     "_comment": "TfL step-free feed omits this lift because Gloucester Road is not a certified step-free station. The lift serves the deep-tube Piccadilly line platforms (3 & 4) only; District/Circle platforms are at street level.",
-    "lifts": 1,
+    "lifts": 2,
     "lift_units": [
       {
         "id": "940GZZLUGTR-Lift-1",
         "name": "Lift 1",
+        "from": "Street",
+        "to": "Eastbound Platform 5, Westbound Platform 4"
+      },
+      {
+        "id": "940GZZLUGTR-Lift-2",
+        "name": "Lift 2",
         "from": "Street",
         "to": "Eastbound Platform 5, Westbound Platform 4"
       }

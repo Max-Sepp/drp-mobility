@@ -245,7 +245,7 @@ export function anyStationAllLiftsDown(
   return outages.some(allLiftsDown)
 }
 
-/** "Victoria: lift (1/2), escalator reported out of service" for each affected station. */
+/** "Paddington: 3/7 lifts on your route broken" for each affected station. */
 export function outageWarning(
   outages: {
     stationName: string
@@ -260,20 +260,25 @@ export function outageWarning(
       let liftPart: string | null = null
       if (o.journeyRelevantLifts && o.journeyRelevantLifts.broken > 0) {
         const { broken, total } = o.journeyRelevantLifts
-        liftPart = total > 1 ? `lift (${broken}/${total})` : 'lift'
+        liftPart =
+          total > 1
+            ? `${broken}/${total} lifts on your route broken`
+            : 'lift on your route broken'
       } else {
         const brokenLifts = o.units.filter((u) => u.equipmentType === 'lift').length
         const totalLifts = o.totalByType['lift'] ?? 0
         liftPart =
           brokenLifts > 0 && totalLifts > 1
-            ? `lift (${brokenLifts}/${totalLifts})`
+            ? `${brokenLifts}/${totalLifts} lifts broken`
             : brokenLifts > 0
-              ? 'lift'
+              ? 'lift reported out of service'
               : null
       }
-      const otherTypes = o.equipmentTypes.filter((t) => t !== 'lift')
+      const otherTypes = o.equipmentTypes
+        .filter((t) => t !== 'lift')
+        .map((t) => `${t} reported out of service`)
       const parts = [liftPart, ...otherTypes].filter(Boolean)
-      return `${o.stationName}: ${parts.join(', ')} reported out of service`
+      return `${o.stationName}: ${parts.join(', ')}`
     })
     .join(' · ')
 }
