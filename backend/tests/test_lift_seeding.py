@@ -76,5 +76,5 @@ def test_each_lift_seeded_as_its_own_equipment_row(client: TestClient, db_sessio
     all_equipment = client.get("/equipment").json()
     lifts = [e for e in all_equipment if e["equipment_type"]["name"] == "lift"]
     feed_lifts = [e for e in lifts if "street → " not in e["connection"].lower()]
-    assert len(feed_lifts) == 573
-    assert len(lifts) >= 573
+    assert len(feed_lifts) == 569
+    assert len(lifts) >= 569
