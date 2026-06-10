@@ -392,13 +392,19 @@ export function MapHomeScreen({ navigation, route }: Props) {
   }
 
   function openStation(stationName: string) {
+    // Set the station sheet height immediately so mapPadding is correct before the
+    // map animation fires — avoids the map resizing after centring.
+    setStationHeight(Dimensions.get('window').height * 0.52)
     setActiveStation(stationName)
     sheetRef.current?.dismiss()
+    mapRef.current?.focusStation(stationName)
   }
 
   function closeStation() {
     setActiveStation(null)
     setStationPausedForJourney(false)
+    setStationHeight(0)
+    mapRef.current?.clearFocus()
     // When the station was opened over an active journey, the search sheet is dismissed and the
     // journey sheet is underneath — don't resurrect the search sheet, just reveal the journey.
     if (!activeJourneyParams) sheetRef.current?.restore()

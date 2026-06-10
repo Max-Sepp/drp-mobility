@@ -14,7 +14,7 @@ const TUBE_LINES = new Set([
   'Waterloo & City',
 ])
 
-function resolveColor(lines: string[]): string {
+export function resolveColor(lines: string[]): string {
   const s = new Set(lines)
   if (s.has('Elizabeth')) return '#6950A1'
   if (s.has('London Overground') || s.has('Overground')) return '#EE7C0E'
