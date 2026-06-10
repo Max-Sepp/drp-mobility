@@ -46,9 +46,9 @@ export const EquipmentPicker = ({
                 paddingVertical: 12,
                 paddingHorizontal: 14,
                 borderWidth: Borders.thin,
-                borderColor: selected ? Colors.successDark : Colors.border,
+                borderColor: selected ? Colors.blue : Colors.border,
                 borderRadius: Radii.small,
-                backgroundColor: selected ? Colors.successBg : Colors.card,
+                backgroundColor: selected ? Colors.blueBg : Colors.card,
               }}
             >
               <YStack
