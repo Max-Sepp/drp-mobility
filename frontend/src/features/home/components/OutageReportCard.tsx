@@ -3,6 +3,7 @@ import { Pressable, StyleSheet } from 'react-native'
 import { Spinner, Text, XStack, YStack } from 'tamagui'
 import type { components } from '@/api/schema.d'
 import { OutageTimeline } from '@/features/outages/OutageTimeline'
+import { formatConnection } from '@/lib/connection'
 import { formatDatetime } from '@/lib/datetime'
 import { useTheme, Borders, Spacing } from '@/theme'
 import { reportSeverity } from '@/features/outages/severity'
@@ -26,7 +27,7 @@ function alertLabel(report: OutageReport, resolved: boolean): string {
   if (equipment.equipment_type.name === 'custom') return 'Custom issue reported'
   const type = equipment.equipment_type.name === 'lift' ? 'Lift' : 'Escalator'
   const status = resolved ? 'resolved' : 'broken'
-  return `${type} ${status} – ${equipment.connection}`
+  return `${type} ${status} – ${formatConnection(equipment.connection, equipment.equipment_type.name)}`
 }
 
 export const OutageReportCard = ({

@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react'
 import { Spinner, Text, XStack, YStack } from 'tamagui'
 import { apiClient } from '@/api/client'
 import type { components } from '@/api/schema.d'
+import { formatConnection } from '@/lib/connection'
 import { formatTime, isToday, parseUtc } from '@/lib/datetime'
 import type {
   AssessedUnit,
@@ -166,7 +167,7 @@ export const OutageDetail = ({ assessments }: { assessments: OutageAssessment[] 
                     </Text>
                   </XStack>
                   <Text fontSize={14} color={Colors.text}>
-                    {unit.connection}
+                    {formatConnection(unit.connection, unit.equipmentType)}
                   </Text>
                   <Text fontSize={13} style={{ color: v.color }}>
                     {verdictDetail(unit)}

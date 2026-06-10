@@ -51,7 +51,7 @@ function connectionEndpoints(connection: string): string[] {
  * The platform(s) a connection touches. Endpoints that name a platform are kept (and any
  * comma-joined list, e.g. "Northbound Platform 1, Southbound Platform 2", is split out).
  */
-function platformEndpoints(connection: string): string[] {
+export function platformEndpoints(connection: string): string[] {
   return connectionEndpoints(connection)
     .filter((endpoint) => /platform/i.test(endpoint))
     .flatMap((endpoint) => endpoint.split(',').map((p) => p.trim()))
