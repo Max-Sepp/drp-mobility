@@ -32,6 +32,11 @@ import {
 import { NativeViewGestureHandler } from 'react-native-gesture-handler'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import type { CustomPlace, SavedPlaces } from '@/features/journey/api/savedPlaces'
+import {
+  addRecentLocation,
+  getRecentLocations,
+  type RecentLocation,
+} from '@/features/journey/api/recentLocations'
 import { clockTime } from '@/features/journey/components/legDisplay'
 import type { SavedJourney } from '@/features/journey/api/savedJourneys'
 import {
@@ -556,6 +561,8 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
     const [locationResults, setLocationResults] = useState<LocationSuggestion[]>([])
     const [searching, setSearching] = useState(false)
     const [gpsLoading, setGpsLoading] = useState(false)
+    const [recentLocations, setRecentLocations] = useState<RecentLocation[]>([])
+    const [searchRowH, setSearchRowH] = useState(60)
 
     const inputRef = useRef<TextInput>(null)
     const sheetRef = useRef<BottomSheetRef>(null)
@@ -563,6 +570,12 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
 
     const { stations } = useStations()
     const cachedCoords = useAppLocation()
+
+    // ── Load recents ──────────────────────────────────────────────────────
+
+    useEffect(() => {
+      getRecentLocations().then(setRecentLocations)
+    }, [])
 
     // ── Debounced search ──────────────────────────────────────────────────
 
@@ -615,6 +628,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
     function handleSheetChange(index: number) {
       if (index === SNAP_IDX_OPEN) {
         setExpanded(true)
+        getRecentLocations().then(setRecentLocations)
         if (shouldFocusOnOpen.current) {
           inputRef.current?.focus()
         }
@@ -641,6 +655,9 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
         }
         const to: ResolvedLocation = { postcode: toPostcode, label: suggestion.label }
 
+        addRecentLocation(suggestion.label, toPostcode)
+        getRecentLocations().then(setRecentLocations)
+
         let from: ResolvedLocation | undefined
         if (cachedCoords) {
           const fromResult = await resolveToPostcode(
@@ -658,6 +675,34 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
       }
     }
 
+    async function handleRecentSelect(item: RecentLocation) {
+      if (item.postcode === null) {
+        // Station recent
+        collapse()
+        onStationPress(item.label)
+      } else {
+        // Location recent — resolve from GPS and open journey planner
+        setGpsLoading(true)
+        try {
+          const to: ResolvedLocation = { postcode: item.postcode, label: item.label }
+          let from: ResolvedLocation | undefined
+          if (cachedCoords) {
+            const fromResult = await resolveToPostcode(
+              `${cachedCoords.latitude},${cachedCoords.longitude}`,
+            )
+            if (!('error' in fromResult)) {
+              from = { postcode: fromResult.postcode, label: 'Current location' }
+            }
+          }
+          addRecentLocation(item.label, item.postcode)
+          collapse()
+          onLocationSelect(from, to)
+        } finally {
+          setGpsLoading(false)
+        }
+      }
+    }
+
     // ── Render ────────────────────────────────────────────────────────────
 
     const hasQuery = query.length >= 3
@@ -670,8 +715,12 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
         snapPoints={SNAP_POINTS}
         onChange={handleSheetChange}
       >
-        {/* Search bar */}
-        <View style={styles.searchRow}>
+        {/* Search bar + recents dropdown */}
+        <View style={{ zIndex: 10 }}>
+          <View
+            style={styles.searchRow}
+            onLayout={(e) => setSearchRowH(e.nativeEvent.layout.height)}
+          >
           <TouchableOpacity
             style={[styles.searchPill, expanded && styles.searchPillExpanded]}
             onPress={expanded ? undefined : expand}
@@ -696,9 +745,10 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
                 value={query}
                 onChangeText={setQuery}
                 onFocus={() => setInputFocused(true)}
-                onBlur={() => setInputFocused(false)}
+                onBlur={() => setTimeout(() => setInputFocused(false), 150)}
                 onSubmitEditing={() => {
                   if (stationResults.length > 0) {
+                    addRecentLocation(stationResults[0].name, null)
                     collapse()
                     onStationPress(stationResults[0].name)
                   } else if (locationResults.length > 0) {
@@ -722,6 +772,56 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
             >
               <MaterialIcons name="close" size={22} color={Colors.secondaryText} />
             </TouchableOpacity>
+          )}
+          </View>
+
+          {/* Recents dropdown — floats below the search pill when input is focused with no query */}
+          {inputFocused && !hasQuery && recentLocations.length > 0 && (
+            <View
+              style={{
+                position: 'absolute',
+                top: searchRowH - Spacing.lg + 4,
+                left: Spacing.lg,
+                right: Spacing.lg,
+                zIndex: 20,
+                borderWidth: 1,
+                borderColor: Colors.border,
+                borderRadius: Radii.button,
+                backgroundColor: Colors.card,
+                overflow: 'hidden',
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.12,
+                shadowRadius: 8,
+                elevation: 8,
+              }}
+            >
+              {recentLocations.slice(0, 5).map((item, i) => (
+                <TouchableOpacity
+                  key={`${item.label}-${i}`}
+                  onPress={() => handleRecentSelect(item)}
+                  activeOpacity={0.7}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: Spacing.md,
+                    paddingHorizontal: Spacing.lg,
+                    minHeight: 52,
+                    borderTopWidth: i === 0 ? 0 : StyleSheet.hairlineWidth,
+                    borderTopColor: Colors.separator,
+                  }}
+                >
+                  <MaterialIcons name="history" size={16} color={Colors.secondaryText} />
+                  <Text
+                    style={[Typography.body, { color: Colors.text, flex: 1 }]}
+                    numberOfLines={1}
+                  >
+                    {item.label}
+                  </Text>
+                  <MaterialIcons name="chevron-right" size={16} color={Colors.tertiaryText} />
+                </TouchableOpacity>
+              ))}
+            </View>
           )}
         </View>
 
@@ -750,6 +850,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
                     <StationResultRow
                       station={s}
                       onPress={() => {
+                        addRecentLocation(s.name, null)
                         collapse()
                         onStationPress(s.name)
                       }}
