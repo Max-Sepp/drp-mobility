@@ -194,7 +194,7 @@ export const OutageDetail = ({ assessments }: { assessments: OutageAssessment[] 
                         <XStack gap="$2" items="center">
                           <MaterialIcons name={v.icon} size={16} color={v.color} />
                           <Text fontSize={13} fontWeight="700" flex={1} style={{ color: v.color }}>
-                            {v.label}
+                            {unit.verified ? v.label : `Reported: ${v.label}`}
                           </Text>
                         </XStack>
                         <Text fontSize={14} color={Colors.text}>
@@ -267,10 +267,12 @@ export const OutageDetail = ({ assessments }: { assessments: OutageAssessment[] 
         const headerBg = allDown ? Colors.dangerBg : Colors.warningBg
         const headerBorder = allDown ? Colors.dangerBorder : Colors.warningBorder
         const headerColor = allDown ? Colors.dangerDark : Colors.warningDark
+        const routeUnitsAllVerified = routeUnits.every((u) => u.verified)
+        const routeStatus = routeUnitsAllVerified ? 'broken' : 'reported broken'
         const routeSummary =
           totalOnRoute > 1
-            ? `${brokenOnRoute}/${totalOnRoute} lifts on your route`
-            : 'lift on your route broken'
+            ? `${brokenOnRoute}/${totalOnRoute} lifts on your route ${routeStatus}`
+            : `lift on your route ${routeStatus}`
 
         return (
           <YStack
@@ -324,7 +326,7 @@ export const OutageDetail = ({ assessments }: { assessments: OutageAssessment[] 
                       <XStack gap="$2" items="center">
                         <MaterialIcons name={v.icon} size={16} color={v.color} />
                         <Text fontSize={13} fontWeight="700" flex={1} style={{ color: v.color }}>
-                          {v.label}
+                          {unit.verified ? v.label : `Reported: ${v.label}`}
                         </Text>
                       </XStack>
                       <Text fontSize={14} color={Colors.text}>

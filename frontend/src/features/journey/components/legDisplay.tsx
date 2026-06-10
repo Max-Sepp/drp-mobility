@@ -251,22 +251,28 @@ export function outageWarning(
   outages: {
     stationName: string
     equipmentTypes: string[]
-    units: { equipmentType: string }[]
+    units: { equipmentType: string; verified?: boolean }[]
     totalByType: Record<string, number>
     journeyRelevantLifts?: { broken: number; total: number }
   }[],
 ): React.ReactNode {
   const segments = outages.map((o, i) => {
-    const brokenLifts = o.units.filter((u) => u.equipmentType === 'lift').length
+    const liftUnits = o.units.filter((u) => u.equipmentType === 'lift')
+    const brokenLifts = liftUnits.length
+    const allVerified = liftUnits.length > 0 && liftUnits.every((u) => u.verified)
+    const status = allVerified ? 'broken' : 'reported broken'
     let liftNode: React.ReactNode = null
 
     if (o.journeyRelevantLifts && o.journeyRelevantLifts.broken > 0) {
       const { broken, total } = o.journeyRelevantLifts
       liftNode =
-        total > 1 ? `${broken}/${total} lifts on your route broken` : 'lift on your route broken'
+        total > 1
+          ? `${broken}/${total} lifts on your route ${status}`
+          : `lift on your route ${status}`
     } else if (o.journeyRelevantLifts && brokenLifts > 0) {
       const totalLifts = o.totalByType['lift'] ?? brokenLifts
-      const count = totalLifts > 1 ? `${brokenLifts}/${totalLifts} lifts broken ` : 'lift broken '
+      const count =
+        totalLifts > 1 ? `${brokenLifts}/${totalLifts} lifts ${status} ` : `lift ${status} `
       liftNode = (
         <>
           {count}
@@ -277,7 +283,7 @@ export function outageWarning(
       const totalLifts = o.totalByType['lift'] ?? 0
       liftNode =
         totalLifts > 1
-          ? `${brokenLifts}/${totalLifts} lifts broken`
+          ? `${brokenLifts}/${totalLifts} lifts ${status}`
           : 'lift reported out of service'
     }
 
