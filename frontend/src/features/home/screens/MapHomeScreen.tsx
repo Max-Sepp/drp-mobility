@@ -1,6 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import { useFocusEffect } from '@react-navigation/native'
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { StationMap, type StationMapHandle } from '@/features/map/components/StationMap'
@@ -176,7 +176,7 @@ function ActiveJourneyBanner({
   )
 }
 
-export function MapHomeScreen({ navigation }: Props) {
+export function MapHomeScreen({ navigation, route }: Props) {
   const { Colors, Shadows } = useTheme()
   const styles = useMemo(
     () =>
@@ -248,6 +248,16 @@ export function MapHomeScreen({ navigation }: Props) {
       else setSavedPlaces({ custom: [] })
     }, [status, user]),
   )
+
+  // Deep link from a tapped push notification: navigation routes to MapHome with a `station`
+  // param. Open that station's sheet, then clear the param so re-tapping the same station
+  // (param goes undefined → station) opens it again.
+  const stationParam = route.params?.station
+  useEffect(() => {
+    if (!stationParam) return
+    openStation(stationParam)
+    navigation.setParams({ station: undefined })
+  }, [stationParam]) // eslint-disable-line react-hooks/exhaustive-deps
 
   function handlePlacePress(key: 'home' | 'work') {
     if (status === 'loading') return
@@ -389,7 +399,9 @@ export function MapHomeScreen({ navigation }: Props) {
   function closeStation() {
     setActiveStation(null)
     setStationPausedForJourney(false)
-    sheetRef.current?.restore()
+    // When the station was opened over an active journey, the search sheet is dismissed and the
+    // journey sheet is underneath — don't resurrect the search sheet, just reveal the journey.
+    if (!activeJourneyParams) sheetRef.current?.restore()
   }
 
   function openJourneyFromTo(from: ResolvedLocation | undefined, to: ResolvedLocation) {
@@ -425,21 +437,24 @@ export function MapHomeScreen({ navigation }: Props) {
         onSnapChange={setSearchHeight}
       />
 
-      <StationSheet
-        station={stationPausedForJourney ? null : activeStation}
-        onClose={closeStation}
-        onReportPress={() => activeStation && setActiveReport(activeStation)}
-        onOpenJourney={(plan) => {
-          setStationPausedForJourney(true)
-          setActivePlan(plan)
+      {/* Sheet render order = z-order (later renders on top). Constraints: a station opened from
+          an active journey must sit above it; the report sheet slides over the station sheet; the
+          journey detail sheet sits over the planner. Hence: ActiveJourney < Planner < Detail <
+          Station < Report. */}
+      <ActiveJourneySheet
+        params={activeJourneyParams}
+        onStationPress={openStation}
+        onComplete={() => {
+          setActiveJourneyParams(null)
+          setActive(null)
+          sheetRef.current?.restore()
         }}
-        onHeightChange={setStationHeight}
-      />
-
-      <ReportSheet
-        station={activeReport}
-        onClose={() => setActiveReport(null)}
-        onHeightChange={setReportHeight}
+        onEnd={() => {
+          setActiveJourneyParams(null)
+          setActive(null)
+          sheetRef.current?.restore()
+        }}
+        onHeightChange={setActiveJourneyHeight}
       />
 
       <JourneyPlannerSheet
@@ -463,19 +478,21 @@ export function MapHomeScreen({ navigation }: Props) {
         onHeightChange={setDetailHeight}
       />
 
-      <ActiveJourneySheet
-        params={activeJourneyParams}
-        onComplete={() => {
-          setActiveJourneyParams(null)
-          setActive(null)
-          sheetRef.current?.restore()
+      <StationSheet
+        station={stationPausedForJourney ? null : activeStation}
+        onClose={closeStation}
+        onReportPress={() => activeStation && setActiveReport(activeStation)}
+        onOpenJourney={(plan) => {
+          setStationPausedForJourney(true)
+          setActivePlan(plan)
         }}
-        onEnd={() => {
-          setActiveJourneyParams(null)
-          setActive(null)
-          sheetRef.current?.restore()
-        }}
-        onHeightChange={setActiveJourneyHeight}
+        onHeightChange={setStationHeight}
+      />
+
+      <ReportSheet
+        station={activeReport}
+        onClose={() => setActiveReport(null)}
+        onHeightChange={setReportHeight}
       />
 
       {/* Top overlay: rendered after sheets so it sits above all backdrops */}

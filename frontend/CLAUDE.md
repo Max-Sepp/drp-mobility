@@ -35,13 +35,25 @@ When adding global context (auth, theming, query client, etc.), insert it inside
 
 ## Navigation (`src/navigation/`)
 
-- `RootNavigator.tsx` is a single native stack. All screens live in `src/screens/`.
-- Route params are typed in `types.ts` as `RootStackParamList`. **Keep this in sync** when adding a screen or changing the params a screen accepts — the typed `navigation.navigate('X', params)` calls depend on it.
-- `stationPicker.ts` holds shared logic for the station-picking flow that's reused across screens.
+The app is **sheet-based**, not screen-based. `MapHomeScreen` (the map) is the only primary
+screen; every product flow — search, journey planning, journey detail, active journey, station
+detail, reporting — lives in a `@gorhom/bottom-sheet` sheet in `src/features/home/components/`
+(`SearchActionSheet`, `JourneyPlannerSheet`, `JourneyDetailSheet`, `ActiveJourneySheet`,
+`StationSheet`, `ReportSheet`). `MapHomeScreen` mounts them all and drives them with local state
+(`activeStation`, `activePlan`, `activeDetail`, …) plus callbacks, so navigating "between screens"
+is really toggling that state. New flows should be added as sheets, not stack screens.
+
+- `RootNavigator.tsx` is a single native stack holding only `MapHome` plus the auth screens
+  (`Login`, `Signup`, `Account`), which are pushed on top of the map and dismissed with `goBack`.
+- Route params are typed in `types.ts` as `RootStackParamList`. `MapHome` takes an optional
+  `{ station }` deep-link param: a tapped push notification routes to the map with a station name,
+  and `MapHomeScreen` opens that station's `StationSheet`.
+- Sheet payload shapes (`JourneyDetailParams`, `ActiveJourneyParams`) are defined and exported from
+  `JourneyDetailSheet.tsx` — the sheets, not the navigator, own these types now.
 
 ## UI components (`src/components/`)
 
-These are app-level building blocks (`FormScreenLayout`, `ScreenHeader`, `SubmitBar`, `PhotoPicker`, etc.), composed from Tamagui primitives. Prefer composing one of these over reaching for raw `View`/`Text`. The form screens (`ReportFormScreen`, `ReportCustomScreen`) are wrapped in `FormScreenLayout` and use `KeyboardAvoidingView` semantics handled inside it — don't add another `KeyboardAvoidingView` outside.
+These are app-level building blocks (`FormScreenLayout`, `ScreenHeader`, `SubmitBar`, `PhotoPicker`, etc.), composed from Tamagui primitives. Prefer composing one of these over reaching for raw `View`/`Text`. `FormScreenLayout`/`ScreenHeader`/`SubmitBar` back the auth screens (`AuthForm`, `AccountScreen`); `FormScreenLayout` handles `KeyboardAvoidingView` internally — don't add another `KeyboardAvoidingView` outside. Reporting is composed inside `ReportSheet` from `EquipmentPicker`, `FormSection`, and `PhotoPicker`.
 
 ## API client (`src/api/`)
 

@@ -11,8 +11,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { Spinner, Text, XStack, YStack } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useNavigation } from '@react-navigation/native'
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import {
   BottomSheetBackdrop,
   BottomSheetFooter,
@@ -38,7 +36,6 @@ import {
 } from '@/features/journey/components/legDisplay'
 import { OutageDetail } from '@/features/journey/components/OutageDetail'
 import { haversineMeters } from '@/lib/geo'
-import type { RootStackParamList } from '@/navigation/types'
 import type { ActiveJourneyParams } from '@/features/home/components/JourneyDetailSheet'
 import { useTheme, Borders, Heights, Opacity, Spacing } from '@/theme'
 
@@ -50,10 +47,17 @@ type Props = {
   params: ActiveJourneyParams | null
   onComplete: () => void
   onEnd: () => void
+  onStationPress?: (station: string) => void
   onHeightChange?: (height: number) => void
 }
 
-export function ActiveJourneySheet({ params, onComplete, onEnd, onHeightChange }: Props) {
+export function ActiveJourneySheet({
+  params,
+  onComplete,
+  onEnd,
+  onStationPress,
+  onHeightChange,
+}: Props) {
   const { Colors, Radii } = useTheme()
   const styles = useMemo(
     () =>
@@ -110,7 +114,6 @@ export function ActiveJourneySheet({ params, onComplete, onEnd, onHeightChange }
     [insets.top, insets.bottom],
   )
   const sheetRef = useRef<BottomSheetRef>(null)
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const [legIndex, setLegIndex] = useState(0)
   const [snapIndex, setSnapIndex] = useState(1)
@@ -413,7 +416,7 @@ export function ActiveJourneySheet({ params, onComplete, onEnd, onHeightChange }
             <LegStations
               leg={currentLeg}
               resolveStation={resolveStation}
-              onStationPress={(s) => navigation.navigate('Station', { station: s })}
+              onStationPress={(s) => onStationPress?.(s)}
             />
             {!line && detailed && (
               <Text fontSize={14} color={Colors.text}>
