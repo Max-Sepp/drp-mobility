@@ -10,7 +10,7 @@ import { BottomSheetBackdrop, type BottomSheetBackdropProps } from '@gorhom/bott
 import BottomSheet, { BottomSheetScrollView, type BottomSheetRef } from '@/components/BottomSheet'
 import { useStations } from '@/features/stations'
 import { useAuth } from '@/features/auth'
-import { assessOutages } from '@/features/journey/api/outageRelevance'
+import { assessOutages, collectDisruptions } from '@/features/journey/api/outageRelevance'
 import { startActiveJourney } from '@/features/journey/api/activeJourney'
 import {
   deleteJourney,
@@ -29,7 +29,7 @@ import {
   WALKING_ICON,
   WALKING_LABEL,
 } from '@/features/journey/components/legDisplay'
-import { OutageDetail } from '@/features/journey/components/OutageDetail'
+import { RouteAlerts } from '@/features/journey/components/RouteAlerts'
 import { useTheme, Borders, Heights, Opacity, Spacing } from '@/theme'
 import type { AccessibilityPreference, Journey, Leg, RouteTag } from '@/features/journey/api/tfl'
 import type { ResolvedLocation } from '@/features/journey/api/geocode'
@@ -129,7 +129,6 @@ function TimelineConnector({
   walkDuration,
   stopCount,
   legDuration,
-  disruptions,
 }: {
   mode: string
   lineColor: string
@@ -138,12 +137,10 @@ function TimelineConnector({
   walkDuration?: number
   stopCount: number
   legDuration: number
-  disruptions: { description?: string }[]
 }) {
-  const { Colors, Radii } = useTheme()
+  const { Colors } = useTheme()
   const isWalking = mode === 'walking'
   const isBus = mode === 'bus' || mode === 'coach'
-  const hasDisruptions = disruptions.some((d) => d.description)
   const badgeBg = isBus ? Colors.searchBg : lineColor
   const badgeText = isBus ? Colors.text : 'white'
   const stopLabel =
@@ -226,28 +223,6 @@ function TimelineConnector({
             </XStack>
           </>
         )}
-
-        {/* Disruptions */}
-        {hasDisruptions ? (
-          <View
-            style={{
-              padding: Spacing.sm,
-              backgroundColor: Colors.dangerBg,
-              borderWidth: Borders.thin,
-              borderColor: Colors.dangerBorder,
-              borderRadius: Radii.small,
-              gap: 2,
-            }}
-          >
-            {disruptions
-              .filter((d) => d.description)
-              .map((d, j) => (
-                <Text key={j} fontSize={12} color={Colors.dangerDark}>
-                  {d.description}
-                </Text>
-              ))}
-          </View>
-        ) : null}
       </View>
     </View>
   )
@@ -387,6 +362,8 @@ export function JourneyDetailSheet({
     [params, stations],
   )
 
+  const disruptions = useMemo(() => (params ? collectDisruptions(params.journey) : []), [params])
+
   async function toggleSave() {
     if (!params || saveBusy || startBusy) return
     setSaveBusy(true)
@@ -513,7 +490,6 @@ export function JourneyDetailSheet({
         walkDuration={isWalking ? leg.duration : undefined}
         stopCount={isWalking ? 0 : stopCount}
         legDuration={isWalking ? 0 : leg.duration}
-        disruptions={leg.isDisrupted ? (leg.disruptions ?? []) : []}
       />,
     )
 
@@ -640,8 +616,8 @@ export function JourneyDetailSheet({
           </TouchableOpacity>
         </View>
 
-        {/* Outage warnings */}
-        <OutageDetail assessments={outageAssessments} />
+        {/* Combined disruptions: TfL service disruptions + accessibility outages, tiered */}
+        <RouteAlerts assessments={outageAssessments} disruptions={disruptions} />
 
         {/* Timeline divider */}
         <View style={styles.separator} />

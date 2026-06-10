@@ -132,10 +132,23 @@ export async function fetchStationOutages(): Promise<StationOutage[]> {
   }))
 }
 
-/** Every station name a journey touches, taken from each leg's departure/arrival points. */
+// Train modes whose stations the rider actually enters (and whose lifts/escalators matter). A
+// station touched only by bus/coach/walking legs — e.g. a bus-to-bus interchange at a stop that
+// shares a train station's name — is excluded, since the rider never uses that station's equipment.
+const STATION_MODES = new Set([
+  'tube',
+  'dlr',
+  'overground',
+  'national-rail',
+  'elizabeth-line',
+  'tflrail',
+])
+
+/** Every train station a journey stops at, taken from each train leg's departure/arrival points. */
 function journeyStationNames(journey: Journey): string[] {
   const names: string[] = []
   for (const leg of journey.legs) {
+    if (!STATION_MODES.has(leg.mode.name)) continue
     if (leg.departurePoint?.commonName) names.push(leg.departurePoint.commonName)
     if (leg.arrivalPoint?.commonName) names.push(leg.arrivalPoint.commonName)
   }

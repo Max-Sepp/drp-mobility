@@ -34,7 +34,7 @@ import {
   modeIcon,
   modeLabel,
 } from '@/features/journey/components/legDisplay'
-import { OutageDetail } from '@/features/journey/components/OutageDetail'
+import { RouteAlerts } from '@/features/journey/components/RouteAlerts'
 import { haversineMeters } from '@/lib/geo'
 import type { ActiveJourneyParams } from '@/features/home/components/JourneyDetailSheet'
 import { useTheme, Borders, Heights, Opacity, Spacing } from '@/theme'
@@ -443,7 +443,7 @@ export function ActiveJourneySheet({
             </Text>
           </XStack>
 
-          <OutageDetail assessments={upcomingAssessments} />
+          <RouteAlerts assessments={upcomingAssessments} disruptions={[]} />
 
           {remaining.length > 0 && (
             <YStack gap="$2">
