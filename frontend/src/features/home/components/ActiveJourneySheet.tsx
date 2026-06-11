@@ -35,6 +35,7 @@ import {
   routeSignature,
   type Journey,
   type RouteTag,
+  type TaggedJourney,
 } from '@/features/journey/api/tfl'
 import type { RerouteState } from '@/features/journey/components/RerouteAlert'
 import { JourneyResultCard } from '@/features/journey/components/JourneyResultCard'
@@ -55,6 +56,7 @@ import { RouteAlerts } from '@/features/journey/components/RouteAlerts'
 import { haversineMeters } from '@/lib/geo'
 import type { ActiveJourneyParams } from '@/features/home/components/JourneyDetailSheet'
 import { useTheme, Borders, Heights, Opacity, Spacing } from '@/theme'
+import { JOURNEY_CACHE_TTL_MS } from '@/config'
 
 const ARRIVAL_RADIUS_M = 120
 const SCREEN_H = Dimensions.get('window').height
@@ -156,6 +158,7 @@ export function ActiveJourneySheet({
   const [rerouteHeaderH, setRerouteHeaderH] = useState(0)
   const [rerouteResultsH, setRerouteResultsH] = useState<number | null>(null)
   const autoAdvancedFromRef = useRef<number | null>(null)
+  const alternativesCacheRef = useRef<{ alternatives: TaggedJourney[]; fetchedAt: number } | null>(null)
 
   const { stations } = useStations()
   const stationNames = useMemo(() => stations.map((s) => s.name), [stations])
@@ -177,6 +180,7 @@ export function ActiveJourneySheet({
     setCurrentJourney(null)
     setRerouteState({ phase: 'idle' })
     autoAdvancedFromRef.current = null
+    alternativesCacheRef.current = null
 
     let active = true
     loadActiveJourney().then((record) => {
@@ -350,6 +354,7 @@ export function ActiveJourneySheet({
     if (!showRerouteAlert) {
       rerouteSheetRef.current?.close()
       alternativesSheetRef.current?.close()
+      alternativesCacheRef.current = null
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setRerouteState({ phase: 'idle' })
     }
@@ -394,6 +399,14 @@ export function ActiveJourneySheet({
 
   async function handleFindAlternative() {
     if (!params) return
+
+    // Return cached results immediately if they're still fresh.
+    const cached = alternativesCacheRef.current
+    if (cached && Date.now() - cached.fetchedAt < JOURNEY_CACHE_TTL_MS) {
+      setRerouteState({ phase: 'found', alternatives: cached.alternatives })
+      return
+    }
+
     setRerouteState({ phase: 'loading' })
 
     const activeLegs = (currentJourney ?? params.journey).legs
@@ -428,9 +441,12 @@ export function ActiveJourneySheet({
         routeSignature(journey) !== baseSig && matchOutages(journey, blockedAsOutages).length === 0,
     )
 
-    setRerouteState(
-      alternatives.length > 0 ? { phase: 'found', alternatives } : { phase: 'none-found' },
-    )
+    if (alternatives.length > 0) {
+      alternativesCacheRef.current = { alternatives, fetchedAt: Date.now() }
+      setRerouteState({ phase: 'found', alternatives })
+    } else {
+      setRerouteState({ phase: 'none-found' })
+    }
   }
 
   function handleSelectAlternative(journey: Journey, _tags: RouteTag[]) {
