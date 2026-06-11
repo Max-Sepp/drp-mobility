@@ -271,26 +271,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/outage-reports/{report_id}/verify": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /**
-         * Verify Outage Report
-         * @description Mark an outage report as physically verified by a trusted worker. Idempotent.
-         */
-        patch: operations["verify_outage_report_outage_reports__report_id__verify_patch"];
-        trace?: never;
-    };
     "/outage-reports/{report_id}/image": {
         parameters: {
             query?: never;
@@ -372,9 +352,34 @@ export interface paths {
         head?: never;
         /**
          * Resolve Failure
-         * @description Mark a failure as resolved. New reports for the same equipment will start a fresh failure.
+         * @description Mark a failure as resolved, with an optional reason. New reports for the same equipment will
+         *     start a fresh failure.
          */
         patch: operations["resolve_failure_failures__failure_id__resolve_patch"];
+        trace?: never;
+    };
+    "/failures/{failure_id}/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Verify Failure
+         * @description Record a trusted worker's on-site verification of this outage.
+         *
+         *     Anonymised — only the time and an optional note are stored, never who verified. Not idempotent:
+         *     each call appends a new verification, so an outage can accrue several over its lifetime. A
+         *     failure counts as verified once it has at least one verification record.
+         */
+        patch: operations["verify_failure_failures__failure_id__verify_patch"];
         trace?: never;
     };
     "/stations": {
@@ -566,10 +571,21 @@ export interface components {
             equipment: components["schemas"]["EquipmentSummary"];
             /** Resolved */
             resolved: boolean;
+            /** Resolved At */
+            resolved_at?: string | null;
+            /** Resolution Description */
+            resolution_description?: string | null;
             /** First Reported */
             first_reported: string | null;
             /** Reports */
             reports: components["schemas"]["OutageReportSummary"][];
+            /**
+             * Verifications
+             * @default []
+             */
+            verifications: components["schemas"]["OutageReportVerificationSchema"][];
+            /** Verified */
+            readonly verified: boolean;
         };
         /**
          * FailureInline
@@ -581,6 +597,28 @@ export interface components {
             equipment: components["schemas"]["EquipmentSummary"];
             /** Resolved */
             resolved: boolean;
+            /** Resolved At */
+            resolved_at?: string | null;
+            /** Resolution Description */
+            resolution_description?: string | null;
+            /**
+             * Verifications
+             * @default []
+             */
+            verifications: components["schemas"]["OutageReportVerificationSchema"][];
+            /**
+             * Verified
+             * @description A failure is verified once at least one verification record exists.
+             */
+            readonly verified: boolean;
+        };
+        /**
+         * FailureResolveRequest
+         * @description Request body for PATCH /failures/{id}/resolve — an optional reason for resolving.
+         */
+        FailureResolveRequest: {
+            /** Description */
+            description?: string | null;
         };
         /**
          * FailureSummary
@@ -592,12 +630,31 @@ export interface components {
             equipment: components["schemas"]["EquipmentSummary"];
             /** Resolved */
             resolved: boolean;
+            /** Resolved At */
+            resolved_at?: string | null;
+            /** Resolution Description */
+            resolution_description?: string | null;
             /** First Reported */
             first_reported: string | null;
             /** Last Reported */
             last_reported: string | null;
             /** Report Count */
             report_count: number;
+            /**
+             * Verifications
+             * @default []
+             */
+            verifications: components["schemas"]["OutageReportVerificationSchema"][];
+            /** Verified */
+            readonly verified: boolean;
+        };
+        /**
+         * FailureVerifyRequest
+         * @description Request body for PATCH /failures/{id}/verify — an optional on-site note.
+         */
+        FailureVerifyRequest: {
+            /** Description */
+            description?: string | null;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -641,10 +698,24 @@ export interface components {
             image_content_type?: string | null;
             /** Reporter Role */
             reporter_role: string;
-            /** Verified */
-            verified: boolean;
             /** Source */
             source: string;
+        };
+        /**
+         * OutageReportVerificationSchema
+         * @description One on-site verification of a failure: when it happened and an optional note. Anonymised —
+         *     no actor is recorded.
+         */
+        OutageReportVerificationSchema: {
+            /** Id */
+            id: number;
+            /**
+             * Verified At
+             * Format: date-time
+             */
+            verified_at: string;
+            /** Description */
+            description?: string | null;
         };
         /**
          * PlatformSchema
@@ -1363,37 +1434,6 @@ export interface operations {
             };
         };
     };
-    verify_outage_report_outage_reports__report_id__verify_patch: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                report_id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["OutageReportSummary"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
     download_image_outage_reports__report_id__image_get: {
         parameters: {
             query?: never;
@@ -1520,7 +1560,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["FailureResolveRequest"] | null;
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {
@@ -1529,6 +1573,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["FailureSummary"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    verify_failure_failures__failure_id__verify_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                failure_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["FailureVerifyRequest"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FailureDetail"];
                 };
             };
             /** @description Validation Error */

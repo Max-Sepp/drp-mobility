@@ -70,16 +70,19 @@ export type JourneyPlanResult =
   | { kind: 'journeys'; journeys: Journey[] }
   | { kind: 'error'; message: string }
 
-/**
- * TfL's `date` (yyyyMMdd) + `time` (HHmm) query params for a departure time. TfL works in
- * London local time and our times are device-local (we assume a London device, as elsewhere),
- * so read the wall-clock components straight off the Date.
- */
-function departureParams(departAt: Date): string[] {
+/** A time constraint for journey planning — either a specific departure or arrival time. */
+export type TimeConstraint = { mode: 'depart'; at: Date } | { mode: 'arrive'; by: Date }
+
+function timeQueryParams(time: TimeConstraint): string[] {
   const pad = (n: number) => String(n).padStart(2, '0')
-  const date = `${departAt.getFullYear()}${pad(departAt.getMonth() + 1)}${pad(departAt.getDate())}`
-  const time = `${pad(departAt.getHours())}${pad(departAt.getMinutes())}`
-  return [`date=${date}`, `time=${time}`, 'timeIs=Departing']
+  const d = time.mode === 'depart' ? time.at : time.by
+  const date = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}`
+  const t = `${pad(d.getHours())}${pad(d.getMinutes())}`
+  return [
+    `date=${date}`,
+    `time=${t}`,
+    `timeIs=${time.mode === 'depart' ? 'Departing' : 'Arriving'}`,
+  ]
 }
 
 /**
@@ -87,19 +90,19 @@ function departureParams(departAt: Date): string[] {
  * `resolveToPostcode`), which TfL resolves uniquely — so we never hit the ambiguous-text
  * "did you mean?" path. `accessibility` asks TfL to return only step-free routes; pass
  * `null`/omit it to apply no accessibility filtering (TfL then returns all modes, e.g. tube).
- * `departAt` plans for leaving at that time; omit/`null` to leave now. `preference` asks TfL to
+ * `time` constrains when to depart or arrive; omit/`null` to leave now. `preference` asks TfL to
  * optimise for a particular criterion (see `planJourneyOptions`).
  */
 export async function planJourney(
   from: string,
   to: string,
   accessibility?: AccessibilityPreference | null,
-  departAt?: Date | null,
+  time?: TimeConstraint | null,
   preference?: JourneyPreference | null,
 ): Promise<JourneyPlanResult> {
   const params: string[] = []
   if (accessibility) params.push(`accessibilityPreference=${accessibility}`)
-  if (departAt) params.push(...departureParams(departAt))
+  if (time) params.push(...timeQueryParams(time))
   if (preference) params.push(`journeyPreference=${preference}`)
   const query = params.length > 0 ? `?${params.join('&')}` : ''
   const url = `${TFL_BASE}/Journey/JourneyResults/${encodeURIComponent(from)}/to/${encodeURIComponent(to)}${query}`
@@ -142,11 +145,26 @@ export type JourneyOptionsResult =
   | { kind: 'journeys'; journeys: TaggedJourney[] }
   | { kind: 'error'; message: string }
 
-const PREFERENCES: { preference: JourneyPreference; tag: RouteTag }[] = [
-  { preference: 'LeastTime', tag: 'fastest' },
-  { preference: 'LeastInterchange', tag: 'fewest-changes' },
-  { preference: 'LeastWalking', tag: 'least-walking' },
-]
+// We query all three criteria not to read tags off them, but because each one surfaces a
+// genuinely different route; the tags themselves are derived from the resulting route data
+// (see `planJourneyOptions`).
+const PREFERENCES: JourneyPreference[] = ['LeastTime', 'LeastInterchange', 'LeastWalking']
+
+/** A route still earns a time-based tag if it's within this fraction of the best value. */
+const TAG_TOLERANCE = 0.1
+
+/** Total minutes spent on walking legs. */
+function walkingMinutes(journey: Journey): number {
+  return journey.legs
+    .filter((leg) => leg.mode.name === 'walking')
+    .reduce((sum, leg) => sum + leg.duration, 0)
+}
+
+/** Number of interchanges = transit (non-walking) legs minus one, floored at zero. */
+function changeCount(journey: Journey): number {
+  const transitLegs = journey.legs.filter((leg) => leg.mode.name !== 'walking').length
+  return Math.max(0, transitLegs - 1)
+}
 
 /**
  * A route's identity, independent of departure time: the ordered transit legs keyed by their
@@ -173,42 +191,53 @@ function routeSignature(journey: Journey): string {
 /**
  * Plan a set of genuinely different routes by asking TfL for each of its optimisation criteria in
  * parallel (fastest / fewest changes / least walking), then collapsing the time-shifted repeats
- * each criterion returns. Each distinct route keeps the tags of every criterion that surfaced it,
- * so a route can be both "Fastest" and "Fewest changes". Accessibility and departure-time
- * preferences are applied to every query. Succeeds on partial results; errors only if all fail.
+ * each criterion returns. Tags are then derived from the actual route data — each metric's
+ * winner (and anything tied with it, within `TAG_TOLERANCE` for the time-based ones) earns the
+ * tag — rather than from whichever criterion happened to surface the route. Accessibility and
+ * departure-time preferences are applied to every query. Succeeds on partial results; errors
+ * only if all fail.
  */
 export async function planJourneyOptions(
   from: string,
   to: string,
   accessibility?: AccessibilityPreference | null,
-  departAt?: Date | null,
+  time?: TimeConstraint | null,
 ): Promise<JourneyOptionsResult> {
   const results = await Promise.all(
-    PREFERENCES.map(({ preference }) => planJourney(from, to, accessibility, departAt, preference)),
+    PREFERENCES.map((preference) => planJourney(from, to, accessibility, time, preference)),
   )
 
-  // Merge in preference order, de-duplicating by route signature. The first criterion to surface a
-  // route owns the representative journey; later criteria just add their tag.
-  const bySignature = new Map<string, TaggedJourney>()
+  // Merge in preference order, de-duplicating by route signature. The first criterion to surface
+  // a route owns the representative journey used for its displayed numbers and tag metrics.
+  const bySignature = new Map<string, Journey>()
   let lastError = 'No journeys found between those locations.'
-  results.forEach((result, i) => {
+  for (const result of results) {
     if (result.kind !== 'journeys') {
       lastError = result.message
-      return
+      continue
     }
-    const { tag } = PREFERENCES[i]
     for (const journey of result.journeys) {
       const key = routeSignature(journey)
-      const existing = bySignature.get(key)
-      if (existing) {
-        if (!existing.tags.includes(tag)) existing.tags.push(tag)
-      } else {
-        bySignature.set(key, { journey, tags: [tag] })
-      }
+      if (!bySignature.has(key)) bySignature.set(key, journey)
     }
-  })
+  }
 
   const journeys = [...bySignature.values()]
   if (journeys.length === 0) return { kind: 'error', message: lastError }
-  return { kind: 'journeys', journeys }
+
+  // Derive tags from the actual routes: the best on each metric (plus anything tied within
+  // TAG_TOLERANCE for the time-based ones) earns the tag.
+  const minDuration = Math.min(...journeys.map((j) => j.duration))
+  const minWalking = Math.min(...journeys.map(walkingMinutes))
+  const minChanges = Math.min(...journeys.map(changeCount))
+
+  const tagged: TaggedJourney[] = journeys.map((journey) => {
+    const tags: RouteTag[] = []
+    // Order matters: matches RouteTags display order (fastest, fewest-changes, least-walking).
+    if (journey.duration <= minDuration * (1 + TAG_TOLERANCE)) tags.push('fastest')
+    if (changeCount(journey) === minChanges) tags.push('fewest-changes')
+    if (walkingMinutes(journey) <= minWalking * (1 + TAG_TOLERANCE)) tags.push('least-walking')
+    return { journey, tags }
+  })
+  return { kind: 'journeys', journeys: tagged }
 }

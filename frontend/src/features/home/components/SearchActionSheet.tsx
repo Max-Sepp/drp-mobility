@@ -8,7 +8,6 @@
 // @gorhom/bottom-sheet — no PanResponder or Animated wiring needed here.
 
 import { MaterialIcons } from '@expo/vector-icons'
-import * as Location from 'expo-location'
 import {
   forwardRef,
   useCallback,
@@ -30,6 +29,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
+import { NativeViewGestureHandler } from 'react-native-gesture-handler'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import type { CustomPlace, SavedPlaces } from '@/features/journey/api/savedPlaces'
 import { clockTime } from '@/features/journey/components/legDisplay'
@@ -60,7 +60,6 @@ const SCREEN_H = Dimensions.get('window').height
 // Heights of the visible sheet at each snap point (gorhom convention: height from bottom).
 const SNAP_POINTS = [72, 320, SCREEN_H * 0.82]
 
-const SNAP_IDX_PILL = 0
 const SNAP_IDX_HOME = 1
 const SNAP_IDX_OPEN = 2
 
@@ -147,76 +146,86 @@ function PlacesRow({
   return (
     <View style={placesStyles.placesSection}>
       <Text style={placesStyles.sectionLabel}>PLACES</Text>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={placesStyles.placesRow}
-        onScroll={(e) => setScrollX(e.nativeEvent.contentOffset.x)}
-        onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}
-        scrollEventThrottle={16}
-      >
-        {NAMED_PLACES.map(({ key, icon, label }) => {
-          const saved = Boolean(savedPlaces[key])
-          return (
+      <NativeViewGestureHandler disallowInterruption>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={placesStyles.placesRow}
+          onScroll={(e) => setScrollX(e.nativeEvent.contentOffset.x)}
+          onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}
+          scrollEventThrottle={16}
+        >
+          {NAMED_PLACES.map(({ key, icon, label }) => {
+            const saved = Boolean(savedPlaces[key])
+            return (
+              <TouchableOpacity
+                key={key}
+                style={placesStyles.placesTile}
+                activeOpacity={0.75}
+                onPress={() => onPress(key)}
+                onLongPress={() => onLongPress(key)}
+                accessibilityRole="button"
+                accessibilityLabel={
+                  saved ? `${label}: ${savedPlaces[key]!.address}` : `Set ${label}`
+                }
+                accessibilityHint={
+                  saved
+                    ? 'Tap to plan journey. Long press to edit or remove.'
+                    : 'Tap to set your address'
+                }
+              >
+                <View
+                  style={[placesStyles.placesTileIcon, saved && placesStyles.placesTileIconSaved]}
+                >
+                  <MaterialIcons name={icon} size={22} color={saved ? Colors.card : Colors.blue} />
+                </View>
+                <Text style={[Typography.label, { color: Colors.text, marginTop: 4 }]}>
+                  {label}
+                </Text>
+                {!saved && (
+                  <Text style={[Typography.label, { color: Colors.blue, marginTop: 1 }]}>Add</Text>
+                )}
+              </TouchableOpacity>
+            )
+          })}
+          {savedPlaces.custom.map((place) => (
             <TouchableOpacity
-              key={key}
+              key={place.id}
               style={placesStyles.placesTile}
               activeOpacity={0.75}
-              onPress={() => onPress(key)}
-              onLongPress={() => onLongPress(key)}
+              onPress={() => onCustomPlacePress(place)}
+              onLongPress={() => onCustomPlaceLongPress(place)}
               accessibilityRole="button"
-              accessibilityLabel={saved ? `${label}: ${savedPlaces[key]!.address}` : `Set ${label}`}
-              accessibilityHint={
-                saved
-                  ? 'Tap to plan journey. Long press to edit or remove.'
-                  : 'Tap to set your address'
-              }
+              accessibilityLabel={`${place.name}: ${place.address}`}
+              accessibilityHint="Tap to plan journey. Long press to remove."
             >
-              <View
-                style={[placesStyles.placesTileIcon, saved && placesStyles.placesTileIconSaved]}
-              >
-                <MaterialIcons name={icon} size={22} color={saved ? Colors.card : Colors.blue} />
+              <View style={[placesStyles.placesTileIcon, placesStyles.placesTileIconSaved]}>
+                <MaterialIcons
+                  name={place.icon as keyof typeof MaterialIcons.glyphMap}
+                  size={22}
+                  color={Colors.card}
+                />
               </View>
-              <Text style={[Typography.label, { color: Colors.text, marginTop: 4 }]}>{label}</Text>
-              {!saved && (
-                <Text style={[Typography.label, { color: Colors.blue, marginTop: 1 }]}>Add</Text>
-              )}
+              <Text
+                style={[Typography.label, { color: Colors.text, marginTop: 4 }]}
+                numberOfLines={1}
+              >
+                {place.name}
+              </Text>
             </TouchableOpacity>
-          )
-        })}
-        {savedPlaces.custom.map((place) => (
+          ))}
           <TouchableOpacity
-            key={place.id}
             style={placesStyles.placesTile}
             activeOpacity={0.75}
-            onPress={() => onCustomPlacePress(place)}
-            onLongPress={() => onCustomPlaceLongPress(place)}
-            accessibilityRole="button"
-            accessibilityLabel={`${place.name}: ${place.address}`}
-            accessibilityHint="Tap to plan journey. Long press to remove."
+            onPress={onAddPress}
           >
-            <View style={[placesStyles.placesTileIcon, placesStyles.placesTileIconSaved]}>
-              <MaterialIcons
-                name={place.icon as keyof typeof MaterialIcons.glyphMap}
-                size={22}
-                color={Colors.card}
-              />
+            <View style={placesStyles.placesTileIcon}>
+              <MaterialIcons name="add" size={22} color={Colors.blue} />
             </View>
-            <Text
-              style={[Typography.label, { color: Colors.text, marginTop: 4 }]}
-              numberOfLines={1}
-            >
-              {place.name}
-            </Text>
+            <Text style={[Typography.label, { color: Colors.text, marginTop: 4 }]}>Add</Text>
           </TouchableOpacity>
-        ))}
-        <TouchableOpacity style={placesStyles.placesTile} activeOpacity={0.75} onPress={onAddPress}>
-          <View style={placesStyles.placesTileIcon}>
-            <MaterialIcons name="add" size={22} color={Colors.blue} />
-          </View>
-          <Text style={[Typography.label, { color: Colors.text, marginTop: 4 }]}>Add</Text>
-        </TouchableOpacity>
-      </ScrollView>
+        </ScrollView>
+      </NativeViewGestureHandler>
       {scrollable && (
         <View style={placesStyles.scrollbarTrack}>
           <View
@@ -541,6 +550,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
     )
     const insets = useSafeAreaInsets()
     const [expanded, setExpanded] = useState(false)
+    const [inputFocused, setInputFocused] = useState(false)
     const [query, setQuery] = useState('')
     const [stationResults, setStationResults] = useState<StationDetail[]>([])
     const [locationResults, setLocationResults] = useState<LocationSuggestion[]>([])
@@ -549,6 +559,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
 
     const inputRef = useRef<TextInput>(null)
     const sheetRef = useRef<BottomSheetRef>(null)
+    const shouldFocusOnOpen = useRef(false)
 
     const { stations } = useStations()
     const cachedCoords = useAppLocation()
@@ -577,6 +588,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
     // ── Snap helpers ──────────────────────────────────────────────────────
 
     const expand = useCallback(() => {
+      shouldFocusOnOpen.current = true
       setExpanded(true)
       sheetRef.current?.snapToIndex(SNAP_IDX_OPEN)
     }, [])
@@ -591,7 +603,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
     const dismiss = useCallback(() => {
       Keyboard.dismiss()
       setQuery('')
-      sheetRef.current?.snapToIndex(SNAP_IDX_PILL)
+      sheetRef.current?.close()
     }, [])
 
     const restore = useCallback(() => {
@@ -603,7 +615,10 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
     function handleSheetChange(index: number) {
       if (index === SNAP_IDX_OPEN) {
         setExpanded(true)
-        inputRef.current?.focus()
+        if (shouldFocusOnOpen.current) {
+          inputRef.current?.focus()
+        }
+        shouldFocusOnOpen.current = false
       } else {
         setExpanded(false)
         setQuery('')
@@ -627,13 +642,10 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
         const to: ResolvedLocation = { postcode: toPostcode, label: suggestion.label }
 
         let from: ResolvedLocation | undefined
-        const { status } = await Location.requestForegroundPermissionsAsync()
-        if (status === 'granted') {
-          const pos =
-            cachedCoords ??
-            (await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }))
-              .coords
-          const fromResult = await resolveToPostcode(`${pos.latitude},${pos.longitude}`)
+        if (cachedCoords) {
+          const fromResult = await resolveToPostcode(
+            `${cachedCoords.latitude},${cachedCoords.longitude}`,
+          )
           if (!('error' in fromResult)) {
             from = { postcode: fromResult.postcode, label: 'Current location' }
           }
@@ -683,6 +695,16 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
                 returnKeyType="search"
                 value={query}
                 onChangeText={setQuery}
+                onFocus={() => setInputFocused(true)}
+                onBlur={() => setInputFocused(false)}
+                onSubmitEditing={() => {
+                  if (stationResults.length > 0) {
+                    collapse()
+                    onStationPress(stationResults[0].name)
+                  } else if (locationResults.length > 0) {
+                    handleLocationSelect(locationResults[0])
+                  }
+                }}
               />
             </View>
             {expanded && hasQuery && searching && (
@@ -690,7 +712,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
             )}
           </TouchableOpacity>
 
-          {expanded && (
+          {(inputFocused || hasQuery) && (
             <TouchableOpacity
               onPress={collapse}
               style={styles.cancelBtn}
@@ -785,7 +807,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
                   <Text
                     style={[
                       Typography.caption,
-                      { color: Colors.secondaryText, paddingVertical: 6 },
+                      { color: Colors.secondaryText, paddingVertical: 6, paddingLeft: Spacing.md },
                     ]}
                   >
                     No saved journeys yet — plan one to save it here.

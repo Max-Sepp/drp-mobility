@@ -1,4 +1,6 @@
-from sqlalchemy import ForeignKey, Index
+from datetime import datetime
+
+from sqlalchemy import ForeignKey, Index, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -17,9 +19,16 @@ class Failure(Base):
     # final: the automated TfL poller must never reopen the issue, even while the feed still
     # reports it. See OutageReportRepository.is_ref_authoritatively_resolved.
     resolved_authoritative: Mapped[bool] = mapped_column(default=False)
+    # Stamped when the failure is resolved; null while open. The optional reason explains why it was
+    # resolved (e.g. "Lift repaired and tested").
+    resolved_at: Mapped[datetime | None] = mapped_column(default=None)
+    resolution_description: Mapped[str | None] = mapped_column(Text, default=None)
 
     equipment: Mapped["Equipment"] = relationship("Equipment", back_populates="failures")
     reports: Mapped[list["OutageReport"]] = relationship("OutageReport", back_populates="failure")
+    verifications: Mapped[list["OutageReportVerification"]] = relationship(
+        "OutageReportVerification", back_populates="failure", order_by="OutageReportVerification.id"
+    )
 
 
 # Enforce the grouping invariant in the database: at most one *unresolved* failure per equipment.

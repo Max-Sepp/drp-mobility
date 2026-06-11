@@ -21,7 +21,6 @@ class OutageReport(Base):
     # The role of whoever submitted this report (anonymous submissions are untrusted). Reports are
     # not linked to a specific user — only this role is copied over at creation time.
     reporter_role: Mapped[str] = mapped_column(default=UserRole.UNTRUSTED.value)
-    verified: Mapped[bool] = mapped_column(default=False)
     # Provenance of this report: "user" for app submissions, "tfl" for rows synthesised by the
     # TfL disruption poller (see services/tfl_ingest.py). The automated "tfl" source ranks below
     # a trusted human — see FailureRepository.resolve / resolved_authoritative.

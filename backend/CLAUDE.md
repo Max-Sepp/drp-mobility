@@ -14,7 +14,7 @@ ruff check --fix .                                  # lint + autofix
 ruff format .                                       # format
 
 # Refresh station data from TfL CSVs (run from repo root):
-python3 temp/enrich_tube_stations.py
+python3 backend/seed_stations_data.py
 rm dev.db && uvicorn app.main:app --reload          # reseed with updated data
 
 # Full reseed of any database, incl. Postgres (run from backend/):
@@ -80,12 +80,13 @@ The grouping invariant is the non-obvious part:
 
 ## Station seed data (`app/data/stations.json`)
 
-All 387 stations are enriched from `temp/tfl-stationdata-detailed/` via `temp/enrich_tube_stations.py`. Key points:
+All 387 stations are enriched from `temp/tfl-stationdata-detailed/` via `backend/seed_stations_data.py`. Key points:
 
 - **No station-level `step_free`** — step-free access is per-platform only (`stepFreeAccess` on each platform object).
 - **`stepFreeAccess`** is derived by BFS on a step-free pathway graph (SameLevelPaths + RampRoutes + Lifts CSVs from the `-Outside` virtual node). Values: `"Full"` / `"to_platform"` / `"to_train"` / `"none"`.
 - **`lift_units`** come from Lifts.csv for stations in that feed; deep-tube stations with no CSV entry get synthesised units (shared concourse → all platforms).
 - **`escalator_units` are mocked** — the TfL feed has no escalator topology. Units are synthesised by distributing the escalator count round-robin across customer-facing platforms and tagged `"mocked": true`. This data must be replaced with hand-curated data before treating as authoritative.
+- **`app/data/station_overrides.json`** contains hand-curated corrections applied after CSV enrichment (lifts absent from the TfL feed, platform `stepFreeAccess` fixes, etc.). Entries here always win over automated sources. Edit this file and re-run `seed_stations_data.py` to apply corrections.
 - The `Station` ORM model only stores `id` and `name` — all other fields are in the JSON and used only during seeding to create `Platform` and `Equipment` rows.
 
 ## Schema changes — workflow

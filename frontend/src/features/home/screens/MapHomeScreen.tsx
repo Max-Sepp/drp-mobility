@@ -1,8 +1,8 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import { useFocusEffect } from '@react-navigation/native'
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { StationMap, type StationMapHandle } from '@/features/map/components/StationMap'
 import { useAppLocation } from '@/lib/LocationContext'
 import { loadSavedJourneys, type SavedJourney } from '@/features/journey/api/savedJourneys'
@@ -176,7 +176,7 @@ function ActiveJourneyBanner({
   )
 }
 
-export function MapHomeScreen({ navigation }: Props) {
+export function MapHomeScreen({ navigation, route }: Props) {
   const { Colors, Shadows } = useTheme()
   const styles = useMemo(
     () =>
@@ -212,6 +212,7 @@ export function MapHomeScreen({ navigation }: Props) {
   const [setPlaceModal, setSetPlaceModal] = useState<{ key: 'home' | 'work' } | null>(null)
   const [addCustomPlaceVisible, setAddCustomPlaceVisible] = useState(false)
   const [activeStation, setActiveStation] = useState<string | null>(null)
+  const [stationPausedForJourney, setStationPausedForJourney] = useState(false)
   const [activeReport, setActiveReport] = useState<string | null>(null)
   const [activePlan, setActivePlan] = useState<JourneyPlan | null>(null)
   const [activeDetail, setActiveDetail] = useState<JourneyDetailParams | null>(null)
@@ -220,10 +221,38 @@ export function MapHomeScreen({ navigation }: Props) {
   const mapRef = useRef<StationMapHandle>(null)
   const { status, user } = useAuth()
   const coords = useAppLocation()
-  // Tracks the visible height of the sheet so the map can pad its camera correctly.
-  const [sheetVisibleHeight, setSheetVisibleHeight] = useState(
-    Dimensions.get('window').height * 0.5,
+  // Each sheet reports its current snap height; the map uses the tallest one as its bottom inset.
+  const [searchHeight, setSearchHeight] = useState(Dimensions.get('window').height * 0.5)
+  const [stationHeight, setStationHeight] = useState(0)
+  const [reportHeight, setReportHeight] = useState(0)
+  const [plannerHeight, setPlannerHeight] = useState(0)
+  const [detailHeight, setDetailHeight] = useState(0)
+  const [activeJourneyHeight, setActiveJourneyHeight] = useState(0)
+  const mapBottomInset = Math.max(
+    searchHeight,
+    stationHeight,
+    reportHeight,
+    plannerHeight,
+    detailHeight,
+    activeJourneyHeight,
   )
+  // The sheets that expand to full height all snap to `SCREEN_H - insets.top - 66`, leaving just
+  // enough room for the top buttons. When a sheet reaches that height it covers the map entirely
+  // (e.g. the route overview), so the re-centre/account buttons are hidden to avoid floating over it.
+  const insets = useSafeAreaInsets()
+  const sheetIsFullscreen = mapBottomInset >= Dimensions.get('window').height - insets.top - 66
+
+  // The search sheet is the resting state of the map. Any other flow (a station, a plan, a journey
+  // detail/active journey, or a report) takes over the screen, so the search sheet is dismissed
+  // while one is open and restored only once they all close. Driving this declaratively from state
+  // avoids the imperative dismiss()/restore() calls racing with sheet close animations.
+  const overlayActive = Boolean(
+    activeStation || activePlan || activeDetail || activeJourneyParams || activeReport,
+  )
+  useEffect(() => {
+    if (overlayActive) sheetRef.current?.dismiss()
+    else sheetRef.current?.restore()
+  }, [overlayActive])
 
   // Refresh on focus so the banner reflects progress made on the active screen and survives a
   // restart (the record is read from storage each time the map regains focus).
@@ -236,6 +265,16 @@ export function MapHomeScreen({ navigation }: Props) {
       else setSavedPlaces({ custom: [] })
     }, [status, user]),
   )
+
+  // Deep link from a tapped push notification: navigation routes to MapHome with a `station`
+  // param. Open that station's sheet, then clear the param so re-tapping the same station
+  // (param goes undefined → station) opens it again.
+  const stationParam = route.params?.station
+  useEffect(() => {
+    if (!stationParam) return
+    openStation(stationParam)
+    navigation.setParams({ station: undefined })
+  }, [stationParam]) // eslint-disable-line react-hooks/exhaustive-deps
 
   function handlePlacePress(key: 'home' | 'work') {
     if (status === 'loading') return
@@ -250,7 +289,6 @@ export function MapHomeScreen({ navigation }: Props) {
     }
     const label = key === 'home' ? 'Home' : 'Work'
     setActivePlan({ initialTo: { postcode: place.postcode, label, isNamedPlace: true } })
-    sheetRef.current?.dismiss()
   }
 
   function handlePlaceLongPress(key: 'home' | 'work') {
@@ -318,7 +356,6 @@ export function MapHomeScreen({ navigation }: Props) {
     setActivePlan({
       initialTo: { postcode: place.postcode, label: place.name, isNamedPlace: true },
     })
-    sheetRef.current?.dismiss()
   }
 
   function handleCustomPlaceLongPress(place: CustomPlace) {
@@ -348,24 +385,6 @@ export function MapHomeScreen({ navigation }: Props) {
     })
   }
 
-  function endActive() {
-    Alert.alert(
-      'End journey?',
-      'This stops following the route. It stays in your saved journeys.',
-      [
-        { text: 'Keep going', style: 'cancel' },
-        {
-          text: 'End journey',
-          style: 'destructive',
-          onPress: async () => {
-            await clearActiveJourney()
-            setActive(null)
-          },
-        },
-      ],
-    )
-  }
-
   // The person icon doubles as the account affordance: log in when anonymous, or show the current
   // user with a log-out option when authenticated. A confirm step guards against an accidental tap.
   function handleAccountPress() {
@@ -385,64 +404,32 @@ export function MapHomeScreen({ navigation }: Props) {
       level: item.level,
       savedId: item.id,
     })
-    sheetRef.current?.dismiss()
   }
 
   function openStation(stationName: string) {
     setActiveStation(stationName)
-    sheetRef.current?.dismiss()
   }
 
   function closeStation() {
     setActiveStation(null)
-    sheetRef.current?.restore()
+    setStationPausedForJourney(false)
   }
 
   function openJourneyFromTo(from: ResolvedLocation | undefined, to: ResolvedLocation) {
     setActivePlan({ initialFrom: from, initialTo: to })
-    sheetRef.current?.dismiss()
   }
 
   function closePlan() {
     setActivePlan(null)
-    sheetRef.current?.restore()
+    // Un-pause the station the plan may have been opened from, so it reappears when the user backs
+    // out of planning. If a journey was started instead, the station was already cleared, so this
+    // is a no-op and the station stays hidden behind the active journey.
+    setStationPausedForJourney(false)
   }
 
   return (
     <View style={styles.screen}>
-      <StationMap ref={mapRef} onStationPress={openStation} bottomInset={sheetVisibleHeight} />
-
-      {/* Top overlay: icon buttons, then a resume banner when a journey is in progress */}
-      <SafeAreaView edges={['top']} style={[styles.topSafe, { pointerEvents: 'box-none' }]}>
-        <View style={[styles.topButtons, { pointerEvents: 'box-none' }]}>
-          <TopIconButton
-            icon="my-location"
-            size={50}
-            color={coords ? Colors.blue : Colors.secondaryText}
-            accessibilityLabel="Re-centre map on my location"
-            onPress={() => mapRef.current?.recentre()}
-          />
-          <TopIconButton
-            icon={status === 'authed' ? 'account-circle' : 'person'}
-            color={status === 'authed' ? Colors.blue : Colors.text}
-            size={50}
-            accessibilityLabel={
-              status === 'authed' && user ? `Logged in as ${user.username}` : 'Log in'
-            }
-            onPress={handleAccountPress}
-          />
-        </View>
-        {active && !activeJourneyParams && (
-          <ActiveJourneyBanner
-            active={active}
-            onResume={() => resumeActive(active)}
-            onEnd={async () => {
-              await clearActiveJourney()
-              setActive(null)
-            }}
-          />
-        )}
-      </SafeAreaView>
+      <StationMap ref={mapRef} onStationPress={openStation} bottomInset={mapBottomInset} />
 
       <SearchActionSheet
         ref={sheetRef}
@@ -456,44 +443,101 @@ export function MapHomeScreen({ navigation }: Props) {
         onCustomPlacePress={handleCustomPlacePress}
         onCustomPlaceLongPress={handleCustomPlaceLongPress}
         onAddCustomPlace={handleAddCustomPlacePress}
-        onSnapChange={setSheetVisibleHeight}
+        onSnapChange={setSearchHeight}
       />
 
-      <StationSheet
-        station={activeStation}
-        onClose={closeStation}
-        onReportPress={() => activeStation && setActiveReport(activeStation)}
-        onOpenJourney={(plan) => {
-          setActivePlan(plan)
-          sheetRef.current?.dismiss()
+      {/* Sheet render order = z-order (later renders on top). Constraints: a station opened from
+          an active journey must sit above it; the report sheet slides over the station sheet; the
+          journey detail sheet sits over the planner. Hence: ActiveJourney < Planner < Detail <
+          Station < Report. */}
+      <ActiveJourneySheet
+        params={activeJourneyParams}
+        onStationPress={openStation}
+        onComplete={() => {
+          setActiveJourneyParams(null)
+          setActive(null)
         }}
+        onEnd={() => {
+          setActiveJourneyParams(null)
+          setActive(null)
+        }}
+        onHeightChange={setActiveJourneyHeight}
       />
-
-      <ReportSheet station={activeReport} onClose={() => setActiveReport(null)} />
 
       <JourneyPlannerSheet
         plan={activePlan}
         onClose={closePlan}
         onJourneySelect={(params) => setActiveDetail(params)}
+        savedPlaces={savedPlaces}
+        onHeightChange={setPlannerHeight}
       />
 
       <JourneyDetailSheet
         params={activeDetail}
         onClose={() => setActiveDetail(null)}
+        onSaveChanged={() => loadSavedJourneys().then(setSaved)}
         onStartJourney={(params) => {
           setActiveDetail(null)
+          setActivePlan(null)
+          // Fully tear down any station that the plan was started from, so it can't reappear over
+          // the route once the active journey is the only open flow.
+          setActiveStation(null)
+          setStationPausedForJourney(false)
           setActiveJourneyParams(params)
         }}
+        onHeightChange={setDetailHeight}
       />
 
-      <ActiveJourneySheet
-        params={activeJourneyParams}
-        onComplete={() => {
-          setActiveJourneyParams(null)
-          setActive(null)
+      <StationSheet
+        station={stationPausedForJourney ? null : activeStation}
+        onClose={closeStation}
+        onReportPress={() => activeStation && setActiveReport(activeStation)}
+        onOpenJourney={(plan) => {
+          setStationPausedForJourney(true)
+          setActivePlan(plan)
         }}
-        onEnd={endActive}
+        onHeightChange={setStationHeight}
       />
+
+      <ReportSheet
+        station={activeReport}
+        onClose={() => setActiveReport(null)}
+        onHeightChange={setReportHeight}
+      />
+
+      {/* Top overlay: rendered after sheets so it sits above all backdrops */}
+      <SafeAreaView edges={['top']} style={[styles.topSafe, { pointerEvents: 'box-none' }]}>
+        {!sheetIsFullscreen && (
+          <View style={[styles.topButtons, { pointerEvents: 'box-none' }]}>
+            <TopIconButton
+              icon="my-location"
+              size={50}
+              color={coords ? Colors.blue : Colors.secondaryText}
+              accessibilityLabel="Re-centre map on my location"
+              onPress={() => mapRef.current?.recentre()}
+            />
+            <TopIconButton
+              icon={status === 'authed' ? 'account-circle' : 'person'}
+              color={status === 'authed' ? Colors.blue : Colors.text}
+              size={50}
+              accessibilityLabel={
+                status === 'authed' && user ? `Logged in as ${user.username}` : 'Log in'
+              }
+              onPress={handleAccountPress}
+            />
+          </View>
+        )}
+        {active && !activeJourneyParams && (
+          <ActiveJourneyBanner
+            active={active}
+            onResume={() => resumeActive(active)}
+            onEnd={async () => {
+              await clearActiveJourney()
+              setActive(null)
+            }}
+          />
+        )}
+      </SafeAreaView>
 
       {setPlaceModal && (
         <SetPlaceModal

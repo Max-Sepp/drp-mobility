@@ -1,66 +1,22 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
-import type { StationOutage } from '@/features/journey/api/accessibility'
-import type { ResolvedLocation } from '@/features/journey/api/geocode'
-import type { AccessibilityPreference, Journey, RouteTag } from '@/features/journey/api/tfl'
 
-// Stations and equipment types are backend rows (GET /stations, GET /equipment-types). Navigation
-// only carries the human-readable station name and the kind of equipment being reported; the
-// concrete equipment row (and its id) is resolved on the report screen.
+// Stations are backend rows (GET /stations). Navigation/sheets carry only the human-readable
+// station name; the concrete equipment row (and its id) is resolved where a report is composed.
 export type Station = string
-export type EquipmentType = 'lift' | 'escalator'
 
 export type RootStackParamList = {
-  MapHome: undefined
-  Search: undefined
-  JourneyPlanner: { initialFrom?: ResolvedLocation; initialTo?: ResolvedLocation } | undefined
-  // The expanded view of a single journey. `savedId` is set when opened from the saved list, so
-  // the screen can show Remove instead of Save. The journey and its context are plain JSON.
-  JourneyDetail: {
-    journey: Journey
-    from?: ResolvedLocation
-    to?: ResolvedLocation
-    outages?: StationOutage[]
-    level?: AccessibilityPreference | null
-    savedId?: string
-    tags?: RouteTag[]
-  }
-  // The list of journeys saved to the device.
-  SavedJourneys: undefined
-  // The follow/execute screen for an in-progress journey. Mirrors JourneyDetail's payload plus
-  // the savedId every active journey is anchored to (the detail screen saves before starting).
-  ActiveJourney: {
-    savedId: string
-    journey: Journey
-    from?: ResolvedLocation
-    to?: ResolvedLocation
-    outages?: StationOutage[]
-    level?: AccessibilityPreference | null
-  }
-  // The station-specific screen (platform access, quick reports, station picker). Reached by
-  // tapping a station in a planned journey; `station` is optional so it can also open standalone.
-  Station: { station?: Station }
-  SelectStation: { currentStation: Station }
-  ReportForm: { equipmentType: EquipmentType; station: Station }
-  ReportCustom: { station: Station }
-  Success: { station: Station }
-  // Auth is optional: these are pushed on top of the normal stack (e.g. from the header) and
-  // dismissed with goBack on success or cancel — there is no login wall.
+  // The map is the only "primary" screen — every product flow lives in a bottom sheet rendered
+  // by MapHomeScreen. `station` is an optional deep-link param: a tapped push notification routes
+  // here with the station name, which opens that station's sheet.
+  MapHome: { station?: string } | undefined
+  // Auth is optional: these are pushed on top of the map (e.g. from the header) and dismissed
+  // with goBack on success or cancel — there is no login wall.
   Login: undefined
   Signup: undefined
   Account: undefined
 }
 
 export type MapHomeScreenProps = NativeStackScreenProps<RootStackParamList, 'MapHome'>
-export type SearchScreenProps = NativeStackScreenProps<RootStackParamList, 'Search'>
-export type JourneyPlannerScreenProps = NativeStackScreenProps<RootStackParamList, 'JourneyPlanner'>
-export type JourneyDetailScreenProps = NativeStackScreenProps<RootStackParamList, 'JourneyDetail'>
-export type SavedJourneysScreenProps = NativeStackScreenProps<RootStackParamList, 'SavedJourneys'>
-export type ActiveJourneyScreenProps = NativeStackScreenProps<RootStackParamList, 'ActiveJourney'>
-export type StationScreenProps = NativeStackScreenProps<RootStackParamList, 'Station'>
-export type SelectStationScreenProps = NativeStackScreenProps<RootStackParamList, 'SelectStation'>
-export type ReportFormScreenProps = NativeStackScreenProps<RootStackParamList, 'ReportForm'>
-export type ReportCustomScreenProps = NativeStackScreenProps<RootStackParamList, 'ReportCustom'>
-export type SuccessScreenProps = NativeStackScreenProps<RootStackParamList, 'Success'>
 export type LoginScreenProps = NativeStackScreenProps<RootStackParamList, 'Login'>
 export type SignupScreenProps = NativeStackScreenProps<RootStackParamList, 'Signup'>
 export type AccountScreenProps = NativeStackScreenProps<RootStackParamList, 'Account'>

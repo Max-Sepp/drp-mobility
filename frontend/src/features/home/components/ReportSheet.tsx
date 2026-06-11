@@ -10,8 +10,15 @@ import { Alert, Dimensions, StyleSheet, TextInput, TouchableOpacity, View } from
 import { Text } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import BottomSheet, { BottomSheetScrollView, type BottomSheetRef } from '@/components/BottomSheet'
+import { SheetHeader } from '@/components/SheetHeader'
 import { apiClient } from '@/api/client'
 import type { components } from '@/api/schema.d'
+import { loadActiveJourney, type ActiveJourney } from '@/features/journey/api/activeJourney'
+import {
+  isEquipmentOnJourney,
+  journeyPlatformsAtStation,
+} from '@/features/journey/api/journeyLifts'
+import { useStations } from '@/features/stations'
 import { EquipmentPicker } from '@/features/reporting/components/EquipmentPicker'
 import { FormSection } from '@/features/reporting/components/FormSection'
 import { PhotoPicker } from '@/features/reporting/components/PhotoPicker'
@@ -22,7 +29,7 @@ type Step = 'type' | 'form' | 'success'
 type IssueType = 'lift' | 'escalator' | 'overcrowding' | 'custom'
 
 const SCREEN_H = Dimensions.get('window').height
-const SNAP_POINTS = [SCREEN_H * 0.55, SCREEN_H * 0.88]
+const TOP_BUTTON_RESERVE = 66
 
 const ALLOWED_MIME = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
 
@@ -37,20 +44,14 @@ const ISSUE_TYPES: { type: IssueType; icon: keyof typeof MaterialIcons.glyphMap;
 type Props = {
   station: string | null
   onClose: () => void
+  onHeightChange?: (height: number) => void
 }
 
-export function ReportSheet({ station, onClose }: Props) {
+export function ReportSheet({ station, onClose, onHeightChange }: Props) {
   const { Colors, Radii, Shadows } = useTheme()
   const styles = useMemo(
     () =>
       StyleSheet.create({
-        header: {
-          flexDirection: 'row',
-          alignItems: 'flex-start',
-          gap: Spacing.sm,
-          paddingHorizontal: Spacing.lg,
-          paddingBottom: Spacing.md,
-        },
         iconBtn: {
           width: 32,
           height: 32,
@@ -144,6 +145,10 @@ export function ReportSheet({ station, onClose }: Props) {
     [Colors, Radii, Shadows],
   )
   const insets = useSafeAreaInsets()
+  const snapPoints = useMemo(
+    () => [SCREEN_H * 0.55, SCREEN_H - insets.top - TOP_BUTTON_RESERVE],
+    [insets.top],
+  )
   const sheetRef = useRef<BottomSheetRef>(null)
 
   const [step, setStep] = useState<Step>('type')
@@ -157,6 +162,10 @@ export function ReportSheet({ station, onClose }: Props) {
   const [submitting, setSubmitting] = useState(false)
   const [hasLifts, setHasLifts] = useState<boolean | undefined>(undefined)
   const [hasEscalators, setHasEscalators] = useState<boolean | undefined>(undefined)
+  // The in-progress journey (if any), used to surface the equipment on the rider's current route
+  // first. Null when no journey is underway — the list keeps its plain alphabetical order.
+  const [activeJourney, setActiveJourney] = useState<ActiveJourney | null>(null)
+  const { stations } = useStations()
 
   function resetForm() {
     setIssueType(null)
@@ -199,7 +208,48 @@ export function ReportSheet({ station, onClose }: Props) {
     }
   }, [station])
 
+  // Re-check for an in-progress journey each time the sheet opens for a station (one may have
+  // started since last open).
+  useEffect(() => {
+    if (!station) return
+    let active = true
+    loadActiveJourney().then((journey) => {
+      if (active) setActiveJourney(journey)
+    })
+    return () => {
+      active = false
+    }
+  }, [station])
+
+  const stationDetail = useMemo(() => stations.find((s) => s.name === station), [stations, station])
+
+  // Ids of the equipment connecting to a platform on the line the rider is using at this station,
+  // for the current journey. Empty unless a journey is underway and passes through here.
+  const highlightedIds = useMemo(() => {
+    if (issueType !== 'lift' && issueType !== 'escalator') return new Set<number>()
+    if (!activeJourney || !stationDetail || !station) return new Set<number>()
+    const relevant = journeyPlatformsAtStation(
+      activeJourney.journey,
+      station,
+      stationDetail.platforms,
+    )
+    if (relevant.onJourney.size === 0) return new Set<number>()
+    return new Set(
+      equipment.filter((e) => isEquipmentOnJourney(e.connection, relevant)).map((e) => e.id),
+    )
+  }, [activeJourney, stationDetail, station, equipment, issueType])
+
+  // Surface the on-route equipment first while preserving the alphabetical order within each group
+  // (Array.prototype.sort is stable). No reordering when nothing is highlighted.
+  const orderedEquipment = useMemo(() => {
+    if (highlightedIds.size === 0) return equipment
+    return [...equipment].sort(
+      (a, b) => Number(highlightedIds.has(b.id)) - Number(highlightedIds.has(a.id)),
+    )
+  }, [equipment, highlightedIds])
+
   function handleChange(index: number) {
+    onHeightChange?.(index >= 0 ? snapPoints[index] : 0)
     if (index === -1) onClose()
   }
 
@@ -316,33 +366,17 @@ export function ReportSheet({ station, onClose }: Props) {
     <BottomSheet
       ref={sheetRef}
       index={-1}
-      snapPoints={SNAP_POINTS}
+      snapPoints={snapPoints}
       enablePanDownToClose
       onChange={handleChange}
     >
       {step === 'type' && (
         <>
-          <View style={styles.header}>
-            <View style={{ flex: 1 }}>
-              <Text fontSize={18} fontWeight="700" color={Colors.text}>
-                Report issue
-              </Text>
-              {station ? (
-                <Text fontSize={13} color={Colors.secondaryText} mt="$1">
-                  @ {station}
-                </Text>
-              ) : null}
-            </View>
-            <TouchableOpacity
-              onPress={() => sheetRef.current?.close()}
-              style={styles.iconBtn}
-              activeOpacity={0.75}
-              accessibilityRole="button"
-              accessibilityLabel="Close"
-            >
-              <MaterialIcons name="close" size={18} color={Colors.secondaryText} />
-            </TouchableOpacity>
-          </View>
+          <SheetHeader
+            title="Report issue"
+            subtitle={station ? `@ ${station}` : undefined}
+            onClose={() => sheetRef.current?.close()}
+          />
 
           <BottomSheetScrollView
             showsVerticalScrollIndicator={false}
@@ -382,36 +416,22 @@ export function ReportSheet({ station, onClose }: Props) {
 
       {step === 'form' && (
         <>
-          <View style={styles.header}>
-            <TouchableOpacity
-              onPress={goBack}
-              style={styles.iconBtn}
-              activeOpacity={0.75}
-              accessibilityRole="button"
-              accessibilityLabel="Back"
-            >
-              <MaterialIcons name="arrow-back" size={20} color={Colors.text} />
-            </TouchableOpacity>
-            <View style={{ flex: 1 }}>
-              <Text fontSize={18} fontWeight="700" color={Colors.text}>
-                {formTitle}
-              </Text>
-              {station ? (
-                <Text fontSize={13} color={Colors.secondaryText} mt="$1">
-                  {station}
-                </Text>
-              ) : null}
-            </View>
-            <TouchableOpacity
-              onPress={() => sheetRef.current?.close()}
-              style={styles.iconBtn}
-              activeOpacity={0.75}
-              accessibilityRole="button"
-              accessibilityLabel="Close"
-            >
-              <MaterialIcons name="close" size={18} color={Colors.secondaryText} />
-            </TouchableOpacity>
-          </View>
+          <SheetHeader
+            title={formTitle}
+            subtitle={station ?? undefined}
+            onClose={() => sheetRef.current?.close()}
+            left={
+              <TouchableOpacity
+                onPress={goBack}
+                style={styles.iconBtn}
+                activeOpacity={0.75}
+                accessibilityRole="button"
+                accessibilityLabel="Back"
+              >
+                <MaterialIcons name="arrow-back" size={20} color={Colors.text} />
+              </TouchableOpacity>
+            }
+          />
 
           <BottomSheetScrollView
             showsVerticalScrollIndicator={false}
@@ -422,10 +442,11 @@ export function ReportSheet({ station, onClose }: Props) {
                 <EquipmentPicker
                   label={issueType === 'lift' ? 'Which lift?' : 'Which escalator?'}
                   loading={loadingEquipment}
-                  equipment={equipment}
+                  equipment={orderedEquipment}
                   selectedId={equipmentId}
                   onSelect={setEquipmentId}
                   emptyText={`No ${issueType}s registered at this station.`}
+                  highlightedIds={highlightedIds}
                 />
                 <FormSection label="Comments (optional)">
                   <TextInput

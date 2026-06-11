@@ -20,7 +20,9 @@ function handleNotificationTap(response: Notifications.NotificationResponse): vo
   const data = response.notification.request.content.data as Record<string, unknown>
   const stationName = typeof data?.station_name === 'string' ? data.station_name : null
   if (stationName && navigationRef.isReady()) {
-    navigationRef.navigate('Station', { station: stationName })
+    // The map owns every station view via its StationSheet; route to it with the station name
+    // as a deep-link param rather than pushing a standalone screen.
+    navigationRef.navigate('MapHome', { station: stationName })
   }
 }
 

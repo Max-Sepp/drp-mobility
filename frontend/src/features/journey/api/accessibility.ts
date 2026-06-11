@@ -8,6 +8,8 @@ import type { Journey } from '@/features/journey/api/tfl'
 
 /** One specific broken piece of equipment at a station, with its reported detail. */
 export type OutageUnit = {
+  /** The failure (outage incident) this unit belongs to — used to fetch its event timeline. */
+  failureId: number
   /** "lift" or "escalator". */
   equipmentType: string
   /** The full connection description, e.g. "Lift A: Booking Hall → Railway platform 1". */
@@ -17,6 +19,9 @@ export type OutageUnit = {
   platformEndpoints: string[]
   reportCount: number
   lastReported: string | null
+  /** Whether a trusted worker has confirmed this outage on-site, and how many times. */
+  verified: boolean
+  verificationCount: number
   /** Escalator topology is not published by TfL, so escalator connections are estimates. */
   estimated: boolean
 }
@@ -46,7 +51,7 @@ function connectionEndpoints(connection: string): string[] {
  * The platform(s) a connection touches. Endpoints that name a platform are kept (and any
  * comma-joined list, e.g. "Northbound Platform 1, Southbound Platform 2", is split out).
  */
-function platformEndpoints(connection: string): string[] {
+export function platformEndpoints(connection: string): string[] {
   return connectionEndpoints(connection)
     .filter((endpoint) => /platform/i.test(endpoint))
     .flatMap((endpoint) => endpoint.split(',').map((p) => p.trim()))
@@ -107,11 +112,14 @@ export async function fetchStationOutages(): Promise<StationOutage[]> {
     const type = equipment.equipment_type.name
     const units = byStation.get(station) ?? []
     units.push({
+      failureId: failure.id,
       equipmentType: type,
       connection: equipment.connection,
       platformEndpoints: platformEndpoints(equipment.connection),
       reportCount: failure.report_count,
       lastReported: failure.last_reported,
+      verified: failure.verified,
+      verificationCount: failure.verifications.length,
       estimated: type === 'escalator',
     })
     byStation.set(station, units)
@@ -124,10 +132,23 @@ export async function fetchStationOutages(): Promise<StationOutage[]> {
   }))
 }
 
-/** Every station name a journey touches, taken from each leg's departure/arrival points. */
+// Train modes whose stations the rider actually enters (and whose lifts/escalators matter). A
+// station touched only by bus/coach/walking legs — e.g. a bus-to-bus interchange at a stop that
+// shares a train station's name — is excluded, since the rider never uses that station's equipment.
+const STATION_MODES = new Set([
+  'tube',
+  'dlr',
+  'overground',
+  'national-rail',
+  'elizabeth-line',
+  'tflrail',
+])
+
+/** Every train station a journey stops at, taken from each train leg's departure/arrival points. */
 function journeyStationNames(journey: Journey): string[] {
   const names: string[] = []
   for (const leg of journey.legs) {
+    if (!STATION_MODES.has(leg.mode.name)) continue
     if (leg.departurePoint?.commonName) names.push(leg.departurePoint.commonName)
     if (leg.arrivalPoint?.commonName) names.push(leg.arrivalPoint.commonName)
   }

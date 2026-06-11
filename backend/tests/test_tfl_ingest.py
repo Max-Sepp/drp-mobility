@@ -93,7 +93,6 @@ def test_matched_lift_creates_tfl_failure_and_report(
     assert summary.failures_opened == 1
     report = db_session.query(OutageReport).one()
     assert report.source == "tfl"
-    assert report.verified is True
     assert report.reporter_role == UserRole.TFL.value
     assert report.external_ref == _lift_unit_id(station, lift)
     assert report.failure.equipment_id == lift.id

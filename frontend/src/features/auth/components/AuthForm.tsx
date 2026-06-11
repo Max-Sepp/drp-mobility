@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Input, Text, XStack } from 'tamagui'
+import { Ionicons } from '@expo/vector-icons'
+import { Input, Text, XStack, YStack } from 'tamagui'
 import { ScreenHeader } from '@/components/ScreenHeader'
 import { FormScreenLayout } from '@/features/reporting/components/FormScreenLayout'
 import { FormSection } from '@/features/reporting/components/FormSection'
@@ -38,6 +39,7 @@ export const AuthForm = ({
 }: AuthFormProps) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -83,16 +85,36 @@ export const AuthForm = ({
       </FormSection>
 
       <FormSection label="Password">
-        <Input
-          value={password}
-          onChangeText={setPassword}
-          placeholder="Your password"
-          placeholderTextColor="$gray9"
-          autoCapitalize="none"
-          autoCorrect={false}
-          secureTextEntry
-          style={fieldStyle}
-        />
+        <YStack position="relative" justify="center">
+          <Input
+            value={password}
+            onChangeText={setPassword}
+            placeholder="Your password"
+            placeholderTextColor="$gray9"
+            autoCapitalize="none"
+            autoCorrect={false}
+            secureTextEntry={!showPassword}
+            style={{ ...fieldStyle, paddingRight: 48 }}
+          />
+          <XStack
+            position="absolute"
+            r={0}
+            width={44}
+            height="100%"
+            items="center"
+            justify="center"
+            pressStyle={{ opacity: 0.6 }}
+            onPress={() => setShowPassword((v) => !v)}
+            accessibilityRole="button"
+            accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
+          >
+            <Ionicons
+              name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+              size={22}
+              color="#6b7280"
+            />
+          </XStack>
+        </YStack>
       </FormSection>
 
       {error && (

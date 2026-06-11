@@ -1,0 +1,19 @@
+[
+  {
+    "_comment": "Hand-curated corrections applied after TfL CSV enrichment. Fields present here replace the CSV-derived value for that station. Keyed by station name (must match stations.json exactly). Supported top-level fields: lift_units, escalator_units, lifts, escalators. To patch individual platform fields use platforms_patch (keyed by platform id).",
+    "name": "__schema_comment__"
+  },
+  {
+    "name": "Gloucester Road",
+    "_comment": "TfL step-free feed omits this lift because Gloucester Road is not a certified step-free station. The lift serves the deep-tube Piccadilly line platforms (3 & 4) only; District/Circle platforms are at street level.",
+    "lifts": 1,
+    "lift_units": [
+      {
+        "id": "940GZZLUGTR-Lift-1",
+        "name": "Lift 1",
+        "from": "Street",
+        "to": "Eastbound Platform 5, Westbound Platform 4"
+      }
+    ]
+  }
+]
