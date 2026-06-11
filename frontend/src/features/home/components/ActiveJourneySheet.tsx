@@ -34,10 +34,10 @@ import {
 import {
   clockTime,
   humanizeSummary,
-  LegStations,
-  lineLabel,
+  legLineColor,
   modeIcon,
-  modeLabel,
+  STATION_MODES,
+  stripStationSuffix,
 } from '@/features/journey/components/legDisplay'
 import { RouteAlerts } from '@/features/journey/components/RouteAlerts'
 import { haversineMeters } from '@/lib/geo'
@@ -183,7 +183,6 @@ export function ActiveJourneySheet({
     goToRef.current = goTo
   }, [legIndex, goTo])
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!params) return
     let active = true
@@ -194,6 +193,8 @@ export function ActiveJourneySheet({
     return () => {
       active = false
     }
+    // params?.journey is the only dep we want — re-fetching when savedId/level change would be wasteful
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params?.journey])
 
   const outageAssessments = useMemo(
@@ -350,18 +351,33 @@ export function ActiveJourneySheet({
   }
 
   const { from, to } = params
-  const line = lineLabel(currentLeg)
-  const legTimes =
-    currentLeg.departureTime && currentLeg.arrivalTime
-      ? `${clockTime(currentLeg.departureTime)} → ${clockTime(currentLeg.arrivalTime)}`
-      : null
+  const lineColor = legLineColor(currentLeg, Colors.blue)
+  const isWalking = currentLeg.mode.name === 'walking'
+  const isBus = currentLeg.mode.name === 'bus' || currentLeg.mode.name === 'coach'
+  const accentBg = isWalking ? Colors.searchBg : lineColor
+  const accentFg = isWalking ? Colors.secondaryText : 'white'
+
+  const routeName = currentLeg.routeOptions?.[0]?.name ?? null
+  const direction = currentLeg.routeOptions?.[0]?.directions?.find(Boolean) ?? null
+
+  const depCommon = currentLeg.departurePoint?.commonName
+  const arrCommon = currentLeg.arrivalPoint?.commonName
+  const depName = depCommon ? stripStationSuffix(depCommon) : null
+  const arrName = arrCommon ? stripStationSuffix(arrCommon) : null
+  const depResolved = depCommon ? resolveStation(depCommon) : null
+  const arrResolved = arrCommon ? resolveStation(arrCommon) : null
+  const depTime = currentLeg.departureTime ? clockTime(currentLeg.departureTime) : null
+  const arrTime = currentLeg.arrivalTime ? clockTime(currentLeg.arrivalTime) : null
+
   const detailed =
     currentLeg.instruction.detailed &&
     currentLeg.instruction.detailed !== currentLeg.instruction.summary
       ? currentLeg.instruction.detailed
       : null
+  const headerColor = isWalking ? Colors.secondaryText : lineColor
   const remaining = legs.slice(legIndex + 1)
   const isExpanded = snapIndex >= 1
+  const hasStations = STATION_MODES.has(currentLeg.mode.name) && !!(depName || arrName)
 
   return (
     <BottomSheet
@@ -381,21 +397,63 @@ export function ActiveJourneySheet({
         accessibilityRole="button"
         accessibilityLabel={isExpanded ? undefined : 'Expand journey details'}
       >
-        <MaterialIcons
-          name={modeIcon(currentLeg.mode.name)}
-          size={22}
-          color={Colors.blue}
-          style={{ marginRight: Spacing.sm }}
-        />
-        <YStack flex={1}>
+        <View
+          style={{
+            width: 36,
+            height: 36,
+            borderRadius: 18,
+            backgroundColor: accentBg,
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginRight: Spacing.sm,
+            flexShrink: 0,
+          }}
+        >
+          <MaterialIcons name={modeIcon(currentLeg.mode.name)} size={20} color={accentFg} />
+        </View>
+        <YStack flex={1} gap="$0.5">
           <Text fontSize={15} fontWeight="700" color={Colors.text} numberOfLines={1}>
-            {humanizeSummary(currentLeg.instruction.summary, [from, to])}
+            {arrName ?? humanizeSummary(currentLeg.instruction.summary, [from, to])}
           </Text>
-          <Text fontSize={12} color={Colors.secondaryText}>
-            Leg {legIndex + 1} of {legs.length}
-          </Text>
+          {routeName && !isWalking ? (
+            <View
+              style={{
+                alignSelf: 'flex-start',
+                backgroundColor: isBus ? Colors.searchBg : accentBg,
+                borderRadius: Radii.xs,
+                paddingHorizontal: 6,
+                paddingVertical: 1,
+                borderWidth: isBus ? Borders.thin : 0,
+                borderColor: isBus ? Colors.border : undefined,
+              }}
+            >
+              <Text
+                fontSize={11}
+                fontWeight="700"
+                style={{ color: isBus ? Colors.text : accentFg }}
+              >
+                {routeName}
+              </Text>
+            </View>
+          ) : isWalking ? (
+            <Text fontSize={12} color={Colors.secondaryText}>
+              {currentLeg.duration} min walk
+            </Text>
+          ) : null}
         </YStack>
-        {!isExpanded && <MaterialIcons name="expand-less" size={20} color={Colors.secondaryText} />}
+        {arrTime && (
+          <Text
+            fontSize={14}
+            fontWeight="700"
+            color={Colors.text}
+            style={{ marginRight: isExpanded ? 0 : Spacing.xs }}
+          >
+            {arrTime}
+          </Text>
+        )}
+        {!isExpanded && (
+          <MaterialIcons name="expand-less" size={20} color={Colors.secondaryText} />
+        )}
       </TouchableOpacity>
 
       {/* Full detail — always rendered so content slides in during snap transition */}
@@ -403,60 +461,258 @@ export function ActiveJourneySheet({
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[styles.content, { paddingBottom: 65 + insets.bottom + Spacing.xl }]}
       >
-        <YStack gap="$4">
-          <YStack
-            p="$4"
-            gap="$2"
-            style={{
-              borderWidth: Borders.thick,
-              borderColor: Colors.blue,
-              borderRadius: Radii.button,
-              backgroundColor: Colors.card,
-            }}
-          >
-            <XStack items="center" gap="$2">
-              <MaterialIcons
-                name={modeIcon(currentLeg.mode.name)}
-                size={26}
-                color={Colors.blue}
-                aria-label={modeLabel(currentLeg.mode.name)}
+        <YStack gap="$3">
+          {/* Heading: live indicator + leg progress */}
+          <XStack items="center" justify="space-between">
+            <XStack items="center" gap="$1.5">
+              <View
+                style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: headerColor }}
               />
-              <Text fontSize={13} fontWeight="700" color={Colors.blue}>
-                {modeLabel(currentLeg.mode.name)} · now
+              <Text fontSize={13} fontWeight="700" style={{ color: headerColor }}>
+                NOW
               </Text>
             </XStack>
-            <Text fontSize={19} fontWeight="700" color={Colors.text}>
-              {humanizeSummary(currentLeg.instruction.summary, [from, to])}
+            <Text fontSize={12} color={Colors.secondaryText}>
+              Leg {legIndex + 1} of {legs.length}
             </Text>
-            {line && (
-              <Text fontSize={14} fontWeight="600" color={Colors.blue}>
-                {line}
-              </Text>
-            )}
-            <LegStations
-              leg={currentLeg}
-              resolveStation={resolveStation}
-              onStationPress={(s) => onStationPress?.(s)}
-            />
-            {!line && detailed && (
-              <Text fontSize={14} color={Colors.text}>
-                {humanizeSummary(detailed, [from, to])}
-              </Text>
-            )}
-            {legTimes && (
-              <Text fontSize={13} color={Colors.secondaryText}>
-                {legTimes} · {currentLeg.duration} min
-              </Text>
-            )}
-          </YStack>
+          </XStack>
 
+          {/* Current leg card */}
+          <View
+            style={{
+              borderRadius: Radii.button,
+              overflow: 'hidden',
+              backgroundColor: Colors.card,
+              borderWidth: Borders.thin,
+              borderColor: Colors.border,
+            }}
+          >
+            {/* Line-colour accent strip */}
+            <View style={{ height: 5, backgroundColor: accentBg }} />
+
+            <YStack p="$5" gap="$4">
+              {/* Mode circle + line badge + direction */}
+              <XStack items="center" gap="$2.5">
+                <View
+                  style={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: 19,
+                    backgroundColor: accentBg,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <MaterialIcons
+                    name={modeIcon(currentLeg.mode.name)}
+                    size={20}
+                    color={accentFg}
+                    aria-label={currentLeg.mode.name}
+                  />
+                </View>
+                {routeName && !isWalking && (
+                  <View
+                    style={{
+                      backgroundColor: isBus ? Colors.searchBg : accentBg,
+                      borderRadius: Radii.xs,
+                      paddingHorizontal: 10,
+                      paddingVertical: 4,
+                      borderWidth: isBus ? Borders.thin : 0,
+                      borderColor: isBus ? Colors.border : undefined,
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Text
+                      fontSize={15}
+                      fontWeight="700"
+                      style={{ color: isBus ? Colors.text : 'white' }}
+                    >
+                      {routeName}
+                    </Text>
+                  </View>
+                )}
+                {direction && (
+                  <Text
+                    fontSize={14}
+                    color={Colors.secondaryText}
+                    numberOfLines={1}
+                    style={{ flex: 1 }}
+                  >
+                    {'→ '}
+                    {stripStationSuffix(direction)}
+                  </Text>
+                )}
+                {isWalking && (
+                  <Text fontSize={16} fontWeight="600" color={Colors.text}>
+                    Walk · {currentLeg.duration} min
+                  </Text>
+                )}
+              </XStack>
+
+              {/* Transit legs: vertical station connector */}
+              {hasStations ? (
+                <View style={{ flexDirection: 'row', gap: Spacing.lg }}>
+                  {/* Gutter: departure dot → connector → arrival dot */}
+                  <View style={{ width: 16, alignItems: 'center', paddingTop: 5 }}>
+                    <View
+                      style={{
+                        width: 11,
+                        height: 11,
+                        borderRadius: 6,
+                        borderWidth: 2,
+                        borderColor: accentBg,
+                        backgroundColor: Colors.card,
+                      }}
+                    />
+                    <View
+                      style={{
+                        flex: 1,
+                        width: 2,
+                        backgroundColor: accentBg,
+                        opacity: 0.35,
+                        marginVertical: 3,
+                        minHeight: 32,
+                      }}
+                    />
+                    <View
+                      style={{ width: 11, height: 11, borderRadius: 6, backgroundColor: accentBg }}
+                    />
+                  </View>
+
+                  {/* Station names + times */}
+                  <View style={{ flex: 1 }}>
+                    {depName && (
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          marginBottom: Spacing.sm,
+                        }}
+                      >
+                        {depResolved ? (
+                          <Text
+                            fontSize={16}
+                            fontWeight="600"
+                            color={Colors.blue}
+                            onPress={() => onStationPress?.(depResolved)}
+                            style={{ flex: 1, textDecorationLine: 'underline' }}
+                            numberOfLines={1}
+                            role="button"
+                            aria-label={`View accessibility for ${depResolved}`}
+                          >
+                            {depName}
+                          </Text>
+                        ) : (
+                          <Text
+                            fontSize={16}
+                            fontWeight="600"
+                            color={Colors.text}
+                            style={{ flex: 1 }}
+                            numberOfLines={1}
+                          >
+                            {depName}
+                          </Text>
+                        )}
+                        {depTime && (
+                          <Text
+                            fontSize={14}
+                            color={Colors.secondaryText}
+                            style={{ marginLeft: Spacing.sm }}
+                          >
+                            {depTime}
+                          </Text>
+                        )}
+                      </View>
+                    )}
+                    <XStack items="center" gap="$1.5" py="$1.5">
+                      <MaterialIcons name="schedule" size={13} color={Colors.tertiaryText} />
+                      <Text fontSize={13} color={Colors.tertiaryText}>
+                        {currentLeg.duration} min
+                      </Text>
+                    </XStack>
+                    {arrName && (
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          marginTop: Spacing.sm,
+                        }}
+                      >
+                        {arrResolved ? (
+                          <Text
+                            fontSize={16}
+                            fontWeight="600"
+                            color={Colors.blue}
+                            onPress={() => onStationPress?.(arrResolved)}
+                            style={{ flex: 1, textDecorationLine: 'underline' }}
+                            numberOfLines={1}
+                            role="button"
+                            aria-label={`View accessibility for ${arrResolved}`}
+                          >
+                            {arrName}
+                          </Text>
+                        ) : (
+                          <Text
+                            fontSize={16}
+                            fontWeight="600"
+                            color={Colors.text}
+                            style={{ flex: 1 }}
+                            numberOfLines={1}
+                          >
+                            {arrName}
+                          </Text>
+                        )}
+                        {arrTime && (
+                          <Text
+                            fontSize={16}
+                            fontWeight="700"
+                            color={Colors.text}
+                            style={{ marginLeft: Spacing.sm }}
+                          >
+                            {arrTime}
+                          </Text>
+                        )}
+                      </View>
+                    )}
+                  </View>
+                </View>
+              ) : (
+                /* Walking / bus / other: instruction text + times */
+                <YStack gap="$2">
+                  {!isWalking && (
+                    <Text fontSize={16} fontWeight="600" color={Colors.text}>
+                      {humanizeSummary(currentLeg.instruction.summary, [from, to])}
+                    </Text>
+                  )}
+                  {detailed && (
+                    <Text fontSize={14} color={Colors.secondaryText}>
+                      {humanizeSummary(detailed, [from, to])}
+                    </Text>
+                  )}
+                  {(depTime || arrTime) && (
+                    <XStack items="center" gap="$1.5" mt="$0.5">
+                      <MaterialIcons name="schedule" size={14} color={Colors.secondaryText} />
+                      <Text fontSize={14} color={Colors.secondaryText}>
+                        {[depTime, arrTime].filter(Boolean).join(' → ')} · {currentLeg.duration} min
+                      </Text>
+                    </XStack>
+                  )}
+                </YStack>
+              )}
+            </YStack>
+          </View>
+
+          {/* GPS status */}
           <XStack items="center" gap="$2">
             <MaterialIcons
               name={gpsActive ? 'my-location' : 'location-disabled'}
-              size={16}
+              size={15}
               color={Colors.secondaryText}
             />
-            <Text fontSize={13} color={Colors.secondaryText} flex={1}>
+            <Text fontSize={12} color={Colors.secondaryText} flex={1}>
               {gpsActive
                 ? 'Advancing automatically as you arrive — or tap Arrived.'
                 : 'Tap Arrived when you reach each stop.'}
@@ -466,24 +722,78 @@ export function ActiveJourneySheet({
           <RouteAlerts assessments={upcomingAssessments} disruptions={[]} />
 
           {remaining.length > 0 && (
-            <YStack gap="$2">
-              <Text fontSize={13} fontWeight="700" color={Colors.secondaryText}>
+            <YStack gap="$1.5">
+              <Text
+                fontSize={11}
+                fontWeight="700"
+                color={Colors.tertiaryText}
+                style={{ letterSpacing: 0.5 }}
+              >
                 COMING UP
               </Text>
-              {remaining.map((leg, i) => (
-                <XStack key={legIndex + 1 + i} gap="$2.5" items="center" opacity={Opacity.subtle}>
-                  <MaterialIcons
-                    name={modeIcon(leg.mode.name)}
-                    size={20}
-                    color={Colors.secondaryText}
-                    aria-label={modeLabel(leg.mode.name)}
-                    style={{ width: 22 }}
-                  />
-                  <Text fontSize={14} color={Colors.text} flex={1}>
-                    {humanizeSummary(leg.instruction.summary, [from, to])}
-                  </Text>
-                </XStack>
-              ))}
+              {remaining.map((leg, i) => {
+                const legColor = legLineColor(leg, Colors.blue)
+                const legIsWalking = leg.mode.name === 'walking'
+                const legIsBus = leg.mode.name === 'bus' || leg.mode.name === 'coach'
+                const legBg = legIsWalking ? Colors.searchBg : legColor
+                const legFg = legIsWalking ? Colors.secondaryText : 'white'
+                const legRouteName = leg.routeOptions?.[0]?.name ?? null
+                const legArrCommon = leg.arrivalPoint?.commonName
+                const legArrName = legArrCommon ? stripStationSuffix(legArrCommon) : null
+                const legArrTime = leg.arrivalTime ? clockTime(leg.arrivalTime) : null
+                return (
+                  <XStack
+                    key={legIndex + 1 + i}
+                    gap="$2.5"
+                    items="center"
+                    py="$1"
+                    opacity={Opacity.subtle}
+                  >
+                    <View
+                      style={{
+                        width: 28,
+                        height: 28,
+                        borderRadius: 14,
+                        backgroundColor: legBg,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0,
+                      }}
+                    >
+                      <MaterialIcons name={modeIcon(leg.mode.name)} size={15} color={legFg} />
+                    </View>
+                    {legRouteName && !legIsWalking && (
+                      <View
+                        style={{
+                          backgroundColor: legIsBus ? Colors.searchBg : legBg,
+                          borderRadius: Radii.xs,
+                          paddingHorizontal: 6,
+                          paddingVertical: 2,
+                          borderWidth: legIsBus ? Borders.thin : 0,
+                          borderColor: legIsBus ? Colors.border : undefined,
+                          flexShrink: 0,
+                        }}
+                      >
+                        <Text
+                          fontSize={11}
+                          fontWeight="700"
+                          style={{ color: legIsBus ? Colors.text : legFg }}
+                        >
+                          {legRouteName}
+                        </Text>
+                      </View>
+                    )}
+                    <Text fontSize={13} color={Colors.text} flex={1} numberOfLines={1}>
+                      {legArrName ?? humanizeSummary(leg.instruction.summary, [from, to])}
+                    </Text>
+                    {legArrTime && (
+                      <Text fontSize={13} color={Colors.secondaryText}>
+                        {legArrTime}
+                      </Text>
+                    )}
+                  </XStack>
+                )
+              })}
             </YStack>
           )}
 
