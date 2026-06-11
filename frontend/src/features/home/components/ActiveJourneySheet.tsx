@@ -8,7 +8,8 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import * as Location from 'expo-location'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Alert, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { Alert, Dimensions, StyleSheet, View } from 'react-native'
+import { TouchableOpacity } from 'react-native-gesture-handler'
 import { Spinner, Text, XStack, YStack } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import {
@@ -87,8 +88,12 @@ export function ActiveJourneySheet({
           borderTopColor: Colors.border,
           backgroundColor: Colors.card,
         },
+        // RNGH touchables render an outer BaseButton (containerStyle) wrapping an inner
+        // Animated.View (style). Flex sizing must go on the outer container or the button
+        // hugs its content; the visual styling stays inner so the opacity animation fades it.
+        secondaryBtnOuter: { flex: 1 },
+        primaryBtnOuter: { flex: 1.4 },
         secondaryBtn: {
-          flex: 1,
           height: Heights.touchTarget,
           borderRadius: Radii.button,
           borderWidth: Borders.medium,
@@ -98,7 +103,6 @@ export function ActiveJourneySheet({
           justifyContent: 'center',
         },
         primaryBtn: {
-          flex: 1.4,
           height: Heights.touchTarget,
           borderRadius: Radii.button,
           backgroundColor: Colors.blue,
@@ -299,6 +303,7 @@ export function ActiveJourneySheet({
       <BottomSheetFooter {...props}>
         <View style={[styles.controlBar, { paddingBottom: insets.bottom + Spacing.sm }]}>
           <TouchableOpacity
+            containerStyle={styles.secondaryBtnOuter}
             style={[styles.secondaryBtn, legIndex === 0 && { opacity: Opacity.disabled }]}
             onPress={legIndex === 0 ? undefined : () => goTo(legIndex - 1)}
             activeOpacity={0.75}
@@ -310,6 +315,7 @@ export function ActiveJourneySheet({
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
+            containerStyle={styles.primaryBtnOuter}
             style={styles.primaryBtn}
             onPress={onArrived}
             activeOpacity={0.85}
