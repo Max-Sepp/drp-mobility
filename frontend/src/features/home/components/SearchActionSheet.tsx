@@ -19,7 +19,6 @@ import {
 } from 'react'
 import {
   ActivityIndicator,
-  Alert,
   Dimensions,
   Keyboard,
   ScrollView,
@@ -576,6 +575,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
     useEffect(() => {
       getRecentLocations().then(setRecentLocations)
     }, [])
+
 
     // ── Debounced search ──────────────────────────────────────────────────
 

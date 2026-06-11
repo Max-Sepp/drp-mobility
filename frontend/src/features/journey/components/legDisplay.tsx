@@ -4,7 +4,7 @@ import type { ResolvedLocation } from '@/features/journey/api/geocode'
 import type { Journey, Leg, RouteTag } from '@/features/journey/api/tfl'
 import { effectiveDiscount } from '@/features/journey/lib/railcards'
 import { useTheme, Borders, Opacity } from '@/theme'
-import { useMobilityStyle } from '@/lib/MobilityStyleContext'
+import { useMobilityStyle, stablePickIndex } from '@/lib/MobilityStyleContext'
 
 export type ResolveStation = (commonName: string) => string | null
 export type StationPressHandler = (stationName: string) => void
@@ -262,7 +262,14 @@ export function legLineColor(leg: Leg, fallback = '#007AFF'): string {
 
 function LegChip({ leg, compact = true }: { leg: Leg; compact?: boolean }) {
   const { Colors, Radii } = useTheme()
-  const { label: walkLabel, icon: walkIcon } = useMobilityStyle()
+  const mobilityStyle = useMobilityStyle()
+  const legSeed = `${leg.mode.name}${leg.duration}${leg.departureTime ?? ''}${leg.arrivalTime ?? ''}`
+  const walkLabel = mobilityStyle.funLabels
+    ? mobilityStyle.funLabels[stablePickIndex(mobilityStyle.funLabels, legSeed)]
+    : mobilityStyle.label
+  const walkIcon = mobilityStyle.funIcons
+    ? mobilityStyle.funIcons[stablePickIndex(mobilityStyle.funIcons, legSeed)]
+    : mobilityStyle.icon
   const icon = modeIcon(leg.mode.name)
   const isWalking = leg.mode.name === 'walking'
   const isBus = leg.mode.name === 'bus' || leg.mode.name === 'coach'

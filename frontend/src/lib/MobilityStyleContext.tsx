@@ -11,6 +11,7 @@ export type MobilityStyleId =
   | 'gliding'
   | 'striding'
   | 'walking'
+  | 'fun'
 
 export type MobilityStyle = {
   id: MobilityStyleId
@@ -18,6 +19,8 @@ export type MobilityStyle = {
   label: string
   description: string
   icon: keyof typeof MaterialIcons.glyphMap
+  funLabels?: string[]
+  funIcons?: (keyof typeof MaterialIcons.glyphMap)[]
 }
 
 export const MOBILITY_STYLES: Record<MobilityStyleId, MobilityStyle> = {
@@ -63,9 +66,36 @@ export const MOBILITY_STYLES: Record<MobilityStyleId, MobilityStyle> = {
     description: 'Classic — for everyone who walks',
     icon: 'directions-walk',
   },
+  fun: {
+    id: 'fun',
+    name: 'Surprise!',
+    label: 'Move',
+    description: 'A different word and icon every time',
+    icon: 'auto-awesome',
+    funLabels: [
+      'Zoom', 'Dance', 'Galumph', 'Sashay', 'Mosey', 'Waddle',
+      'Shimmy', 'Prance', 'Toddle', 'Scuttle', 'Whoosh', 'Skedaddle',
+      'Lumber', 'Swagger', 'Trot', 'Frolic', 'Traipse', 'Stomp',
+      'Scamper', 'Saunter', 'Bound', 'Lurch', 'Hustle', 'Tiptoe',
+      'Strut', 'Bumble', 'Shuffle', 'Skip', 'Meander', 'Dart',
+    ],
+    funIcons: [
+      'accessible-forward', 'assist-walker', 'nordic-walking', 'directions-walk',
+      'directions-run', 'skateboarding', 'celebration', 'bolt',
+      'waving-hand', 'auto-awesome', 'sledding', 'emoji-emotions', 'rocket',
+    ],
+  },
 }
 
 export const DEFAULT_MOBILITY_STYLE_ID: MobilityStyleId = 'navigating'
+
+/** Deterministic index into an array, seeded by leg properties so the same leg always
+ *  shows the same fun word/icon regardless of re-renders or navigation. */
+export function stablePickIndex(arr: unknown[], seed: string): number {
+  let h = 5381
+  for (let i = 0; i < seed.length; i++) h = (h * 33 + seed.charCodeAt(i)) & 0x7fffffff
+  return h % arr.length
+}
 
 type MobilityStyleContextValue = {
   styleId: MobilityStyleId

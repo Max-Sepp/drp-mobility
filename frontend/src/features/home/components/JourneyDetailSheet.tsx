@@ -27,7 +27,7 @@ import {
   RouteTags,
   stripStationSuffix,
 } from '@/features/journey/components/legDisplay'
-import { useMobilityStyle } from '@/lib/MobilityStyleContext'
+import { useMobilityStyle, stablePickIndex } from '@/lib/MobilityStyleContext'
 import { OutageDetail } from '@/features/journey/components/OutageDetail'
 import { useTheme, Borders, Heights, Opacity, Spacing } from '@/theme'
 import type { AccessibilityPreference, Journey, Leg, RouteTag } from '@/features/journey/api/tfl'
@@ -128,6 +128,8 @@ function TimelineConnector({
   walkDuration,
   stopCount,
   legDuration,
+  departureTime,
+  arrivalTime,
   disruptions,
 }: {
   mode: string
@@ -137,10 +139,19 @@ function TimelineConnector({
   walkDuration?: number
   stopCount: number
   legDuration: number
+  departureTime?: string | null
+  arrivalTime?: string | null
   disruptions: { description?: string }[]
 }) {
   const { Colors, Radii } = useTheme()
-  const { label: walkLabel, icon: walkIcon } = useMobilityStyle()
+  const mobilityStyle = useMobilityStyle()
+  const connectorSeed = `${mode}${walkDuration ?? legDuration}${departureTime ?? ''}${arrivalTime ?? ''}`
+  const walkLabel = mobilityStyle.funLabels
+    ? mobilityStyle.funLabels[stablePickIndex(mobilityStyle.funLabels, connectorSeed)]
+    : mobilityStyle.label
+  const walkIcon = mobilityStyle.funIcons
+    ? mobilityStyle.funIcons[stablePickIndex(mobilityStyle.funIcons, connectorSeed)]
+    : mobilityStyle.icon
   const isWalking = mode === 'walking'
   const isBus = mode === 'bus' || mode === 'coach'
   const hasDisruptions = disruptions.some((d) => d.description)
@@ -513,6 +524,8 @@ export function JourneyDetailSheet({
         walkDuration={isWalking ? leg.duration : undefined}
         stopCount={isWalking ? 0 : stopCount}
         legDuration={isWalking ? 0 : leg.duration}
+        departureTime={leg.departureTime}
+        arrivalTime={leg.arrivalTime}
         disruptions={leg.isDisrupted ? (leg.disruptions ?? []) : []}
       />,
     )
