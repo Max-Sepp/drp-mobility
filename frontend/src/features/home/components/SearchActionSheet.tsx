@@ -19,6 +19,7 @@ import {
 } from 'react'
 import {
   ActivityIndicator,
+  Alert,
   Dimensions,
   Keyboard,
   ScrollView,
