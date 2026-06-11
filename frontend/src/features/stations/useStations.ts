@@ -38,15 +38,25 @@ export function useStations(): UseStations {
         }
       } catch {}
 
-      const { data } = await apiClient.GET('/stations')
-      if (!active) return
-      if (data) {
-        setStations(data)
-        setLoading(false)
-        AsyncStorage.setItem(CACHE_KEY, JSON.stringify(data)).catch(() => {})
-      } else if (!hadCache) {
-        setError(true)
-        setLoading(false)
+      try {
+        const { data } = await apiClient.GET('/stations')
+        if (!active) return
+        if (data) {
+          setStations(data)
+          setLoading(false)
+          AsyncStorage.setItem(CACHE_KEY, JSON.stringify(data)).catch(() => {})
+        } else if (!hadCache) {
+          setError(true)
+          setLoading(false)
+        }
+      } catch {
+        // Network failure (e.g. backend unreachable). Keep cached data if we
+        // have it; otherwise surface the error state.
+        if (!active) return
+        if (!hadCache) {
+          setError(true)
+          setLoading(false)
+        }
       }
     }
 

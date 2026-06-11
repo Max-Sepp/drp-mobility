@@ -48,10 +48,8 @@ export type JourneyDetailParams = {
   tags?: RouteTag[]
 }
 
-// The follow/execute payload for an in-progress journey. Mirrors JourneyDetailParams plus the
-// savedId every active journey is anchored to (the detail sheet saves before starting).
 export type ActiveJourneyParams = {
-  savedId: string
+  savedId?: string
   journey: Journey
   from?: ResolvedLocation
   to?: ResolvedLocation

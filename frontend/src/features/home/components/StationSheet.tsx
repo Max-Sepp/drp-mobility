@@ -5,16 +5,19 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native'
-import { Text } from 'tamagui'
+import { Text, XStack } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import BottomSheet, { BottomSheetScrollView, type BottomSheetRef } from '@/components/BottomSheet'
 import { SheetHeader } from '@/components/SheetHeader'
 import { PlatformAccessCard } from '@/features/home/components/PlatformAccessCard'
 import { ReportsStatus } from '@/features/home/components/ReportsStatus'
+import { StationAlertBanner } from '@/features/home/components/StationAlertBanner'
 import { StationAdditionalInfoCard } from '@/features/home/components/StationAdditionalInfoCard'
 import { StationInfoCard } from '@/features/home/components/StationInfoCard'
 import { useOutages } from '@/features/outages'
-import { useStations } from '@/features/stations'
+import { overallSeverity } from '@/features/outages/severity'
+import { useStationAlerts, worstAlertSeverity } from '@/features/outages/stationAlerts'
+import { StepFreeBadge, useStations } from '@/features/stations'
 import { resolveToPostcode, type ResolvedLocation } from '@/features/journey/api/geocode'
 import { useAppLocation } from '@/lib/LocationContext'
 import type { JourneyPlan } from '@/features/home/components/JourneyPlannerSheet'
@@ -93,9 +96,18 @@ export function StationSheet({
 
   const { reports: allReports, loading } = useOutages()
   const reports = useMemo(
-    () => allReports.filter((r) => r.failure.equipment.station.name === station),
+    () =>
+      allReports.filter((r) => r.failure.equipment.station.name === station && r.source !== 'tfl'),
     [allReports, station],
   )
+  const { alerts } = useStationAlerts(stationDetail?.id)
+  const badgeSeverity = useMemo(() => overallSeverity(reports), [reports])
+  const hasIssues = reports.length > 0 || alerts.length > 0
+  const issueSeverity =
+    badgeSeverity === 'danger' || worstAlertSeverity(alerts) === 'danger' ? 'danger' : 'warning'
+
+  // Imperatively open or close the sheet when the station prop changes.
+  // The index prop alone is unreliable for re-triggering gorhom after mount.
   useEffect(() => {
     if (station) {
       programmaticClose.current = false
@@ -152,6 +164,38 @@ export function StationSheet({
         onClose={() => sheetRef.current?.close()}
       />
 
+      {/* Status badges — on their own row so the station name is never truncated. */}
+      {(stationDetail?.step_free || hasIssues) && (
+        <XStack gap="$2" flexWrap="wrap" px="$4" pb="$2">
+          {stationDetail?.step_free && <StepFreeBadge value={stationDetail.step_free} />}
+          {hasIssues && (
+            <XStack
+              items="center"
+              gap="$1.5"
+              px="$2"
+              py="$1"
+              style={{
+                backgroundColor: issueSeverity === 'warning' ? Colors.warningBg : Colors.dangerBg,
+                borderRadius: 6,
+              }}
+            >
+              <MaterialIcons
+                name="warning"
+                size={16}
+                color={issueSeverity === 'warning' ? Colors.warningDark : Colors.dangerDark}
+              />
+              <Text
+                fontSize={13}
+                fontWeight="600"
+                color={issueSeverity === 'warning' ? Colors.warningDark : Colors.dangerDark}
+              >
+                Known issues
+              </Text>
+            </XStack>
+          )}
+        </XStack>
+      )}
+
       {/* Action buttons row */}
       <View style={styles.actionsRow}>
         <TouchableOpacity
@@ -193,6 +237,7 @@ export function StationSheet({
       >
         {stationDetail && <StationInfoCard station={stationDetail} />}
         {stationDetail && <PlatformAccessCard key={station} platforms={stationDetail.platforms} />}
+        <StationAlertBanner alerts={alerts} />
         <ReportsStatus loading={loading} reports={reports} />
         {stationDetail && <StationAdditionalInfoCard station={stationDetail} />}
       </BottomSheetScrollView>

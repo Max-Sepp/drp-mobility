@@ -1,3 +1,4 @@
+import os
 from collections.abc import Callable, Iterator
 
 import pytest
@@ -11,6 +12,11 @@ from app.main import app
 from app.models.user import UserRole
 from app.repositories.user import UserRepository
 from app.seed import seed_defaults
+
+# The app lifespan starts an in-process TfL poll loop unless disabled. The `client` fixture enters
+# that lifespan, so force it off for the whole suite to keep tests hermetic (no network). The loop
+# only starts at lifespan entry (TestClient enter), so setting this after import is sufficient.
+os.environ["TFL_POLL_ENABLED"] = "false"
 
 
 @pytest.fixture

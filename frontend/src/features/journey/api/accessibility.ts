@@ -32,6 +32,14 @@ export type StationOutage = {
   stationName: string
   equipmentTypes: string[]
   units: OutageUnit[]
+  /** For each equipment type, the total count installed at this station (broken + working). */
+  totalByType: Record<string, number>
+  /**
+   * Journey-relevant lift counts: how many lifts on the user's specific path are broken vs.
+   * total. Populated by enrichOutagesWithJourneyRelevance() in JourneyPlannerSheet after
+   * assessOutages runs; absent until then.
+   */
+  journeyRelevantLifts?: { broken: number; total: number }
 }
 
 /**
@@ -106,6 +114,7 @@ export async function fetchStationOutages(): Promise<StationOutage[]> {
   if (error || !data) return []
 
   const byStation = new Map<string, OutageUnit[]>()
+  const totalByStationType = new Map<string, Record<string, number>>()
   for (const failure of data) {
     if (failure.resolved) continue
     const { equipment } = failure
@@ -124,12 +133,16 @@ export async function fetchStationOutages(): Promise<StationOutage[]> {
       estimated: type === 'escalator',
     })
     byStation.set(station, units)
+    const totals = totalByStationType.get(station) ?? {}
+    totals[type] = failure.station_total_same_type_count
+    totalByStationType.set(station, totals)
   }
 
   return [...byStation].map(([stationName, units]) => ({
     stationName,
     equipmentTypes: [...new Set(units.map((u) => u.equipmentType))],
     units,
+    totalByType: totalByStationType.get(stationName) ?? {},
   }))
 }
 
@@ -173,11 +186,16 @@ export function reportsToStationOutages(reports: OutageReport[]): StationOutage[
     byStation.set(stationName, arr)
   }
 
-  return [...byStation].map(([stationName, units]) => ({
-    stationName,
-    equipmentTypes: [...new Set(units.map((u) => u.equipmentType))],
-    units,
-  }))
+  return [...byStation].map(([stationName, units]) => {
+    const totalByType: Record<string, number> = {}
+    for (const u of units) totalByType[u.equipmentType] = (totalByType[u.equipmentType] ?? 0) + 1
+    return {
+      stationName,
+      equipmentTypes: [...new Set(units.map((u) => u.equipmentType))],
+      units,
+      totalByType,
+    }
+  })
 }
 
 // Train modes whose stations the rider actually enters (and whose lifts/escalators matter). A

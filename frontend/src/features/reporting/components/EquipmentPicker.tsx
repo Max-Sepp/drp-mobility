@@ -122,20 +122,16 @@ export const EquipmentPicker = ({
                     paddingVertical: 12,
                     paddingHorizontal: 14,
                     borderWidth: highlighted && !selected ? Borders.medium : Borders.thin,
-                    borderColor: selected
-                      ? Colors.successDark
-                      : highlighted
-                        ? Colors.blue
-                        : Colors.border,
+                    borderColor: selected || highlighted ? Colors.blue : Colors.border,
                     borderRadius: Radii.small,
-                    backgroundColor: selected ? Colors.successBg : Colors.card,
+                    backgroundColor: selected ? Colors.blueBg : Colors.card,
                   }}
                 >
                   <YStack
                     style={{
                       width: 22,
                       height: 22,
-                      borderRadius: Radii.xs,
+                      borderRadius: Radii.circle,
                       borderWidth: Borders.thick,
                       borderColor: selected ? Colors.blue : Colors.placeholderText,
                       backgroundColor: selected ? Colors.blue : 'transparent',
