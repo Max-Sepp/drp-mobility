@@ -59,6 +59,7 @@ def seed_defaults(db: Session) -> None:
             zone_list = data.get("zones") or []
             stations[data["name"]] = Station(
                 name=data["name"],
+                tfl_id=data.get("id"),
                 latitude=coords.get("lat"),
                 longitude=coords.get("lng"),
                 wifi=bool(data.get("wifi", False)),

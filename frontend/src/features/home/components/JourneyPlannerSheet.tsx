@@ -17,6 +17,8 @@ import { type PlaceShortcut } from '@/features/journey/components/LocationInput'
 import type { SavedPlaces } from '@/features/journey/api/savedPlaces'
 import { useAppLocation } from '@/lib/LocationContext'
 import { useAccessibilityPreference } from '@/lib/AccessibilityPreferenceContext'
+import { useWorkShift } from '@/lib/WorkShiftContext'
+import { useAuth } from '@/features/auth'
 import {
   type AccessibilityPreference,
   type Journey,
@@ -137,6 +139,15 @@ export function JourneyPlannerSheet({
   const closedByButton = useRef(false)
 
   const cachedCoords = useAppLocation()
+  const { workStation } = useWorkShift()
+  const { user } = useAuth()
+  // For staff on shift, "current location" resolves to their station (GPS is unreliable
+  // underground). Null when not on shift, falling back to the device location.
+  const shiftDetail =
+    user?.role === 'trusted' && workStation
+      ? stations.find((s) => s.name === workStation)
+      : undefined
+  const hasShiftCoords = shiftDetail?.latitude != null && shiftDetail?.longitude != null
   // Measured height of the From input container — used to vertically position the swap button.
   const [fromH, setFromH] = useState(70)
 
@@ -161,18 +172,24 @@ export function JourneyPlannerSheet({
   // ── Current-location helper ────────────────────────────────────────────
 
   const handleCurrentLocation = useCallback(async () => {
-    if (!cachedCoords) return
+    const coord =
+      hasShiftCoords && shiftDetail
+        ? `${shiftDetail.latitude},${shiftDetail.longitude}`
+        : cachedCoords
+          ? `${cachedCoords.latitude},${cachedCoords.longitude}`
+          : null
+    if (!coord) return
     setGettingLocation(true)
     try {
-      const result = await resolveToPostcode(`${cachedCoords.latitude},${cachedCoords.longitude}`)
+      const result = await resolveToPostcode(coord)
       if ('error' in result) return
-      setFrom('Current location')
+      setFrom(shiftDetail ? `On shift: ${shiftDetail.name}` : 'Current location')
       setFromPostcode(result.postcode)
       setFromIsCurrentLocation(true)
     } finally {
       setGettingLocation(false)
     }
-  }, [cachedCoords])
+  }, [cachedCoords, hasShiftCoords, shiftDetail])
 
   // ── Open/close driven by plan prop ────────────────────────────────────
 
@@ -193,7 +210,7 @@ export function JourneyPlannerSheet({
       setGettingLocation(false)
       setLoading(false)
       sheetRef.current?.snapToIndex(1)
-      if (!plan.initialFrom && cachedCoords) handleCurrentLocation()
+      if (!plan.initialFrom && (hasShiftCoords || cachedCoords)) handleCurrentLocation()
     } else if (!closedByButton.current) {
       // Programmatic close (parent cleared plan) — animate the sheet away.
       // If closedByButton is true, close() was already called from the button handler.
@@ -330,7 +347,7 @@ export function JourneyPlannerSheet({
               isResolved={fromPostcode !== null}
               textColor={fromIsCurrentLocation ? Colors.blue : undefined}
               textBold={fromIsCurrentLocation}
-              onCurrentLocation={cachedCoords ? handleCurrentLocation : undefined}
+              onCurrentLocation={hasShiftCoords || cachedCoords ? handleCurrentLocation : undefined}
               currentLocationLoading={gettingLocation}
               savedPlaceShortcuts={placeShortcuts}
             />

@@ -2,12 +2,18 @@ import { Ionicons, MaterialIcons } from '@expo/vector-icons'
 import { Pressable, StyleSheet } from 'react-native'
 import { Spinner, Text, XStack, YStack } from 'tamagui'
 import type { components } from '@/api/schema.d'
+import { TflBadge } from '@/components/TflBadge'
 import { OutageTimeline } from '@/features/outages/OutageTimeline'
+import { formatConnection } from '@/lib/connection'
 import { formatDatetime } from '@/lib/datetime'
 import { useTheme, Borders, Spacing } from '@/theme'
 import { reportSeverity } from '@/features/outages/severity'
 
 type OutageReport = components['schemas']['OutageReportSummary']
+
+function isTfl(report: OutageReport): boolean {
+  return (report as OutageReport & { source?: string }).source === 'tfl'
+}
 
 type OutageReportCardProps = {
   /** All active reports under the same failure, sorted oldest-first. */
@@ -25,8 +31,9 @@ function alertLabel(report: OutageReport, resolved: boolean): string {
   if (equipment.equipment_type.name === 'overcrowding') return 'Overcrowding reported'
   if (equipment.equipment_type.name === 'custom') return 'Custom issue reported'
   const type = equipment.equipment_type.name === 'lift' ? 'Lift' : 'Escalator'
-  const status = resolved ? 'resolved' : 'broken'
-  return `${type} ${status} – ${equipment.connection}`
+  // TfL data reports an official outage; user reports describe something "broken".
+  const status = resolved ? 'resolved' : isTfl(report) ? 'out of service' : 'broken'
+  return `${type} ${status} – ${formatConnection(equipment.connection, equipment.equipment_type.name)}`
 }
 
 export const OutageReportCard = ({
@@ -48,6 +55,7 @@ export const OutageReportCard = ({
   const times = reports.map((r) => r.breakdown_time).sort()
   const firstReported = times[0]
   const reportCount = reports.length
+  const official = reports.some(isTfl)
   const hasTrustedReporter = reports.some((r) => r.reporter_role === 'trusted')
   // Verification and resolution are failure-scoped, so every report under this group carries the
   // same failure state.
@@ -157,8 +165,13 @@ export const OutageReportCard = ({
             {alertLabel(reports[0], resolved)}
           </Text>
           <Text fontSize={12} color={accent}>
-            first reported {formatDatetime(firstReported)}
+            {official ? 'Published by TfL' : 'first reported'} {formatDatetime(firstReported)}
           </Text>
+          {official && (
+            <XStack mt="$0.5">
+              <TflBadge label="Official · TfL" />
+            </XStack>
+          )}
           {resolved && (
             <XStack items="center" gap="$1" mt="$0.5">
               <Ionicons name="checkmark-done-circle" size={11} color={Colors.successDark} />
@@ -167,7 +180,7 @@ export const OutageReportCard = ({
               </Text>
             </XStack>
           )}
-          {hasTrustedReporter && (
+          {!official && hasTrustedReporter && (
             <XStack items="center" gap="$1" mt="$0.5">
               <Ionicons name="shield-checkmark" size={11} color="#15803d" />
               <Text fontSize={11} fontWeight="600" color="#15803d">
@@ -186,7 +199,7 @@ export const OutageReportCard = ({
         </YStack>
 
         <YStack items="flex-end" gap="$1" style={{ flexShrink: 0 }}>
-          {reportCount > 1 && (
+          {!official && reportCount > 1 && (
             <Text fontSize={11} fontWeight="700" color={accent}>
               {reportCount} reports
             </Text>

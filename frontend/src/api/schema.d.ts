@@ -402,6 +402,49 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/station-alerts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Station Alerts
+         * @description Return station-level accessibility alerts, newest first.
+         *
+         *     Defaults to active alerts only; pass ``active=false`` to include cleared ones. Optionally
+         *     filter to a single station.
+         */
+        get: operations["list_station_alerts_station_alerts_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/station-alerts/{alert_id}/dismiss": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Dismiss Station Alert
+         * @description Trusted-user dismissal of an alert. Final: the TfL poller will never reactivate it.
+         */
+        patch: operations["dismiss_station_alert_station_alerts__alert_id__dismiss_patch"];
+        trace?: never;
+    };
     "/equipment-types": {
         parameters: {
             query?: never;
@@ -436,6 +479,29 @@ export interface paths {
         get: operations["list_equipment_equipment_get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/tfl/ingest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Trigger Tfl Ingest
+         * @description Run one TfL disruption ingest cycle now and return the counts.
+         *
+         *     Intended for a cron job (authenticated with a trusted user's bearer token) or manual use; the
+         *     in-process auto-poll loop runs the same ``ingest_once`` on an interval.
+         */
+        post: operations["trigger_tfl_ingest_admin_tfl_ingest_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -637,6 +703,8 @@ export interface components {
             image_content_type?: string | null;
             /** Reporter Role */
             reporter_role: string;
+            /** Source */
+            source: string;
         };
         /**
          * OutageReportVerificationSchema
@@ -735,6 +803,44 @@ export interface components {
              * @default []
              */
             custom: components["schemas"]["CustomPlaceSchema"][];
+        };
+        /**
+         * StationAlertKind
+         * @description Category of a station-level accessibility advisory ingested from TfL.
+         *
+         *     These are the disruptions that don't fit the per-equipment Failure model: a lift outage we
+         *     couldn't pin to a specific Equipment row, a whole-station step-free loss, a closure, etc.
+         *     Stored as a portable VARCHAR + CHECK (native_enum=False), like PlatformStepFree.
+         * @enum {string}
+         */
+        StationAlertKind: "lift_outage" | "step_free_unavailable" | "closure" | "accessibility" | "other";
+        /**
+         * StationAlertSchema
+         * @description A station-level accessibility advisory as returned to clients.
+         */
+        StationAlertSchema: {
+            /** Id */
+            id: number;
+            station: components["schemas"]["StationSchema"];
+            kind: components["schemas"]["StationAlertKind"];
+            /** Message */
+            message: string;
+            /** Source */
+            source: string;
+            /** Active */
+            active: boolean;
+            /**
+             * Started At
+             * Format: date-time
+             */
+            started_at: string;
+            /** Cleared At */
+            cleared_at?: string | null;
+            /**
+             * Last Seen At
+             * Format: date-time
+             */
+            last_seen_at: string;
         };
         /**
          * StationDetail
@@ -1555,6 +1661,69 @@ export interface operations {
             };
         };
     };
+    list_station_alerts_station_alerts_get: {
+        parameters: {
+            query?: {
+                active?: boolean;
+                station_id?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StationAlertSchema"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    dismiss_station_alert_station_alerts__alert_id__dismiss_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                alert_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StationAlertSchema"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_equipment_types_equipment_types_get: {
         parameters: {
             query?: never;
@@ -1602,6 +1771,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    trigger_tfl_ingest_admin_tfl_ingest_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: number;
+                    };
                 };
             };
         };

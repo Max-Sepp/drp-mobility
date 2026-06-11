@@ -59,7 +59,7 @@ function connectionEndpoints(connection: string): string[] {
  * The platform(s) a connection touches. Endpoints that name a platform are kept (and any
  * comma-joined list, e.g. "Northbound Platform 1, Southbound Platform 2", is split out).
  */
-function platformEndpoints(connection: string): string[] {
+export function platformEndpoints(connection: string): string[] {
   return connectionEndpoints(connection)
     .filter((endpoint) => /platform/i.test(endpoint))
     .flatMap((endpoint) => endpoint.split(',').map((p) => p.trim()))
@@ -145,10 +145,23 @@ export async function fetchStationOutages(): Promise<StationOutage[]> {
   }))
 }
 
-/** Every station name a journey touches, taken from each leg's departure/arrival points. */
+// Train modes whose stations the rider actually enters (and whose lifts/escalators matter). A
+// station touched only by bus/coach/walking legs — e.g. a bus-to-bus interchange at a stop that
+// shares a train station's name — is excluded, since the rider never uses that station's equipment.
+const STATION_MODES = new Set([
+  'tube',
+  'dlr',
+  'overground',
+  'national-rail',
+  'elizabeth-line',
+  'tflrail',
+])
+
+/** Every train station a journey stops at, taken from each train leg's departure/arrival points. */
 function journeyStationNames(journey: Journey): string[] {
   const names: string[] = []
   for (const leg of journey.legs) {
+    if (!STATION_MODES.has(leg.mode.name)) continue
     if (leg.departurePoint?.commonName) names.push(leg.departurePoint.commonName)
     if (leg.arrivalPoint?.commonName) names.push(leg.arrivalPoint.commonName)
   }

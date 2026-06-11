@@ -55,10 +55,17 @@ function findStation(poiName: string, lat: number, lng: number): string | null {
   return match?.name ?? null
 }
 
-type Props = { onStationPress: (name: string) => void; bottomInset: number }
+type Props = {
+  onStationPress: (name: string) => void
+  bottomInset: number
+  // When set (e.g. a staff member's on-shift station), the map centres here on open instead
+  // of the device location. GPS is often unavailable underground, so this is the reliable
+  // anchor for staff. The manual recentre button still uses GPS.
+  anchor?: { latitude: number; longitude: number } | null
+}
 
 export const StationMap = forwardRef<StationMapHandle, Props>(function StationMap(
-  { onStationPress, bottomInset },
+  { onStationPress, bottomInset, anchor },
   ref,
 ) {
   const coords = useAppLocation()
@@ -80,14 +87,29 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
 
   useImperativeHandle(ref, () => ({ recentre: animateToUser }), [animateToUser])
 
-  // Animate to user location the first time coords become available.
+  // Centre on open. The anchor (staff's shift station) always wins and is honoured even if it
+  // resolves late (station data loads async) — so it overrides an earlier GPS centring exactly
+  // once. With no anchor, centre on the device location the first time coords become available.
+  const anchoredRef = useRef(false)
   const centredRef = useRef(false)
   useEffect(() => {
-    if (coords && !centredRef.current) {
+    if (anchor && !anchoredRef.current) {
+      anchoredRef.current = true
+      centredRef.current = true
+      mapRef.current?.animateToRegion(
+        {
+          latitude: anchor.latitude,
+          longitude: anchor.longitude,
+          latitudeDelta: 0.02,
+          longitudeDelta: 0.02,
+        },
+        600,
+      )
+    } else if (!anchor && coords && !centredRef.current) {
       centredRef.current = true
       animateToUser()
     }
-  }, [coords, animateToUser])
+  }, [anchor, coords, animateToUser])
 
   function handlePoiClick(event: PoiClickEvent) {
     const { name, coordinate } = event.nativeEvent

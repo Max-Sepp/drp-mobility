@@ -13,6 +13,12 @@ import BottomSheet, { BottomSheetScrollView, type BottomSheetRef } from '@/compo
 import { SheetHeader } from '@/components/SheetHeader'
 import { apiClient } from '@/api/client'
 import type { components } from '@/api/schema.d'
+import { loadActiveJourney, type ActiveJourney } from '@/features/journey/api/activeJourney'
+import {
+  isEquipmentOnJourney,
+  journeyPlatformsAtStation,
+} from '@/features/journey/api/journeyLifts'
+import { useStations } from '@/features/stations'
 import { EquipmentPicker } from '@/features/reporting/components/EquipmentPicker'
 import { FormSection } from '@/features/reporting/components/FormSection'
 import { PhotoPicker } from '@/features/reporting/components/PhotoPicker'
@@ -49,7 +55,7 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
         iconBtn: {
           width: 32,
           height: 32,
-          borderRadius: 16,
+          borderRadius: Radii.circle,
           backgroundColor: Colors.searchBg,
           alignItems: 'center',
           justifyContent: 'center',
@@ -119,7 +125,7 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
         successCircle: {
           width: 110,
           height: 110,
-          borderRadius: 55,
+          borderRadius: Radii.circle,
           borderWidth: 3,
           borderColor: Colors.successDark,
           backgroundColor: Colors.successBg,
@@ -156,6 +162,10 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
   const [submitting, setSubmitting] = useState(false)
   const [hasLifts, setHasLifts] = useState<boolean | undefined>(undefined)
   const [hasEscalators, setHasEscalators] = useState<boolean | undefined>(undefined)
+  // The in-progress journey (if any), used to surface the equipment on the rider's current route
+  // first. Null when no journey is underway — the list keeps its plain alphabetical order.
+  const [activeJourney, setActiveJourney] = useState<ActiveJourney | null>(null)
+  const { stations } = useStations()
 
   function resetForm() {
     setIssueType(null)
@@ -197,6 +207,46 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
       sheetRef.current?.close()
     }
   }, [station])
+
+  // Re-check for an in-progress journey each time the sheet opens for a station (one may have
+  // started since last open).
+  useEffect(() => {
+    if (!station) return
+    let active = true
+    loadActiveJourney().then((journey) => {
+      if (active) setActiveJourney(journey)
+    })
+    return () => {
+      active = false
+    }
+  }, [station])
+
+  const stationDetail = useMemo(() => stations.find((s) => s.name === station), [stations, station])
+
+  // Ids of the equipment connecting to a platform on the line the rider is using at this station,
+  // for the current journey. Empty unless a journey is underway and passes through here.
+  const highlightedIds = useMemo(() => {
+    if (issueType !== 'lift' && issueType !== 'escalator') return new Set<number>()
+    if (!activeJourney || !stationDetail || !station) return new Set<number>()
+    const relevant = journeyPlatformsAtStation(
+      activeJourney.journey,
+      station,
+      stationDetail.platforms,
+    )
+    if (relevant.onJourney.size === 0) return new Set<number>()
+    return new Set(
+      equipment.filter((e) => isEquipmentOnJourney(e.connection, relevant)).map((e) => e.id),
+    )
+  }, [activeJourney, stationDetail, station, equipment, issueType])
+
+  // Surface the on-route equipment first while preserving the alphabetical order within each group
+  // (Array.prototype.sort is stable). No reordering when nothing is highlighted.
+  const orderedEquipment = useMemo(() => {
+    if (highlightedIds.size === 0) return equipment
+    return [...equipment].sort(
+      (a, b) => Number(highlightedIds.has(b.id)) - Number(highlightedIds.has(a.id)),
+    )
+  }, [equipment, highlightedIds])
 
   function handleChange(index: number) {
     onHeightChange?.(index >= 0 ? snapPoints[index] : 0)
@@ -392,10 +442,11 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
                 <EquipmentPicker
                   label={issueType === 'lift' ? 'Which lift?' : 'Which escalator?'}
                   loading={loadingEquipment}
-                  equipment={equipment}
+                  equipment={orderedEquipment}
                   selectedId={equipmentId}
                   onSelect={setEquipmentId}
                   emptyText={`No ${issueType}s registered at this station.`}
+                  highlightedIds={highlightedIds}
                 />
                 <FormSection label="Comments (optional)">
                   <TextInput

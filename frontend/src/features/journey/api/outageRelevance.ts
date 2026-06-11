@@ -69,6 +69,38 @@ export type OutageAssessment = {
   journeyRelevantLifts: { broken: number; total: number }
 }
 
+/**
+ * Verdicts that *directly affect* the journey — equipment on a platform/line the rider uses here,
+ * or on the shared vertical path they must take. Other verdicts (`other-platform`, `unknown`) are
+ * only *potentially* relevant and are tucked away from the at-a-glance view.
+ */
+export const DIRECT_VERDICTS = new Set<UnitVerdict>(['on-your-platform', 'shared-route'])
+
+/** A TfL service disruption affecting a line the journey runs on. */
+export type RouteDisruption = { line: string; description: string }
+
+/**
+ * The TfL service disruptions attached to a journey's legs, deduped on line + description. These
+ * sit on a line the rider is actually on, so they always directly affect the journey.
+ */
+export function collectDisruptions(journey: Journey): RouteDisruption[] {
+  const out: RouteDisruption[] = []
+  const seen = new Set<string>()
+  for (const leg of journey.legs) {
+    if (!leg.isDisrupted || !leg.disruptions) continue
+    const line = legLine(leg)
+    for (const disruption of leg.disruptions) {
+      const description = disruption.description?.trim()
+      if (!description) continue
+      const key = `${line}|${description}`
+      if (seen.has(key)) continue
+      seen.add(key)
+      out.push({ line, description })
+    }
+  }
+  return out
+}
+
 /** The line a train leg runs on: TfL's route name, else the mode (e.g. "DLR"). */
 function legLine(leg: Journey['legs'][number]): string {
   return leg.routeOptions?.[0]?.name?.trim() || leg.mode.name
@@ -196,8 +228,13 @@ export function assessOutages(
   stations: StationDetail[],
 ): OutageAssessment[] {
   const stationNames = stations.map((s) => s.name)
-  return outages.map((outage) => {
+  const assessed: OutageAssessment[] = []
+  for (const outage of outages) {
     const { role, lines } = roleAt(journey, outage.stationName, stationNames)
+    // Skip stations no train leg boards/alights at — the journey only touches them via bus/coach
+    // (e.g. a bus-to-bus interchange at a stop that shares a train station's name), so the rider
+    // never uses that station's lifts/escalators.
+    if (role === 'unknown') continue
     const station = stations.find(
       (s) => normaliseStationName(s.name) === normaliseStationName(outage.stationName),
     )
@@ -211,12 +248,13 @@ export function assessOutages(
         (u.verdict === 'on-your-platform' || u.verdict === 'shared-route'),
     ).length
     const journeyTotal = journeyRelevantLiftCount(station, lines)
-    return {
+    assessed.push({
       stationName: outage.stationName,
       role,
       journeyLines: lines,
       units: assessedUnits,
       journeyRelevantLifts: { broken: journeyBroken, total: journeyTotal },
-    }
-  })
+    })
+  }
+  return assessed
 }
