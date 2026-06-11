@@ -96,11 +96,13 @@ function TimelineWaypoint({
   name,
   time,
   dotColor,
+  stopNumber,
 }: {
   kind: WaypointKind
   name: string
   time?: string
   dotColor: string
+  stopNumber?: string
 }) {
   const { Colors } = useTheme()
   return (
@@ -132,7 +134,7 @@ function TimelineWaypoint({
       </View>
       <View style={{ flex: 1, paddingLeft: 6 }}>
         <Text fontSize={17} fontWeight="600" color={Colors.text}>
-          {name}
+          {name}{stopNumber ? ` (Stop ${stopNumber})` : ''}
         </Text>
       </View>
       {time ? (
@@ -189,7 +191,7 @@ function TimelineConnector({
       {/* Gutter line */}
       <View style={{ width: GUTTER_W, alignItems: 'center' }}>
         {isWalking ? (
-          <DashedVerticalLine color={Colors.separator} />
+          <DashedVerticalLine color={Colors.tertiaryText} />
         ) : (
           <View
             style={{
@@ -521,6 +523,11 @@ export function JourneyDetailSheet({
 
   const timelineItems: React.ReactNode[] = []
 
+  const isBusLeg = (leg: Leg) => leg.mode.name === 'bus' || leg.mode.name === 'coach'
+  const firstLeg = journey.legs[0]
+  const originStopNumber =
+    firstLeg && isBusLeg(firstLeg) ? firstLeg.departurePoint?.stopLetter : undefined
+
   // Origin waypoint
   timelineItems.push(
     <TimelineWaypoint
@@ -529,6 +536,7 @@ export function JourneyDetailSheet({
       name={originName}
       time={clockTime(journey.startDateTime)}
       dotColor={Colors.text}
+      stopNumber={originStopNumber}
     />,
   )
 
@@ -559,11 +567,16 @@ export function JourneyDetailSheet({
       />,
     )
 
-    // Arrival waypoint
+    // Arrival waypoint — show stop number when this leg or the next is a bus leg
     const dotColor = nextIsTransit ? legLineColor(nextLeg, Colors.blue) : Colors.text
     const arrivalName = isLast
       ? (to?.label ?? stripStationSuffix(leg.arrivalPoint?.commonName ?? 'Destination'))
       : stripStationSuffix(leg.arrivalPoint?.commonName ?? '')
+    const arrivalStopNumber = isBusLeg(leg)
+      ? leg.arrivalPoint?.stopLetter
+      : nextLeg && isBusLeg(nextLeg)
+        ? nextLeg.departurePoint?.stopLetter
+        : undefined
 
     timelineItems.push(
       <TimelineWaypoint
@@ -572,6 +585,7 @@ export function JourneyDetailSheet({
         name={arrivalName}
         time={leg.arrivalTime ? clockTime(leg.arrivalTime) : undefined}
         dotColor={dotColor}
+        stopNumber={arrivalStopNumber}
       />,
     )
   })
