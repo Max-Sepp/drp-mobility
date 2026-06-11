@@ -10,7 +10,6 @@ import {
   type AssessedUnit,
   type OutageAssessment,
   type RouteDisruption,
-  type StationRole,
   type UnitVerdict,
 } from '@/features/journey/api/outageRelevance'
 import { OutageTimeline } from '@/features/outages/OutageTimeline'
@@ -24,20 +23,6 @@ type VerdictStyle = {
   background: string
   border: string
   label: string
-}
-
-function roleText(role: StationRole, lines: string[]): string | null {
-  const service = lines.length > 0 ? ` (${lines.join(' / ')})` : ''
-  switch (role) {
-    case 'board':
-      return `You board here${service}`
-    case 'alight':
-      return `You exit here${service}`
-    case 'interchange':
-      return `You change here${service}`
-    default:
-      return null
-  }
 }
 
 function reportMeta(unit: AssessedUnit): string {
@@ -63,16 +48,13 @@ function verdictDetail(unit: AssessedUnit): string {
   }
 }
 
-/** Whether a station has any equipment that directly affects the rider's route here. */
-function stationDirectlyAffects(station: OutageAssessment): boolean {
-  return station.units.some((u) => DIRECT_VERDICTS.has(u.verdict))
-}
-
-/** A station's units, with the ones directly affecting the route ordered first. */
-function orderedUnits(station: OutageAssessment): AssessedUnit[] {
-  return [...station.units].sort(
-    (a, b) => Number(DIRECT_VERDICTS.has(b.verdict)) - Number(DIRECT_VERDICTS.has(a.verdict)),
-  )
+/**
+ * A station's equipment that's actually on the rider's route here (on their platform or on the
+ * shared vertical path). Off-route equipment is excluded entirely — we never surface it to the
+ * rider, so it can't add noise or false alarm to a journey it doesn't affect.
+ */
+function routeUnits(station: OutageAssessment): AssessedUnit[] {
+  return station.units.filter((u) => DIRECT_VERDICTS.has(u.verdict))
 }
 
 export const RouteAlerts = ({
@@ -221,13 +203,10 @@ export const RouteAlerts = ({
   // station open/closed; every problem at the station lives inside, so a station's issues are
   // never split across the view.
   const renderStation = (station: OutageAssessment) => {
-    const role = roleText(station.role, station.journeyLines)
-    const directly = stationDirectlyAffects(station)
-    // Every station starts collapsed; the header alone tells the rider whether it's on their route.
+    const units = routeUnits(station)
+    // Every station starts collapsed; the header alone tells the rider it's on their route.
     const open = stationOpen[station.stationName] ?? false
-    const count = station.units.length
-    const statusColor = directly ? Colors.dangerDark : Colors.secondaryText
-    const statusLabel = directly ? 'On your route' : 'Not on your route'
+    const count = units.length
     return (
       <YStack
         key={station.stationName}
@@ -235,8 +214,9 @@ export const RouteAlerts = ({
         gap={open ? '$2.5' : '$0'}
         style={{
           borderWidth: Borders.medium,
-          borderColor: directly ? Colors.dangerBorder : Colors.border,
+          borderColor: Colors.dangerBorder,
           borderRadius: Radii.button,
+          backgroundColor: Colors.dangerBg,
         }}
       >
         <XStack
@@ -250,19 +230,14 @@ export const RouteAlerts = ({
           }
           pressStyle={{ opacity: 0.6 }}
         >
-          <MaterialIcons name={directly ? 'error' : 'info-outline'} size={18} color={statusColor} />
+          <MaterialIcons name="error" size={18} color={Colors.dangerDark} />
           <YStack flex={1} gap="$0.5">
             <Text fontSize={15} fontWeight="700" color={Colors.text}>
               {station.stationName}
             </Text>
-            <Text fontSize={13} fontWeight="600" style={{ color: statusColor }}>
-              {statusLabel} · {count} {count === 1 ? 'issue' : 'issues'}
+            <Text fontSize={13} fontWeight="600" style={{ color: Colors.dangerDark }}>
+              On your route · {count} {count === 1 ? 'issue' : 'issues'}
             </Text>
-            {role && (
-              <Text fontSize={12} color={Colors.secondaryText}>
-                {role}
-              </Text>
-            )}
           </YStack>
           <MaterialIcons
             name={open ? 'expand-less' : 'expand-more'}
@@ -270,7 +245,7 @@ export const RouteAlerts = ({
             color={Colors.secondaryText}
           />
         </XStack>
-        {open && orderedUnits(station).map((unit, i) => renderUnit(unit, i))}
+        {open && units.map((unit, i) => renderUnit(unit, i))}
       </YStack>
     )
   }
@@ -345,31 +320,31 @@ export const RouteAlerts = ({
     return [...byLine].map(([line, descriptions]) => ({ line, descriptions }))
   }, [disruptions])
 
-  // Stations that directly affect the route are surfaced first; stations that are only potentially
-  // relevant follow. Every card stays collapsed until tapped.
-  const { directStations, potentialStations } = useMemo(() => {
-    const directStations: OutageAssessment[] = []
-    const potentialStations: OutageAssessment[] = []
-    for (const station of assessments) {
-      ;(stationDirectlyAffects(station) ? directStations : potentialStations).push(station)
-    }
-    return { directStations, potentialStations }
-  }, [assessments])
+  // Only stations with equipment actually on the rider's route are shown — off-route outages are
+  // dropped entirely so they never appear as alerts. Every card stays collapsed until tapped.
+  const routeStations = useMemo(
+    () => assessments.filter((station) => routeUnits(station).length > 0),
+    [assessments],
+  )
 
-  const hasAnything =
-    disruptions.length > 0 || directStations.length > 0 || potentialStations.length > 0
+  const hasAnything = disruptions.length > 0 || routeStations.length > 0
   if (!hasAnything) return null
 
   return (
     <YStack gap="$3">
-      <Text fontSize={16} fontWeight="700" color={Colors.text}>
+      <Text
+        fontSize={16}
+        fontWeight="700"
+        color={Colors.text}
+        pt="$3"
+        style={{ borderTopWidth: Borders.thin, borderTopColor: Colors.border }}
+      >
         Disruptions on this route
       </Text>
 
       {disruptionGroups.map(renderDisruptionGroup)}
 
-      {directStations.map(renderStation)}
-      {potentialStations.map(renderStation)}
+      {routeStations.map(renderStation)}
     </YStack>
   )
 }

@@ -256,30 +256,25 @@ export function outageWarning(
     journeyRelevantLifts?: { broken: number; total: number }
   }[],
 ): React.ReactNode {
-  const segments = outages.map((o, i) => {
+  const segments = outages.flatMap((o) => {
     const liftUnits = o.units.filter((u) => u.equipmentType === 'lift')
     const brokenLifts = liftUnits.length
     const allVerified = liftUnits.length > 0 && liftUnits.every((u) => u.verified)
     const status = allVerified ? 'broken' : 'reported broken'
     let liftNode: React.ReactNode = null
 
-    if (o.journeyRelevantLifts && o.journeyRelevantLifts.broken > 0) {
+    if (o.journeyRelevantLifts) {
+      // Route-aware: only warn about lifts on the rider's actual path. Lifts that are broken
+      // but not on the route (broken === 0 of the relevant set) are suppressed entirely.
       const { broken, total } = o.journeyRelevantLifts
-      liftNode =
-        total > 1
-          ? `${broken}/${total} lifts on your route ${status}`
-          : `lift on your route ${status}`
-    } else if (o.journeyRelevantLifts && brokenLifts > 0) {
-      const totalLifts = o.totalByType['lift'] ?? brokenLifts
-      const count =
-        totalLifts > 1 ? `${brokenLifts}/${totalLifts} lifts ${status} ` : `lift ${status} `
-      liftNode = (
-        <>
-          {count}
-          <Text fontWeight="700">(not on your route)</Text>
-        </>
-      )
+      if (broken > 0) {
+        liftNode =
+          total > 1
+            ? `${broken}/${total} lifts on your route ${status}`
+            : `lift on your route ${status}`
+      }
     } else if (brokenLifts > 0) {
+      // No route assessment available — fall back to the station-level count.
       const totalLifts = o.totalByType['lift'] ?? 0
       liftNode =
         totalLifts > 1
@@ -292,17 +287,29 @@ export function outageWarning(
       .map((t) => `${t} reported out of service`)
       .join(', ')
 
-    const sep = i > 0 ? ' · ' : ''
-    return (
-      <Text key={i}>
-        {sep}
+    // Nothing relevant to the rider at this station — don't surface it at all.
+    if (!liftNode && !otherParts) return []
+
+    return [
+      <Text key={o.stationName}>
         <Text fontWeight="700">{o.stationName}:</Text> {liftNode}
         {otherParts ? (liftNode ? `, ${otherParts}` : otherParts) : null}
-      </Text>
-    )
+      </Text>,
+    ]
   })
 
-  return <>{segments}</>
+  if (segments.length === 0) return null
+
+  return (
+    <>
+      {segments.map((seg, i) => (
+        <Text key={i}>
+          {i > 0 ? ' · ' : ''}
+          {seg}
+        </Text>
+      ))}
+    </>
+  )
 }
 
 // ---------------------------------------------------------------------------

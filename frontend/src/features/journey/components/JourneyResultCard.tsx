@@ -34,6 +34,8 @@ export const JourneyResultCard = ({
   const { user } = useAuth()
   const fare = fareLabel(journey, user?.traveller_type, user?.railcard)
   const critical = anyStationAllLiftsDown(outages)
+  // May be null when every outage on these stations is off the rider's route.
+  const warning = outageWarning(outages)
 
   return (
     <YStack
@@ -51,7 +53,7 @@ export const JourneyResultCard = ({
         overflow: 'hidden',
       }}
     >
-      {outages.length > 0 && (
+      {warning && (
         <XStack
           gap="$2"
           px="$3"
@@ -65,7 +67,7 @@ export const JourneyResultCard = ({
         >
           <Text fontSize={13}>⚠️</Text>
           <Text fontSize={12} color={critical ? Colors.dangerDark : Colors.warningDark} flex={1}>
-            {outageWarning(outages)}
+            {warning}
           </Text>
         </XStack>
       )}
