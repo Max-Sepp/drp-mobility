@@ -1,13 +1,15 @@
 import { Ionicons } from '@expo/vector-icons'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Alert,
   Animated,
+  Keyboard,
   Modal,
   Platform,
   ScrollView,
   StyleSheet,
   Text as RNText,
+  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native'
@@ -20,6 +22,9 @@ import { Borders, Opacity, Overlays, Spacing, useTheme, useThemeControls, THEMES
 import type { ThemeId } from '@/theme'
 import { useAuth } from '@/features/auth/context/AuthContext'
 import { useAccessibilityPreference } from '@/lib/AccessibilityPreferenceContext'
+import { useWorkShift } from '@/lib/WorkShiftContext'
+import { useStations } from '@/features/stations'
+import { fuzzyScore } from '@/lib/fuzzy'
 import type { AccessibilityPreference } from '@/features/journey/api/tfl'
 
 const USE_NATIVE_DRIVER = Platform.OS !== 'web'
@@ -29,17 +34,27 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
   const { Colors, Radii, Shadows } = useTheme()
   const { themeId, setTheme } = useThemeControls()
   const { defaultLevel, setDefaultLevel } = useAccessibilityPreference()
+  const { workStation, setWorkStation } = useWorkShift()
+  const { stations } = useStations()
 
   const [saving, setSaving] = useState(false)
   const [travellerModalVisible, setTravellerModalVisible] = useState(false)
   const [themeModalVisible, setThemeModalVisible] = useState(false)
   const [accessibilityModalVisible, setAccessibilityModalVisible] = useState(false)
+  const [shiftModalVisible, setShiftModalVisible] = useState(false)
+  const [shiftQuery, setShiftQuery] = useState('')
   const [backdropAnim] = useState(() => new Animated.Value(0))
   const [sheetAnim] = useState(() => new Animated.Value(500))
   const [themeBackdropAnim] = useState(() => new Animated.Value(0))
   const [themeSheetAnim] = useState(() => new Animated.Value(500))
   const [accessibilityBackdropAnim] = useState(() => new Animated.Value(0))
   const [accessibilitySheetAnim] = useState(() => new Animated.Value(500))
+  const [shiftBackdropAnim] = useState(() => new Animated.Value(0))
+  const [shiftSheetAnim] = useState(() => new Animated.Value(500))
+  // The shift picker is the only modal with a text input. It's anchored to the bottom, so on iOS
+  // (where the keyboard overlays content) we lift it by the keyboard height. Android resizes the
+  // window itself, so no offset is needed there — mirrors FormScreenLayout's approach.
+  const [keyboardHeight, setKeyboardHeight] = useState(0)
 
   const styles = useMemo(
     () =>
@@ -126,9 +141,51 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
           borderWidth: 1,
           borderColor: Colors.separator,
         },
+        searchInput: {
+          marginHorizontal: Spacing.lg,
+          marginTop: Spacing.md,
+          marginBottom: Spacing.sm,
+          height: 44,
+          borderWidth: Borders.thin,
+          borderColor: Colors.border,
+          borderRadius: Radii.input,
+          backgroundColor: Colors.searchBg,
+          color: Colors.text,
+          fontSize: 15,
+          paddingHorizontal: Spacing.md,
+        },
+        emptyHint: {
+          paddingHorizontal: Spacing.lg,
+          paddingVertical: Spacing.xl,
+          fontSize: 14,
+          color: Colors.secondaryText,
+          textAlign: 'center',
+        },
       }),
     [Colors, Radii, Shadows],
   )
+
+  useEffect(() => {
+    if (Platform.OS !== 'ios') return
+    const showSub = Keyboard.addListener('keyboardWillShow', (e) =>
+      setKeyboardHeight(e.endCoordinates.height),
+    )
+    const hideSub = Keyboard.addListener('keyboardWillHide', () => setKeyboardHeight(0))
+    return () => {
+      showSub.remove()
+      hideSub.remove()
+    }
+  }, [])
+
+  // Top fuzzy matches for the typed query; require 2+ chars to avoid rendering all 387 stations.
+  const shiftResults = useMemo(() => {
+    if (shiftQuery.trim().length < 2) return []
+    return stations
+      .map((s) => ({ name: s.name, score: fuzzyScore(shiftQuery, s.name) }))
+      .filter(({ score }) => score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 8)
+  }, [shiftQuery, stations])
 
   if (!user) {
     navigation.goBack()
@@ -299,6 +356,51 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
   }
 
   // ---------------------------------------------------------------------------
+  // On-shift station picker (trusted staff only)
+  // ---------------------------------------------------------------------------
+
+  const isTrusted = user.role === 'trusted'
+
+  function openShiftPicker() {
+    setShiftQuery('')
+    setShiftModalVisible(true)
+    Animated.parallel([
+      Animated.timing(shiftBackdropAnim, {
+        toValue: 1,
+        duration: 220,
+        useNativeDriver: USE_NATIVE_DRIVER,
+      }),
+      Animated.spring(shiftSheetAnim, {
+        toValue: 0,
+        stiffness: 130,
+        damping: 22,
+        mass: 1,
+        useNativeDriver: USE_NATIVE_DRIVER,
+      }),
+    ]).start()
+  }
+
+  function closeShiftPicker() {
+    Animated.parallel([
+      Animated.timing(shiftBackdropAnim, {
+        toValue: 0,
+        duration: 180,
+        useNativeDriver: USE_NATIVE_DRIVER,
+      }),
+      Animated.timing(shiftSheetAnim, {
+        toValue: 500,
+        duration: 220,
+        useNativeDriver: USE_NATIVE_DRIVER,
+      }),
+    ]).start(() => setShiftModalVisible(false))
+  }
+
+  function handleSelectShift(name: string | null) {
+    setWorkStation(name)
+    closeShiftPicker()
+  }
+
+  // ---------------------------------------------------------------------------
   // Sign out
   // ---------------------------------------------------------------------------
 
@@ -354,6 +456,33 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
             </YStack>
           </XStack>
         </YStack>
+
+        {/* On-shift station (trusted staff only) */}
+        {isTrusted && (
+          <YStack gap="$2">
+            <Text fontSize={12} fontWeight="600" color={Colors.secondaryText} letterSpacing={0.8}>
+              ON-SHIFT STATION
+            </Text>
+            <TouchableOpacity
+              style={[styles.card, styles.triggerRow]}
+              activeOpacity={Opacity.pressed}
+              onPress={openShiftPicker}
+            >
+              <Ionicons name="briefcase-outline" size={20} color={Colors.blue} />
+              <YStack flex={1} gap={2}>
+                <Text fontSize={15} fontWeight="500" color={Colors.text}>
+                  {workStation ?? 'Not set'}
+                </Text>
+                <Text fontSize={13} color={Colors.secondaryText} numberOfLines={2}>
+                  {workStation
+                    ? 'Reporting and journeys start here today. Resets tomorrow.'
+                    : 'Set the station you are working at for one-tap reporting.'}
+                </Text>
+              </YStack>
+              <Ionicons name="chevron-down" size={16} color={Colors.secondaryText} />
+            </TouchableOpacity>
+          </YStack>
+        )}
 
         {/* Traveller type */}
         <YStack gap="$2">
@@ -601,6 +730,88 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
                   </TouchableOpacity>
                 )
               })}
+            </ScrollView>
+          </Animated.View>
+        </View>
+      </Modal>
+
+      {/* On-shift station modal */}
+      <Modal
+        visible={shiftModalVisible}
+        transparent
+        animationType="none"
+        onRequestClose={closeShiftPicker}
+      >
+        <View style={styles.modalRoot}>
+          <Animated.View
+            style={[StyleSheet.absoluteFillObject, styles.backdrop, { opacity: shiftBackdropAnim }]}
+            pointerEvents="none"
+          />
+          <TouchableOpacity
+            style={StyleSheet.absoluteFillObject}
+            onPress={closeShiftPicker}
+            activeOpacity={1}
+          />
+          <Animated.View
+            style={[
+              styles.sheet,
+              { marginBottom: keyboardHeight, transform: [{ translateY: shiftSheetAnim }] },
+            ]}
+          >
+            <View style={styles.handle} />
+            <RNText style={styles.sheetTitle}>ON-SHIFT STATION</RNText>
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search for your station…"
+              placeholderTextColor={Colors.placeholderText}
+              autoCapitalize="none"
+              autoCorrect={false}
+              value={shiftQuery}
+              onChangeText={setShiftQuery}
+            />
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+              style={styles.optionList}
+            >
+              {workStation && (
+                <TouchableOpacity
+                  style={[styles.option, styles.optionSeparator]}
+                  activeOpacity={Opacity.pressed}
+                  onPress={() => handleSelectShift(null)}
+                >
+                  <Ionicons name="close-circle-outline" size={20} color={Colors.danger} />
+                  <View style={{ flex: 1 }}>
+                    <RNText style={[styles.optionName, { color: Colors.danger }]}>End shift</RNText>
+                    <RNText style={styles.optionDesc}>Clear your on-shift station</RNText>
+                  </View>
+                </TouchableOpacity>
+              )}
+              {shiftResults.map(({ name }, i) => {
+                const selected = workStation === name
+                const isLast = i === shiftResults.length - 1
+                return (
+                  <TouchableOpacity
+                    key={name}
+                    style={[styles.option, !isLast && styles.optionSeparator]}
+                    activeOpacity={Opacity.pressed}
+                    onPress={() => handleSelectShift(name)}
+                  >
+                    <View style={{ flex: 1 }}>
+                      <RNText style={[styles.optionName, selected && styles.optionNameSelected]}>
+                        {name}
+                      </RNText>
+                    </View>
+                    {selected && <Ionicons name="checkmark" size={20} color={Colors.blue} />}
+                  </TouchableOpacity>
+                )
+              })}
+              {shiftQuery.trim().length >= 2 && shiftResults.length === 0 && (
+                <RNText style={styles.emptyHint}>No stations match “{shiftQuery.trim()}”.</RNText>
+              )}
+              {shiftQuery.trim().length < 2 && !workStation && (
+                <RNText style={styles.emptyHint}>Type at least 2 letters to search.</RNText>
+              )}
             </ScrollView>
           </Animated.View>
         </View>

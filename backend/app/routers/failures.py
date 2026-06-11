@@ -72,7 +72,10 @@ def resolve_failure(
     failure = repo.get(failure_id)
     if failure is None:
         raise HTTPException(status_code=404, detail="Failure not found")
-    failure = repo.resolve(failure, description=payload.description if payload else None)
+    # A trusted human's close is authoritative: the TfL poller must never reopen it.
+    failure = repo.resolve(
+        failure, authoritative=True, description=payload.description if payload else None
+    )
     # Tell live clients this failure is resolved. Clients that have it loaded show the resolved
     # state (with the reason) rather than dropping it outright.
     broker.publish(
