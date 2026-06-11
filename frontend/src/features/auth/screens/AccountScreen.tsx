@@ -26,10 +26,7 @@ import { useWorkShift } from '@/lib/WorkShiftContext'
 import { useStations } from '@/features/stations'
 import { fuzzyScore } from '@/lib/fuzzy'
 import type { AccessibilityPreference } from '@/features/journey/api/tfl'
-import {
-  MOBILITY_STYLES,
-  useMobilityStyleControls,
-} from '@/lib/MobilityStyleContext'
+import { MOBILITY_STYLES, useMobilityStyleControls } from '@/lib/MobilityStyleContext'
 import type { MobilityStyleId } from '@/lib/MobilityStyleContext'
 
 const USE_NATIVE_DRIVER = Platform.OS !== 'web'
@@ -836,9 +833,7 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
             onPress={closeMobilityPicker}
             activeOpacity={1}
           />
-          <Animated.View
-            style={[styles.sheet, { transform: [{ translateY: mobilitySheetAnim }] }]}
-          >
+          <Animated.View style={[styles.sheet, { transform: [{ translateY: mobilitySheetAnim }] }]}>
             <View style={styles.handle} />
             <RNText style={styles.sheetTitle}>MOVEMENT STYLE</RNText>
             <ScrollView
@@ -946,7 +941,9 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
                 )
               })}
               {shiftQuery.trim().length >= 2 && shiftResults.length === 0 && (
-                <RNText style={styles.emptyHint}>No stations match &quot;{shiftQuery.trim()}&quot;.</RNText>
+                <RNText style={styles.emptyHint}>
+                  No stations match &quot;{shiftQuery.trim()}&quot;.
+                </RNText>
               )}
               {shiftQuery.trim().length < 2 && !workStation && (
                 <RNText style={styles.emptyHint}>Type at least 2 letters to search.</RNText>

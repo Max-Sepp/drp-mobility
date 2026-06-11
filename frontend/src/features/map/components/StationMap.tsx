@@ -132,7 +132,12 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
     // (MapHomeScreen.openStation updates stationHeight before calling focusStation),
     // so a single immediate animation centres correctly in the visible area.
     mapRef.current?.animateToRegion(
-      { latitude: station.lat, longitude: station.lng, latitudeDelta: LAT_DELTA, longitudeDelta: LAT_DELTA },
+      {
+        latitude: station.lat,
+        longitude: station.lng,
+        latitudeDelta: LAT_DELTA,
+        longitudeDelta: LAT_DELTA,
+      },
       600,
     )
   }, [])

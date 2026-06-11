@@ -49,17 +49,14 @@ export async function getRecentLocations(): Promise<RecentLocation[]> {
   }
 }
 
-export async function addRecentLocation(
-  label: string,
-  postcode: string | null,
-): Promise<void> {
+export async function addRecentLocation(label: string, postcode: string | null): Promise<void> {
   if (!isAuthed()) {
     const existing = await readLocal()
     const filtered = existing.filter((r) => r.label !== label)
-    const updated = [
-      { label, postcode, searched_at: new Date().toISOString() },
-      ...filtered,
-    ].slice(0, MAX_LOCAL)
+    const updated = [{ label, postcode, searched_at: new Date().toISOString() }, ...filtered].slice(
+      0,
+      MAX_LOCAL,
+    )
     await writeLocal(updated)
     return
   }

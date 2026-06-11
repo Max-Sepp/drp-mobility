@@ -582,7 +582,6 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
       getRecentLocations().then(setRecentLocations)
     }, [])
 
-
     // ── Debounced search ──────────────────────────────────────────────────
 
     useEffect(() => {
@@ -735,58 +734,58 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
             style={styles.searchRow}
             onLayout={(e) => setSearchRowH(e.nativeEvent.layout.height)}
           >
-          <TouchableOpacity
-            style={[styles.searchPill, expanded && styles.searchPillExpanded]}
-            onPress={expanded ? undefined : expand}
-            activeOpacity={expanded ? 1 : 0.8}
-          >
-            <MaterialIcons
-              name="search"
-              size={18}
-              color={Colors.secondaryText}
-              style={{ marginRight: 6 }}
-            />
-            <View style={{ flex: 1, pointerEvents: expanded ? 'auto' : 'none' }}>
-              <TextInput
-                ref={inputRef}
-                style={styles.searchInput}
-                placeholder="Where to?"
-                placeholderTextColor={Colors.placeholderText}
-                editable={expanded}
-                autoCapitalize="none"
-                autoCorrect={false}
-                returnKeyType="search"
-                value={query}
-                onChangeText={setQuery}
-                onFocus={() => setInputFocused(true)}
-                onBlur={() => setTimeout(() => setInputFocused(false), 150)}
-                onSubmitEditing={() => {
-                  if (stationResults.length > 0) {
-                    addRecentLocation(stationResults[0].name, null)
-                    collapse()
-                    onStationPress(stationResults[0].name)
-                  } else if (locationResults.length > 0) {
-                    handleLocationSelect(locationResults[0])
-                  }
-                }}
-              />
-            </View>
-            {expanded && hasQuery && searching && (
-              <ActivityIndicator size="small" color={Colors.secondaryText} />
-            )}
-          </TouchableOpacity>
-
-          {(inputFocused || hasQuery) && (
             <TouchableOpacity
-              onPress={collapse}
-              style={styles.cancelBtn}
-              activeOpacity={0.7}
-              accessibilityRole="button"
-              accessibilityLabel="Close search"
+              style={[styles.searchPill, expanded && styles.searchPillExpanded]}
+              onPress={expanded ? undefined : expand}
+              activeOpacity={expanded ? 1 : 0.8}
             >
-              <MaterialIcons name="close" size={22} color={Colors.secondaryText} />
+              <MaterialIcons
+                name="search"
+                size={18}
+                color={Colors.secondaryText}
+                style={{ marginRight: 6 }}
+              />
+              <View style={{ flex: 1, pointerEvents: expanded ? 'auto' : 'none' }}>
+                <TextInput
+                  ref={inputRef}
+                  style={styles.searchInput}
+                  placeholder="Where to?"
+                  placeholderTextColor={Colors.placeholderText}
+                  editable={expanded}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  returnKeyType="search"
+                  value={query}
+                  onChangeText={setQuery}
+                  onFocus={() => setInputFocused(true)}
+                  onBlur={() => setTimeout(() => setInputFocused(false), 150)}
+                  onSubmitEditing={() => {
+                    if (stationResults.length > 0) {
+                      addRecentLocation(stationResults[0].name, null)
+                      collapse()
+                      onStationPress(stationResults[0].name)
+                    } else if (locationResults.length > 0) {
+                      handleLocationSelect(locationResults[0])
+                    }
+                  }}
+                />
+              </View>
+              {expanded && hasQuery && searching && (
+                <ActivityIndicator size="small" color={Colors.secondaryText} />
+              )}
             </TouchableOpacity>
-          )}
+
+            {(inputFocused || hasQuery) && (
+              <TouchableOpacity
+                onPress={collapse}
+                style={styles.cancelBtn}
+                activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityLabel="Close search"
+              >
+                <MaterialIcons name="close" size={22} color={Colors.secondaryText} />
+              </TouchableOpacity>
+            )}
           </View>
 
           {/* Recents dropdown — floats below the search pill when input is focused with no query */}

@@ -196,16 +196,13 @@ export function ActiveJourneySheet({
   useEffect(() => {
     if (!params) return
     let active = true
-    setLiveOutages(null)
     fetchStationOutages().then((all) => {
       if (active) setLiveOutages(matchOutages(params.journey, all))
     })
     return () => {
       active = false
     }
-    // params?.journey is the only dep we want — re-fetching when savedId/level change would be wasteful
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params?.journey])
+  }, [params])
 
   const outageAssessments = useMemo(
     () =>

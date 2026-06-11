@@ -208,9 +208,7 @@ export const LocationInput = ({
             onChangeText={handleType}
             onFocus={() => {
               setFocused(true)
-              getRecentLocations().then((r) =>
-                setRecents(r.filter((x) => x.postcode !== null)),
-              )
+              getRecentLocations().then((r) => setRecents(r.filter((x) => x.postcode !== null)))
             }}
             onBlur={() => setTimeout(() => setFocused(false), 150)}
             onSubmitEditing={() => {

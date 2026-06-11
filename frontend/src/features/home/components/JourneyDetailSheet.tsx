@@ -333,18 +333,16 @@ export function JourneyDetailSheet({
 
   // Re-fetch live outages each time a journey is opened so the alerts reflect the current state
   // rather than the stale snapshot stored with the saved journey.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!params) return
     let active = true
-    setLiveOutages(null)
     fetchStationOutages().then((all) => {
       if (active) setLiveOutages(matchOutages(params.journey, all))
     })
     return () => {
       active = false
     }
-  }, [params?.journey])
+  }, [params])
 
   useEffect(() => {
     if (!params) {
