@@ -5,6 +5,7 @@
 
 import { apiClient } from '@/api/client'
 import type { Journey } from '@/features/journey/api/tfl'
+import type { OutageReport } from '@/features/outages/types'
 
 /** One specific broken piece of equipment at a station, with its reported detail. */
 export type OutageUnit = {
@@ -143,6 +144,58 @@ export async function fetchStationOutages(): Promise<StationOutage[]> {
     units,
     totalByType: totalByStationType.get(stationName) ?? {},
   }))
+}
+
+/**
+ * Convert the live SSE `OutageReport[]` feed (from `useOutages`) into the `StationOutage[]`
+ * format expected by `matchOutages` and `assessOutages`. One `OutageUnit` is produced per
+ * unique failure (grouped by `failure_id`); `reportCount` and `lastReported` are derived from
+ * the individual reports in the feed.
+ */
+export function reportsToStationOutages(reports: OutageReport[]): StationOutage[] {
+  const unitsByFailure = new Map<number, OutageUnit>()
+
+  for (const report of reports) {
+    if (report.failure.resolved) continue
+    const { failure_id, failure, breakdown_time } = report
+    const existing = unitsByFailure.get(failure_id)
+    if (existing) {
+      existing.reportCount++
+      if (breakdown_time > (existing.lastReported ?? '')) existing.lastReported = breakdown_time
+    } else {
+      unitsByFailure.set(failure_id, {
+        failureId: failure_id,
+        equipmentType: failure.equipment.equipment_type.name,
+        connection: failure.equipment.connection,
+        platformEndpoints: platformEndpoints(failure.equipment.connection),
+        reportCount: 1,
+        lastReported: breakdown_time,
+        verified: failure.verified,
+        verificationCount: failure.verifications.length,
+        estimated: failure.equipment.equipment_type.name === 'escalator',
+      })
+    }
+  }
+
+  const byStation = new Map<string, OutageUnit[]>()
+  for (const [failureId, unit] of unitsByFailure) {
+    const stationName = reports.find((r) => r.failure_id === failureId)!.failure.equipment.station
+      .name
+    const arr = byStation.get(stationName) ?? []
+    arr.push(unit)
+    byStation.set(stationName, arr)
+  }
+
+  return [...byStation].map(([stationName, units]) => {
+    const totalByType: Record<string, number> = {}
+    for (const u of units) totalByType[u.equipmentType] = (totalByType[u.equipmentType] ?? 0) + 1
+    return {
+      stationName,
+      equipmentTypes: [...new Set(units.map((u) => u.equipmentType))],
+      units,
+      totalByType,
+    }
+  })
 }
 
 // Train modes whose stations the rider actually enters (and whose lifts/escalators matter). A

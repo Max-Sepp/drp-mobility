@@ -310,6 +310,7 @@ type Props = {
   onStartJourney: (params: ActiveJourneyParams) => void
   onSaveChanged?: () => void
   onHeightChange?: (height: number) => void
+  hideSave?: boolean
 }
 
 export function JourneyDetailSheet({
@@ -318,6 +319,7 @@ export function JourneyDetailSheet({
   onStartJourney,
   onSaveChanged,
   onHeightChange,
+  hideSave = false,
 }: Props) {
   const { Colors, Radii } = useTheme()
   const styles = useMemo(
@@ -396,13 +398,17 @@ export function JourneyDetailSheet({
   useEffect(() => {
     if (!params) return
     let active = true
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setLiveOutages(null)
     fetchStationOutages().then((all) => {
       if (active) setLiveOutages(matchOutages(params.journey, all))
     })
     return () => {
       active = false
     }
-  }, [params])
+    // params.journey is the only dep we want
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params?.journey])
 
   useEffect(() => {
     if (!params) {
@@ -474,21 +480,34 @@ export function JourneyDetailSheet({
   async function startJourney() {
     if (!params || startBusy || saveBusy) return
     setStartBusy(true)
+    const activeOutages = liveOutages ?? params.outages ?? []
     try {
+      let savedJourneyId = currentSavedId
+      if (!savedJourneyId) {
+        const record = await saveJourney({
+          from: params.from,
+          to: params.to,
+          level: params.level ?? null,
+          outages: activeOutages,
+          journey: params.journey,
+        })
+        savedJourneyId = record.id
+        setCurrentSavedId(record.id)
+      }
       await startActiveJourney({
-        savedId: currentSavedId ?? undefined,
+        savedId: savedJourneyId,
         journey: params.journey,
         from: params.from,
         to: params.to,
-        outages: params.outages ?? [],
+        outages: activeOutages,
         level: params.level ?? null,
       })
       onStartJourney({
-        savedId: currentSavedId ?? undefined,
+        savedId: savedJourneyId,
         journey: params.journey,
         from: params.from,
         to: params.to,
-        outages: params.outages ?? [],
+        outages: activeOutages,
         level: params.level ?? null,
       })
     } catch {
@@ -514,7 +533,8 @@ export function JourneyDetailSheet({
     )
   }
 
-  const { journey, from, to, tags } = params
+  const { from, to } = params
+  const { journey, tags } = params
   const fare = fareLabel(journey, user?.traveller_type, user?.railcard)
   const saved = currentSavedId !== null
   const anyBusy = startBusy || saveBusy
@@ -671,29 +691,31 @@ export function JourneyDetailSheet({
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[
-              styles.actionBtn,
-              {
-                backgroundColor: saved ? Colors.searchBg : Colors.card,
-                borderColor: Colors.border,
-              },
-              anyBusy && { opacity: Opacity.disabledMid },
-            ]}
-            onPress={anyBusy ? undefined : toggleSave}
-            activeOpacity={0.8}
-            accessibilityRole="button"
-            accessibilityLabel={saved ? 'Remove from saved journeys' : 'Save this journey'}
-          >
-            <MaterialIcons
-              name={saved ? 'bookmark' : 'bookmark-border'}
-              size={18}
-              color={Colors.text}
-            />
-            <Text fontSize={16} fontWeight="600" color={Colors.text}>
-              {saveBusy ? 'Saving…' : saved ? 'Saved' : 'Save'}
-            </Text>
-          </TouchableOpacity>
+          {!hideSave && (
+            <TouchableOpacity
+              style={[
+                styles.actionBtn,
+                {
+                  backgroundColor: saved ? Colors.searchBg : Colors.card,
+                  borderColor: Colors.border,
+                },
+                anyBusy && { opacity: Opacity.disabledMid },
+              ]}
+              onPress={anyBusy ? undefined : toggleSave}
+              activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel={saved ? 'Remove from saved journeys' : 'Save this journey'}
+            >
+              <MaterialIcons
+                name={saved ? 'bookmark' : 'bookmark-border'}
+                size={18}
+                color={Colors.text}
+              />
+              <Text fontSize={16} fontWeight="600" color={Colors.text}>
+                {saveBusy ? 'Saving…' : saved ? 'Saved' : 'Save'}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Combined disruptions: TfL service disruptions + accessibility outages, tiered */}

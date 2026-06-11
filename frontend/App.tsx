@@ -14,6 +14,7 @@ import { MobilityStyleProvider } from './src/lib/MobilityStyleContext'
 import { WorkShiftProvider } from './src/lib/WorkShiftContext'
 import { navigationRef } from './src/navigation/navigationRef'
 import RootNavigator from './src/navigation/RootNavigator'
+import { SheetStackProvider } from './src/components/SheetStack'
 
 // Separate component so usePushNotifications can access AuthContext via useAuth().
 function AppContent() {
@@ -21,12 +22,14 @@ function AppContent() {
   return (
     <OutageProvider>
       <SafeAreaProvider>
-        <LocationProvider>
-          <NavigationContainer ref={navigationRef}>
-            <RootNavigator />
-            <StatusBar style="auto" />
-          </NavigationContainer>
-        </LocationProvider>
+        <SheetStackProvider>
+          <LocationProvider>
+            <NavigationContainer ref={navigationRef}>
+              <RootNavigator />
+              <StatusBar style="auto" />
+            </NavigationContainer>
+          </LocationProvider>
+        </SheetStackProvider>
       </SafeAreaProvider>
     </OutageProvider>
   )
