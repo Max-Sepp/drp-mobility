@@ -19,8 +19,13 @@ import {
 } from '@gorhom/bottom-sheet'
 import BottomSheet, { BottomSheetScrollView, type BottomSheetRef } from '@/components/BottomSheet'
 import { useStations } from '@/features/stations'
-import { resolveStationName } from '@/features/journey/api/accessibility'
+import {
+  fetchStationOutages,
+  matchOutages,
+  resolveStationName,
+} from '@/features/journey/api/accessibility'
 import { assessOutages } from '@/features/journey/api/outageRelevance'
+import type { StationOutage } from '@/features/journey/api/accessibility'
 import {
   clearActiveJourney,
   loadActiveJourney,
@@ -34,7 +39,7 @@ import {
   modeIcon,
   modeLabel,
 } from '@/features/journey/components/legDisplay'
-import { OutageDetail } from '@/features/journey/components/OutageDetail'
+import { RouteAlerts } from '@/features/journey/components/RouteAlerts'
 import { haversineMeters } from '@/lib/geo'
 import type { ActiveJourneyParams } from '@/features/home/components/JourneyDetailSheet'
 import { useTheme, Borders, Heights, Opacity, Spacing } from '@/theme'
@@ -118,6 +123,7 @@ export function ActiveJourneySheet({
   const [legIndex, setLegIndex] = useState(0)
   const [snapIndex, setSnapIndex] = useState(1)
   const [gpsActive, setGpsActive] = useState(false)
+  const [liveOutages, setLiveOutages] = useState<StationOutage[] | null>(null)
   const autoAdvancedFromRef = useRef<number | null>(null)
 
   const { stations } = useStations()
@@ -177,9 +183,23 @@ export function ActiveJourneySheet({
     goToRef.current = goTo
   }, [legIndex, goTo])
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!params) return
+    let active = true
+    setLiveOutages(null)
+    fetchStationOutages().then((all) => {
+      if (active) setLiveOutages(matchOutages(params.journey, all))
+    })
+    return () => {
+      active = false
+    }
+  }, [params?.journey])
+
   const outageAssessments = useMemo(
-    () => (params ? assessOutages(params.journey, params.outages ?? [], stations) : []),
-    [params, stations],
+    () =>
+      params ? assessOutages(params.journey, liveOutages ?? params.outages ?? [], stations) : [],
+    [params, liveOutages, stations],
   )
 
   const arrivalStation = currentLeg?.arrivalPoint?.commonName
@@ -443,7 +463,7 @@ export function ActiveJourneySheet({
             </Text>
           </XStack>
 
-          <OutageDetail assessments={upcomingAssessments} />
+          <RouteAlerts assessments={upcomingAssessments} disruptions={[]} />
 
           {remaining.length > 0 && (
             <YStack gap="$2">
