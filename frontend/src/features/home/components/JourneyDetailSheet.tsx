@@ -26,9 +26,8 @@ import {
   ModePipe,
   RouteTags,
   stripStationSuffix,
-  WALKING_ICON,
-  WALKING_LABEL,
 } from '@/features/journey/components/legDisplay'
+import { useMobilityStyle } from '@/lib/MobilityStyleContext'
 import { OutageDetail } from '@/features/journey/components/OutageDetail'
 import { useTheme, Borders, Heights, Opacity, Spacing } from '@/theme'
 import type { AccessibilityPreference, Journey, Leg, RouteTag } from '@/features/journey/api/tfl'
@@ -141,6 +140,7 @@ function TimelineConnector({
   disruptions: { description?: string }[]
 }) {
   const { Colors, Radii } = useTheme()
+  const { label: walkLabel, icon: walkIcon } = useMobilityStyle()
   const isWalking = mode === 'walking'
   const isBus = mode === 'bus' || mode === 'coach'
   const hasDisruptions = disruptions.some((d) => d.description)
@@ -183,9 +183,9 @@ function TimelineConnector({
       <View style={{ flex: 1, paddingLeft: 6, paddingVertical: 8, gap: 4 }}>
         {isWalking ? (
           <XStack items="center" gap={5}>
-            <MaterialIcons name={WALKING_ICON} size={14} color={Colors.secondaryText} />
+            <MaterialIcons name={walkIcon} size={14} color={Colors.secondaryText} />
             <Text fontSize={13} color={Colors.secondaryText}>
-              {WALKING_LABEL} {walkDuration} min
+              {walkLabel} {walkDuration} min
             </Text>
           </XStack>
         ) : (

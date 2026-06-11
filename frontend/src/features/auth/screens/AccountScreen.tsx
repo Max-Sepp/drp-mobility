@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons'
+import { Ionicons, MaterialIcons } from '@expo/vector-icons'
 import { useMemo, useState } from 'react'
 import {
   Alert,
@@ -21,6 +21,11 @@ import type { ThemeId } from '@/theme'
 import { useAuth } from '@/features/auth/context/AuthContext'
 import { useAccessibilityPreference } from '@/lib/AccessibilityPreferenceContext'
 import type { AccessibilityPreference } from '@/features/journey/api/tfl'
+import {
+  MOBILITY_STYLES,
+  useMobilityStyleControls,
+} from '@/lib/MobilityStyleContext'
+import type { MobilityStyleId } from '@/lib/MobilityStyleContext'
 
 const USE_NATIVE_DRIVER = Platform.OS !== 'web'
 
@@ -29,17 +34,21 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
   const { Colors, Radii, Shadows } = useTheme()
   const { themeId, setTheme } = useThemeControls()
   const { defaultLevel, setDefaultLevel } = useAccessibilityPreference()
+  const { styleId: mobilityStyleId, setStyle: setMobilityStyle } = useMobilityStyleControls()
 
   const [saving, setSaving] = useState(false)
   const [travellerModalVisible, setTravellerModalVisible] = useState(false)
   const [themeModalVisible, setThemeModalVisible] = useState(false)
   const [accessibilityModalVisible, setAccessibilityModalVisible] = useState(false)
+  const [mobilityModalVisible, setMobilityModalVisible] = useState(false)
   const [backdropAnim] = useState(() => new Animated.Value(0))
   const [sheetAnim] = useState(() => new Animated.Value(500))
   const [themeBackdropAnim] = useState(() => new Animated.Value(0))
   const [themeSheetAnim] = useState(() => new Animated.Value(500))
   const [accessibilityBackdropAnim] = useState(() => new Animated.Value(0))
   const [accessibilitySheetAnim] = useState(() => new Animated.Value(500))
+  const [mobilityBackdropAnim] = useState(() => new Animated.Value(0))
+  const [mobilitySheetAnim] = useState(() => new Animated.Value(500))
 
   const styles = useMemo(
     () =>
@@ -299,6 +308,51 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
   }
 
   // ---------------------------------------------------------------------------
+  // Mobility style picker
+  // ---------------------------------------------------------------------------
+
+  const allMobilityStyles = Object.values(MOBILITY_STYLES)
+  const currentMobilityStyle = MOBILITY_STYLES[mobilityStyleId]
+
+  function openMobilityPicker() {
+    setMobilityModalVisible(true)
+    Animated.parallel([
+      Animated.timing(mobilityBackdropAnim, {
+        toValue: 1,
+        duration: 220,
+        useNativeDriver: USE_NATIVE_DRIVER,
+      }),
+      Animated.spring(mobilitySheetAnim, {
+        toValue: 0,
+        stiffness: 130,
+        damping: 22,
+        mass: 1,
+        useNativeDriver: USE_NATIVE_DRIVER,
+      }),
+    ]).start()
+  }
+
+  function closeMobilityPicker() {
+    Animated.parallel([
+      Animated.timing(mobilityBackdropAnim, {
+        toValue: 0,
+        duration: 180,
+        useNativeDriver: USE_NATIVE_DRIVER,
+      }),
+      Animated.timing(mobilitySheetAnim, {
+        toValue: 500,
+        duration: 220,
+        useNativeDriver: USE_NATIVE_DRIVER,
+      }),
+    ]).start(() => setMobilityModalVisible(false))
+  }
+
+  function handleSelectMobility(id: MobilityStyleId) {
+    setMobilityStyle(id)
+    closeMobilityPicker()
+  }
+
+  // ---------------------------------------------------------------------------
   // Sign out
   // ---------------------------------------------------------------------------
 
@@ -399,6 +453,33 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
             <YStack flex={1} gap={2}>
               <Text fontSize={15} fontWeight="500" color={Colors.text}>
                 {currentTheme.label}
+              </Text>
+            </YStack>
+            <Ionicons name="chevron-down" size={16} color={Colors.secondaryText} />
+          </TouchableOpacity>
+        </YStack>
+
+        {/* Movement style */}
+        <YStack gap="$2">
+          <Text fontSize={12} fontWeight="600" color={Colors.secondaryText} letterSpacing={0.8}>
+            MOVEMENT STYLE
+          </Text>
+          <TouchableOpacity
+            style={[styles.card, styles.triggerRow]}
+            activeOpacity={Opacity.pressed}
+            onPress={openMobilityPicker}
+          >
+            <MaterialIcons
+              name={currentMobilityStyle.icon}
+              size={20}
+              color={Colors.secondaryText}
+            />
+            <YStack flex={1} gap={2}>
+              <Text fontSize={15} fontWeight="500" color={Colors.text}>
+                {currentMobilityStyle.name}
+              </Text>
+              <Text fontSize={13} color={Colors.secondaryText} numberOfLines={1}>
+                {currentMobilityStyle.description}
               </Text>
             </YStack>
             <Ionicons name="chevron-down" size={16} color={Colors.secondaryText} />
@@ -595,6 +676,64 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
                       </RNText>
                       <RNText style={styles.optionDesc} numberOfLines={2}>
                         {opt.description}
+                      </RNText>
+                    </View>
+                    {selected && <Ionicons name="checkmark" size={20} color={Colors.blue} />}
+                  </TouchableOpacity>
+                )
+              })}
+            </ScrollView>
+          </Animated.View>
+        </View>
+      </Modal>
+      {/* Mobility style modal */}
+      <Modal
+        visible={mobilityModalVisible}
+        transparent
+        animationType="none"
+        onRequestClose={closeMobilityPicker}
+      >
+        <View style={styles.modalRoot}>
+          <Animated.View
+            style={[
+              StyleSheet.absoluteFillObject,
+              styles.backdrop,
+              { opacity: mobilityBackdropAnim },
+            ]}
+            pointerEvents="none"
+          />
+          <TouchableOpacity
+            style={StyleSheet.absoluteFillObject}
+            onPress={closeMobilityPicker}
+            activeOpacity={1}
+          />
+          <Animated.View
+            style={[styles.sheet, { transform: [{ translateY: mobilitySheetAnim }] }]}
+          >
+            <View style={styles.handle} />
+            <RNText style={styles.sheetTitle}>MOVEMENT STYLE</RNText>
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              bounces={false}
+              style={styles.optionList}
+            >
+              {allMobilityStyles.map((ms, i) => {
+                const selected = mobilityStyleId === ms.id
+                const isLast = i === allMobilityStyles.length - 1
+                return (
+                  <TouchableOpacity
+                    key={ms.id}
+                    style={[styles.option, !isLast && styles.optionSeparator]}
+                    activeOpacity={Opacity.pressed}
+                    onPress={() => handleSelectMobility(ms.id)}
+                  >
+                    <MaterialIcons name={ms.icon} size={22} color={Colors.secondaryText} />
+                    <View style={{ flex: 1 }}>
+                      <RNText style={[styles.optionName, selected && styles.optionNameSelected]}>
+                        {ms.name}
+                      </RNText>
+                      <RNText style={styles.optionDesc} numberOfLines={2}>
+                        {ms.description}
                       </RNText>
                     </View>
                     {selected && <Ionicons name="checkmark" size={20} color={Colors.blue} />}

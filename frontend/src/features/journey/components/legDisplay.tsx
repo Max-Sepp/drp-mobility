@@ -4,6 +4,7 @@ import type { ResolvedLocation } from '@/features/journey/api/geocode'
 import type { Journey, Leg, RouteTag } from '@/features/journey/api/tfl'
 import { effectiveDiscount } from '@/features/journey/lib/railcards'
 import { useTheme, Borders, Opacity } from '@/theme'
+import { useMobilityStyle } from '@/lib/MobilityStyleContext'
 
 export type ResolveStation = (commonName: string) => string | null
 export type StationPressHandler = (stationName: string) => void
@@ -261,6 +262,7 @@ export function legLineColor(leg: Leg, fallback = '#007AFF'): string {
 
 function LegChip({ leg, compact = true }: { leg: Leg; compact?: boolean }) {
   const { Colors, Radii } = useTheme()
+  const { label: walkLabel, icon: walkIcon } = useMobilityStyle()
   const icon = modeIcon(leg.mode.name)
   const isWalking = leg.mode.name === 'walking'
   const isBus = leg.mode.name === 'bus' || leg.mode.name === 'coach'
@@ -275,9 +277,9 @@ function LegChip({ leg, compact = true }: { leg: Leg; compact?: boolean }) {
         px={compact ? 6 : 9}
         py={compact ? 2 : 4}
         style={{ backgroundColor: Colors.searchBg, borderRadius: Radii.pill }}
-        aria-label={`${WALKING_LABEL} ${mins}`}
+        aria-label={`${walkLabel} ${mins}`}
       >
-        <MaterialIcons name={WALKING_ICON} size={compact ? 14 : 18} color={Colors.secondaryText} />
+        <MaterialIcons name={walkIcon} size={compact ? 14 : 18} color={Colors.secondaryText} />
         <Text fontSize={compact ? 11 : 13} fontWeight="600" color={Colors.secondaryText}>
           {mins}
         </Text>
