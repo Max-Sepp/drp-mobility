@@ -29,7 +29,7 @@ export function RouteTags({ tags }: { tags?: RouteTag[] }) {
           py="$1.5"
           style={{
             backgroundColor: Colors.blueBg,
-            borderColor: Colors.blue,
+            borderColor: Colors.border,
             borderWidth: Borders.thin,
             borderRadius: Radii.pill,
           }}

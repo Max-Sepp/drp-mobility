@@ -78,7 +78,7 @@ function TimelineWaypoint({
 }) {
   const { Colors } = useTheme()
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', minHeight: 32 }}>
+    <View style={{ flexDirection: 'row', alignItems: 'center', minHeight: 40 }}>
       <View style={{ width: GUTTER_W, alignItems: 'center', justifyContent: 'center' }}>
         {kind === 'destination' ? (
           <MaterialIcons name="place" size={22} color={Colors.text} />
@@ -187,7 +187,7 @@ function TimelineConnector({
       </View>
 
       {/* Content */}
-      <View style={{ flex: 1, paddingLeft: 6, paddingVertical: 8, gap: 4 }}>
+      <View style={{ flex: 1, paddingLeft: 6, paddingVertical: 10, gap: 6 }}>
         {isWalking ? (
           <XStack items="center" gap={5}>
             <MaterialIcons name={walkIcon} size={16} color={Colors.secondaryText} />
@@ -301,11 +301,11 @@ export function JourneyDetailSheet({
       StyleSheet.create({
         header: {
           flexDirection: 'row',
-          alignItems: 'center',
+          alignItems: 'flex-start',
           gap: Spacing.sm,
           paddingHorizontal: Spacing.lg,
-          paddingTop: Spacing.lg,
-          paddingBottom: Spacing.md,
+          paddingTop: Spacing.xl,
+          paddingBottom: Spacing.lg,
           borderBottomWidth: StyleSheet.hairlineWidth,
           borderBottomColor: Colors.separator,
         },
@@ -319,13 +319,13 @@ export function JourneyDetailSheet({
         },
         content: {
           paddingHorizontal: Spacing.lg,
-          paddingTop: Spacing.lg,
+          paddingTop: Spacing.sm,
           paddingBottom: Spacing.section,
         },
         actionRow: {
           flexDirection: 'row',
           gap: Spacing.sm,
-          marginTop: Spacing.lg,
+          marginTop: Spacing.sm,
         },
         actionBtn: {
           flex: 1,
@@ -336,11 +336,6 @@ export function JourneyDetailSheet({
           justifyContent: 'center',
           gap: 6,
           borderWidth: Borders.medium,
-        },
-        separator: {
-          height: StyleSheet.hairlineWidth,
-          backgroundColor: Colors.separator,
-          marginVertical: Spacing.lg,
         },
       }),
     [Colors, Radii],
@@ -589,7 +584,7 @@ export function JourneyDetailSheet({
       {/* Header: prominent duration + arrive/fare + tags + close */}
       <View style={styles.header}>
         <MaterialIcons name={modeIcon(primaryMode)} size={24} color={Colors.secondaryText} />
-        <View style={{ flex: 1, gap: 4 }}>
+        <View style={{ flex: 1, gap: 6 }}>
           <Text fontSize={26} fontWeight="800" color={Colors.text} style={{ lineHeight: 30 }}>
             {journey.duration} min
           </Text>
@@ -597,7 +592,11 @@ export function JourneyDetailSheet({
             Arrive {clockTime(journey.arrivalDateTime)}
             {fare ? ` · ${fare}` : ''}
           </Text>
-          {tags && tags.length > 0 ? <RouteTags tags={tags} /> : null}
+          {tags && tags.length > 0 ? (
+            <View style={{ marginTop: 2 }}>
+              <RouteTags tags={tags} />
+            </View>
+          ) : null}
         </View>
         <TouchableOpacity
           onPress={() => sheetRef.current?.close()}
@@ -664,11 +663,8 @@ export function JourneyDetailSheet({
         {/* Combined disruptions: TfL service disruptions + accessibility outages, tiered */}
         <RouteAlerts assessments={outageAssessments} disruptions={disruptions} />
 
-        {/* Timeline divider */}
-        <View style={styles.separator} />
-
         {/* Gutter timeline */}
-        <View style={{ gap: 0 }}>{timelineItems}</View>
+        <View style={{ gap: 0, marginTop: Spacing.lg }}>{timelineItems}</View>
       </BottomSheetScrollView>
     </BottomSheet>
   )
