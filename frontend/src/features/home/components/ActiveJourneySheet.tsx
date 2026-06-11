@@ -111,11 +111,11 @@ export function ActiveJourneySheet({
   const insets = useSafeAreaInsets()
   // Three snaps: compact (handle + summary row + footer), half-screen, near-full.
   // Handle is 24 px (gorhom default). Summary row has no paddingTop, paddingBottom 12, two text
-  // lines ~38 px, so ~50 px total. Footer = paddingTop 8 + button 48 + border 1 + paddingBottom 8
-  // + insets.bottom = 65 + insets.bottom. Tight fit leaves no gap for scroll content to bleed through.
+  // lines ~46 px (19 pt destination + 12 pt badge), so ~58 px total. Footer = paddingTop 8 +
+  // button 48 + border 1 + paddingBottom 8 + insets.bottom = 65 + insets.bottom.
   // Full snap matches other sheets: SCREEN_H - insets.top - 66, clearing the top nav buttons.
   const snapPoints = useMemo(
-    () => [24 + 47 + 65 + insets.bottom, SNAP_HALF, SCREEN_H - insets.top - 66],
+    () => [24 + 58 + 65 + insets.bottom, SNAP_HALF, SCREEN_H - insets.top - 66],
     [insets.top, insets.bottom],
   )
   const sheetRef = useRef<BottomSheetRef>(null)
@@ -411,8 +411,8 @@ export function ActiveJourneySheet({
         >
           <MaterialIcons name={modeIcon(currentLeg.mode.name)} size={20} color={accentFg} />
         </View>
-        <YStack flex={1} gap="$0.5">
-          <Text fontSize={15} fontWeight="700" color={Colors.text} numberOfLines={1}>
+        <YStack flex={1} gap="$1">
+          <Text fontSize={19} fontWeight="700" color={Colors.text} numberOfLines={1}>
             {arrName ?? humanizeSummary(currentLeg.instruction.summary, [from, to])}
           </Text>
           {routeName && !isWalking ? (
@@ -428,7 +428,7 @@ export function ActiveJourneySheet({
               }}
             >
               <Text
-                fontSize={11}
+                fontSize={12}
                 fontWeight="700"
                 style={{ color: isBus ? Colors.text : accentFg }}
               >
@@ -436,14 +436,14 @@ export function ActiveJourneySheet({
               </Text>
             </View>
           ) : isWalking ? (
-            <Text fontSize={12} color={Colors.secondaryText}>
+            <Text fontSize={13} color={Colors.secondaryText}>
               {currentLeg.duration} min walk
             </Text>
           ) : null}
         </YStack>
         {arrTime && (
           <Text
-            fontSize={14}
+            fontSize={16}
             fontWeight="700"
             color={Colors.text}
             style={{ marginRight: isExpanded ? 0 : Spacing.xs }}
@@ -552,132 +552,153 @@ export function ActiveJourneySheet({
 
               {/* Transit legs: vertical station connector */}
               {hasStations ? (
-                <View style={{ flexDirection: 'row', gap: Spacing.lg }}>
-                  {/* Gutter: departure dot → connector → arrival dot */}
-                  <View style={{ width: 16, alignItems: 'center', paddingTop: 5 }}>
-                    <View
-                      style={{
-                        width: 11,
-                        height: 11,
-                        borderRadius: 6,
-                        borderWidth: 2,
-                        borderColor: accentBg,
-                        backgroundColor: Colors.card,
-                      }}
-                    />
-                    <View
-                      style={{
-                        flex: 1,
-                        width: 2,
-                        backgroundColor: accentBg,
-                        opacity: 0.35,
-                        marginVertical: 3,
-                        minHeight: 32,
-                      }}
-                    />
-                    <View
-                      style={{ width: 11, height: 11, borderRadius: 6, backgroundColor: accentBg }}
-                    />
-                  </View>
-
-                  {/* Station names + times */}
-                  <View style={{ flex: 1 }}>
-                    {depName && (
+                <View>
+                  {/* Departure — dot is in the same row as the chip, so alignItems:'center'
+                      guarantees the dot always centres on the station label regardless of chip height */}
+                  {depName && (
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <View style={{ width: 20, alignItems: 'center' }}>
+                        <View
+                          style={{
+                            width: 11,
+                            height: 11,
+                            borderRadius: 6,
+                            borderWidth: 2,
+                            borderColor: accentBg,
+                            backgroundColor: Colors.card,
+                          }}
+                        />
+                      </View>
                       <View
                         style={{
+                          flex: 1,
                           flexDirection: 'row',
-                          justifyContent: 'space-between',
                           alignItems: 'center',
-                          marginBottom: Spacing.sm,
+                          justifyContent: 'space-between',
                         }}
                       >
                         {depResolved ? (
-                          <Text
-                            fontSize={16}
-                            fontWeight="600"
-                            color={Colors.blue}
+                          <TouchableOpacity
                             onPress={() => onStationPress?.(depResolved)}
-                            style={{ flex: 1, textDecorationLine: 'underline' }}
-                            numberOfLines={1}
-                            role="button"
-                            aria-label={`View accessibility for ${depResolved}`}
+                            activeOpacity={0.7}
+                            accessibilityRole="button"
+                            accessibilityLabel={`View accessibility for ${depResolved}`}
+                            style={{
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              gap: 5,
+                              borderRadius: Radii.small,
+                              borderWidth: Borders.thin,
+                              borderColor: accentBg,
+                              paddingHorizontal: 8,
+                              paddingVertical: 5,
+                            }}
                           >
-                            {depName}
-                          </Text>
+                            <Text
+                              fontSize={16}
+                              fontWeight="600"
+                              style={{ flexShrink: 1, color: accentBg }}
+                              numberOfLines={1}
+                            >
+                              {depName}
+                            </Text>
+                            <MaterialIcons name="chevron-right" size={16} color={accentBg} />
+                          </TouchableOpacity>
                         ) : (
                           <Text
                             fontSize={16}
                             fontWeight="600"
                             color={Colors.text}
-                            style={{ flex: 1 }}
                             numberOfLines={1}
                           >
                             {depName}
                           </Text>
                         )}
                         {depTime && (
-                          <Text
-                            fontSize={14}
-                            color={Colors.secondaryText}
-                            style={{ marginLeft: Spacing.sm }}
-                          >
+                          <Text fontSize={15} fontWeight="600" color={Colors.secondaryText}>
                             {depTime}
                           </Text>
                         )}
                       </View>
-                    )}
-                    <XStack items="center" gap="$1.5" py="$1.5">
+                    </View>
+                  )}
+
+                  {/* Connector + duration — gutter stretches to this row's height */}
+                  <View style={{ flexDirection: 'row' }}>
+                    <View style={{ width: 20, alignItems: 'center' }}>
+                      <View
+                        style={{ flex: 1, width: 2, backgroundColor: accentBg, opacity: 0.35 }}
+                      />
+                    </View>
+                    <XStack items="center" gap="$1.5" py="$2" style={{ paddingLeft: Spacing.sm }}>
                       <MaterialIcons name="schedule" size={13} color={Colors.tertiaryText} />
                       <Text fontSize={13} color={Colors.tertiaryText}>
                         {currentLeg.duration} min
                       </Text>
                     </XStack>
-                    {arrName && (
+                  </View>
+
+                  {/* Arrival — same inline-dot pattern */}
+                  {arrName && (
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <View style={{ width: 20, alignItems: 'center' }}>
+                        <View
+                          style={{ width: 11, height: 11, borderRadius: 6, backgroundColor: accentBg }}
+                        />
+                      </View>
                       <View
                         style={{
+                          flex: 1,
                           flexDirection: 'row',
-                          justifyContent: 'space-between',
                           alignItems: 'center',
-                          marginTop: Spacing.sm,
+                          justifyContent: 'space-between',
                         }}
                       >
                         {arrResolved ? (
-                          <Text
-                            fontSize={16}
-                            fontWeight="600"
-                            color={Colors.blue}
+                          <TouchableOpacity
                             onPress={() => onStationPress?.(arrResolved)}
-                            style={{ flex: 1, textDecorationLine: 'underline' }}
-                            numberOfLines={1}
-                            role="button"
-                            aria-label={`View accessibility for ${arrResolved}`}
+                            activeOpacity={0.7}
+                            accessibilityRole="button"
+                            accessibilityLabel={`View accessibility for ${arrResolved}`}
+                            style={{
+                              flexDirection: 'row',
+                              alignItems: 'center',
+                              gap: 5,
+                              borderRadius: Radii.small,
+                              borderWidth: Borders.thin,
+                              borderColor: accentBg,
+                              paddingHorizontal: 8,
+                              paddingVertical: 5,
+                            }}
                           >
-                            {arrName}
-                          </Text>
+                            <Text
+                              fontSize={16}
+                              fontWeight="600"
+                              style={{ flexShrink: 1, color: accentBg }}
+                              numberOfLines={1}
+                            >
+                              {arrName}
+                            </Text>
+                            <MaterialIcons name="chevron-right" size={16} color={accentBg} />
+                          </TouchableOpacity>
                         ) : (
                           <Text
                             fontSize={16}
                             fontWeight="600"
                             color={Colors.text}
-                            style={{ flex: 1 }}
                             numberOfLines={1}
                           >
                             {arrName}
                           </Text>
                         )}
                         {arrTime && (
-                          <Text
-                            fontSize={16}
-                            fontWeight="700"
-                            color={Colors.text}
-                            style={{ marginLeft: Spacing.sm }}
-                          >
+                          <Text fontSize={15} fontWeight="600" color={Colors.secondaryText}>
                             {arrTime}
                           </Text>
                         )}
                       </View>
-                    )}
-                  </View>
+                    </View>
+                  )}
                 </View>
               ) : (
                 /* Walking / bus / other: instruction text + times */
