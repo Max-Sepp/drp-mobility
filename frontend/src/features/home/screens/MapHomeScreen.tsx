@@ -5,6 +5,8 @@ import { Alert, Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'rea
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { StationMap, type StationMapHandle } from '@/features/map/components/StationMap'
 import { useAppLocation } from '@/lib/LocationContext'
+import { useWorkShift } from '@/lib/WorkShiftContext'
+import { useStations } from '@/features/stations'
 import { loadSavedJourneys, type SavedJourney } from '@/features/journey/api/savedJourneys'
 import {
   clearActiveJourney,
@@ -176,6 +178,69 @@ function ActiveJourneyBanner({
   )
 }
 
+/**
+ * Compact bar shown to a staff member who is on shift. It sits between the top map buttons and,
+ * when tapped, jumps straight to their station's sheet (the lower view) — no search needed.
+ */
+function ShiftBanner({ station, onJump }: { station: string; onJump: () => void }) {
+  const { Colors, Radii, Shadows } = useTheme()
+  const bannerStyles = useMemo(
+    () =>
+      StyleSheet.create({
+        banner: {
+          flex: 1,
+          minWidth: 0,
+          height: 50,
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: Spacing.sm,
+          paddingLeft: Spacing.md,
+          paddingRight: Spacing.sm,
+          backgroundColor: Colors.card,
+          borderRadius: Radii.pill,
+          ...Shadows.card,
+        },
+        title: {
+          ...Typography.caption,
+          color: Colors.secondaryText,
+        },
+        station: {
+          ...Typography.bodyBold,
+          color: Colors.text,
+        },
+        jumpCircle: {
+          width: 34,
+          height: 34,
+          borderRadius: 17,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: Colors.blue,
+        },
+      }),
+    [Colors, Radii, Shadows],
+  )
+  return (
+    <TouchableOpacity
+      style={bannerStyles.banner}
+      onPress={onJump}
+      activeOpacity={0.85}
+      accessibilityRole="button"
+      accessibilityLabel={`On shift at ${station}. Tap to jump to station.`}
+    >
+      <MaterialIcons name="badge" size={22} color={Colors.blue} />
+      <View style={{ flex: 1, minWidth: 0 }}>
+        <Text style={bannerStyles.title}>On shift at</Text>
+        <Text style={bannerStyles.station} numberOfLines={1}>
+          {station}
+        </Text>
+      </View>
+      <View style={bannerStyles.jumpCircle}>
+        <MaterialIcons name="arrow-upward" size={20} color={Colors.card} />
+      </View>
+    </TouchableOpacity>
+  )
+}
+
 export function MapHomeScreen({ navigation, route }: Props) {
   const { Colors, Shadows } = useTheme()
   const styles = useMemo(
@@ -194,6 +259,8 @@ export function MapHomeScreen({ navigation, route }: Props) {
         topButtons: {
           flexDirection: 'row',
           justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: Spacing.sm,
           paddingTop: 8,
           paddingHorizontal: Spacing.md,
         },
@@ -221,6 +288,17 @@ export function MapHomeScreen({ navigation, route }: Props) {
   const mapRef = useRef<StationMapHandle>(null)
   const { status, user } = useAuth()
   const coords = useAppLocation()
+  const { workStation } = useWorkShift()
+  const { stations } = useStations()
+  const isTrusted = user?.role === 'trusted'
+  // Staff's on-shift station, when set, anchors the map and powers one-tap reporting.
+  const shiftStation = isTrusted && workStation ? workStation : null
+  const shiftAnchor = useMemo(() => {
+    if (!shiftStation) return null
+    const station = stations.find((s) => s.name === shiftStation)
+    if (station?.latitude == null || station?.longitude == null) return null
+    return { latitude: station.latitude, longitude: station.longitude }
+  }, [shiftStation, stations])
   // Each sheet reports its current snap height; the map uses the tallest one as its bottom inset.
   const [searchHeight, setSearchHeight] = useState(Dimensions.get('window').height * 0.5)
   const [stationHeight, setStationHeight] = useState(0)
@@ -410,6 +488,13 @@ export function MapHomeScreen({ navigation, route }: Props) {
     setActiveStation(stationName)
   }
 
+  // One-tap access for staff: skip the search step and pull up the station sheet for the
+  // station they declared they're working at.
+  function jumpToShiftStation() {
+    if (!shiftStation) return
+    openStation(shiftStation)
+  }
+
   function closeStation() {
     setActiveStation(null)
     setStationPausedForJourney(false)
@@ -429,7 +514,12 @@ export function MapHomeScreen({ navigation, route }: Props) {
 
   return (
     <View style={styles.screen}>
-      <StationMap ref={mapRef} onStationPress={openStation} bottomInset={mapBottomInset} />
+      <StationMap
+        ref={mapRef}
+        onStationPress={openStation}
+        bottomInset={mapBottomInset}
+        anchor={shiftAnchor}
+      />
 
       <SearchActionSheet
         ref={sheetRef}
@@ -516,6 +606,9 @@ export function MapHomeScreen({ navigation, route }: Props) {
               accessibilityLabel="Re-centre map on my location"
               onPress={() => mapRef.current?.recentre()}
             />
+            {shiftStation && !activeStation && !activeReport && (
+              <ShiftBanner station={shiftStation} onJump={jumpToShiftStation} />
+            )}
             <TopIconButton
               icon={status === 'authed' ? 'account-circle' : 'person'}
               color={status === 'authed' ? Colors.blue : Colors.text}

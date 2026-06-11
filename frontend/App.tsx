@@ -10,6 +10,7 @@ import { OutageProvider } from './src/features/outages'
 import { usePushNotifications } from './src/hooks/usePushNotifications'
 import { LocationProvider } from './src/lib/LocationContext'
 import { AccessibilityPreferenceProvider } from './src/lib/AccessibilityPreferenceContext'
+import { WorkShiftProvider } from './src/lib/WorkShiftContext'
 import { navigationRef } from './src/navigation/navigationRef'
 import RootNavigator from './src/navigation/RootNavigator'
 
@@ -35,11 +36,13 @@ export default function App() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ThemeProvider>
         <AccessibilityPreferenceProvider>
-          <TamaguiProvider config={tamaguiConfig} defaultTheme="light">
-            <AuthProvider>
-              <AppContent />
-            </AuthProvider>
-          </TamaguiProvider>
+          <WorkShiftProvider>
+            <TamaguiProvider config={tamaguiConfig} defaultTheme="light">
+              <AuthProvider>
+                <AppContent />
+              </AuthProvider>
+            </TamaguiProvider>
+          </WorkShiftProvider>
         </AccessibilityPreferenceProvider>
       </ThemeProvider>
     </GestureHandlerRootView>
