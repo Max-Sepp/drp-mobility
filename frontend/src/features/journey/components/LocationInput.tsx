@@ -7,6 +7,11 @@ import {
   postcodeForSuggestion,
   searchLocations,
 } from '@/features/journey/api/geocode'
+import {
+  addRecentLocation,
+  getRecentLocations,
+  type RecentLocation,
+} from '@/features/journey/api/recentLocations'
 import { useTheme, Borders, Opacity } from '@/theme'
 
 export type PlaceShortcut = {
@@ -48,6 +53,7 @@ export const LocationInput = ({
   const [searching, setSearching] = useState(false)
   const [resolved, setResolved] = useState(isResolvedProp ?? false)
   const [focused, setFocused] = useState(false)
+  const [recents, setRecents] = useState<RecentLocation[]>([])
   // Measured height of the input box, used to anchor the floating dropdown below it.
   const [inputH, setInputH] = useState(44)
 
@@ -129,6 +135,7 @@ export const LocationInput = ({
     }
     setSearching(false)
     if (!postcode) return
+    addRecentLocation(suggestion.label, postcode)
     skipNextSearch.current = true
     setResolved(true)
     if (onSelect) {
@@ -136,6 +143,19 @@ export const LocationInput = ({
     } else {
       onResolved(postcode)
       onChangeText(suggestion.label)
+    }
+  }
+
+  function chooseRecent(recent: RecentLocation) {
+    setSuggestions([])
+    skipNextSearch.current = true
+    setResolved(true)
+    addRecentLocation(recent.label, recent.postcode)
+    if (onSelect) {
+      onSelect(recent.label, recent.postcode!)
+    } else {
+      onResolved(recent.postcode!)
+      onChangeText(recent.label)
     }
   }
 
@@ -153,6 +173,7 @@ export const LocationInput = ({
 
   const showLocationShortcut = Boolean(onCurrentLocation) && focused && value.length === 0
   const showSavedShortcuts = focused && value.length === 0 && (savedPlaceShortcuts?.length ?? 0) > 0
+  const showRecents = focused && value.length === 0 && recents.length > 0
   const matchedSavedPlaces =
     focused && value.length > 0 && !resolved && (savedPlaceShortcuts?.length ?? 0) > 0
       ? savedPlaceShortcuts!.filter((p) => p.label.toLowerCase().includes(value.toLowerCase()))
@@ -160,6 +181,7 @@ export const LocationInput = ({
   const showDropdown =
     showLocationShortcut ||
     showSavedShortcuts ||
+    showRecents ||
     matchedSavedPlaces.length > 0 ||
     suggestions.length > 0
 
@@ -184,7 +206,10 @@ export const LocationInput = ({
           <Input
             value={value}
             onChangeText={handleType}
-            onFocus={() => setFocused(true)}
+            onFocus={() => {
+              setFocused(true)
+              getRecentLocations().then((r) => setRecents(r.filter((x) => x.postcode !== null)))
+            }}
             onBlur={() => setTimeout(() => setFocused(false), 150)}
             onSubmitEditing={() => {
               if (matchedSavedPlaces.length > 0) chooseSavedPlace(matchedSavedPlaces[0])
@@ -300,6 +325,30 @@ export const LocationInput = ({
                     />
                     <Text fontSize={15} fontWeight="600" color={Colors.text}>
                       {place.label}
+                    </Text>
+                  </YStack>
+                </YStack>
+              ))}
+
+            {showRecents &&
+              recents.slice(0, 5).map((recent, i) => (
+                <YStack
+                  key={recent.label + i}
+                  px="$4"
+                  justify="center"
+                  pressStyle={{ background: Colors.searchBg }}
+                  onPress={() => chooseRecent(recent)}
+                  style={{
+                    minHeight: 56,
+                    borderTopWidth:
+                      i === 0 && !showLocationShortcut && !showSavedShortcuts ? 0 : Borders.thin,
+                    borderTopColor: Colors.border,
+                  }}
+                >
+                  <YStack gap="$2" style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <MaterialIcons name="history" size={16} color={Colors.secondaryText} />
+                    <Text fontSize={15} fontWeight="600" color={Colors.text}>
+                      {recent.label}
                     </Text>
                   </YStack>
                 </YStack>

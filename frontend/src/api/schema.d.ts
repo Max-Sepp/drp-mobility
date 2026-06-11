@@ -297,6 +297,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/users/me/recent-locations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Recent Locations */
+        get: operations["list_recent_locations_users_me_recent_locations_get"];
+        put?: never;
+        /** Add Recent Location */
+        post: operations["add_recent_location_users_me_recent_locations_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/failures": {
         parameters: {
             query?: never;
@@ -746,6 +764,27 @@ export interface components {
         PushTokenBody: {
             /** Token */
             token: string;
+        };
+        /** RecentLocationCreate */
+        RecentLocationCreate: {
+            /** Label */
+            label: string;
+            /** Postcode */
+            postcode?: string | null;
+        };
+        /** RecentLocationOut */
+        RecentLocationOut: {
+            /** Id */
+            id: number;
+            /** Label */
+            label: string;
+            /** Postcode */
+            postcode: string | null;
+            /**
+             * Searched At
+             * Format: date-time
+             */
+            searched_at: string;
         };
         /**
          * SavedJourneyCreate
@@ -1507,6 +1546,59 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["OutageReportSummary"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_recent_locations_users_me_recent_locations_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecentLocationOut"][];
+                };
+            };
+        };
+    };
+    add_recent_location_users_me_recent_locations_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RecentLocationCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecentLocationOut"];
                 };
             };
             /** @description Validation Error */

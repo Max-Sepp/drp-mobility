@@ -49,3 +49,6 @@ class User(Base):
     saved_places: Mapped[list["SavedPlace"]] = relationship(  # noqa: F821
         "SavedPlace", back_populates="user", cascade="all, delete-orphan"
     )
+    recent_locations: Mapped[list["RecentLocation"]] = relationship(  # noqa: F821
+        "RecentLocation", back_populates="user", cascade="all, delete-orphan"
+    )

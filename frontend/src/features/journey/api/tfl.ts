@@ -14,7 +14,7 @@ type Mode = { name: string }
  * endpoints); they're optional because the type is also reused for persisted journey snapshots,
  * so consumers (e.g. GPS proximity in the active-journey screen) must treat them defensively.
  */
-type Point = { commonName?: string; lat?: number; lon?: number }
+type Point = { commonName?: string; lat?: number; lon?: number; stopLetter?: string }
 
 /** A line/route a leg runs on, e.g. `name: "Victoria"`, `directions: ["Brixton"]`. */
 type RouteOption = { name?: string; directions?: string[] }

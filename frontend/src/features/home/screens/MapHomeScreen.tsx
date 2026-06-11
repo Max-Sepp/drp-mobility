@@ -306,14 +306,12 @@ export function MapHomeScreen({ navigation, route }: Props) {
   const [plannerHeight, setPlannerHeight] = useState(0)
   const [detailHeight, setDetailHeight] = useState(0)
   const [activeJourneyHeight, setActiveJourneyHeight] = useState(0)
-  const mapBottomInset = Math.max(
-    searchHeight,
-    stationHeight,
-    reportHeight,
-    plannerHeight,
-    detailHeight,
-    activeJourneyHeight,
-  )
+  // When a station is open the search sheet is being dismissed — exclude its height so
+  // mapPadding jumps straight to stationHeight in the same render that opens the station,
+  // preventing a second padding-driven camera shift on Android.
+  const mapBottomInset = activeStation
+    ? Math.max(stationHeight, reportHeight, plannerHeight, detailHeight, activeJourneyHeight)
+    : Math.max(searchHeight, plannerHeight, detailHeight, activeJourneyHeight)
   // The sheets that expand to full height all snap to `SCREEN_H - insets.top - 66`, leaving just
   // enough room for the top buttons. When a sheet reaches that height it covers the map entirely
   // (e.g. the route overview), so the re-centre/account buttons are hidden to avoid floating over it.
@@ -485,7 +483,10 @@ export function MapHomeScreen({ navigation, route }: Props) {
   }
 
   function openStation(stationName: string) {
+    setStationHeight(Dimensions.get('window').height * 0.52)
     setActiveStation(stationName)
+    sheetRef.current?.dismiss()
+    mapRef.current?.focusStation(stationName)
   }
 
   // One-tap access for staff: skip the search step and pull up the station sheet for the
@@ -498,6 +499,12 @@ export function MapHomeScreen({ navigation, route }: Props) {
   function closeStation() {
     setActiveStation(null)
     setStationPausedForJourney(false)
+    setStationHeight(0)
+    mapRef.current?.clearFocus()
+    if (coords) mapRef.current?.recentre()
+    // When the station was opened over an active journey, the search sheet is dismissed and the
+    // journey sheet is underneath — don't resurrect the search sheet, just reveal the journey.
+    if (!activeJourneyParams) sheetRef.current?.restore()
   }
 
   function openJourneyFromTo(from: ResolvedLocation | undefined, to: ResolvedLocation) {

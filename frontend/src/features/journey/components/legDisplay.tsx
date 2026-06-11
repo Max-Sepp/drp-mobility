@@ -5,6 +5,7 @@ import type { ResolvedLocation } from '@/features/journey/api/geocode'
 import type { Journey, Leg, RouteTag } from '@/features/journey/api/tfl'
 import { effectiveDiscount } from '@/features/journey/lib/railcards'
 import { useTheme, Borders, Opacity } from '@/theme'
+import { useMobilityStyle, stablePickIndex } from '@/lib/MobilityStyleContext'
 
 export type ResolveStation = (commonName: string) => string | null
 export type StationPressHandler = (stationName: string) => void
@@ -20,12 +21,12 @@ export function RouteTags({ tags }: { tags?: RouteTag[] }) {
   const { Colors, Radii } = useTheme()
   if (!tags || tags.length === 0) return null
   return (
-    <XStack flexWrap="wrap" gap="$1.5">
+    <XStack flexWrap="wrap" gap="$2">
       {tags.map((tag) => (
         <XStack
           key={tag}
-          px="$2"
-          py="$1"
+          px="$3"
+          py="$1.5"
           style={{
             backgroundColor: Colors.blueBg,
             borderColor: Colors.border,
@@ -33,7 +34,7 @@ export function RouteTags({ tags }: { tags?: RouteTag[] }) {
             borderRadius: Radii.pill,
           }}
         >
-          <Text fontSize={11} fontWeight="700" color={Colors.blue}>
+          <Text fontSize={14} fontWeight="700" color={Colors.blue}>
             {TAG_LABELS[tag]}
           </Text>
         </XStack>
@@ -347,6 +348,11 @@ export function legLineColor(leg: Leg, fallback = '#007AFF'): string {
 
 function LegChip({ leg, compact = true }: { leg: Leg; compact?: boolean }) {
   const { Colors, Radii } = useTheme()
+  const mobilityStyle = useMobilityStyle()
+  const legSeed = `${leg.mode.name}${leg.duration}${leg.departureTime ?? ''}${leg.arrivalTime ?? ''}`
+  const funPair = mobilityStyle.funPairs?.[stablePickIndex(mobilityStyle.funPairs, legSeed)]
+  const walkLabel = funPair?.label ?? mobilityStyle.label
+  const walkIcon = funPair?.icon ?? mobilityStyle.icon
   const icon = modeIcon(leg.mode.name)
   const isWalking = leg.mode.name === 'walking'
   const isBus = leg.mode.name === 'bus' || leg.mode.name === 'coach'
@@ -361,9 +367,9 @@ function LegChip({ leg, compact = true }: { leg: Leg; compact?: boolean }) {
         px={compact ? 6 : 9}
         py={compact ? 2 : 4}
         style={{ backgroundColor: Colors.searchBg, borderRadius: Radii.pill }}
-        aria-label={`${WALKING_LABEL} ${mins}`}
+        aria-label={`${walkLabel} ${mins}`}
       >
-        <MaterialIcons name={WALKING_ICON} size={compact ? 14 : 18} color={Colors.secondaryText} />
+        <MaterialIcons name={walkIcon} size={compact ? 14 : 18} color={Colors.secondaryText} />
         <Text fontSize={compact ? 11 : 13} fontWeight="600" color={Colors.secondaryText}>
           {mins}
         </Text>

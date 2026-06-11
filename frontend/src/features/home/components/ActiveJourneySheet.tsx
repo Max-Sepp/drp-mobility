@@ -1022,6 +1022,41 @@ export function ActiveJourneySheet({
                         {humanizeSummary(detailed, [from, to])}
                       </Text>
                     )}
+                    {isBus && (depName || arrName) && (
+                      <XStack gap="$3" items="center" mt="$0.5">
+                        {depName && (
+                          <Text
+                            fontSize={13}
+                            fontWeight="600"
+                            color={Colors.text}
+                            flex={1}
+                            numberOfLines={1}
+                          >
+                            {depName}
+                            {currentLeg.departurePoint?.stopLetter
+                              ? ` (Stop ${currentLeg.departurePoint.stopLetter})`
+                              : ''}
+                          </Text>
+                        )}
+                        {depName && arrName && (
+                          <MaterialIcons name="arrow-forward" size={14} color={Colors.tertiaryText} />
+                        )}
+                        {arrName && (
+                          <Text
+                            fontSize={13}
+                            fontWeight="600"
+                            color={Colors.text}
+                            flex={1}
+                            numberOfLines={1}
+                          >
+                            {arrName}
+                            {currentLeg.arrivalPoint?.stopLetter
+                              ? ` (Stop ${currentLeg.arrivalPoint.stopLetter})`
+                              : ''}
+                          </Text>
+                        )}
+                      </XStack>
+                    )}
                     {(depTime || arrTime) && (
                       <XStack items="center" gap="$1.5" mt="$0.5">
                         <MaterialIcons name="schedule" size={14} color={Colors.secondaryText} />
