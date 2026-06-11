@@ -108,7 +108,7 @@ export const ReportsStatus = ({ loading, reports }: ReportsStatusProps) => {
           </Text>
         </YStack>
         <Heading fontSize={18} color={Colors.successDark}>
-          No known issues
+          No reported issues
         </Heading>
       </YStack>
     )

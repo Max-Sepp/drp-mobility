@@ -27,9 +27,8 @@ import {
   ModePipe,
   RouteTags,
   stripStationSuffix,
-  WALKING_ICON,
-  WALKING_LABEL,
 } from '@/features/journey/components/legDisplay'
+import { useMobilityStyle, stablePickIndex } from '@/lib/MobilityStyleContext'
 import { RouteAlerts } from '@/features/journey/components/RouteAlerts'
 import { useTheme, Borders, Heights, Opacity, Spacing } from '@/theme'
 import type { AccessibilityPreference, Journey, Leg, RouteTag } from '@/features/journey/api/tfl'
@@ -128,6 +127,8 @@ function TimelineConnector({
   walkDuration,
   stopCount,
   legDuration,
+  departureTime,
+  arrivalTime,
 }: {
   mode: string
   lineColor: string
@@ -136,8 +137,15 @@ function TimelineConnector({
   walkDuration?: number
   stopCount: number
   legDuration: number
+  departureTime?: string | null
+  arrivalTime?: string | null
 }) {
   const { Colors } = useTheme()
+  const mobilityStyle = useMobilityStyle()
+  const connectorSeed = `${mode}${walkDuration ?? legDuration}${departureTime ?? ''}${arrivalTime ?? ''}`
+  const funPair = mobilityStyle.funPairs?.[stablePickIndex(mobilityStyle.funPairs, connectorSeed)]
+  const walkLabel = funPair?.label ?? mobilityStyle.label
+  const walkIcon = funPair?.icon ?? mobilityStyle.icon
   const isWalking = mode === 'walking'
   const isBus = mode === 'bus' || mode === 'coach'
   const badgeBg = isBus ? Colors.searchBg : lineColor
@@ -179,9 +187,9 @@ function TimelineConnector({
       <View style={{ flex: 1, paddingLeft: 6, paddingVertical: 8, gap: 4 }}>
         {isWalking ? (
           <XStack items="center" gap={5}>
-            <MaterialIcons name={WALKING_ICON} size={14} color={Colors.secondaryText} />
+            <MaterialIcons name={walkIcon} size={14} color={Colors.secondaryText} />
             <Text fontSize={13} color={Colors.secondaryText}>
-              {WALKING_LABEL} {walkDuration} min
+              {walkLabel} {walkDuration} min
             </Text>
           </XStack>
         ) : (
@@ -325,18 +333,16 @@ export function JourneyDetailSheet({
 
   // Re-fetch live outages each time a journey is opened so the alerts reflect the current state
   // rather than the stale snapshot stored with the saved journey.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!params) return
     let active = true
-    setLiveOutages(null)
     fetchStationOutages().then((all) => {
       if (active) setLiveOutages(matchOutages(params.journey, all))
     })
     return () => {
       active = false
     }
-  }, [params?.journey])
+  }, [params])
 
   useEffect(() => {
     if (!params) {
@@ -494,6 +500,8 @@ export function JourneyDetailSheet({
         walkDuration={isWalking ? leg.duration : undefined}
         stopCount={isWalking ? 0 : stopCount}
         legDuration={isWalking ? 0 : leg.duration}
+        departureTime={leg.departureTime}
+        arrivalTime={leg.arrivalTime}
       />,
     )
 

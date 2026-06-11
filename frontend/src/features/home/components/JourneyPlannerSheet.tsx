@@ -64,6 +64,25 @@ const STEP_FREE_OPTIONS: { label: string; value: string | null }[] = [
 ]
 
 // ---------------------------------------------------------------------------
+// Journey options cache
+// ---------------------------------------------------------------------------
+
+type CachedOptions = { journey: Journey; tags: RouteTag[] }[]
+const journeyOptionsCache = new Map<string, CachedOptions>()
+
+const CACHE_BUCKET_MS = 5 * 60 * 1000 // 5-minute staleness window for "leave now"
+
+function optionsCacheKey(
+  from: string,
+  to: string,
+  level: AccessibilityPreference | null,
+  time: TimeConstraint | null,
+): string {
+  const timePart = time ?? Math.floor(Date.now() / CACHE_BUCKET_MS)
+  return JSON.stringify([from, to, level, timePart])
+}
+
+// ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
@@ -137,6 +156,16 @@ export function JourneyPlannerSheet({
   const [resolved, setResolved] = useState<Resolved | null>(null)
   // True after the close button is tapped so handleChange(-1) doesn't fire onClose() again.
   const closedByButton = useRef(false)
+  // True once a successful search has been performed; resets when the planner re-opens.
+  const hasSearched = useRef(false)
+  // Guards the prevHadBoth auto-search: reset on every plan open so re-opening with the same
+  // postcodes (unchanged state) still fires the auto-search.
+  const prevHadBoth = useRef(false)
+  // Incremented each time the planner opens. Included in the auto-search effect's deps so
+  // the effect fires even when postcodes are identical to the previous session (e.g. the user
+  // taps the same recent location twice — React bails on the setState, so [fromPostcode,
+  // toPostcode] alone wouldn't re-run).
+  const [autoSearchTrigger, setAutoSearchTrigger] = useState(0)
 
   const cachedCoords = useAppLocation()
   const { workStation } = useWorkShift()
@@ -209,6 +238,9 @@ export function JourneyPlannerSheet({
       setResolved(null)
       setGettingLocation(false)
       setLoading(false)
+      hasSearched.current = false
+      prevHadBoth.current = false
+      setAutoSearchTrigger((t) => t + 1)
       sheetRef.current?.snapToIndex(1)
       if (!plan.initialFrom && (hasShiftCoords || cachedCoords)) handleCurrentLocation()
     } else if (!closedByButton.current) {
@@ -224,16 +256,23 @@ export function JourneyPlannerSheet({
 
   // Auto-search the moment both postcodes become resolved — covers opening from a saved place
   // (where current location fills in async) and the general case of resolving the second field.
-  const prevHadBoth = useRef(false)
   useEffect(() => {
     const hasBoth = fromPostcode !== null && toPostcode !== null
     if (hasBoth && !prevHadBoth.current && !loading) run()
     prevHadBoth.current = hasBoth
-  }, [fromPostcode, toPostcode]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [fromPostcode, toPostcode, autoSearchTrigger]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Re-run automatically when the step-free preference or time constraint changes, but only
+  // after an initial search has already been performed (so the first open doesn't double-fire).
+  useEffect(() => {
+    if (!hasSearched.current || !canSearch || loading) return
+    run()
+  }, [level, timeConstraint]) // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleChange(index: number) {
     onHeightChange?.(index >= 0 ? snapPoints[index] : 0)
     if (index === -1) {
+      journeyOptionsCache.clear()
       if (!closedByButton.current) onClose()
       closedByButton.current = false
     }
@@ -272,35 +311,57 @@ export function JourneyPlannerSheet({
       isNamedPlace: toIsNamedPlace || undefined,
     }
 
-    const outagesPromise = fetchStationOutages()
-    setResolved({ from: fromLoc, to: toLoc })
+    try {
+      const outagesPromise = fetchStationOutages()
+      setResolved({ from: fromLoc, to: toLoc })
 
-    const optResult: JourneyOptionsResult = await planJourneyOptions(
-      fromLoc.postcode,
-      toLoc.postcode,
-      level,
-      timeConstraint,
-    )
+      const cacheKey = optionsCacheKey(fromLoc.postcode, toLoc.postcode, level, timeConstraint)
+      const cached = journeyOptionsCache.get(cacheKey)
 
-    if (optResult.kind !== 'journeys') {
+      let journeyOptions: CachedOptions
+      if (cached) {
+        journeyOptions = cached
+      } else {
+        const optResult: JourneyOptionsResult = await planJourneyOptions(
+          fromLoc.postcode,
+          toLoc.postcode,
+          level,
+          timeConstraint,
+        )
+        if (optResult.kind !== 'journeys') {
+          setLoading(false)
+          // Reset so the next manual search or preference change doesn't silently fire.
+          hasSearched.current = false
+          Alert.alert('No journey', optResult.message)
+          return
+        }
+        journeyOptions = optResult.journeys
+        journeyOptionsCache.set(cacheKey, journeyOptions)
+      }
+
+      const outages = await outagesPromise
+      const flagged = journeyOptions.map(({ journey, tags }) => {
+        const matched = matchOutages(journey, outages)
+        const assessments = assessOutages(journey, matched, stations)
+        const enriched = matched.map((outage) => {
+          // assessOutages skips stations with unknown role so length may be < matched;
+          // look up by station name rather than assuming a 1-to-1 index correspondence.
+          const assessment = assessments.find((a) => a.stationName === outage.stationName)
+          return {
+            ...outage,
+            journeyRelevantLifts: assessment?.journeyRelevantLifts ?? { broken: 0, total: 0 },
+          }
+        })
+        return { journey, tags, outages: enriched }
+      })
+      flagged.sort((a, b) => Number(a.outages.length > 0) - Number(b.outages.length > 0))
+      setResults(flagged)
+      hasSearched.current = true
+    } catch {
+      // Unexpected error — reset so the UI isn't permanently stuck in loading state.
+    } finally {
       setLoading(false)
-      Alert.alert('No journey', optResult.message)
-      return
     }
-
-    const outages = await outagesPromise
-    const flagged = optResult.journeys.map(({ journey, tags }) => {
-      const matched = matchOutages(journey, outages)
-      const assessments = assessOutages(journey, matched, stations)
-      const enriched = matched.map((outage, i) => ({
-        ...outage,
-        journeyRelevantLifts: assessments[i].journeyRelevantLifts,
-      }))
-      return { journey, tags, outages: enriched }
-    })
-    flagged.sort((a, b) => Number(a.outages.length > 0) - Number(b.outages.length > 0))
-    setResults(flagged)
-    setLoading(false)
   }
 
   // ── Render ────────────────────────────────────────────────────────────
@@ -320,6 +381,7 @@ export function JourneyPlannerSheet({
         title="Plan a journey"
         onClose={() => {
           closedByButton.current = true
+          journeyOptionsCache.clear()
           onClose()
           sheetRef.current?.close()
         }}
