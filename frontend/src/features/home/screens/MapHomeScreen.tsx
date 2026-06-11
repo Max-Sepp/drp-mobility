@@ -2,7 +2,7 @@ import { MaterialIcons } from '@expo/vector-icons'
 import { useFocusEffect } from '@react-navigation/native'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { StationMap, type StationMapHandle } from '@/features/map/components/StationMap'
 import { useAppLocation } from '@/lib/LocationContext'
 import { loadSavedJourneys, type SavedJourney } from '@/features/journey/api/savedJourneys'
@@ -236,6 +236,24 @@ export function MapHomeScreen({ navigation, route }: Props) {
     detailHeight,
     activeJourneyHeight,
   )
+  // The sheets that expand to full height all snap to `SCREEN_H - insets.top - 66`, leaving just
+  // enough room for the top buttons. When a sheet reaches that height it covers the map entirely
+  // (e.g. the route overview), so the re-centre/account buttons are hidden to avoid floating over it.
+  const insets = useSafeAreaInsets()
+  const sheetIsFullscreen =
+    mapBottomInset >= Dimensions.get('window').height - insets.top - 66
+
+  // The search sheet is the resting state of the map. Any other flow (a station, a plan, a journey
+  // detail/active journey, or a report) takes over the screen, so the search sheet is dismissed
+  // while one is open and restored only once they all close. Driving this declaratively from state
+  // avoids the imperative dismiss()/restore() calls racing with sheet close animations.
+  const overlayActive = Boolean(
+    activeStation || activePlan || activeDetail || activeJourneyParams || activeReport,
+  )
+  useEffect(() => {
+    if (overlayActive) sheetRef.current?.dismiss()
+    else sheetRef.current?.restore()
+  }, [overlayActive])
 
   // Refresh on focus so the banner reflects progress made on the active screen and survives a
   // restart (the record is read from storage each time the map regains focus).
@@ -272,7 +290,6 @@ export function MapHomeScreen({ navigation, route }: Props) {
     }
     const label = key === 'home' ? 'Home' : 'Work'
     setActivePlan({ initialTo: { postcode: place.postcode, label, isNamedPlace: true } })
-    sheetRef.current?.dismiss()
   }
 
   function handlePlaceLongPress(key: 'home' | 'work') {
@@ -340,7 +357,6 @@ export function MapHomeScreen({ navigation, route }: Props) {
     setActivePlan({
       initialTo: { postcode: place.postcode, label: place.name, isNamedPlace: true },
     })
-    sheetRef.current?.dismiss()
   }
 
   function handleCustomPlaceLongPress(place: CustomPlace) {
@@ -393,29 +409,23 @@ export function MapHomeScreen({ navigation, route }: Props) {
 
   function openStation(stationName: string) {
     setActiveStation(stationName)
-    sheetRef.current?.dismiss()
   }
 
   function closeStation() {
     setActiveStation(null)
     setStationPausedForJourney(false)
-    // When the station was opened over an active journey, the search sheet is dismissed and the
-    // journey sheet is underneath — don't resurrect the search sheet, just reveal the journey.
-    if (!activeJourneyParams) sheetRef.current?.restore()
   }
 
   function openJourneyFromTo(from: ResolvedLocation | undefined, to: ResolvedLocation) {
     setActivePlan({ initialFrom: from, initialTo: to })
-    sheetRef.current?.dismiss()
   }
 
   function closePlan() {
     setActivePlan(null)
+    // Un-pause the station the plan may have been opened from, so it reappears when the user backs
+    // out of planning. If a journey was started instead, the station was already cleared, so this
+    // is a no-op and the station stays hidden behind the active journey.
     setStationPausedForJourney(false)
-    // Only restore home sheet when no station is active; otherwise the station sheet remounts
-    if (!activeStation) {
-      sheetRef.current?.restore()
-    }
   }
 
   return (
@@ -447,12 +457,10 @@ export function MapHomeScreen({ navigation, route }: Props) {
         onComplete={() => {
           setActiveJourneyParams(null)
           setActive(null)
-          sheetRef.current?.restore()
         }}
         onEnd={() => {
           setActiveJourneyParams(null)
           setActive(null)
-          sheetRef.current?.restore()
         }}
         onHeightChange={setActiveJourneyHeight}
       />
@@ -472,7 +480,10 @@ export function MapHomeScreen({ navigation, route }: Props) {
         onStartJourney={(params) => {
           setActiveDetail(null)
           setActivePlan(null)
-          sheetRef.current?.dismiss()
+          // Fully tear down any station that the plan was started from, so it can't reappear over
+          // the route once the active journey is the only open flow.
+          setActiveStation(null)
+          setStationPausedForJourney(false)
           setActiveJourneyParams(params)
         }}
         onHeightChange={setDetailHeight}
@@ -497,24 +508,26 @@ export function MapHomeScreen({ navigation, route }: Props) {
 
       {/* Top overlay: rendered after sheets so it sits above all backdrops */}
       <SafeAreaView edges={['top']} style={[styles.topSafe, { pointerEvents: 'box-none' }]}>
-        <View style={[styles.topButtons, { pointerEvents: 'box-none' }]}>
-          <TopIconButton
-            icon="my-location"
-            size={50}
-            color={coords ? Colors.blue : Colors.secondaryText}
-            accessibilityLabel="Re-centre map on my location"
-            onPress={() => mapRef.current?.recentre()}
-          />
-          <TopIconButton
-            icon={status === 'authed' ? 'account-circle' : 'person'}
-            color={status === 'authed' ? Colors.blue : Colors.text}
-            size={50}
-            accessibilityLabel={
-              status === 'authed' && user ? `Logged in as ${user.username}` : 'Log in'
-            }
-            onPress={handleAccountPress}
-          />
-        </View>
+        {!sheetIsFullscreen && (
+          <View style={[styles.topButtons, { pointerEvents: 'box-none' }]}>
+            <TopIconButton
+              icon="my-location"
+              size={50}
+              color={coords ? Colors.blue : Colors.secondaryText}
+              accessibilityLabel="Re-centre map on my location"
+              onPress={() => mapRef.current?.recentre()}
+            />
+            <TopIconButton
+              icon={status === 'authed' ? 'account-circle' : 'person'}
+              color={status === 'authed' ? Colors.blue : Colors.text}
+              size={50}
+              accessibilityLabel={
+                status === 'authed' && user ? `Logged in as ${user.username}` : 'Log in'
+              }
+              onPress={handleAccountPress}
+            />
+          </View>
+        )}
         {active && !activeJourneyParams && (
           <ActiveJourneyBanner
             active={active}
