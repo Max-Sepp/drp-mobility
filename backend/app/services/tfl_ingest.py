@@ -266,7 +266,7 @@ def _match_lift_unit(lifts: list[Equipment], lift_uid: str, station_uid: str) ->
 
 
 def _lift_unit_name(lift_uid: str, station_uid: str) -> str:
-    """"940GZZLUMDN-Lift-2" -> "lift 2" (the station-code prefix stripped, dashes spaced)."""
+    """ "940GZZLUMDN-Lift-2" -> "lift 2" (the station-code prefix stripped, dashes spaced)."""
     suffix = lift_uid
     if station_uid and lift_uid.startswith(f"{station_uid}-"):
         suffix = lift_uid[len(station_uid) + 1 :]

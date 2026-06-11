@@ -97,9 +97,7 @@ export function StationSheet({
   const { reports: allReports, loading } = useOutages()
   const reports = useMemo(
     () =>
-      allReports.filter(
-        (r) => r.failure.equipment.station.name === station && r.source !== 'tfl',
-      ),
+      allReports.filter((r) => r.failure.equipment.station.name === station && r.source !== 'tfl'),
     [allReports, station],
   )
   const { alerts } = useStationAlerts(stationDetail?.id)
