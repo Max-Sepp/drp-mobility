@@ -20,7 +20,11 @@ import {
 } from '@gorhom/bottom-sheet'
 import BottomSheet, { BottomSheetScrollView, type BottomSheetRef } from '@/components/BottomSheet'
 import { SheetHeader } from '@/components/SheetHeader'
-import { JourneyDetailSheet } from '@/features/home/components/JourneyDetailSheet'
+import {
+  JourneyDetailSheet,
+  type ActiveJourneyParams,
+  type JourneyDetailParams,
+} from '@/features/home/components/JourneyDetailSheet'
 import { useStations } from '@/features/stations'
 import {
   matchOutages,
@@ -54,7 +58,6 @@ import {
 } from '@/features/journey/components/legDisplay'
 import { RouteAlerts } from '@/features/journey/components/RouteAlerts'
 import { haversineMeters } from '@/lib/geo'
-import type { ActiveJourneyParams } from '@/features/home/components/JourneyDetailSheet'
 import { useTheme, Borders, Heights, Opacity, Spacing } from '@/theme'
 import { JOURNEY_CACHE_TTL_MS } from '@/config'
 import { useSheetStack } from '@/components/SheetStack'
@@ -159,7 +162,9 @@ export function ActiveJourneySheet({
   const [rerouteHeaderH, setRerouteHeaderH] = useState(0)
   const [rerouteResultsH, setRerouteResultsH] = useState<number | null>(null)
   const autoAdvancedFromRef = useRef<number | null>(null)
-  const alternativesCacheRef = useRef<{ alternatives: TaggedJourney[]; fetchedAt: number } | null>(null)
+  const alternativesCacheRef = useRef<{ alternatives: TaggedJourney[]; fetchedAt: number } | null>(
+    null,
+  )
 
   const { register, push, onClosed, dismissAll } = useSheetStack()
 
@@ -182,7 +187,10 @@ export function ActiveJourneySheet({
       () => alternativesSheetRef.current?.snapToIndex(0),
       () => alternativesSheetRef.current?.close(),
     )
-    return () => { unregIssues(); unregAlts() }
+    return () => {
+      unregIssues()
+      unregAlts()
+    }
   }, [register])
 
   useEffect(() => {
@@ -269,7 +277,6 @@ export function ActiveJourneySheet({
     [arrivalStation, outageAssessments],
   )
 
-
   // All station names the rider still needs to pass through (arrival of current leg onwards).
   const futureStationNames = useMemo(() => {
     const names = new Set<string>()
@@ -328,7 +335,6 @@ export function ActiveJourneySheet({
       : `Issues at ${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`
   })()
 
-
   // Three snaps: compact (handle + summary row + optional banner + footer), half-screen, near-full.
   // Banner height is only added when an accessibility alert is active, so snap 0 grows dynamically.
   // Footer = paddingTop 8 + button 48 + border 1 + paddingBottom 8 + insets.bottom = 65 + insets.bottom.
@@ -358,7 +364,6 @@ export function ActiveJourneySheet({
   // Push the alternatives sheet when results arrive; defer 'found' until height is measured.
   useEffect(() => {
     if (rerouteState.phase === 'none-found') push('reroute-alternatives')
-    if (rerouteState.phase !== 'found') setRerouteResultsH(null)
   }, [rerouteState.phase, push])
 
   useEffect(() => {
@@ -619,10 +624,21 @@ export function ActiveJourneySheet({
         <BottomSheet ref={sheetRef} index={-1} snapPoints={snapPoints} onChange={handleChange}>
           {null}
         </BottomSheet>
-        <BottomSheet ref={rerouteSheetRef} index={-1} snapPoints={rerouteSnapPoints} enablePanDownToClose>
+        <BottomSheet
+          ref={rerouteSheetRef}
+          index={-1}
+          snapPoints={rerouteSnapPoints}
+          enablePanDownToClose
+        >
           {null}
         </BottomSheet>
-        <BottomSheet ref={alternativesSheetRef} index={-1} snapPoints={[SCREEN_H * 0.55]} handleComponent={null} enablePanDownToClose>
+        <BottomSheet
+          ref={alternativesSheetRef}
+          index={-1}
+          snapPoints={[SCREEN_H * 0.55]}
+          handleComponent={null}
+          enablePanDownToClose
+        >
           {null}
         </BottomSheet>
       </>
@@ -640,10 +656,21 @@ export function ActiveJourneySheet({
             </Text>
           </YStack>
         </BottomSheet>
-        <BottomSheet ref={rerouteSheetRef} index={-1} snapPoints={rerouteSnapPoints} enablePanDownToClose>
+        <BottomSheet
+          ref={rerouteSheetRef}
+          index={-1}
+          snapPoints={rerouteSnapPoints}
+          enablePanDownToClose
+        >
           {null}
         </BottomSheet>
-        <BottomSheet ref={alternativesSheetRef} index={-1} snapPoints={[SCREEN_H * 0.55]} handleComponent={null} enablePanDownToClose>
+        <BottomSheet
+          ref={alternativesSheetRef}
+          index={-1}
+          snapPoints={[SCREEN_H * 0.55]}
+          handleComponent={null}
+          enablePanDownToClose
+        >
           {null}
         </BottomSheet>
       </>
@@ -1039,7 +1066,11 @@ export function ActiveJourneySheet({
                           </Text>
                         )}
                         {depName && arrName && (
-                          <MaterialIcons name="arrow-forward" size={14} color={Colors.tertiaryText} />
+                          <MaterialIcons
+                            name="arrow-forward"
+                            size={14}
+                            color={Colors.tertiaryText}
+                          />
                         )}
                         {arrName && (
                           <Text
