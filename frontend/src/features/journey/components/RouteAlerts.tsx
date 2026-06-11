@@ -336,6 +336,7 @@ export const RouteAlerts = ({
         fontSize={16}
         fontWeight="700"
         color={Colors.text}
+        mt="$3"
         pt="$3"
         style={{ borderTopWidth: Borders.thin, borderTopColor: Colors.border }}
       >
