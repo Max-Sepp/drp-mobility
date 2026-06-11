@@ -742,6 +742,9 @@ export function ActiveJourneySheet({
           <YStack flex={1} gap="$1">
             <Text fontSize={19} fontWeight="700" color={Colors.text} numberOfLines={1}>
               {arrName ?? humanizeSummary(currentLeg.instruction.summary, [from, to])}
+              {isBus && currentLeg.arrivalPoint?.stopLetter
+                ? ` (Stop ${currentLeg.arrivalPoint.stopLetter})`
+                : ''}
             </Text>
             {routeName && !isWalking ? (
               <View
@@ -1137,6 +1140,7 @@ export function ActiveJourneySheet({
                   const legRouteName = leg.routeOptions?.[0]?.name || null
                   const legArrCommon = leg.arrivalPoint?.commonName
                   const legArrName = legArrCommon ? stripStationSuffix(legArrCommon) : null
+                  const legArrStopLetter = legIsBus ? leg.arrivalPoint?.stopLetter : undefined
                   const legArrTime = leg.arrivalTime ? clockTime(leg.arrivalTime) : null
                   return (
                     <XStack
@@ -1181,7 +1185,9 @@ export function ActiveJourneySheet({
                         </View>
                       )}
                       <Text fontSize={13} color={Colors.text} flex={1} numberOfLines={1}>
-                        {legArrName ?? humanizeSummary(leg.instruction.summary, [from, to])}
+                        {legArrName
+                          ? `${legArrName}${legArrStopLetter ? ` (Stop ${legArrStopLetter})` : ''}`
+                          : humanizeSummary(leg.instruction.summary, [from, to])}
                       </Text>
                       {legArrTime && (
                         <Text fontSize={13} color={Colors.secondaryText}>
