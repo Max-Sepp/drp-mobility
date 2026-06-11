@@ -63,6 +63,32 @@ const GUTTER_W = 36
 // Timeline sub-components
 // ---------------------------------------------------------------------------
 
+// Renders a dashed vertical line for walking legs. Uses absoluteFillObject so
+// the segments don't affect row height — overflow:'hidden' clips the excess.
+// borderStyle:'dashed' on a single border side is unreliable on iOS.
+function DashedVerticalLine({ color }: { color: string }) {
+  return (
+    <View
+      style={{
+        position: 'absolute',
+        top: 2,
+        bottom: 2,
+        left: 0,
+        right: 0,
+        alignItems: 'center',
+        overflow: 'hidden',
+      }}
+    >
+      {Array.from({ length: 40 }).map((_, i) => (
+        <View
+          key={i}
+          style={{ width: 2, height: 5, borderRadius: 1, backgroundColor: color, marginBottom: 3 }}
+        />
+      ))}
+    </View>
+  )
+}
+
 type WaypointKind = 'origin' | 'transit' | 'destination'
 
 function TimelineWaypoint({
@@ -163,16 +189,7 @@ function TimelineConnector({
       {/* Gutter line */}
       <View style={{ width: GUTTER_W, alignItems: 'center' }}>
         {isWalking ? (
-          <View
-            style={{
-              flex: 1,
-              width: 0,
-              borderLeftWidth: 2,
-              borderLeftColor: Colors.separator,
-              borderStyle: 'dashed',
-              marginVertical: 2,
-            }}
-          />
+          <DashedVerticalLine color={Colors.separator} />
         ) : (
           <View
             style={{
