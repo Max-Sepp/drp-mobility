@@ -269,7 +269,7 @@ export function ActiveJourneySheet({
     const lastLeg = legs[legs.length - 1]
     const arr = lastLeg?.arrivalPoint
     return arr?.lat != null && arr?.lon != null ? `${arr.lat},${arr.lon}` : null
-  }, [params?.to?.postcode, legs])
+  }, [params, legs])
 
   const showRerouteAlert = useMemo(
     () => upcomingBlockedAssessments.length > 0 && rerouteToLocation != null,
