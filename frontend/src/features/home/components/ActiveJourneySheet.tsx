@@ -457,9 +457,7 @@ export function ActiveJourneySheet({
             {arrTime}
           </Text>
         )}
-        {!isExpanded && (
-          <MaterialIcons name="expand-less" size={20} color={Colors.secondaryText} />
-        )}
+        {!isExpanded && <MaterialIcons name="expand-less" size={20} color={Colors.secondaryText} />}
       </TouchableOpacity>
 
       {/* Full detail — always rendered so content slides in during snap transition */}
@@ -649,7 +647,12 @@ export function ActiveJourneySheet({
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                       <View style={{ width: 20, alignItems: 'center' }}>
                         <View
-                          style={{ width: 11, height: 11, borderRadius: 6, backgroundColor: accentBg }}
+                          style={{
+                            width: 11,
+                            height: 11,
+                            borderRadius: 6,
+                            backgroundColor: accentBg,
+                          }}
                         />
                       </View>
                       <View
