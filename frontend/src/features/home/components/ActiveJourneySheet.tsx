@@ -256,9 +256,18 @@ export function ActiveJourneySheet({
     [outageAssessments, futureStationNames],
   )
 
+  // Destination for the reroute planner: prefer the stored postcode, fall back to the
+  // last leg's arrival coordinates (TfL accepts both formats).
+  const rerouteToLocation = useMemo(() => {
+    if (params?.to?.postcode) return params.to.postcode
+    const lastLeg = legs[legs.length - 1]
+    const arr = lastLeg?.arrivalPoint
+    return arr?.lat != null && arr?.lon != null ? `${arr.lat},${arr.lon}` : null
+  }, [params?.to?.postcode, legs])
+
   const showRerouteAlert = useMemo(
-    () => upcomingBlockedAssessments.length > 0 && params?.to?.postcode != null,
-    [upcomingBlockedAssessments, params?.to?.postcode],
+    () => upcomingBlockedAssessments.length > 0 && rerouteToLocation != null,
+    [upcomingBlockedAssessments, rerouteToLocation],
   )
 
   const rerouteBannerText =
@@ -353,7 +362,7 @@ export function ActiveJourneySheet({
     // never from the original starting point.
     const fromLocation =
       dep?.lat != null && dep?.lon != null ? `${dep.lat},${dep.lon}` : null
-    const toLocation = params.to?.postcode ?? null
+    const toLocation = rerouteToLocation
 
     if (!fromLocation || !toLocation) {
       setRerouteState({ phase: 'none-found' })
