@@ -7,10 +7,15 @@ import { Image } from 'react-native'
 import { Text, XStack, YStack } from 'tamagui'
 import { BASE_URL } from '@/api/client'
 import type { components } from '@/api/schema.d'
+import { TflBadge } from '@/components/TflBadge'
 import { formatDatetime } from '@/lib/datetime'
 import { useTheme } from '@/theme'
 
 type OutageReport = components['schemas']['OutageReportSummary']
+
+function isTfl(report: OutageReport): boolean {
+  return (report as OutageReport & { source?: string }).source === 'tfl'
+}
 type Verification = components['schemas']['OutageReportVerificationSchema']
 
 type TimelineEvent =
@@ -71,18 +76,22 @@ export const OutageTimeline = ({
               <YStack flex={1} gap="$1">
                 <XStack items="center" gap="$2" flexWrap="wrap">
                   <Text fontSize={12} fontWeight="700" color={Colors.dangerDark}>
-                    Reported
+                    {isTfl(event.report) ? 'From TfL' : 'Reported'}
                   </Text>
                   <Text fontSize={11} color={Colors.dangerDark} style={{ opacity: 0.7 }}>
                     {formatDatetime(event.time)}
                   </Text>
-                  {event.report.reporter_role === 'trusted' && (
-                    <XStack items="center" gap="$1">
-                      <Ionicons name="shield-checkmark" size={10} color="#15803d" />
-                      <Text fontSize={11} fontWeight="600" color="#15803d">
-                        Trusted
-                      </Text>
-                    </XStack>
+                  {isTfl(event.report) ? (
+                    <TflBadge />
+                  ) : (
+                    event.report.reporter_role === 'trusted' && (
+                      <XStack items="center" gap="$1">
+                        <Ionicons name="shield-checkmark" size={10} color="#15803d" />
+                        <Text fontSize={11} fontWeight="600" color="#15803d">
+                          Trusted
+                        </Text>
+                      </XStack>
+                    )
                   )}
                 </XStack>
                 {event.report.description && (

@@ -1,3 +1,4 @@
+import React from 'react'
 import { MaterialIcons } from '@expo/vector-icons'
 import { Text, XStack } from 'tamagui'
 import type { ResolvedLocation } from '@/features/journey/api/geocode'
@@ -218,13 +219,98 @@ export function humanizeSummary(
   return out
 }
 
-/** "Victoria: lift, escalator reported out of service" for each affected station. */
+/**
+ * True when every lift on the user's journey path at a station is broken. Uses journey-relevant
+ * counts when available (populated by assessOutages), falls back to station-level total.
+ */
+export function allLiftsDown(outage: {
+  units: { equipmentType: string }[]
+  totalByType: Record<string, number>
+  journeyRelevantLifts?: { broken: number; total: number }
+}): boolean {
+  if (outage.journeyRelevantLifts) {
+    const { broken, total } = outage.journeyRelevantLifts
+    return broken > 0 && total > 0 && broken >= total
+  }
+  const brokenLifts = outage.units.filter((u) => u.equipmentType === 'lift').length
+  const totalLifts = outage.totalByType['lift'] ?? brokenLifts
+  return brokenLifts > 0 && brokenLifts >= totalLifts
+}
+
+/**
+ * True when any station on the journey has all its lifts down, meaning step-free
+ * access is completely blocked there.
+ */
+export function anyStationAllLiftsDown(
+  outages: { units: { equipmentType: string }[]; totalByType: Record<string, number> }[],
+): boolean {
+  return outages.some(allLiftsDown)
+}
+
+/** "Paddington: 3/7 lifts on your route broken" for each affected station. */
 export function outageWarning(
-  outages: { stationName: string; equipmentTypes: string[] }[],
-): string {
-  return outages
-    .map((o) => `${o.stationName}: ${o.equipmentTypes.join(', ')} reported out of service`)
-    .join(' · ')
+  outages: {
+    stationName: string
+    equipmentTypes: string[]
+    units: { equipmentType: string; verified?: boolean }[]
+    totalByType: Record<string, number>
+    journeyRelevantLifts?: { broken: number; total: number }
+  }[],
+): React.ReactNode {
+  const segments = outages.flatMap((o) => {
+    const liftUnits = o.units.filter((u) => u.equipmentType === 'lift')
+    const brokenLifts = liftUnits.length
+    const allVerified = liftUnits.length > 0 && liftUnits.every((u) => u.verified)
+    const status = allVerified ? 'broken' : 'reported broken'
+    let liftNode: React.ReactNode = null
+
+    if (o.journeyRelevantLifts) {
+      // Route-aware: only warn about lifts on the rider's actual path. Lifts that are broken
+      // but not on the route (broken === 0 of the relevant set) are suppressed entirely.
+      const { broken, total } = o.journeyRelevantLifts
+      if (broken > 0) {
+        liftNode =
+          total > 1
+            ? `${broken}/${total} lifts on your route ${status}`
+            : `lift on your route ${status}`
+      }
+    } else if (brokenLifts > 0) {
+      // No route assessment available — fall back to the station-level count.
+      const totalLifts = o.totalByType['lift'] ?? 0
+      liftNode =
+        totalLifts > 1
+          ? `${brokenLifts}/${totalLifts} lifts ${status}`
+          : 'lift reported out of service'
+    }
+
+    const otherParts = o.equipmentTypes
+      .filter((t) => t !== 'lift')
+      .map((t) => `${t} reported out of service`)
+      .join(', ')
+
+    // Nothing relevant to the rider at this station — don't surface it at all.
+    if (!liftNode && !otherParts) return []
+
+    return [
+      <Text key={o.stationName}>
+        <Text fontWeight="700">{o.stationName}:</Text> {liftNode}
+        {otherParts ? (liftNode ? `, ${otherParts}` : otherParts) : null}
+      </Text>,
+    ]
+  })
+
+  if (segments.length === 0) return null
+
+  return (
+    <>
+      {segments.map((seg, i) => (
+        <Text key={i}>
+          {i > 0 ? ' · ' : ''}
+          {seg}
+        </Text>
+      ))}
+    </>
+  )
 }
 
 // ---------------------------------------------------------------------------

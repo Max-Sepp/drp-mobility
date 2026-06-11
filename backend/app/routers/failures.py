@@ -34,6 +34,7 @@ def _failure_detail(repo: FailureRepository, failure) -> FailureDetail:
 @router.get("", response_model=list[FailureSummary])
 def list_failures(repo: FailureRepository = Depends(get_failure_repo)) -> list[FailureSummary]:
     """Return all failures with computed first_reported and active report count."""
+    counts = repo.equipment_counts_by_station_and_type()
     return [
         FailureSummary(
             id=failure.id,
@@ -43,6 +44,9 @@ def list_failures(repo: FailureRepository = Depends(get_failure_repo)) -> list[F
             last_reported=last_reported,
             report_count=report_count,
             verifications=failure.verifications,
+            station_total_same_type_count=counts.get(
+                (failure.equipment.station_id, failure.equipment.equipment_type_id), 1
+            ),
         )
         for failure, first_reported, last_reported, report_count in repo.list_all_with_stats()
     ]
@@ -72,7 +76,10 @@ def resolve_failure(
     failure = repo.get(failure_id)
     if failure is None:
         raise HTTPException(status_code=404, detail="Failure not found")
-    failure = repo.resolve(failure, description=payload.description if payload else None)
+    # A trusted human's close is authoritative: the TfL poller must never reopen it.
+    failure = repo.resolve(
+        failure, authoritative=True, description=payload.description if payload else None
+    )
     # Tell live clients this failure is resolved. Clients that have it loaded show the resolved
     # state (with the reason) rather than dropping it outright.
     broker.publish(

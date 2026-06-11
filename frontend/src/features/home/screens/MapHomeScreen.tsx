@@ -2,9 +2,11 @@ import { MaterialIcons } from '@expo/vector-icons'
 import { useFocusEffect } from '@react-navigation/native'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { StationMap, type StationMapHandle } from '@/features/map/components/StationMap'
 import { useAppLocation } from '@/lib/LocationContext'
+import { useWorkShift } from '@/lib/WorkShiftContext'
+import { useStations } from '@/features/stations'
 import { loadSavedJourneys, type SavedJourney } from '@/features/journey/api/savedJourneys'
 import {
   clearActiveJourney,
@@ -176,6 +178,69 @@ function ActiveJourneyBanner({
   )
 }
 
+/**
+ * Compact bar shown to a staff member who is on shift. It sits between the top map buttons and,
+ * when tapped, jumps straight to their station's sheet (the lower view) — no search needed.
+ */
+function ShiftBanner({ station, onJump }: { station: string; onJump: () => void }) {
+  const { Colors, Radii, Shadows } = useTheme()
+  const bannerStyles = useMemo(
+    () =>
+      StyleSheet.create({
+        banner: {
+          flex: 1,
+          minWidth: 0,
+          height: 50,
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: Spacing.sm,
+          paddingLeft: Spacing.md,
+          paddingRight: Spacing.sm,
+          backgroundColor: Colors.card,
+          borderRadius: Radii.pill,
+          ...Shadows.card,
+        },
+        title: {
+          ...Typography.caption,
+          color: Colors.secondaryText,
+        },
+        station: {
+          ...Typography.bodyBold,
+          color: Colors.text,
+        },
+        jumpCircle: {
+          width: 34,
+          height: 34,
+          borderRadius: 17,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: Colors.blue,
+        },
+      }),
+    [Colors, Radii, Shadows],
+  )
+  return (
+    <TouchableOpacity
+      style={bannerStyles.banner}
+      onPress={onJump}
+      activeOpacity={0.85}
+      accessibilityRole="button"
+      accessibilityLabel={`On shift at ${station}. Tap to jump to station.`}
+    >
+      <MaterialIcons name="badge" size={22} color={Colors.blue} />
+      <View style={{ flex: 1, minWidth: 0 }}>
+        <Text style={bannerStyles.title}>On shift at</Text>
+        <Text style={bannerStyles.station} numberOfLines={1}>
+          {station}
+        </Text>
+      </View>
+      <View style={bannerStyles.jumpCircle}>
+        <MaterialIcons name="arrow-upward" size={20} color={Colors.card} />
+      </View>
+    </TouchableOpacity>
+  )
+}
+
 export function MapHomeScreen({ navigation, route }: Props) {
   const { Colors, Shadows } = useTheme()
   const styles = useMemo(
@@ -194,6 +259,8 @@ export function MapHomeScreen({ navigation, route }: Props) {
         topButtons: {
           flexDirection: 'row',
           justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: Spacing.sm,
           paddingTop: 8,
           paddingHorizontal: Spacing.md,
         },
@@ -221,6 +288,17 @@ export function MapHomeScreen({ navigation, route }: Props) {
   const mapRef = useRef<StationMapHandle>(null)
   const { status, user } = useAuth()
   const coords = useAppLocation()
+  const { workStation } = useWorkShift()
+  const { stations } = useStations()
+  const isTrusted = user?.role === 'trusted'
+  // Staff's on-shift station, when set, anchors the map and powers one-tap reporting.
+  const shiftStation = isTrusted && workStation ? workStation : null
+  const shiftAnchor = useMemo(() => {
+    if (!shiftStation) return null
+    const station = stations.find((s) => s.name === shiftStation)
+    if (station?.latitude == null || station?.longitude == null) return null
+    return { latitude: station.latitude, longitude: station.longitude }
+  }, [shiftStation, stations])
   // Each sheet reports its current snap height; the map uses the tallest one as its bottom inset.
   const [searchHeight, setSearchHeight] = useState(Dimensions.get('window').height * 0.5)
   const [stationHeight, setStationHeight] = useState(0)
@@ -236,6 +314,23 @@ export function MapHomeScreen({ navigation, route }: Props) {
     detailHeight,
     activeJourneyHeight,
   )
+  // The sheets that expand to full height all snap to `SCREEN_H - insets.top - 66`, leaving just
+  // enough room for the top buttons. When a sheet reaches that height it covers the map entirely
+  // (e.g. the route overview), so the re-centre/account buttons are hidden to avoid floating over it.
+  const insets = useSafeAreaInsets()
+  const sheetIsFullscreen = mapBottomInset >= Dimensions.get('window').height - insets.top - 66
+
+  // The search sheet is the resting state of the map. Any other flow (a station, a plan, a journey
+  // detail/active journey, or a report) takes over the screen, so the search sheet is dismissed
+  // while one is open and restored only once they all close. Driving this declaratively from state
+  // avoids the imperative dismiss()/restore() calls racing with sheet close animations.
+  const overlayActive = Boolean(
+    activeStation || activePlan || activeDetail || activeJourneyParams || activeReport,
+  )
+  useEffect(() => {
+    if (overlayActive) sheetRef.current?.dismiss()
+    else sheetRef.current?.restore()
+  }, [overlayActive])
 
   // Refresh on focus so the banner reflects progress made on the active screen and survives a
   // restart (the record is read from storage each time the map regains focus).
@@ -272,7 +367,6 @@ export function MapHomeScreen({ navigation, route }: Props) {
     }
     const label = key === 'home' ? 'Home' : 'Work'
     setActivePlan({ initialTo: { postcode: place.postcode, label, isNamedPlace: true } })
-    sheetRef.current?.dismiss()
   }
 
   function handlePlaceLongPress(key: 'home' | 'work') {
@@ -340,7 +434,6 @@ export function MapHomeScreen({ navigation, route }: Props) {
     setActivePlan({
       initialTo: { postcode: place.postcode, label: place.name, isNamedPlace: true },
     })
-    sheetRef.current?.dismiss()
   }
 
   function handleCustomPlaceLongPress(place: CustomPlace) {
@@ -400,6 +493,13 @@ export function MapHomeScreen({ navigation, route }: Props) {
     mapRef.current?.focusStation(stationName)
   }
 
+  // One-tap access for staff: skip the search step and pull up the station sheet for the
+  // station they declared they're working at.
+  function jumpToShiftStation() {
+    if (!shiftStation) return
+    openStation(shiftStation)
+  }
+
   function closeStation() {
     setActiveStation(null)
     setStationPausedForJourney(false)
@@ -412,21 +512,24 @@ export function MapHomeScreen({ navigation, route }: Props) {
 
   function openJourneyFromTo(from: ResolvedLocation | undefined, to: ResolvedLocation) {
     setActivePlan({ initialFrom: from, initialTo: to })
-    sheetRef.current?.dismiss()
   }
 
   function closePlan() {
     setActivePlan(null)
+    // Un-pause the station the plan may have been opened from, so it reappears when the user backs
+    // out of planning. If a journey was started instead, the station was already cleared, so this
+    // is a no-op and the station stays hidden behind the active journey.
     setStationPausedForJourney(false)
-    // Only restore home sheet when no station is active; otherwise the station sheet remounts
-    if (!activeStation) {
-      sheetRef.current?.restore()
-    }
   }
 
   return (
     <View style={styles.screen}>
-      <StationMap ref={mapRef} onStationPress={openStation} bottomInset={mapBottomInset} />
+      <StationMap
+        ref={mapRef}
+        onStationPress={openStation}
+        bottomInset={mapBottomInset}
+        anchor={shiftAnchor}
+      />
 
       <SearchActionSheet
         ref={sheetRef}
@@ -453,12 +556,10 @@ export function MapHomeScreen({ navigation, route }: Props) {
         onComplete={() => {
           setActiveJourneyParams(null)
           setActive(null)
-          sheetRef.current?.restore()
         }}
         onEnd={() => {
           setActiveJourneyParams(null)
           setActive(null)
-          sheetRef.current?.restore()
         }}
         onHeightChange={setActiveJourneyHeight}
       />
@@ -478,7 +579,10 @@ export function MapHomeScreen({ navigation, route }: Props) {
         onStartJourney={(params) => {
           setActiveDetail(null)
           setActivePlan(null)
-          sheetRef.current?.dismiss()
+          // Fully tear down any station that the plan was started from, so it can't reappear over
+          // the route once the active journey is the only open flow.
+          setActiveStation(null)
+          setStationPausedForJourney(false)
           setActiveJourneyParams(params)
         }}
         onHeightChange={setDetailHeight}
@@ -503,24 +607,29 @@ export function MapHomeScreen({ navigation, route }: Props) {
 
       {/* Top overlay: rendered after sheets so it sits above all backdrops */}
       <SafeAreaView edges={['top']} style={[styles.topSafe, { pointerEvents: 'box-none' }]}>
-        <View style={[styles.topButtons, { pointerEvents: 'box-none' }]}>
-          <TopIconButton
-            icon="my-location"
-            size={50}
-            color={coords ? Colors.blue : Colors.secondaryText}
-            accessibilityLabel="Re-centre map on my location"
-            onPress={() => mapRef.current?.recentre()}
-          />
-          <TopIconButton
-            icon={status === 'authed' ? 'account-circle' : 'person'}
-            color={status === 'authed' ? Colors.blue : Colors.text}
-            size={50}
-            accessibilityLabel={
-              status === 'authed' && user ? `Logged in as ${user.username}` : 'Log in'
-            }
-            onPress={handleAccountPress}
-          />
-        </View>
+        {!sheetIsFullscreen && (
+          <View style={[styles.topButtons, { pointerEvents: 'box-none' }]}>
+            <TopIconButton
+              icon="my-location"
+              size={50}
+              color={coords ? Colors.blue : Colors.secondaryText}
+              accessibilityLabel="Re-centre map on my location"
+              onPress={() => mapRef.current?.recentre()}
+            />
+            {shiftStation && !activeStation && !activeReport && (
+              <ShiftBanner station={shiftStation} onJump={jumpToShiftStation} />
+            )}
+            <TopIconButton
+              icon={status === 'authed' ? 'account-circle' : 'person'}
+              color={status === 'authed' ? Colors.blue : Colors.text}
+              size={50}
+              accessibilityLabel={
+                status === 'authed' && user ? `Logged in as ${user.username}` : 'Log in'
+              }
+              onPress={handleAccountPress}
+            />
+          </View>
+        )}
         {active && !activeJourneyParams && (
           <ActiveJourneyBanner
             active={active}

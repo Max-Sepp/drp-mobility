@@ -55,7 +55,7 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
         iconBtn: {
           width: 32,
           height: 32,
-          borderRadius: 16,
+          borderRadius: Radii.circle,
           backgroundColor: Colors.searchBg,
           alignItems: 'center',
           justifyContent: 'center',
@@ -125,7 +125,7 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
         successCircle: {
           width: 110,
           height: 110,
-          borderRadius: 55,
+          borderRadius: Radii.circle,
           borderWidth: 3,
           borderColor: Colors.successDark,
           backgroundColor: Colors.successBg,

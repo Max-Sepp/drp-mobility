@@ -12794,7 +12794,7 @@
   },
   {
     "name": "Gloucester Road",
-    "lifts": 1,
+    "lifts": 2,
     "escalators": 0,
     "platforms": [
       {
@@ -12874,6 +12874,12 @@
       {
         "id": "940GZZLUGTR-Lift-1",
         "name": "Lift 1",
+        "from": "Street",
+        "to": "Eastbound Platform 5, Westbound Platform 4"
+      },
+      {
+        "id": "940GZZLUGTR-Lift-2",
+        "name": "Lift 2",
         "from": "Street",
         "to": "Eastbound Platform 5, Westbound Platform 4"
       }

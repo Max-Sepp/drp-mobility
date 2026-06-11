@@ -31,6 +31,14 @@ export type StationOutage = {
   stationName: string
   equipmentTypes: string[]
   units: OutageUnit[]
+  /** For each equipment type, the total count installed at this station (broken + working). */
+  totalByType: Record<string, number>
+  /**
+   * Journey-relevant lift counts: how many lifts on the user's specific path are broken vs.
+   * total. Populated by enrichOutagesWithJourneyRelevance() in JourneyPlannerSheet after
+   * assessOutages runs; absent until then.
+   */
+  journeyRelevantLifts?: { broken: number; total: number }
 }
 
 /**
@@ -105,6 +113,7 @@ export async function fetchStationOutages(): Promise<StationOutage[]> {
   if (error || !data) return []
 
   const byStation = new Map<string, OutageUnit[]>()
+  const totalByStationType = new Map<string, Record<string, number>>()
   for (const failure of data) {
     if (failure.resolved) continue
     const { equipment } = failure
@@ -123,19 +132,36 @@ export async function fetchStationOutages(): Promise<StationOutage[]> {
       estimated: type === 'escalator',
     })
     byStation.set(station, units)
+    const totals = totalByStationType.get(station) ?? {}
+    totals[type] = failure.station_total_same_type_count
+    totalByStationType.set(station, totals)
   }
 
   return [...byStation].map(([stationName, units]) => ({
     stationName,
     equipmentTypes: [...new Set(units.map((u) => u.equipmentType))],
     units,
+    totalByType: totalByStationType.get(stationName) ?? {},
   }))
 }
 
-/** Every station name a journey touches, taken from each leg's departure/arrival points. */
+// Train modes whose stations the rider actually enters (and whose lifts/escalators matter). A
+// station touched only by bus/coach/walking legs — e.g. a bus-to-bus interchange at a stop that
+// shares a train station's name — is excluded, since the rider never uses that station's equipment.
+const STATION_MODES = new Set([
+  'tube',
+  'dlr',
+  'overground',
+  'national-rail',
+  'elizabeth-line',
+  'tflrail',
+])
+
+/** Every train station a journey stops at, taken from each train leg's departure/arrival points. */
 function journeyStationNames(journey: Journey): string[] {
   const names: string[] = []
   for (const leg of journey.legs) {
+    if (!STATION_MODES.has(leg.mode.name)) continue
     if (leg.departurePoint?.commonName) names.push(leg.departurePoint.commonName)
     if (leg.arrivalPoint?.commonName) names.push(leg.arrivalPoint.commonName)
   }

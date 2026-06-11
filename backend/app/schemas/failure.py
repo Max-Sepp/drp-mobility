@@ -61,6 +61,7 @@ class FailureSummary(BaseModel):
     last_reported: datetime | None
     report_count: int
     verifications: list[OutageReportVerificationSchema] = []
+    station_total_same_type_count: int = 1
 
     @computed_field
     @property
