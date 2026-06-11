@@ -145,7 +145,7 @@ export function ActiveJourneySheet({
   const insets = useSafeAreaInsets()
   const sheetRef = useRef<BottomSheetRef>(null)
   const rerouteSheetRef = useRef<BottomSheetRef>(null)
-  const previewSheetRef = useRef<BottomSheetRef>(null)
+  const alternativesSheetRef = useRef<BottomSheetRef>(null)
 
   const [legIndex, setLegIndex] = useState(0)
   const [snapIndex, setSnapIndex] = useState(1)
@@ -320,33 +320,36 @@ export function ActiveJourneySheet({
     [insets.top, insets.bottom, showRerouteAlert],
   )
 
-  const rerouteSnapPoints = useMemo(() => {
+  // Issues sheet is fixed height — just RouteAlerts + option buttons footer.
+  const rerouteSnapPoints = useMemo(() => [SCREEN_H * 0.78], [])
+
+  // Alternatives sheet resizes dynamically to hug its content.
+  const alternativesSnapPoints = useMemo(() => {
     if (rerouteState.phase === 'none-found') return [SCREEN_H * 0.38]
     if (rerouteState.phase === 'found' && rerouteResultsH !== null) {
       const total = rerouteHeaderH + Spacing.xs + rerouteResultsH + Spacing.xl + insets.bottom
       return [Math.min(total, SCREEN_H * 0.88)]
     }
-    return [SCREEN_H * 0.78] // idle/loading: issues + two option buttons; found before measurement
+    return [SCREEN_H * 0.55]
   }, [rerouteState.phase, rerouteHeaderH, rerouteResultsH, insets.bottom])
 
-  // Re-snap the reroute sheet when results arrive so it resizes to the new content.
-  // For 'found', defer the snap until onLayout has measured the results height.
+  // Open the alternatives sheet when results arrive; defer 'found' until height is measured.
   useEffect(() => {
-    if (rerouteState.phase === 'none-found') rerouteSheetRef.current?.snapToIndex(0)
+    if (rerouteState.phase === 'none-found') alternativesSheetRef.current?.snapToIndex(0)
     if (rerouteState.phase !== 'found') setRerouteResultsH(null)
   }, [rerouteState.phase])
 
   useEffect(() => {
     if (rerouteState.phase === 'found' && rerouteResultsH !== null) {
-      rerouteSheetRef.current?.snapToIndex(0)
+      alternativesSheetRef.current?.snapToIndex(0)
     }
   }, [rerouteState.phase, rerouteResultsH])
 
-  // Close and reset the reroute sheet when the blocking outages resolve or all
-  // affected stations have been passed.
+  // Close both reroute sheets when the blocking outages resolve or are passed.
   useEffect(() => {
     if (!showRerouteAlert) {
       rerouteSheetRef.current?.close()
+      alternativesSheetRef.current?.close()
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setRerouteState({ phase: 'idle' })
     }
@@ -436,6 +439,7 @@ export function ActiveJourneySheet({
     setRerouteState({ phase: 'idle' })
     autoAdvancedFromRef.current = null
     rerouteSheetRef.current?.close()
+    alternativesSheetRef.current?.close()
   }
 
   function handlePreviewStart(activeParams: ActiveJourneyParams) {
@@ -512,7 +516,10 @@ export function ActiveJourneySheet({
                 borderBottomColor: Colors.dangerBorder,
               },
             ]}
-            onPress={() => rerouteSheetRef.current?.snapToIndex(0)}
+            onPress={() => {
+              setRerouteState({ phase: 'idle' })
+              rerouteSheetRef.current?.snapToIndex(0)
+            }}
             activeOpacity={0.85}
             accessibilityRole="button"
             accessibilityLabel="Accessibility issue ahead — tap to find alternative route"
@@ -579,14 +586,10 @@ export function ActiveJourneySheet({
         <BottomSheet ref={sheetRef} index={-1} snapPoints={snapPoints} onChange={handleChange}>
           {null}
         </BottomSheet>
-        <BottomSheet
-          ref={rerouteSheetRef}
-          index={-1}
-          snapPoints={rerouteSnapPoints}
-          backdropComponent={rerouteBackdrop}
-          enablePanDownToClose
-          onChange={() => {}}
-        >
+        <BottomSheet ref={rerouteSheetRef} index={-1} snapPoints={rerouteSnapPoints} enablePanDownToClose>
+          {null}
+        </BottomSheet>
+        <BottomSheet ref={alternativesSheetRef} index={-1} snapPoints={[SCREEN_H * 0.55]} handleComponent={null} enablePanDownToClose>
           {null}
         </BottomSheet>
       </>
@@ -604,14 +607,10 @@ export function ActiveJourneySheet({
             </Text>
           </YStack>
         </BottomSheet>
-        <BottomSheet
-          ref={rerouteSheetRef}
-          index={-1}
-          snapPoints={rerouteSnapPoints}
-          backdropComponent={rerouteBackdrop}
-          enablePanDownToClose
-          onChange={() => {}}
-        >
+        <BottomSheet ref={rerouteSheetRef} index={-1} snapPoints={rerouteSnapPoints} enablePanDownToClose>
+          {null}
+        </BottomSheet>
+        <BottomSheet ref={alternativesSheetRef} index={-1} snapPoints={[SCREEN_H * 0.55]} handleComponent={null} enablePanDownToClose>
           {null}
         </BottomSheet>
       </>
@@ -1113,7 +1112,7 @@ export function ActiveJourneySheet({
         </BottomSheetScrollView>
       </BottomSheet>
 
-      {/* Reroute sheet — rendered after main sheet so it sits on top (higher z-order). */}
+      {/* Issues sheet — modal popup, no handlebar, opens when the banner is tapped. */}
       <BottomSheet
         ref={rerouteSheetRef}
         index={-1}
@@ -1121,16 +1120,142 @@ export function ActiveJourneySheet({
         backdropComponent={rerouteBackdrop}
         handleComponent={null}
         enablePanDownToClose
-        onChange={() => {}}
+        onChange={(index) => {
+          if (index === -1) {
+            setRerouteState({ phase: 'idle' })
+            alternativesSheetRef.current?.close()
+          }
+        }}
+      >
+        <SheetHeader
+          title="Accessibility issues"
+          onClose={() => rerouteSheetRef.current?.close()}
+          modal
+        />
+        <BottomSheetScrollView
+          showsVerticalScrollIndicator={false}
+          style={{ flex: 1 }}
+          contentContainerStyle={{
+            paddingHorizontal: Spacing.lg,
+            paddingTop: Spacing.xs,
+            paddingBottom: Spacing.xl,
+          }}
+        >
+          <RouteAlerts
+            assessments={upcomingBlockedAssessments}
+            disruptions={[]}
+            hideHeader
+            defaultExpanded
+          />
+        </BottomSheetScrollView>
+
+        {/* Option buttons pinned to bottom of issues sheet */}
+        <YStack
+          gap="$2"
+          px="$4"
+          pt="$3"
+          style={{
+            paddingBottom: insets.bottom + Spacing.md,
+            backgroundColor: Colors.card,
+            borderTopWidth: StyleSheet.hairlineWidth,
+            borderTopColor: Colors.border,
+          }}
+        >
+          <Text
+            fontSize={11}
+            fontWeight="700"
+            color={Colors.tertiaryText}
+            style={{ letterSpacing: 0.5 }}
+          >
+            FIND ALTERNATIVE ROUTES
+          </Text>
+          {(() => {
+            const busy = rerouteState.phase === 'loading'
+            return (
+              <>
+                <TouchableOpacity
+                  style={[
+                    styles.rerouteSheetBtn,
+                    {
+                      backgroundColor: busy ? Colors.dangerBorder : Colors.dangerDark,
+                      opacity: busy ? Opacity.disabledMid : 1,
+                    },
+                  ]}
+                  onPress={busy ? undefined : handleFindAlternative}
+                  activeOpacity={0.8}
+                  accessibilityRole="button"
+                  accessibilityLabel="Find alternative route from your location"
+                >
+                  {busy ? (
+                    <Spinner size="small" color="white" />
+                  ) : (
+                    <MaterialIcons name="my-location" size={16} color="white" />
+                  )}
+                  <YStack flex={1}>
+                    <Text fontSize={14} fontWeight="700" color="white">
+                      {busy ? 'Searching…' : 'From your location'}
+                    </Text>
+                    {!busy && (
+                      <Text fontSize={12} color="white" style={{ opacity: 0.8 }}>
+                        Plan a new route avoiding the issue
+                      </Text>
+                    )}
+                  </YStack>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.rerouteSheetBtn,
+                    {
+                      backgroundColor: Colors.searchBg,
+                      borderWidth: Borders.medium,
+                      borderColor: Colors.border,
+                      opacity: Opacity.disabled,
+                    },
+                  ]}
+                  disabled
+                  activeOpacity={1}
+                  accessibilityRole="button"
+                  accessibilityLabel="Find step-free stops along this line — coming soon"
+                >
+                  <MaterialIcons name="train" size={16} color={Colors.secondaryText} />
+                  <YStack flex={1}>
+                    <Text fontSize={14} fontWeight="700" color={Colors.text}>
+                      Along this line
+                    </Text>
+                    <Text fontSize={12} color={Colors.secondaryText}>
+                      Find step-free stops you can reach from here
+                    </Text>
+                  </YStack>
+                  <Text fontSize={11} fontWeight="600" color={Colors.tertiaryText}>
+                    Coming soon
+                  </Text>
+                </TouchableOpacity>
+              </>
+            )
+          })()}
+        </YStack>
+      </BottomSheet>
+
+      {/* Alternatives sheet — modal-style popup, no handlebar, opens over the issues sheet. */}
+      <BottomSheet
+        ref={alternativesSheetRef}
+        index={-1}
+        snapPoints={alternativesSnapPoints}
+        backdropComponent={rerouteBackdrop}
+        handleComponent={null}
+        enablePanDownToClose
+        onChange={(index) => {
+          if (index === -1) {
+            setRerouteState({ phase: 'idle' })
+            setPreviewJourney(null)
+          }
+        }}
       >
         <View onLayout={(e) => setRerouteHeaderH(e.nativeEvent.layout.height)}>
           <SheetHeader
-            title={
-              rerouteState.phase === 'found' || rerouteState.phase === 'none-found'
-                ? 'Alternative routes'
-                : 'Accessibility issues'
-            }
-            onClose={() => rerouteSheetRef.current?.close()}
+            title="Alternative routes"
+            onClose={() => alternativesSheetRef.current?.close()}
             modal
           />
         </View>
@@ -1144,23 +1269,8 @@ export function ActiveJourneySheet({
           }}
         >
           <YStack gap="$4">
-
-            {/* Issue breakdown — hidden once we have results, user no longer needs it */}
-            {(rerouteState.phase === 'idle' || rerouteState.phase === 'loading') && (
-              <RouteAlerts
-                assessments={upcomingBlockedAssessments}
-                disruptions={[]}
-                hideHeader
-                defaultExpanded
-              />
-            )}
-
-            {/* Alternative routes list */}
             {rerouteState.phase === 'found' && (
-              <YStack
-                gap="$2"
-                onLayout={(e) => setRerouteResultsH(e.nativeEvent.layout.height)}
-              >
+              <YStack gap="$2" onLayout={(e) => setRerouteResultsH(e.nativeEvent.layout.height)}>
                 {rerouteState.alternatives.map(({ journey, tags }, i) => (
                   <JourneyResultCard
                     key={i}
@@ -1181,7 +1291,6 @@ export function ActiveJourneySheet({
               </YStack>
             )}
 
-            {/* No alternatives found */}
             {rerouteState.phase === 'none-found' && (
               <XStack gap="$2" items="flex-start">
                 <MaterialIcons
@@ -1197,96 +1306,8 @@ export function ActiveJourneySheet({
             )}
           </YStack>
         </BottomSheetScrollView>
-
-        {/* Option buttons — plain View so they animate with the sheet, not independently */}
-        {(rerouteState.phase === 'idle' || rerouteState.phase === 'loading') && (
-          <YStack
-            gap="$2"
-            px="$4"
-            pt="$3"
-            style={{
-              paddingBottom: insets.bottom + Spacing.md,
-              backgroundColor: Colors.card,
-              borderTopWidth: StyleSheet.hairlineWidth,
-              borderTopColor: Colors.border,
-            }}
-          >
-            <Text
-              fontSize={11}
-              fontWeight="700"
-              color={Colors.tertiaryText}
-              style={{ letterSpacing: 0.5 }}
-            >
-              FIND ALTERNATIVE ROUTES
-            </Text>
-            {(() => {
-              const busy = rerouteState.phase === 'loading'
-              return (
-                <>
-                  <TouchableOpacity
-                    style={[
-                      styles.rerouteSheetBtn,
-                      {
-                        backgroundColor: busy ? Colors.dangerBorder : Colors.dangerDark,
-                        opacity: busy ? Opacity.disabledMid : 1,
-                      },
-                    ]}
-                    onPress={busy ? undefined : handleFindAlternative}
-                    activeOpacity={0.8}
-                    accessibilityRole="button"
-                    accessibilityLabel="Find alternative route from your location"
-                  >
-                    {busy ? (
-                      <Spinner size="small" color="white" />
-                    ) : (
-                      <MaterialIcons name="my-location" size={16} color="white" />
-                    )}
-                    <YStack flex={1}>
-                      <Text fontSize={14} fontWeight="700" color="white">
-                        {busy ? 'Searching…' : 'From your location'}
-                      </Text>
-                      {!busy && (
-                        <Text fontSize={12} color="white" style={{ opacity: 0.8 }}>
-                          Plan a new route avoiding the issue
-                        </Text>
-                      )}
-                    </YStack>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={[
-                      styles.rerouteSheetBtn,
-                      {
-                        backgroundColor: Colors.searchBg,
-                        borderWidth: Borders.medium,
-                        borderColor: Colors.border,
-                        opacity: Opacity.disabled,
-                      },
-                    ]}
-                    disabled
-                    activeOpacity={1}
-                    accessibilityRole="button"
-                    accessibilityLabel="Find step-free stops along this line — coming soon"
-                  >
-                    <MaterialIcons name="train" size={16} color={Colors.secondaryText} />
-                    <YStack flex={1}>
-                      <Text fontSize={14} fontWeight="700" color={Colors.text}>
-                        Along this line
-                      </Text>
-                      <Text fontSize={12} color={Colors.secondaryText}>
-                        Find step-free stops you can reach from here
-                      </Text>
-                    </YStack>
-                    <Text fontSize={11} fontWeight="600" color={Colors.tertiaryText}>
-                      Coming soon
-                    </Text>
-                  </TouchableOpacity>
-                </>
-              )
-            })()}
-          </YStack>
-        )}
       </BottomSheet>
+
       {/* Route preview — opens when a result card is tapped; no save option */}
       <JourneyDetailSheet
         params={previewJourney}
