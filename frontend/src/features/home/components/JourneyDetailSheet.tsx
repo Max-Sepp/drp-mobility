@@ -134,7 +134,8 @@ function TimelineWaypoint({
       </View>
       <View style={{ flex: 1, paddingLeft: 6 }}>
         <Text fontSize={17} fontWeight="600" color={Colors.text}>
-          {name}{stopNumber ? ` (Stop ${stopNumber})` : ''}
+          {name}
+          {stopNumber ? ` (Stop ${stopNumber})` : ''}
         </Text>
       </View>
       {time ? (
@@ -250,7 +251,9 @@ function TimelineConnector({
                   onPress={() => setExpanded((v) => !v)}
                   activeOpacity={0.6}
                   accessibilityRole="button"
-                  accessibilityLabel={expanded ? 'Hide intermediate stops' : 'Show intermediate stops'}
+                  accessibilityLabel={
+                    expanded ? 'Hide intermediate stops' : 'Show intermediate stops'
+                  }
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 >
                   <MaterialIcons

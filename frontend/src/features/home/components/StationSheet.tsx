@@ -167,7 +167,13 @@ export function StationSheet({
   }
 
   return (
-    <BottomSheet ref={sheetRef} index={-1} snapPoints={snapPoints} onChange={handleChange} onAnimate={handleAnimate}>
+    <BottomSheet
+      ref={sheetRef}
+      index={-1}
+      snapPoints={snapPoints}
+      onChange={handleChange}
+      onAnimate={handleAnimate}
+    >
       <SheetHeader
         title={station ?? ''}
         subtitle="Underground station"
