@@ -60,9 +60,13 @@ function routeUnits(station: OutageAssessment): AssessedUnit[] {
 export const RouteAlerts = ({
   assessments,
   disruptions,
+  hideHeader = false,
+  defaultExpanded = false,
 }: {
   assessments: OutageAssessment[]
   disruptions: RouteDisruption[]
+  hideHeader?: boolean
+  defaultExpanded?: boolean
 }) => {
   const { Colors, Radii } = useTheme()
   // Lazily-fetched event timeline per failure, opened via the per-problem dropdown.
@@ -204,8 +208,7 @@ export const RouteAlerts = ({
   // never split across the view.
   const renderStation = (station: OutageAssessment) => {
     const units = routeUnits(station)
-    // Every station starts collapsed; the header alone tells the rider it's on their route.
-    const open = stationOpen[station.stationName] ?? false
+    const open = stationOpen[station.stationName] ?? defaultExpanded
     const count = units.length
     return (
       <YStack
@@ -254,7 +257,7 @@ export const RouteAlerts = ({
   // cards. These sit on a line the rider is on, so they always count as on-route.
   const renderDisruptionGroup = (group: { line: string; descriptions: string[] }) => {
     const key = `line:${group.line}`
-    const open = stationOpen[key] ?? false
+    const open = stationOpen[key] ?? defaultExpanded
     const count = group.descriptions.length
     return (
       <YStack
@@ -332,16 +335,18 @@ export const RouteAlerts = ({
 
   return (
     <YStack gap="$3">
-      <Text
-        fontSize={16}
-        fontWeight="700"
-        color={Colors.text}
-        mt="$3"
-        pt="$3"
-        style={{ borderTopWidth: Borders.thin, borderTopColor: Colors.border }}
-      >
-        Disruptions on this route
-      </Text>
+      {!hideHeader && (
+        <Text
+          fontSize={16}
+          fontWeight="700"
+          color={Colors.text}
+          mt="$3"
+          pt="$3"
+          style={{ borderTopWidth: Borders.thin, borderTopColor: Colors.border }}
+        >
+          Disruptions on this route
+        </Text>
+      )}
 
       {disruptionGroups.map(renderDisruptionGroup)}
 
