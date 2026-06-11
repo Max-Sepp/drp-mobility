@@ -28,7 +28,12 @@ import {
 import { assessOutages, DIRECT_VERDICTS } from '@/features/journey/api/outageRelevance'
 import type { StationOutage } from '@/features/journey/api/accessibility'
 import { useOutages } from '@/features/outages'
-import { planJourneyOptions, routeSignature, type Journey, type RouteTag } from '@/features/journey/api/tfl'
+import {
+  planJourneyOptions,
+  routeSignature,
+  type Journey,
+  type RouteTag,
+} from '@/features/journey/api/tfl'
 import type { RerouteState } from '@/features/journey/components/RerouteAlert'
 import { JourneyResultCard } from '@/features/journey/components/JourneyResultCard'
 import {
@@ -366,8 +371,7 @@ export function ActiveJourneySheet({
     const dep = activeLegs[legIndex]?.departurePoint
     // Always reroute from the current leg's departure point (where the user is now),
     // never from the original starting point.
-    const fromLocation =
-      dep?.lat != null && dep?.lon != null ? `${dep.lat},${dep.lon}` : null
+    const fromLocation = dep?.lat != null && dep?.lon != null ? `${dep.lat},${dep.lon}` : null
     const toLocation = rerouteToLocation
 
     if (!fromLocation || !toLocation) {
@@ -392,8 +396,7 @@ export function ActiveJourneySheet({
     const baseSig = routeSignature(currentJourney ?? params.journey)
     const alternatives = result.journeys.filter(
       ({ journey }) =>
-        routeSignature(journey) !== baseSig &&
-        matchOutages(journey, blockedAsOutages).length === 0,
+        routeSignature(journey) !== baseSig && matchOutages(journey, blockedAsOutages).length === 0,
     )
 
     setRerouteState(
@@ -527,7 +530,17 @@ export function ActiveJourneySheet({
         </View>
       </BottomSheetFooter>
     ),
-    [showRerouteAlert, rerouteBannerText, legIndex, isFinalLeg, goTo, onArrived, insets, Colors, styles],
+    [
+      showRerouteAlert,
+      rerouteBannerText,
+      legIndex,
+      isFinalLeg,
+      goTo,
+      onArrived,
+      insets,
+      Colors,
+      styles,
+    ],
   )
 
   if (!params) {
@@ -606,565 +619,571 @@ export function ActiveJourneySheet({
 
   return (
     <>
-    <BottomSheet
-      ref={sheetRef}
-      index={-1}
-      snapPoints={snapPoints}
-      enablePanDownToClose={false}
-      backdropComponent={collapseBackdrop}
-      footerComponent={renderFooter}
-      onChange={handleChange}
-    >
-      {/* Compact summary row — always visible */}
-      <TouchableOpacity
-        style={styles.compactRow}
-        onPress={isExpanded ? undefined : () => sheetRef.current?.snapToIndex(1)}
-        activeOpacity={isExpanded ? 1 : 0.7}
-        accessibilityRole="button"
-        accessibilityLabel={isExpanded ? undefined : 'Expand journey details'}
+      <BottomSheet
+        ref={sheetRef}
+        index={-1}
+        snapPoints={snapPoints}
+        enablePanDownToClose={false}
+        backdropComponent={collapseBackdrop}
+        footerComponent={renderFooter}
+        onChange={handleChange}
       >
-        <View
-          style={{
-            width: 36,
-            height: 36,
-            borderRadius: 18,
-            backgroundColor: accentBg,
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginRight: Spacing.sm,
-            flexShrink: 0,
-          }}
+        {/* Compact summary row — always visible */}
+        <TouchableOpacity
+          style={styles.compactRow}
+          onPress={isExpanded ? undefined : () => sheetRef.current?.snapToIndex(1)}
+          activeOpacity={isExpanded ? 1 : 0.7}
+          accessibilityRole="button"
+          accessibilityLabel={isExpanded ? undefined : 'Expand journey details'}
         >
-          <MaterialIcons name={modeIcon(currentLeg.mode.name)} size={20} color={accentFg} />
-        </View>
-        <YStack flex={1} gap="$1">
-          <Text fontSize={19} fontWeight="700" color={Colors.text} numberOfLines={1}>
-            {arrName ?? humanizeSummary(currentLeg.instruction.summary, [from, to])}
-          </Text>
-          {routeName && !isWalking ? (
-            <View
-              style={{
-                alignSelf: 'flex-start',
-                backgroundColor: isBus ? Colors.searchBg : accentBg,
-                borderRadius: Radii.xs,
-                paddingHorizontal: 6,
-                paddingVertical: 1,
-                borderWidth: isBus ? Borders.thin : 0,
-                borderColor: isBus ? Colors.border : undefined,
-              }}
-            >
-              <Text
-                fontSize={12}
-                fontWeight="700"
-                style={{ color: isBus ? Colors.text : accentFg }}
-              >
-                {routeName}
-              </Text>
-            </View>
-          ) : isWalking ? (
-            <Text fontSize={13} color={Colors.secondaryText}>
-              {currentLeg.duration} min walk
-            </Text>
-          ) : null}
-        </YStack>
-        {arrTime && (
-          <Text
-            fontSize={16}
-            fontWeight="700"
-            color={Colors.text}
-            style={{ marginRight: isExpanded ? 0 : Spacing.xs }}
-          >
-            {arrTime}
-          </Text>
-        )}
-        {!isExpanded && <MaterialIcons name="expand-less" size={20} color={Colors.secondaryText} />}
-      </TouchableOpacity>
-
-      {/* Full detail — always rendered so content slides in during snap transition */}
-      <BottomSheetScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={[styles.content, { paddingBottom: 65 + insets.bottom + Spacing.xl }]}
-      >
-        <YStack gap="$3">
-          {/* Heading: live indicator + leg progress */}
-          <XStack items="center" justify="space-between">
-            <XStack items="center" gap="$1.5">
-              <View
-                style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: headerColor }}
-              />
-              <Text fontSize={13} fontWeight="700" style={{ color: headerColor }}>
-                NOW
-              </Text>
-            </XStack>
-            <Text fontSize={12} color={Colors.secondaryText}>
-              Leg {legIndex + 1} of {legs.length}
-            </Text>
-          </XStack>
-
-          {/* Current leg card */}
           <View
             style={{
-              borderRadius: Radii.button,
-              overflow: 'hidden',
-              backgroundColor: Colors.card,
-              borderWidth: Borders.thin,
-              borderColor: Colors.border,
+              width: 36,
+              height: 36,
+              borderRadius: 18,
+              backgroundColor: accentBg,
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginRight: Spacing.sm,
+              flexShrink: 0,
             }}
           >
-            {/* Line-colour accent strip */}
-            <View style={{ height: 5, backgroundColor: accentBg }} />
-
-            <YStack p="$5" gap="$4">
-              {/* Mode circle + line badge + direction */}
-              <XStack items="center" gap="$2.5">
-                <View
-                  style={{
-                    width: 38,
-                    height: 38,
-                    borderRadius: 19,
-                    backgroundColor: accentBg,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                  }}
+            <MaterialIcons name={modeIcon(currentLeg.mode.name)} size={20} color={accentFg} />
+          </View>
+          <YStack flex={1} gap="$1">
+            <Text fontSize={19} fontWeight="700" color={Colors.text} numberOfLines={1}>
+              {arrName ?? humanizeSummary(currentLeg.instruction.summary, [from, to])}
+            </Text>
+            {routeName && !isWalking ? (
+              <View
+                style={{
+                  alignSelf: 'flex-start',
+                  backgroundColor: isBus ? Colors.searchBg : accentBg,
+                  borderRadius: Radii.xs,
+                  paddingHorizontal: 6,
+                  paddingVertical: 1,
+                  borderWidth: isBus ? Borders.thin : 0,
+                  borderColor: isBus ? Colors.border : undefined,
+                }}
+              >
+                <Text
+                  fontSize={12}
+                  fontWeight="700"
+                  style={{ color: isBus ? Colors.text : accentFg }}
                 >
-                  <MaterialIcons
-                    name={modeIcon(currentLeg.mode.name)}
-                    size={20}
-                    color={accentFg}
-                    aria-label={currentLeg.mode.name}
-                  />
-                </View>
-                {routeName && !isWalking && (
+                  {routeName}
+                </Text>
+              </View>
+            ) : isWalking ? (
+              <Text fontSize={13} color={Colors.secondaryText}>
+                {currentLeg.duration} min walk
+              </Text>
+            ) : null}
+          </YStack>
+          {arrTime && (
+            <Text
+              fontSize={16}
+              fontWeight="700"
+              color={Colors.text}
+              style={{ marginRight: isExpanded ? 0 : Spacing.xs }}
+            >
+              {arrTime}
+            </Text>
+          )}
+          {!isExpanded && (
+            <MaterialIcons name="expand-less" size={20} color={Colors.secondaryText} />
+          )}
+        </TouchableOpacity>
+
+        {/* Full detail — always rendered so content slides in during snap transition */}
+        <BottomSheetScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={[
+            styles.content,
+            { paddingBottom: 65 + insets.bottom + Spacing.xl },
+          ]}
+        >
+          <YStack gap="$3">
+            {/* Heading: live indicator + leg progress */}
+            <XStack items="center" justify="space-between">
+              <XStack items="center" gap="$1.5">
+                <View
+                  style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: headerColor }}
+                />
+                <Text fontSize={13} fontWeight="700" style={{ color: headerColor }}>
+                  NOW
+                </Text>
+              </XStack>
+              <Text fontSize={12} color={Colors.secondaryText}>
+                Leg {legIndex + 1} of {legs.length}
+              </Text>
+            </XStack>
+
+            {/* Current leg card */}
+            <View
+              style={{
+                borderRadius: Radii.button,
+                overflow: 'hidden',
+                backgroundColor: Colors.card,
+                borderWidth: Borders.thin,
+                borderColor: Colors.border,
+              }}
+            >
+              {/* Line-colour accent strip */}
+              <View style={{ height: 5, backgroundColor: accentBg }} />
+
+              <YStack p="$5" gap="$4">
+                {/* Mode circle + line badge + direction */}
+                <XStack items="center" gap="$2.5">
                   <View
                     style={{
-                      backgroundColor: isBus ? Colors.searchBg : accentBg,
-                      borderRadius: Radii.xs,
-                      paddingHorizontal: 10,
-                      paddingVertical: 4,
-                      borderWidth: isBus ? Borders.thin : 0,
-                      borderColor: isBus ? Colors.border : undefined,
+                      width: 38,
+                      height: 38,
+                      borderRadius: 19,
+                      backgroundColor: accentBg,
+                      alignItems: 'center',
+                      justifyContent: 'center',
                       flexShrink: 0,
                     }}
                   >
-                    <Text
-                      fontSize={15}
-                      fontWeight="700"
-                      style={{ color: isBus ? Colors.text : 'white' }}
-                    >
-                      {routeName}
-                    </Text>
+                    <MaterialIcons
+                      name={modeIcon(currentLeg.mode.name)}
+                      size={20}
+                      color={accentFg}
+                      aria-label={currentLeg.mode.name}
+                    />
                   </View>
-                )}
-                {direction && (
-                  <Text
-                    fontSize={14}
-                    color={Colors.secondaryText}
-                    numberOfLines={1}
-                    style={{ flex: 1 }}
-                  >
-                    {'→ '}
-                    {stripStationSuffix(direction)}
-                  </Text>
-                )}
-                {isWalking && (
-                  <Text fontSize={16} fontWeight="600" color={Colors.text}>
-                    Walk · {currentLeg.duration} min
-                  </Text>
-                )}
-              </XStack>
+                  {routeName && !isWalking && (
+                    <View
+                      style={{
+                        backgroundColor: isBus ? Colors.searchBg : accentBg,
+                        borderRadius: Radii.xs,
+                        paddingHorizontal: 10,
+                        paddingVertical: 4,
+                        borderWidth: isBus ? Borders.thin : 0,
+                        borderColor: isBus ? Colors.border : undefined,
+                        flexShrink: 0,
+                      }}
+                    >
+                      <Text
+                        fontSize={15}
+                        fontWeight="700"
+                        style={{ color: isBus ? Colors.text : 'white' }}
+                      >
+                        {routeName}
+                      </Text>
+                    </View>
+                  )}
+                  {direction && (
+                    <Text
+                      fontSize={14}
+                      color={Colors.secondaryText}
+                      numberOfLines={1}
+                      style={{ flex: 1 }}
+                    >
+                      {'→ '}
+                      {stripStationSuffix(direction)}
+                    </Text>
+                  )}
+                  {isWalking && (
+                    <Text fontSize={16} fontWeight="600" color={Colors.text}>
+                      Walk · {currentLeg.duration} min
+                    </Text>
+                  )}
+                </XStack>
 
-              {/* Transit legs: vertical station connector */}
-              {hasStations ? (
-                <View>
-                  {/* Departure — dot is in the same row as the chip, so alignItems:'center'
+                {/* Transit legs: vertical station connector */}
+                {hasStations ? (
+                  <View>
+                    {/* Departure — dot is in the same row as the chip, so alignItems:'center'
                       guarantees the dot always centres on the station label regardless of chip height */}
-                  {depName && (
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                      <View style={{ width: 20, alignItems: 'center' }}>
+                    {depName && (
+                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <View style={{ width: 20, alignItems: 'center' }}>
+                          <View
+                            style={{
+                              width: 11,
+                              height: 11,
+                              borderRadius: 6,
+                              borderWidth: 2,
+                              borderColor: accentBg,
+                              backgroundColor: Colors.card,
+                            }}
+                          />
+                        </View>
                         <View
                           style={{
-                            width: 11,
-                            height: 11,
-                            borderRadius: 6,
-                            borderWidth: 2,
-                            borderColor: accentBg,
-                            backgroundColor: Colors.card,
+                            flex: 1,
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
                           }}
-                        />
-                      </View>
-                      <View
-                        style={{
-                          flex: 1,
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                        }}
-                      >
-                        {depResolved ? (
-                          <TouchableOpacity
-                            onPress={() => onStationPress?.(depResolved)}
-                            activeOpacity={0.7}
-                            accessibilityRole="button"
-                            accessibilityLabel={`View accessibility for ${depResolved}`}
-                            style={{
-                              flexDirection: 'row',
-                              alignItems: 'center',
-                              gap: 5,
-                              borderRadius: Radii.small,
-                              borderWidth: Borders.thin,
-                              borderColor: accentBg,
-                              paddingHorizontal: 8,
-                              paddingVertical: 5,
-                            }}
-                          >
+                        >
+                          {depResolved ? (
+                            <TouchableOpacity
+                              onPress={() => onStationPress?.(depResolved)}
+                              activeOpacity={0.7}
+                              accessibilityRole="button"
+                              accessibilityLabel={`View accessibility for ${depResolved}`}
+                              style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                gap: 5,
+                                borderRadius: Radii.small,
+                                borderWidth: Borders.thin,
+                                borderColor: accentBg,
+                                paddingHorizontal: 8,
+                                paddingVertical: 5,
+                              }}
+                            >
+                              <Text
+                                fontSize={16}
+                                fontWeight="600"
+                                style={{ flexShrink: 1, color: accentBg }}
+                                numberOfLines={1}
+                              >
+                                {depName}
+                              </Text>
+                              <MaterialIcons name="chevron-right" size={16} color={accentBg} />
+                            </TouchableOpacity>
+                          ) : (
                             <Text
                               fontSize={16}
                               fontWeight="600"
-                              style={{ flexShrink: 1, color: accentBg }}
+                              color={Colors.text}
                               numberOfLines={1}
                             >
                               {depName}
                             </Text>
-                            <MaterialIcons name="chevron-right" size={16} color={accentBg} />
-                          </TouchableOpacity>
-                        ) : (
-                          <Text
-                            fontSize={16}
-                            fontWeight="600"
-                            color={Colors.text}
-                            numberOfLines={1}
-                          >
-                            {depName}
-                          </Text>
-                        )}
-                        {depTime && (
-                          <Text fontSize={15} fontWeight="600" color={Colors.secondaryText}>
-                            {depTime}
-                          </Text>
-                        )}
+                          )}
+                          {depTime && (
+                            <Text fontSize={15} fontWeight="600" color={Colors.secondaryText}>
+                              {depTime}
+                            </Text>
+                          )}
+                        </View>
                       </View>
-                    </View>
-                  )}
+                    )}
 
-                  {/* Connector + duration — gutter stretches to this row's height */}
-                  <View style={{ flexDirection: 'row' }}>
-                    <View style={{ width: 20, alignItems: 'center' }}>
-                      <View
-                        style={{ flex: 1, width: 2, backgroundColor: accentBg, opacity: 0.35 }}
-                      />
-                    </View>
-                    <XStack items="center" gap="$1.5" py="$2" style={{ paddingLeft: Spacing.sm }}>
-                      <MaterialIcons name="schedule" size={13} color={Colors.tertiaryText} />
-                      <Text fontSize={13} color={Colors.tertiaryText}>
-                        {currentLeg.duration} min
-                      </Text>
-                    </XStack>
-                  </View>
-
-                  {/* Arrival — same inline-dot pattern */}
-                  {arrName && (
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    {/* Connector + duration — gutter stretches to this row's height */}
+                    <View style={{ flexDirection: 'row' }}>
                       <View style={{ width: 20, alignItems: 'center' }}>
                         <View
-                          style={{
-                            width: 11,
-                            height: 11,
-                            borderRadius: 6,
-                            backgroundColor: accentBg,
-                          }}
+                          style={{ flex: 1, width: 2, backgroundColor: accentBg, opacity: 0.35 }}
                         />
                       </View>
-                      <View
-                        style={{
-                          flex: 1,
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                        }}
-                      >
-                        {arrResolved ? (
-                          <TouchableOpacity
-                            onPress={() => onStationPress?.(arrResolved)}
-                            activeOpacity={0.7}
-                            accessibilityRole="button"
-                            accessibilityLabel={`View accessibility for ${arrResolved}`}
+                      <XStack items="center" gap="$1.5" py="$2" style={{ paddingLeft: Spacing.sm }}>
+                        <MaterialIcons name="schedule" size={13} color={Colors.tertiaryText} />
+                        <Text fontSize={13} color={Colors.tertiaryText}>
+                          {currentLeg.duration} min
+                        </Text>
+                      </XStack>
+                    </View>
+
+                    {/* Arrival — same inline-dot pattern */}
+                    {arrName && (
+                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <View style={{ width: 20, alignItems: 'center' }}>
+                          <View
                             style={{
-                              flexDirection: 'row',
-                              alignItems: 'center',
-                              gap: 5,
-                              borderRadius: Radii.small,
-                              borderWidth: Borders.thin,
-                              borderColor: accentBg,
-                              paddingHorizontal: 8,
-                              paddingVertical: 5,
+                              width: 11,
+                              height: 11,
+                              borderRadius: 6,
+                              backgroundColor: accentBg,
                             }}
-                          >
+                          />
+                        </View>
+                        <View
+                          style={{
+                            flex: 1,
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                          }}
+                        >
+                          {arrResolved ? (
+                            <TouchableOpacity
+                              onPress={() => onStationPress?.(arrResolved)}
+                              activeOpacity={0.7}
+                              accessibilityRole="button"
+                              accessibilityLabel={`View accessibility for ${arrResolved}`}
+                              style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                gap: 5,
+                                borderRadius: Radii.small,
+                                borderWidth: Borders.thin,
+                                borderColor: accentBg,
+                                paddingHorizontal: 8,
+                                paddingVertical: 5,
+                              }}
+                            >
+                              <Text
+                                fontSize={16}
+                                fontWeight="600"
+                                style={{ flexShrink: 1, color: accentBg }}
+                                numberOfLines={1}
+                              >
+                                {arrName}
+                              </Text>
+                              <MaterialIcons name="chevron-right" size={16} color={accentBg} />
+                            </TouchableOpacity>
+                          ) : (
                             <Text
                               fontSize={16}
                               fontWeight="600"
-                              style={{ flexShrink: 1, color: accentBg }}
+                              color={Colors.text}
                               numberOfLines={1}
                             >
                               {arrName}
                             </Text>
-                            <MaterialIcons name="chevron-right" size={16} color={accentBg} />
-                          </TouchableOpacity>
-                        ) : (
-                          <Text
-                            fontSize={16}
-                            fontWeight="600"
-                            color={Colors.text}
-                            numberOfLines={1}
-                          >
-                            {arrName}
-                          </Text>
-                        )}
-                        {arrTime && (
-                          <Text fontSize={15} fontWeight="600" color={Colors.secondaryText}>
-                            {arrTime}
-                          </Text>
-                        )}
+                          )}
+                          {arrTime && (
+                            <Text fontSize={15} fontWeight="600" color={Colors.secondaryText}>
+                              {arrTime}
+                            </Text>
+                          )}
+                        </View>
                       </View>
-                    </View>
-                  )}
-                </View>
-              ) : (
-                /* Walking / bus / other: instruction text + times */
-                <YStack gap="$2">
-                  {!isWalking && (
-                    <Text fontSize={16} fontWeight="600" color={Colors.text}>
-                      {humanizeSummary(currentLeg.instruction.summary, [from, to])}
-                    </Text>
-                  )}
-                  {detailed && (
-                    <Text fontSize={14} color={Colors.secondaryText}>
-                      {humanizeSummary(detailed, [from, to])}
-                    </Text>
-                  )}
-                  {(depTime || arrTime) && (
-                    <XStack items="center" gap="$1.5" mt="$0.5">
-                      <MaterialIcons name="schedule" size={14} color={Colors.secondaryText} />
-                      <Text fontSize={14} color={Colors.secondaryText}>
-                        {[depTime, arrTime].filter(Boolean).join(' → ')} · {currentLeg.duration} min
+                    )}
+                  </View>
+                ) : (
+                  /* Walking / bus / other: instruction text + times */
+                  <YStack gap="$2">
+                    {!isWalking && (
+                      <Text fontSize={16} fontWeight="600" color={Colors.text}>
+                        {humanizeSummary(currentLeg.instruction.summary, [from, to])}
                       </Text>
-                    </XStack>
-                  )}
-                </YStack>
-              )}
-            </YStack>
-          </View>
+                    )}
+                    {detailed && (
+                      <Text fontSize={14} color={Colors.secondaryText}>
+                        {humanizeSummary(detailed, [from, to])}
+                      </Text>
+                    )}
+                    {(depTime || arrTime) && (
+                      <XStack items="center" gap="$1.5" mt="$0.5">
+                        <MaterialIcons name="schedule" size={14} color={Colors.secondaryText} />
+                        <Text fontSize={14} color={Colors.secondaryText}>
+                          {[depTime, arrTime].filter(Boolean).join(' → ')} · {currentLeg.duration}{' '}
+                          min
+                        </Text>
+                      </XStack>
+                    )}
+                  </YStack>
+                )}
+              </YStack>
+            </View>
 
-          {/* GPS status */}
-          <XStack items="center" gap="$2">
-            <MaterialIcons
-              name={gpsActive ? 'my-location' : 'location-disabled'}
-              size={15}
-              color={Colors.secondaryText}
-            />
-            <Text fontSize={12} color={Colors.secondaryText} flex={1}>
-              {gpsActive
-                ? 'Advancing automatically as you arrive — or tap Arrived.'
-                : 'Tap Arrived when you reach each stop.'}
-            </Text>
-          </XStack>
-
-          <RouteAlerts assessments={upcomingAssessments} disruptions={[]} />
-
-          {remaining.length > 0 && (
-            <YStack gap="$1.5">
-              <Text
-                fontSize={11}
-                fontWeight="700"
-                color={Colors.tertiaryText}
-                style={{ letterSpacing: 0.5 }}
-              >
-                COMING UP
+            {/* GPS status */}
+            <XStack items="center" gap="$2">
+              <MaterialIcons
+                name={gpsActive ? 'my-location' : 'location-disabled'}
+                size={15}
+                color={Colors.secondaryText}
+              />
+              <Text fontSize={12} color={Colors.secondaryText} flex={1}>
+                {gpsActive
+                  ? 'Advancing automatically as you arrive — or tap Arrived.'
+                  : 'Tap Arrived when you reach each stop.'}
               </Text>
-              {remaining.map((leg, i) => {
-                const legColor = legLineColor(leg, Colors.blue)
-                const legIsWalking = leg.mode.name === 'walking'
-                const legIsBus = leg.mode.name === 'bus' || leg.mode.name === 'coach'
-                const legBg = legIsWalking ? Colors.searchBg : legColor
-                const legFg = legIsWalking ? Colors.secondaryText : 'white'
-                const legRouteName = leg.routeOptions?.[0]?.name || null
-                const legArrCommon = leg.arrivalPoint?.commonName
-                const legArrName = legArrCommon ? stripStationSuffix(legArrCommon) : null
-                const legArrTime = leg.arrivalTime ? clockTime(leg.arrivalTime) : null
-                return (
-                  <XStack
-                    key={legIndex + 1 + i}
-                    gap="$2.5"
-                    items="center"
-                    py="$1"
-                    opacity={Opacity.subtle}
-                  >
-                    <View
-                      style={{
-                        width: 28,
-                        height: 28,
-                        borderRadius: 14,
-                        backgroundColor: legBg,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0,
-                      }}
+            </XStack>
+
+            <RouteAlerts assessments={upcomingAssessments} disruptions={[]} />
+
+            {remaining.length > 0 && (
+              <YStack gap="$1.5">
+                <Text
+                  fontSize={11}
+                  fontWeight="700"
+                  color={Colors.tertiaryText}
+                  style={{ letterSpacing: 0.5 }}
+                >
+                  COMING UP
+                </Text>
+                {remaining.map((leg, i) => {
+                  const legColor = legLineColor(leg, Colors.blue)
+                  const legIsWalking = leg.mode.name === 'walking'
+                  const legIsBus = leg.mode.name === 'bus' || leg.mode.name === 'coach'
+                  const legBg = legIsWalking ? Colors.searchBg : legColor
+                  const legFg = legIsWalking ? Colors.secondaryText : 'white'
+                  const legRouteName = leg.routeOptions?.[0]?.name || null
+                  const legArrCommon = leg.arrivalPoint?.commonName
+                  const legArrName = legArrCommon ? stripStationSuffix(legArrCommon) : null
+                  const legArrTime = leg.arrivalTime ? clockTime(leg.arrivalTime) : null
+                  return (
+                    <XStack
+                      key={legIndex + 1 + i}
+                      gap="$2.5"
+                      items="center"
+                      py="$1"
+                      opacity={Opacity.subtle}
                     >
-                      <MaterialIcons name={modeIcon(leg.mode.name)} size={15} color={legFg} />
-                    </View>
-                    {legRouteName && !legIsWalking && (
                       <View
                         style={{
-                          backgroundColor: legIsBus ? Colors.searchBg : legBg,
-                          borderRadius: Radii.xs,
-                          paddingHorizontal: 6,
-                          paddingVertical: 2,
-                          borderWidth: legIsBus ? Borders.thin : 0,
-                          borderColor: legIsBus ? Colors.border : undefined,
+                          width: 28,
+                          height: 28,
+                          borderRadius: 14,
+                          backgroundColor: legBg,
+                          alignItems: 'center',
+                          justifyContent: 'center',
                           flexShrink: 0,
                         }}
                       >
-                        <Text
-                          fontSize={11}
-                          fontWeight="700"
-                          style={{ color: legIsBus ? Colors.text : legFg }}
-                        >
-                          {legRouteName}
-                        </Text>
+                        <MaterialIcons name={modeIcon(leg.mode.name)} size={15} color={legFg} />
                       </View>
-                    )}
-                    <Text fontSize={13} color={Colors.text} flex={1} numberOfLines={1}>
-                      {legArrName ?? humanizeSummary(leg.instruction.summary, [from, to])}
-                    </Text>
-                    {legArrTime && (
-                      <Text fontSize={13} color={Colors.secondaryText}>
-                        {legArrTime}
+                      {legRouteName && !legIsWalking && (
+                        <View
+                          style={{
+                            backgroundColor: legIsBus ? Colors.searchBg : legBg,
+                            borderRadius: Radii.xs,
+                            paddingHorizontal: 6,
+                            paddingVertical: 2,
+                            borderWidth: legIsBus ? Borders.thin : 0,
+                            borderColor: legIsBus ? Colors.border : undefined,
+                            flexShrink: 0,
+                          }}
+                        >
+                          <Text
+                            fontSize={11}
+                            fontWeight="700"
+                            style={{ color: legIsBus ? Colors.text : legFg }}
+                          >
+                            {legRouteName}
+                          </Text>
+                        </View>
+                      )}
+                      <Text fontSize={13} color={Colors.text} flex={1} numberOfLines={1}>
+                        {legArrName ?? humanizeSummary(leg.instruction.summary, [from, to])}
                       </Text>
-                    )}
-                  </XStack>
-                )
-              })}
-            </YStack>
-          )}
+                      {legArrTime && (
+                        <Text fontSize={13} color={Colors.secondaryText}>
+                          {legArrTime}
+                        </Text>
+                      )}
+                    </XStack>
+                  )
+                })}
+              </YStack>
+            )}
 
-          <YStack
-            items="center"
-            justify="center"
-            py="$2"
-            onPress={endJourney}
-            pressStyle={{ opacity: Opacity.pressedLight }}
-            role="button"
-            aria-label="End journey"
-          >
-            <Text fontSize={14} fontWeight="600" color={Colors.danger}>
-              End journey
-            </Text>
-          </YStack>
-        </YStack>
-      </BottomSheetScrollView>
-    </BottomSheet>
-
-    {/* Reroute sheet — rendered after main sheet so it sits on top (higher z-order). */}
-    <BottomSheet
-      ref={rerouteSheetRef}
-      index={-1}
-      snapPoints={rerouteSnapPoints}
-      backdropComponent={rerouteBackdrop}
-      enablePanDownToClose
-      onChange={() => {}}
-    >
-      <BottomSheetScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingHorizontal: Spacing.lg,
-          paddingBottom: insets.bottom + Spacing.xl,
-        }}
-      >
-        <YStack gap="$4" pt="$2">
-          {/* Header */}
-          <XStack gap="$2" items="flex-start">
-            <MaterialIcons
-              name="warning-amber"
-              size={18}
-              color={Colors.warningDark}
-              style={{ marginTop: 1 }}
-            />
-            <YStack flex={1} gap="$1">
-              <Text fontSize={15} fontWeight="700" color={Colors.warningDark}>
-                Accessibility issue on your route
-              </Text>
-              <Text fontSize={13} color={Colors.secondaryText}>
-                {rerouteBodyText}
-              </Text>
-            </YStack>
-          </XStack>
-
-          {/* Find alternative / loading */}
-          {(rerouteState.phase === 'idle' || rerouteState.phase === 'loading') && (
-            <TouchableOpacity
-              style={[
-                styles.rerouteSheetBtn,
-                {
-                  backgroundColor:
-                    rerouteState.phase === 'loading' ? Colors.warningBorder : Colors.warningDark,
-                  opacity: rerouteState.phase === 'loading' ? Opacity.disabledMid : 1,
-                },
-              ]}
-              onPress={rerouteState.phase === 'loading' ? undefined : handleFindAlternative}
-              activeOpacity={0.8}
-              accessibilityRole="button"
-              accessibilityLabel="Find alternative route"
+            <YStack
+              items="center"
+              justify="center"
+              py="$2"
+              onPress={endJourney}
+              pressStyle={{ opacity: Opacity.pressedLight }}
+              role="button"
+              aria-label="End journey"
             >
-              {rerouteState.phase === 'loading' ? (
-                <Spinner size="small" color="white" />
-              ) : (
-                <MaterialIcons name="alt-route" size={16} color="white" />
-              )}
-              <Text fontSize={14} fontWeight="700" color="white">
-                {rerouteState.phase === 'loading' ? 'Searching…' : 'Find alternative route'}
+              <Text fontSize={14} fontWeight="600" color={Colors.danger}>
+                End journey
               </Text>
-            </TouchableOpacity>
-          )}
-
-          {/* Alternative routes list */}
-          {rerouteState.phase === 'found' && (
-            <YStack gap="$2">
-              <Text
-                fontSize={11}
-                fontWeight="700"
-                color={Colors.tertiaryText}
-                style={{ letterSpacing: 0.5 }}
-              >
-                ALTERNATIVE ROUTES
-              </Text>
-              {rerouteState.alternatives.map(({ journey, tags }, i) => (
-                <JourneyResultCard
-                  key={i}
-                  journey={journey}
-                  tags={tags}
-                  onPress={() => handleSelectAlternative(journey, tags)}
-                />
-              ))}
             </YStack>
-          )}
+          </YStack>
+        </BottomSheetScrollView>
+      </BottomSheet>
 
-          {/* No alternatives found */}
-          {rerouteState.phase === 'none-found' && (
+      {/* Reroute sheet — rendered after main sheet so it sits on top (higher z-order). */}
+      <BottomSheet
+        ref={rerouteSheetRef}
+        index={-1}
+        snapPoints={rerouteSnapPoints}
+        backdropComponent={rerouteBackdrop}
+        enablePanDownToClose
+        onChange={() => {}}
+      >
+        <BottomSheetScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingHorizontal: Spacing.lg,
+            paddingBottom: insets.bottom + Spacing.xl,
+          }}
+        >
+          <YStack gap="$4" pt="$2">
+            {/* Header */}
             <XStack gap="$2" items="flex-start">
               <MaterialIcons
-                name="info-outline"
-                size={16}
-                color={Colors.secondaryText}
+                name="warning-amber"
+                size={18}
+                color={Colors.warningDark}
                 style={{ marginTop: 1 }}
               />
-              <Text fontSize={13} color={Colors.secondaryText} flex={1}>
-                No accessible alternative routes were found for this journey.
-              </Text>
+              <YStack flex={1} gap="$1">
+                <Text fontSize={15} fontWeight="700" color={Colors.warningDark}>
+                  Accessibility issue on your route
+                </Text>
+                <Text fontSize={13} color={Colors.secondaryText}>
+                  {rerouteBodyText}
+                </Text>
+              </YStack>
             </XStack>
-          )}
-        </YStack>
-      </BottomSheetScrollView>
-    </BottomSheet>
+
+            {/* Find alternative / loading */}
+            {(rerouteState.phase === 'idle' || rerouteState.phase === 'loading') && (
+              <TouchableOpacity
+                style={[
+                  styles.rerouteSheetBtn,
+                  {
+                    backgroundColor:
+                      rerouteState.phase === 'loading' ? Colors.warningBorder : Colors.warningDark,
+                    opacity: rerouteState.phase === 'loading' ? Opacity.disabledMid : 1,
+                  },
+                ]}
+                onPress={rerouteState.phase === 'loading' ? undefined : handleFindAlternative}
+                activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel="Find alternative route"
+              >
+                {rerouteState.phase === 'loading' ? (
+                  <Spinner size="small" color="white" />
+                ) : (
+                  <MaterialIcons name="alt-route" size={16} color="white" />
+                )}
+                <Text fontSize={14} fontWeight="700" color="white">
+                  {rerouteState.phase === 'loading' ? 'Searching…' : 'Find alternative route'}
+                </Text>
+              </TouchableOpacity>
+            )}
+
+            {/* Alternative routes list */}
+            {rerouteState.phase === 'found' && (
+              <YStack gap="$2">
+                <Text
+                  fontSize={11}
+                  fontWeight="700"
+                  color={Colors.tertiaryText}
+                  style={{ letterSpacing: 0.5 }}
+                >
+                  ALTERNATIVE ROUTES
+                </Text>
+                {rerouteState.alternatives.map(({ journey, tags }, i) => (
+                  <JourneyResultCard
+                    key={i}
+                    journey={journey}
+                    tags={tags}
+                    onPress={() => handleSelectAlternative(journey, tags)}
+                  />
+                ))}
+              </YStack>
+            )}
+
+            {/* No alternatives found */}
+            {rerouteState.phase === 'none-found' && (
+              <XStack gap="$2" items="flex-start">
+                <MaterialIcons
+                  name="info-outline"
+                  size={16}
+                  color={Colors.secondaryText}
+                  style={{ marginTop: 1 }}
+                />
+                <Text fontSize={13} color={Colors.secondaryText} flex={1}>
+                  No accessible alternative routes were found for this journey.
+                </Text>
+              </XStack>
+            )}
+          </YStack>
+        </BottomSheetScrollView>
+      </BottomSheet>
     </>
   )
 }

@@ -69,7 +69,12 @@ export function RerouteAlert({
     >
       {/* Header */}
       <XStack gap="$2" px="$3" pt="$3" pb="$2" items="flex-start">
-        <MaterialIcons name="warning-amber" size={18} color={Colors.warningDark} style={styles.icon} />
+        <MaterialIcons
+          name="warning-amber"
+          size={18}
+          color={Colors.warningDark}
+          style={styles.icon}
+        />
         <YStack flex={1} gap="$1">
           <Text fontSize={13} fontWeight="700" color={Colors.warningDark}>
             Accessibility issue on your route
@@ -115,14 +120,7 @@ export function RerouteAlert({
           }}
           pb="$3"
         >
-          <Text
-            fontSize={12}
-            fontWeight="600"
-            color={Colors.warningDark}
-            px="$3"
-            pt="$3"
-            pb="$1"
-          >
+          <Text fontSize={12} fontWeight="600" color={Colors.warningDark} px="$3" pt="$3" pb="$1">
             Alternative routes {avoidLabel(blockedAssessments)}:
           </Text>
           {rerouteState.alternatives.map(({ journey, tags }, i) => (
@@ -148,7 +146,12 @@ export function RerouteAlert({
           }}
           pt="$3"
         >
-          <MaterialIcons name="info-outline" size={16} color={Colors.warningDark} style={styles.icon} />
+          <MaterialIcons
+            name="info-outline"
+            size={16}
+            color={Colors.warningDark}
+            style={styles.icon}
+          />
           <Text fontSize={12} color={Colors.warningDark} flex={1}>
             No accessible alternative routes were found for this journey.
           </Text>
