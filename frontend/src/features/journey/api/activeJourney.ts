@@ -1,9 +1,10 @@
 // On-device state for the single journey the rider is currently following ("executing"). Unlike
 // a saved journey — a passive snapshot kept for later — the active journey tracks live progress:
-// which leg the rider is on. It anchors to a SavedJourney via `savedId` (a journey is always
-// saved before it is followed) but also embeds a full snapshot so the active screen keeps working
-// even if the saved entry is deleted mid-trip. There is only ever one active journey, so it's
-// stored as a single JSON object under one AsyncStorage key (not an array like saved journeys).
+// which leg the rider is on. It optionally anchors to a SavedJourney via `savedId` when the rider
+// saved the route, but a journey can also be followed without ever being saved (`savedId` absent).
+// Either way it embeds a full snapshot so the active screen keeps working even if the saved entry
+// is deleted mid-trip. There is only ever one active journey, so it's stored as a single JSON
+// object under one AsyncStorage key (not an array like saved journeys).
 
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import type { StationOutage } from '@/features/journey/api/accessibility'
@@ -13,9 +14,7 @@ import type { AccessibilityPreference, Journey } from '@/features/journey/api/tf
 const STORAGE_KEY = '@drp/active-journey'
 
 export type ActiveJourney = {
-  // The SavedJourney this follow session is anchored to. Every active journey corresponds to a
-  // persisted saved journey (the detail screen saves before starting).
-  savedId: string
+  savedId?: string
   // Self-contained snapshot so the active screen renders even if the saved entry is removed.
   journey: Journey
   from?: ResolvedLocation
@@ -34,8 +33,15 @@ export async function loadActiveJourney(): Promise<ActiveJourney | null> {
     const raw = await AsyncStorage.getItem(STORAGE_KEY)
     if (!raw) return null
     const parsed = JSON.parse(raw)
-    // Guard against a stray array or partial write — only accept a record with a savedId.
-    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed) && parsed.savedId) {
+    // Guard against a stray array or partial write — accept any record carrying a journey
+    // snapshot. `savedId` is optional: a journey can be followed without ever being saved.
+    if (
+      parsed &&
+      typeof parsed === 'object' &&
+      !Array.isArray(parsed) &&
+      parsed.journey &&
+      Array.isArray(parsed.journey.legs)
+    ) {
       return parsed as ActiveJourney
     }
     return null

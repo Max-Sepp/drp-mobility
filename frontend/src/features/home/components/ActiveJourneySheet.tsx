@@ -151,7 +151,13 @@ export function ActiveJourneySheet({
 
     let active = true
     loadActiveJourney().then((record) => {
-      if (active && record && record.savedId === params.savedId) {
+      // Restore stored progress for the journey being resumed. A saved journey matches on
+      // savedId; an unsaved one matches when neither side carries a savedId (only one active
+      // journey ever exists, so this can't collide with a different route).
+      const matchesStored = params.savedId
+        ? record?.savedId === params.savedId
+        : record != null && !record.savedId
+      if (active && record && matchesStored) {
         setLegIndex(record.currentLegIndex)
       }
     })
@@ -253,21 +259,17 @@ export function ActiveJourneySheet({
   }, [params, legs])
 
   function endJourney() {
-    Alert.alert(
-      'End journey?',
-      'This stops following the route. It stays in your saved journeys.',
-      [
-        { text: 'Keep going', style: 'cancel' },
-        {
-          text: 'End journey',
-          style: 'destructive',
-          onPress: async () => {
-            await clearActiveJourney()
-            sheetRef.current?.close()
-          },
+    Alert.alert('End journey?', 'This stops following the route.', [
+      { text: 'Keep going', style: 'cancel' },
+      {
+        text: 'End journey',
+        style: 'destructive',
+        onPress: async () => {
+          await clearActiveJourney()
+          sheetRef.current?.close()
         },
-      ],
-    )
+      },
+    ])
   }
 
   const onArrived = useCallback(() => {
@@ -363,7 +365,7 @@ export function ActiveJourneySheet({
   const accentBg = isWalking ? Colors.searchBg : lineColor
   const accentFg = isWalking ? Colors.secondaryText : 'white'
 
-  const routeName = currentLeg.routeOptions?.[0]?.name ?? null
+  const routeName = currentLeg.routeOptions?.[0]?.name || null
   const direction = currentLeg.routeOptions?.[0]?.directions?.find(Boolean) ?? null
 
   const depCommon = currentLeg.departurePoint?.commonName
@@ -767,7 +769,7 @@ export function ActiveJourneySheet({
                 const legIsBus = leg.mode.name === 'bus' || leg.mode.name === 'coach'
                 const legBg = legIsWalking ? Colors.searchBg : legColor
                 const legFg = legIsWalking ? Colors.secondaryText : 'white'
-                const legRouteName = leg.routeOptions?.[0]?.name ?? null
+                const legRouteName = leg.routeOptions?.[0]?.name || null
                 const legArrCommon = leg.arrivalPoint?.commonName
                 const legArrName = legArrCommon ? stripStationSuffix(legArrCommon) : null
                 const legArrTime = leg.arrivalTime ? clockTime(leg.arrivalTime) : null
