@@ -20,6 +20,7 @@ import {
 } from '@gorhom/bottom-sheet'
 import BottomSheet, { BottomSheetScrollView, type BottomSheetRef } from '@/components/BottomSheet'
 import { SheetHeader } from '@/components/SheetHeader'
+import { JourneyDetailSheet } from '@/features/home/components/JourneyDetailSheet'
 import { useStations } from '@/features/stations'
 import {
   matchOutages,
@@ -144,12 +145,16 @@ export function ActiveJourneySheet({
   const insets = useSafeAreaInsets()
   const sheetRef = useRef<BottomSheetRef>(null)
   const rerouteSheetRef = useRef<BottomSheetRef>(null)
+  const previewSheetRef = useRef<BottomSheetRef>(null)
 
   const [legIndex, setLegIndex] = useState(0)
   const [snapIndex, setSnapIndex] = useState(1)
   const [gpsActive, setGpsActive] = useState(false)
   const [currentJourney, setCurrentJourney] = useState<Journey | null>(null)
   const [rerouteState, setRerouteState] = useState<RerouteState>({ phase: 'idle' })
+  const [previewJourney, setPreviewJourney] = useState<JourneyDetailParams | null>(null)
+  const [rerouteHeaderH, setRerouteHeaderH] = useState(0)
+  const [rerouteResultsH, setRerouteResultsH] = useState<number | null>(null)
   const autoAdvancedFromRef = useRef<number | null>(null)
 
   const { stations } = useStations()
@@ -317,16 +322,25 @@ export function ActiveJourneySheet({
 
   const rerouteSnapPoints = useMemo(() => {
     if (rerouteState.phase === 'none-found') return [SCREEN_H * 0.38]
-    if (rerouteState.phase === 'found') return [SCREEN_H * 0.78]
-    return [SCREEN_H * 0.78] // idle/loading: issues + two option buttons
-  }, [rerouteState.phase])
+    if (rerouteState.phase === 'found' && rerouteResultsH !== null) {
+      const total = rerouteHeaderH + Spacing.xs + rerouteResultsH + Spacing.xl + insets.bottom
+      return [Math.min(total, SCREEN_H * 0.88)]
+    }
+    return [SCREEN_H * 0.78] // idle/loading: issues + two option buttons; found before measurement
+  }, [rerouteState.phase, rerouteHeaderH, rerouteResultsH, insets.bottom])
 
   // Re-snap the reroute sheet when results arrive so it resizes to the new content.
+  // For 'found', defer the snap until onLayout has measured the results height.
   useEffect(() => {
-    if (rerouteState.phase === 'found' || rerouteState.phase === 'none-found') {
+    if (rerouteState.phase === 'none-found') rerouteSheetRef.current?.snapToIndex(0)
+    if (rerouteState.phase !== 'found') setRerouteResultsH(null)
+  }, [rerouteState.phase])
+
+  useEffect(() => {
+    if (rerouteState.phase === 'found' && rerouteResultsH !== null) {
       rerouteSheetRef.current?.snapToIndex(0)
     }
-  }, [rerouteState.phase])
+  }, [rerouteState.phase, rerouteResultsH])
 
   // Close and reset the reroute sheet when the blocking outages resolve or all
   // affected stations have been passed.
@@ -422,6 +436,11 @@ export function ActiveJourneySheet({
     setRerouteState({ phase: 'idle' })
     autoAdvancedFromRef.current = null
     rerouteSheetRef.current?.close()
+  }
+
+  function handlePreviewStart(activeParams: ActiveJourneyParams) {
+    setPreviewJourney(null)
+    handleSelectAlternative(activeParams.journey, [])
   }
 
   function endJourney() {
@@ -1104,15 +1123,17 @@ export function ActiveJourneySheet({
         enablePanDownToClose
         onChange={() => {}}
       >
-        <SheetHeader
-          title={
-            rerouteState.phase === 'found' || rerouteState.phase === 'none-found'
-              ? 'Alternative routes'
-              : 'Accessibility issues'
-          }
-          onClose={() => rerouteSheetRef.current?.close()}
-          modal
-        />
+        <View onLayout={(e) => setRerouteHeaderH(e.nativeEvent.layout.height)}>
+          <SheetHeader
+            title={
+              rerouteState.phase === 'found' || rerouteState.phase === 'none-found'
+                ? 'Alternative routes'
+                : 'Accessibility issues'
+            }
+            onClose={() => rerouteSheetRef.current?.close()}
+            modal
+          />
+        </View>
         <BottomSheetScrollView
           showsVerticalScrollIndicator={false}
           style={{ flex: 1 }}
@@ -1136,13 +1157,25 @@ export function ActiveJourneySheet({
 
             {/* Alternative routes list */}
             {rerouteState.phase === 'found' && (
-              <YStack gap="$2">
+              <YStack
+                gap="$2"
+                onLayout={(e) => setRerouteResultsH(e.nativeEvent.layout.height)}
+              >
                 {rerouteState.alternatives.map(({ journey, tags }, i) => (
                   <JourneyResultCard
                     key={i}
                     journey={journey}
                     tags={tags}
-                    onPress={() => handleSelectAlternative(journey, tags)}
+                    onPress={() =>
+                      setPreviewJourney({
+                        journey,
+                        tags,
+                        from: params?.from,
+                        to: params?.to,
+                        outages: params?.outages,
+                        level: params?.level,
+                      })
+                    }
                   />
                 ))}
               </YStack>
@@ -1254,6 +1287,13 @@ export function ActiveJourneySheet({
           </YStack>
         )}
       </BottomSheet>
+      {/* Route preview — opens when a result card is tapped; no save option */}
+      <JourneyDetailSheet
+        params={previewJourney}
+        onClose={() => setPreviewJourney(null)}
+        onStartJourney={handlePreviewStart}
+        hideSave
+      />
     </>
   )
 }

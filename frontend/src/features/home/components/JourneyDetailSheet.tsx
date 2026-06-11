@@ -237,6 +237,7 @@ type Props = {
   onStartJourney: (params: ActiveJourneyParams) => void
   onSaveChanged?: () => void
   onHeightChange?: (height: number) => void
+  hideSave?: boolean
 }
 
 export function JourneyDetailSheet({
@@ -245,6 +246,7 @@ export function JourneyDetailSheet({
   onStartJourney,
   onSaveChanged,
   onHeightChange,
+  hideSave = false,
 }: Props) {
   const { Colors, Radii } = useTheme()
   const styles = useMemo(
@@ -609,29 +611,31 @@ export function JourneyDetailSheet({
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[
-              styles.actionBtn,
-              {
-                backgroundColor: saved ? Colors.searchBg : Colors.card,
-                borderColor: Colors.border,
-              },
-              anyBusy && { opacity: Opacity.disabledMid },
-            ]}
-            onPress={anyBusy ? undefined : toggleSave}
-            activeOpacity={0.8}
-            accessibilityRole="button"
-            accessibilityLabel={saved ? 'Remove from saved journeys' : 'Save this journey'}
-          >
-            <MaterialIcons
-              name={saved ? 'bookmark' : 'bookmark-border'}
-              size={18}
-              color={Colors.text}
-            />
-            <Text fontSize={15} fontWeight="600" color={Colors.text}>
-              {saveBusy ? 'Saving…' : saved ? 'Saved' : 'Save'}
-            </Text>
-          </TouchableOpacity>
+          {!hideSave && (
+            <TouchableOpacity
+              style={[
+                styles.actionBtn,
+                {
+                  backgroundColor: saved ? Colors.searchBg : Colors.card,
+                  borderColor: Colors.border,
+                },
+                anyBusy && { opacity: Opacity.disabledMid },
+              ]}
+              onPress={anyBusy ? undefined : toggleSave}
+              activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel={saved ? 'Remove from saved journeys' : 'Save this journey'}
+            >
+              <MaterialIcons
+                name={saved ? 'bookmark' : 'bookmark-border'}
+                size={18}
+                color={Colors.text}
+              />
+              <Text fontSize={15} fontWeight="600" color={Colors.text}>
+                {saveBusy ? 'Saving…' : saved ? 'Saved' : 'Save'}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Combined disruptions: TfL service disruptions + accessibility outages, tiered */}
