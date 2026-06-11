@@ -57,6 +57,7 @@ import { haversineMeters } from '@/lib/geo'
 import type { ActiveJourneyParams } from '@/features/home/components/JourneyDetailSheet'
 import { useTheme, Borders, Heights, Opacity, Spacing } from '@/theme'
 import { JOURNEY_CACHE_TTL_MS } from '@/config'
+import { useSheetStack } from '@/components/SheetStack'
 
 const ARRIVAL_RADIUS_M = 120
 const SCREEN_H = Dimensions.get('window').height
@@ -160,12 +161,29 @@ export function ActiveJourneySheet({
   const autoAdvancedFromRef = useRef<number | null>(null)
   const alternativesCacheRef = useRef<{ alternatives: TaggedJourney[]; fetchedAt: number } | null>(null)
 
+  const { register, push, onClosed, dismissAll } = useSheetStack()
+
   const { stations } = useStations()
   const stationNames = useMemo(() => stations.map((s) => s.name), [stations])
   const resolveStation = useCallback(
     (name: string) => resolveStationName(name, stationNames),
     [stationNames],
   )
+
+  // Register both reroute sheets with the global sheet stack so push/pop wires them together.
+  useEffect(() => {
+    const unregIssues = register(
+      'reroute-issues',
+      () => rerouteSheetRef.current?.snapToIndex(0),
+      () => rerouteSheetRef.current?.close(),
+    )
+    const unregAlts = register(
+      'reroute-alternatives',
+      () => alternativesSheetRef.current?.snapToIndex(0),
+      () => alternativesSheetRef.current?.close(),
+    )
+    return () => { unregIssues(); unregAlts() }
+  }, [register])
 
   useEffect(() => {
     if (!params) {
@@ -337,28 +355,27 @@ export function ActiveJourneySheet({
     return [SCREEN_H * 0.55]
   }, [rerouteState.phase, rerouteHeaderH, rerouteResultsH, insets.bottom])
 
-  // Open the alternatives sheet when results arrive; defer 'found' until height is measured.
+  // Push the alternatives sheet when results arrive; defer 'found' until height is measured.
   useEffect(() => {
-    if (rerouteState.phase === 'none-found') alternativesSheetRef.current?.snapToIndex(0)
+    if (rerouteState.phase === 'none-found') push('reroute-alternatives')
     if (rerouteState.phase !== 'found') setRerouteResultsH(null)
-  }, [rerouteState.phase])
+  }, [rerouteState.phase, push])
 
   useEffect(() => {
     if (rerouteState.phase === 'found' && rerouteResultsH !== null) {
-      alternativesSheetRef.current?.snapToIndex(0)
+      push('reroute-alternatives')
     }
-  }, [rerouteState.phase, rerouteResultsH])
+  }, [rerouteState.phase, rerouteResultsH, push])
 
-  // Close both reroute sheets when the blocking outages resolve or are passed.
+  // Dismiss all reroute sheets when the blocking outages resolve or are passed.
   useEffect(() => {
     if (!showRerouteAlert) {
-      rerouteSheetRef.current?.close()
-      alternativesSheetRef.current?.close()
+      dismissAll()
       alternativesCacheRef.current = null
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setRerouteState({ phase: 'idle' })
     }
-  }, [showRerouteAlert])
+  }, [showRerouteAlert, dismissAll])
 
   useEffect(() => {
     if (!params) return
@@ -454,8 +471,7 @@ export function ActiveJourneySheet({
     setLegIndex(0)
     setRerouteState({ phase: 'idle' })
     autoAdvancedFromRef.current = null
-    rerouteSheetRef.current?.close()
-    alternativesSheetRef.current?.close()
+    dismissAll()
   }
 
   function handlePreviewStart(activeParams: ActiveJourneyParams) {
@@ -534,7 +550,7 @@ export function ActiveJourneySheet({
             ]}
             onPress={() => {
               setRerouteState({ phase: 'idle' })
-              rerouteSheetRef.current?.snapToIndex(0)
+              push('reroute-issues')
             }}
             activeOpacity={0.85}
             accessibilityRole="button"
@@ -586,6 +602,7 @@ export function ActiveJourneySheet({
     [
       showRerouteAlert,
       rerouteBannerText,
+      push,
       legIndex,
       isFinalLeg,
       goTo,
@@ -1137,9 +1154,9 @@ export function ActiveJourneySheet({
         handleComponent={null}
         enablePanDownToClose
         onChange={(index) => {
-          if (index === -1) {
+          if (index === -1 && onClosed('reroute-issues')) {
             setRerouteState({ phase: 'idle' })
-            alternativesSheetRef.current?.close()
+            alternativesCacheRef.current = null
           }
         }}
       >
@@ -1262,7 +1279,7 @@ export function ActiveJourneySheet({
         handleComponent={null}
         enablePanDownToClose
         onChange={(index) => {
-          if (index === -1) {
+          if (index === -1 && onClosed('reroute-alternatives')) {
             setRerouteState({ phase: 'idle' })
             setPreviewJourney(null)
           }
