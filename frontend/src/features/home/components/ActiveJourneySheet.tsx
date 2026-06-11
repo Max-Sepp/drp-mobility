@@ -21,12 +21,16 @@ import {
 import BottomSheet, { BottomSheetScrollView, type BottomSheetRef } from '@/components/BottomSheet'
 import { useStations } from '@/features/stations'
 import {
-  fetchStationOutages,
   matchOutages,
+  reportsToStationOutages,
   resolveStationName,
 } from '@/features/journey/api/accessibility'
-import { assessOutages } from '@/features/journey/api/outageRelevance'
+import { assessOutages, DIRECT_VERDICTS } from '@/features/journey/api/outageRelevance'
 import type { StationOutage } from '@/features/journey/api/accessibility'
+import { useOutages } from '@/features/outages'
+import { planJourneyOptions, routeSignature, type Journey, type RouteTag } from '@/features/journey/api/tfl'
+import type { RerouteState } from '@/features/journey/components/RerouteAlert'
+import { JourneyResultCard } from '@/features/journey/components/JourneyResultCard'
 import {
   clearActiveJourney,
   loadActiveJourney,
@@ -48,6 +52,8 @@ import { useTheme, Borders, Heights, Opacity, Spacing } from '@/theme'
 const ARRIVAL_RADIUS_M = 120
 const SCREEN_H = Dimensions.get('window').height
 const SNAP_HALF = SCREEN_H * 0.52
+// Extra height added to snap 0 when the reroute banner is visible in the footer.
+const REROUTE_BANNER_H = 56
 
 type Props = {
   params: ActiveJourneyParams | null
@@ -109,25 +115,35 @@ export function ActiveJourneySheet({
           alignItems: 'center',
           justifyContent: 'center',
         },
+        rerouteBanner: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: Spacing.md,
+          paddingHorizontal: Spacing.lg,
+          paddingVertical: Spacing.md,
+          borderTopWidth: StyleSheet.hairlineWidth,
+          borderBottomWidth: StyleSheet.hairlineWidth,
+        },
+        rerouteSheetBtn: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: Heights.button,
+          borderRadius: Radii.button,
+          gap: 8,
+        },
       }),
     [Colors, Radii],
   )
   const insets = useSafeAreaInsets()
-  // Three snaps: compact (handle + summary row + footer), half-screen, near-full.
-  // Handle is 24 px (gorhom default). Summary row has no paddingTop, paddingBottom 12, two text
-  // lines ~46 px (19 pt destination + 12 pt badge), so ~58 px total. Footer = paddingTop 8 +
-  // button 48 + border 1 + paddingBottom 8 + insets.bottom = 65 + insets.bottom.
-  // Full snap matches other sheets: SCREEN_H - insets.top - 66, clearing the top nav buttons.
-  const snapPoints = useMemo(
-    () => [24 + 58 + 65 + insets.bottom, SNAP_HALF, SCREEN_H - insets.top - 66],
-    [insets.top, insets.bottom],
-  )
   const sheetRef = useRef<BottomSheetRef>(null)
+  const rerouteSheetRef = useRef<BottomSheetRef>(null)
 
   const [legIndex, setLegIndex] = useState(0)
   const [snapIndex, setSnapIndex] = useState(1)
   const [gpsActive, setGpsActive] = useState(false)
-  const [liveOutages, setLiveOutages] = useState<StationOutage[] | null>(null)
+  const [currentJourney, setCurrentJourney] = useState<Journey | null>(null)
+  const [rerouteState, setRerouteState] = useState<RerouteState>({ phase: 'idle' })
   const autoAdvancedFromRef = useRef<number | null>(null)
 
   const { stations } = useStations()
@@ -147,6 +163,8 @@ export function ActiveJourneySheet({
     setSnapIndex(0)
     setLegIndex(0)
     setGpsActive(false)
+    setCurrentJourney(null)
+    setRerouteState({ phase: 'idle' })
     autoAdvancedFromRef.current = null
 
     let active = true
@@ -166,7 +184,10 @@ export function ActiveJourneySheet({
     if (index === -1) onEnd()
   }
 
-  const legs = useMemo(() => params?.journey.legs ?? [], [params])
+  const legs = useMemo(
+    () => (currentJourney ?? params?.journey)?.legs ?? [],
+    [currentJourney, params],
+  )
   const lastIndex = legs.length - 1
   const currentLeg = legs[legIndex]
   const isFinalLeg = legIndex >= lastIndex
@@ -187,25 +208,19 @@ export function ActiveJourneySheet({
     goToRef.current = goTo
   }, [legIndex, goTo])
 
-  useEffect(() => {
-    if (!params) return
-    let active = true
-    setLiveOutages(null)
-    fetchStationOutages().then((all) => {
-      if (active) setLiveOutages(matchOutages(params.journey, all))
-    })
-    return () => {
-      active = false
-    }
-    // params?.journey is the only dep we want — re-fetching when savedId/level change would be wasteful
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params?.journey])
+  const { reports } = useOutages()
+  const allOutages = useMemo(() => reportsToStationOutages(reports), [reports])
 
-  const outageAssessments = useMemo(
-    () =>
-      params ? assessOutages(params.journey, liveOutages ?? params.outages ?? [], stations) : [],
-    [params, liveOutages, stations],
-  )
+  const outageAssessments = useMemo(() => {
+    const journey = currentJourney ?? params?.journey
+    if (!journey) return []
+    // Fall back to the snapshot captured at journey start until the SSE feed has data
+    const matched =
+      allOutages.length > 0
+        ? matchOutages(journey, allOutages)
+        : matchOutages(journey, params?.outages ?? [])
+    return assessOutages(journey, matched, stations)
+  }, [currentJourney, params?.journey, allOutages, params?.outages, stations])
 
   const arrivalStation = currentLeg?.arrivalPoint?.commonName
     ? resolveStation(currentLeg.arrivalPoint.commonName)
@@ -214,6 +229,82 @@ export function ActiveJourneySheet({
     () => (arrivalStation ? outageAssessments.filter((a) => a.stationName === arrivalStation) : []),
     [arrivalStation, outageAssessments],
   )
+
+  // All station names the rider still needs to pass through (arrival of current leg onwards).
+  const futureStationNames = useMemo(() => {
+    const names = new Set<string>()
+    for (let i = legIndex; i < legs.length; i++) {
+      const arrCommon = legs[i].arrivalPoint?.commonName
+      if (arrCommon) {
+        const resolved = resolveStation(arrCommon)
+        if (resolved) names.add(resolved)
+      }
+    }
+    return names
+  }, [legs, legIndex, resolveStation])
+
+  // Outage assessments at future stations that carry a direct-verdict unit — these justify
+  // offering a reroute.
+  const upcomingBlockedAssessments = useMemo(
+    () =>
+      outageAssessments.filter(
+        (a) =>
+          a.role !== 'unknown' &&
+          futureStationNames.has(a.stationName) &&
+          a.units.some((u) => DIRECT_VERDICTS.has(u.verdict)),
+      ),
+    [outageAssessments, futureStationNames],
+  )
+
+  const showRerouteAlert = useMemo(
+    () => upcomingBlockedAssessments.length > 0 && params?.to?.postcode != null,
+    [upcomingBlockedAssessments, params?.to?.postcode],
+  )
+
+  const rerouteBannerText =
+    upcomingBlockedAssessments.length === 1
+      ? `Reroute around ${upcomingBlockedAssessments[0].stationName}?`
+      : `Find alternative routes?`
+
+  const rerouteBodyText = useMemo(() => {
+    if (upcomingBlockedAssessments.length === 1) {
+      const a = upcomingBlockedAssessments[0]
+      const types = [...new Set(a.units.map((u) => u.equipmentType))]
+      const equipment = types.length === 1 ? types[0] : 'step-free equipment'
+      return `A ${equipment} at ${a.stationName} is reported out of service on this route.`
+    }
+    const names = upcomingBlockedAssessments.map((a) => a.stationName)
+    const listed =
+      names.length === 2
+        ? `${names[0]} and ${names[1]}`
+        : `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`
+    return `Step-free access issues reported at ${listed}.`
+  }, [upcomingBlockedAssessments])
+
+  // Three snaps: compact (handle + summary row + optional banner + footer), half-screen, near-full.
+  // Banner height is only added when an accessibility alert is active, so snap 0 grows dynamically.
+  // Footer = paddingTop 8 + button 48 + border 1 + paddingBottom 8 + insets.bottom = 65 + insets.bottom.
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
+  const snapPoints = useMemo(
+    () => [
+      24 + 58 + (showRerouteAlert ? REROUTE_BANNER_H : 0) + 65 + insets.bottom,
+      SNAP_HALF,
+      SCREEN_H - insets.top - 66,
+    ],
+    [insets.top, insets.bottom, showRerouteAlert],
+  )
+
+  const rerouteSnapPoints = useMemo(() => [SCREEN_H * 0.55], [])
+
+  // Close and reset the reroute sheet when the blocking outages resolve or all
+  // affected stations have been passed.
+  useEffect(() => {
+    if (!showRerouteAlert) {
+      rerouteSheetRef.current?.close()
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setRerouteState({ phase: 'idle' })
+    }
+  }, [showRerouteAlert])
 
   useEffect(() => {
     if (!params) return
@@ -251,6 +342,56 @@ export function ActiveJourneySheet({
       sub?.remove()
     }
   }, [params, legs])
+
+  async function handleFindAlternative() {
+    if (!params) return
+    setRerouteState({ phase: 'loading' })
+
+    const activeLegs = (currentJourney ?? params.journey).legs
+    const dep = activeLegs[legIndex]?.departurePoint
+    // Always reroute from the current leg's departure point (where the user is now),
+    // never from the original starting point.
+    const fromLocation =
+      dep?.lat != null && dep?.lon != null ? `${dep.lat},${dep.lon}` : null
+    const toLocation = params.to?.postcode ?? null
+
+    if (!fromLocation || !toLocation) {
+      setRerouteState({ phase: 'none-found' })
+      return
+    }
+
+    const result = await planJourneyOptions(fromLocation, toLocation, params.level, null, true)
+
+    if (result.kind !== 'journeys') {
+      setRerouteState({ phase: 'none-found' })
+      return
+    }
+
+    const blockedAsOutages: StationOutage[] = upcomingBlockedAssessments.map((a) => ({
+      stationName: a.stationName,
+      equipmentTypes: [],
+      units: [],
+    }))
+
+    const baseSig = routeSignature(currentJourney ?? params.journey)
+    const alternatives = result.journeys.filter(
+      ({ journey }) =>
+        routeSignature(journey) !== baseSig &&
+        matchOutages(journey, blockedAsOutages).length === 0,
+    )
+
+    setRerouteState(
+      alternatives.length > 0 ? { phase: 'found', alternatives } : { phase: 'none-found' },
+    )
+  }
+
+  function handleSelectAlternative(journey: Journey, _tags: RouteTag[]) {
+    setCurrentJourney(journey)
+    setLegIndex(0)
+    setRerouteState({ phase: 'idle' })
+    autoAdvancedFromRef.current = null
+    rerouteSheetRef.current?.close()
+  }
 
   function endJourney() {
     Alert.alert(
@@ -296,11 +437,53 @@ export function ActiveJourneySheet({
     [],
   )
 
-  // footerComponent pins Previous/Arrived to the visible bottom of the sheet
-  // regardless of which snap point is active.
+  // Semi-transparent backdrop for the reroute sheet; tapping it closes the sheet.
+  const rerouteBackdrop = useCallback(
+    (props: BottomSheetBackdropProps) => (
+      <BottomSheetBackdrop
+        {...props}
+        opacity={0.4}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        pressBehavior="close"
+      />
+    ),
+    [],
+  )
+
+  // footerComponent pins the reroute alert banner (if active) + Previous/Arrived controls
+  // to the visible bottom of the sheet at all times.
   const renderFooter = useCallback(
     (props: BottomSheetFooterProps) => (
       <BottomSheetFooter {...props}>
+        {showRerouteAlert && (
+          <TouchableOpacity
+            style={[
+              styles.rerouteBanner,
+              {
+                backgroundColor: Colors.warningBg,
+                borderTopColor: Colors.warningBorder,
+                borderBottomColor: Colors.warningBorder,
+              },
+            ]}
+            onPress={() => rerouteSheetRef.current?.snapToIndex(0)}
+            activeOpacity={0.85}
+            accessibilityRole="button"
+            accessibilityLabel="Accessibility issue ahead — tap to find alternative route"
+          >
+            <MaterialIcons name="warning-amber" size={16} color={Colors.warningDark} />
+            <Text
+              fontSize={13}
+              fontWeight="600"
+              color={Colors.warningDark}
+              style={{ flex: 1 }}
+              numberOfLines={1}
+            >
+              {rerouteBannerText}
+            </Text>
+            <MaterialIcons name="chevron-right" size={18} color={Colors.warningDark} />
+          </TouchableOpacity>
+        )}
         <View style={[styles.controlBar, { paddingBottom: insets.bottom + Spacing.sm }]}>
           <TouchableOpacity
             containerStyle={styles.secondaryBtnOuter}
@@ -332,27 +515,51 @@ export function ActiveJourneySheet({
         </View>
       </BottomSheetFooter>
     ),
-    [legIndex, isFinalLeg, goTo, onArrived, insets, Colors, styles],
+    [showRerouteAlert, rerouteBannerText, legIndex, isFinalLeg, goTo, onArrived, insets, Colors, styles],
   )
 
   if (!params) {
     return (
-      <BottomSheet ref={sheetRef} index={-1} snapPoints={snapPoints} onChange={handleChange}>
-        {null}
-      </BottomSheet>
+      <>
+        <BottomSheet ref={sheetRef} index={-1} snapPoints={snapPoints} onChange={handleChange}>
+          {null}
+        </BottomSheet>
+        <BottomSheet
+          ref={rerouteSheetRef}
+          index={-1}
+          snapPoints={rerouteSnapPoints}
+          backdropComponent={rerouteBackdrop}
+          enablePanDownToClose
+          onChange={() => {}}
+        >
+          {null}
+        </BottomSheet>
+      </>
     )
   }
 
   if (!currentLeg) {
     return (
-      <BottomSheet ref={sheetRef} index={-1} snapPoints={snapPoints} onChange={handleChange}>
-        <YStack flex={1} items="center" justify="center" gap="$3">
-          <Spinner color={Colors.blue} />
-          <Text fontSize={15} color={Colors.secondaryText}>
-            Loading your journey…
-          </Text>
-        </YStack>
-      </BottomSheet>
+      <>
+        <BottomSheet ref={sheetRef} index={-1} snapPoints={snapPoints} onChange={handleChange}>
+          <YStack flex={1} items="center" justify="center" gap="$3">
+            <Spinner color={Colors.blue} />
+            <Text fontSize={15} color={Colors.secondaryText}>
+              Loading your journey…
+            </Text>
+          </YStack>
+        </BottomSheet>
+        <BottomSheet
+          ref={rerouteSheetRef}
+          index={-1}
+          snapPoints={rerouteSnapPoints}
+          backdropComponent={rerouteBackdrop}
+          enablePanDownToClose
+          onChange={() => {}}
+        >
+          {null}
+        </BottomSheet>
+      </>
     )
   }
 
@@ -386,6 +593,7 @@ export function ActiveJourneySheet({
   const hasStations = STATION_MODES.has(currentLeg.mode.name) && !!(depName || arrName)
 
   return (
+    <>
     <BottomSheet
       ref={sheetRef}
       index={-1}
@@ -843,5 +1051,108 @@ export function ActiveJourneySheet({
         </YStack>
       </BottomSheetScrollView>
     </BottomSheet>
+
+    {/* Reroute sheet — rendered after main sheet so it sits on top (higher z-order). */}
+    <BottomSheet
+      ref={rerouteSheetRef}
+      index={-1}
+      snapPoints={rerouteSnapPoints}
+      backdropComponent={rerouteBackdrop}
+      enablePanDownToClose
+      onChange={() => {}}
+    >
+      <BottomSheetScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingHorizontal: Spacing.lg,
+          paddingBottom: insets.bottom + Spacing.xl,
+        }}
+      >
+        <YStack gap="$4" pt="$2">
+          {/* Header */}
+          <XStack gap="$2" items="flex-start">
+            <MaterialIcons
+              name="warning-amber"
+              size={18}
+              color={Colors.warningDark}
+              style={{ marginTop: 1 }}
+            />
+            <YStack flex={1} gap="$1">
+              <Text fontSize={15} fontWeight="700" color={Colors.warningDark}>
+                Accessibility issue on your route
+              </Text>
+              <Text fontSize={13} color={Colors.secondaryText}>
+                {rerouteBodyText}
+              </Text>
+            </YStack>
+          </XStack>
+
+          {/* Find alternative / loading */}
+          {(rerouteState.phase === 'idle' || rerouteState.phase === 'loading') && (
+            <TouchableOpacity
+              style={[
+                styles.rerouteSheetBtn,
+                {
+                  backgroundColor:
+                    rerouteState.phase === 'loading' ? Colors.warningBorder : Colors.warningDark,
+                  opacity: rerouteState.phase === 'loading' ? Opacity.disabledMid : 1,
+                },
+              ]}
+              onPress={rerouteState.phase === 'loading' ? undefined : handleFindAlternative}
+              activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel="Find alternative route"
+            >
+              {rerouteState.phase === 'loading' ? (
+                <Spinner size="small" color="white" />
+              ) : (
+                <MaterialIcons name="alt-route" size={16} color="white" />
+              )}
+              <Text fontSize={14} fontWeight="700" color="white">
+                {rerouteState.phase === 'loading' ? 'Searching…' : 'Find alternative route'}
+              </Text>
+            </TouchableOpacity>
+          )}
+
+          {/* Alternative routes list */}
+          {rerouteState.phase === 'found' && (
+            <YStack gap="$2">
+              <Text
+                fontSize={11}
+                fontWeight="700"
+                color={Colors.tertiaryText}
+                style={{ letterSpacing: 0.5 }}
+              >
+                ALTERNATIVE ROUTES
+              </Text>
+              {rerouteState.alternatives.map(({ journey, tags }, i) => (
+                <JourneyResultCard
+                  key={i}
+                  journey={journey}
+                  tags={tags}
+                  onPress={() => handleSelectAlternative(journey, tags)}
+                />
+              ))}
+            </YStack>
+          )}
+
+          {/* No alternatives found */}
+          {rerouteState.phase === 'none-found' && (
+            <XStack gap="$2" items="flex-start">
+              <MaterialIcons
+                name="info-outline"
+                size={16}
+                color={Colors.secondaryText}
+                style={{ marginTop: 1 }}
+              />
+              <Text fontSize={13} color={Colors.secondaryText} flex={1}>
+                No accessible alternative routes were found for this journey.
+              </Text>
+            </XStack>
+          )}
+        </YStack>
+      </BottomSheetScrollView>
+    </BottomSheet>
+    </>
   )
 }

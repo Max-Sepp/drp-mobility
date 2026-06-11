@@ -325,12 +325,10 @@ export function JourneyDetailSheet({
 
   const { user } = useAuth()
 
-  // Re-fetch live outages each time a journey is opened so the alerts reflect the current state
-  // rather than the stale snapshot stored with the saved journey.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!params) return
     let active = true
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLiveOutages(null)
     fetchStationOutages().then((all) => {
       if (active) setLiveOutages(matchOutages(params.journey, all))
@@ -338,6 +336,8 @@ export function JourneyDetailSheet({
     return () => {
       active = false
     }
+    // params.journey is the only dep we want
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params?.journey])
 
   useEffect(() => {
@@ -410,6 +410,7 @@ export function JourneyDetailSheet({
   async function startJourney() {
     if (!params || startBusy || saveBusy) return
     setStartBusy(true)
+    const activeOutages = liveOutages ?? params.outages ?? []
     try {
       let savedJourneyId = currentSavedId
       if (!savedJourneyId) {
@@ -417,7 +418,7 @@ export function JourneyDetailSheet({
           from: params.from,
           to: params.to,
           level: params.level ?? null,
-          outages: params.outages ?? [],
+          outages: activeOutages,
           journey: params.journey,
         })
         savedJourneyId = record.id
@@ -428,7 +429,7 @@ export function JourneyDetailSheet({
         journey: params.journey,
         from: params.from,
         to: params.to,
-        outages: params.outages ?? [],
+        outages: activeOutages,
         level: params.level ?? null,
       })
       onStartJourney({
@@ -436,7 +437,7 @@ export function JourneyDetailSheet({
         journey: params.journey,
         from: params.from,
         to: params.to,
-        outages: params.outages ?? [],
+        outages: activeOutages,
         level: params.level ?? null,
       })
     } catch {
@@ -462,7 +463,8 @@ export function JourneyDetailSheet({
     )
   }
 
-  const { journey, from, to, tags } = params
+  const { from, to } = params
+  const { journey, tags } = params
   const fare = fareLabel(journey, user?.traveller_type, user?.railcard)
   const saved = currentSavedId !== null
   const anyBusy = startBusy || saveBusy

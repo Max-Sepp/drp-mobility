@@ -91,7 +91,9 @@ function timeQueryParams(time: TimeConstraint): string[] {
  * "did you mean?" path. `accessibility` asks TfL to return only step-free routes; pass
  * `null`/omit it to apply no accessibility filtering (TfL then returns all modes, e.g. tube).
  * `time` constrains when to depart or arrive; omit/`null` to leave now. `preference` asks TfL to
- * optimise for a particular criterion (see `planJourneyOptions`).
+ * optimise for a particular criterion (see `planJourneyOptions`). `includeAlternativeRoutes`
+ * asks TfL to generate additional geometrically distinct routes by removing links from the
+ * network — useful when the caller needs to filter out specific stations post-query.
  */
 export async function planJourney(
   from: string,
@@ -99,11 +101,13 @@ export async function planJourney(
   accessibility?: AccessibilityPreference | null,
   time?: TimeConstraint | null,
   preference?: JourneyPreference | null,
+  includeAlternativeRoutes?: boolean,
 ): Promise<JourneyPlanResult> {
   const params: string[] = []
   if (accessibility) params.push(`accessibilityPreference=${accessibility}`)
   if (time) params.push(...timeQueryParams(time))
   if (preference) params.push(`journeyPreference=${preference}`)
+  if (includeAlternativeRoutes) params.push('includeAlternativeRoutes=true')
   const query = params.length > 0 ? `?${params.join('&')}` : ''
   const url = `${TFL_BASE}/Journey/JourneyResults/${encodeURIComponent(from)}/to/${encodeURIComponent(to)}${query}`
 
@@ -177,8 +181,11 @@ function changeCount(journey: Journey): number {
  * are the same route, taken on whichever train comes first. Comparing the stations collapses
  * them. Walking legs are reduced to a marker; they're connective and their named endpoints (raw
  * addresses) vary between otherwise-identical journeys.
+ *
+ * Exported so callers can deduplicate against a known journey (e.g. exclude the current route
+ * when surfacing rerouting alternatives).
  */
-function routeSignature(journey: Journey): string {
+export function routeSignature(journey: Journey): string {
   return journey.legs
     .map((leg) =>
       leg.mode.name === 'walking'
@@ -196,15 +203,22 @@ function routeSignature(journey: Journey): string {
  * tag — rather than from whichever criterion happened to surface the route. Accessibility and
  * departure-time preferences are applied to every query. Succeeds on partial results; errors
  * only if all fail.
+ *
+ * Pass `includeAlternativeRoutes: true` to ask TfL to generate additional geometrically distinct
+ * routes (by removing links from its network model). Useful when the caller needs a broader set
+ * to filter against — e.g. finding alternatives that avoid a station with a reported outage.
  */
 export async function planJourneyOptions(
   from: string,
   to: string,
   accessibility?: AccessibilityPreference | null,
   time?: TimeConstraint | null,
+  includeAlternativeRoutes?: boolean,
 ): Promise<JourneyOptionsResult> {
   const results = await Promise.all(
-    PREFERENCES.map((preference) => planJourney(from, to, accessibility, time, preference)),
+    PREFERENCES.map((preference) =>
+      planJourney(from, to, accessibility, time, preference, includeAlternativeRoutes),
+    ),
   )
 
   // Merge in preference order, de-duplicating by route signature. The first criterion to surface
