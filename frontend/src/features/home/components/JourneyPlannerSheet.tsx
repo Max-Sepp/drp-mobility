@@ -64,8 +64,9 @@ const STEP_FREE_OPTIONS: { label: string; value: string | null }[] = [
 // ---------------------------------------------------------------------------
 
 type CachedOptions = { journey: Journey; tags: RouteTag[] }[]
-// Module-level so the cache survives sheet close/reopen within the same app session.
 const journeyOptionsCache = new Map<string, CachedOptions>()
+
+const CACHE_BUCKET_MS = 5 * 60 * 1000 // 5-minute staleness window for "leave now"
 
 function optionsCacheKey(
   from: string,
@@ -73,7 +74,8 @@ function optionsCacheKey(
   level: AccessibilityPreference | null,
   time: TimeConstraint | null,
 ): string {
-  return JSON.stringify([from, to, level, time])
+  const timePart = time ?? Math.floor(Date.now() / CACHE_BUCKET_MS)
+  return JSON.stringify([from, to, level, timePart])
 }
 
 // ---------------------------------------------------------------------------
@@ -241,6 +243,7 @@ export function JourneyPlannerSheet({
   function handleChange(index: number) {
     onHeightChange?.(index >= 0 ? snapPoints[index] : 0)
     if (index === -1) {
+      journeyOptionsCache.clear()
       if (!closedByButton.current) onClose()
       closedByButton.current = false
     }
@@ -333,6 +336,7 @@ export function JourneyPlannerSheet({
         title="Plan a journey"
         onClose={() => {
           closedByButton.current = true
+          journeyOptionsCache.clear()
           onClose()
           sheetRef.current?.close()
         }}
