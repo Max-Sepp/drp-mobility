@@ -42,6 +42,10 @@ class Station(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(unique=True)
+    # TfL NaPTAN/HUB code from stations.json ("id"), e.g. "940GZZLUMDN". Lets the TfL disruption
+    # poller map a feed's stationUniqueId straight to our row. Nullable for any legacy/unmatched
+    # seed entries.
+    tfl_id: Mapped[str | None] = mapped_column(String, nullable=True, index=True, default=None)
     latitude: Mapped[float | None] = mapped_column(Float, nullable=True)
     longitude: Mapped[float | None] = mapped_column(Float, nullable=True)
     wifi: Mapped[bool] = mapped_column(Boolean, default=False)

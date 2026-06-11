@@ -15,6 +15,10 @@ class UserRole(str, Enum):
 
     TRUSTED = "trusted"
     UNTRUSTED = "untrusted"
+    # Not an account role: a label copied onto reports synthesised from TfL's official disruption
+    # feed (see services/tfl_ingest.py). Ranks below a trusted human — the automated feed never
+    # overrides a trusted human's close.
+    TFL = "tfl"
 
 
 class User(Base):

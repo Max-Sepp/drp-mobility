@@ -15,6 +15,10 @@ class Failure(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     equipment_id: Mapped[int] = mapped_column(ForeignKey("equipment.id"), index=True)
     resolved: Mapped[bool] = mapped_column(default=False)
+    # True when a trusted human (incl. a TfL employee) resolved this via the API. Such a close is
+    # final: the automated TfL poller must never reopen the issue, even while the feed still
+    # reports it. See OutageReportRepository.is_ref_authoritatively_resolved.
+    resolved_authoritative: Mapped[bool] = mapped_column(default=False)
     # Stamped when the failure is resolved; null while open. The optional reason explains why it was
     # resolved (e.g. "Lift repaired and tested").
     resolved_at: Mapped[datetime | None] = mapped_column(default=None)
