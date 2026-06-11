@@ -133,7 +133,7 @@ export const RouteAlerts = ({
         gap="$1.5"
         p="$2.5"
         style={{
-          backgroundColor: v.background,
+          backgroundColor: Colors.card,
           borderWidth: Borders.thin,
           borderColor: v.border,
           borderRadius: Radii.small,
