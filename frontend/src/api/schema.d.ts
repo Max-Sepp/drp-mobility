@@ -645,6 +645,11 @@ export interface components {
              * @default []
              */
             verifications: components["schemas"]["OutageReportVerificationSchema"][];
+            /**
+             * Station Total Same Type Count
+             * @default 1
+             */
+            station_total_same_type_count: number;
             /** Verified */
             readonly verified: boolean;
         };
@@ -856,6 +861,11 @@ export interface components {
             /** Platforms */
             platforms: components["schemas"]["PlatformSchema"][];
             /**
+             * Lifts
+             * @default []
+             */
+            lifts: components["schemas"]["StationLift"][];
+            /**
              * Wifi
              * @default false
              */
@@ -885,6 +895,16 @@ export interface components {
              * @default false
              */
             taxi_rank: boolean;
+        };
+        /**
+         * StationLift
+         * @description Minimal lift descriptor — just enough for the client to classify a lift against a journey.
+         */
+        StationLift: {
+            /** Id */
+            id: number;
+            /** Connection */
+            connection: string;
         };
         /**
          * StationSchema

@@ -13,6 +13,23 @@ import { normaliseStationName, resolveStationName } from '@/features/journey/api
 import type { OutageUnit, StationOutage } from '@/features/journey/api/accessibility'
 import type { Journey } from '@/features/journey/api/tfl'
 
+/**
+ * Extract every endpoint from a connection string — both sides of the →, including comma-
+ * separated multi-platform ends. E.g. "Lift A: Entrance → Elizabeth line ticket hall" gives
+ * ["Entrance", "Elizabeth line ticket hall"]. Used to find served lines even when the connection
+ * doesn't mention the word "platform".
+ */
+function allLiftEndpoints(connection: string): string[] {
+  const afterName = connection.includes(':')
+    ? connection.slice(connection.indexOf(':') + 1)
+    : connection
+  return afterName
+    .split('→')
+    .flatMap((part) => part.split(','))
+    .map((p) => p.trim())
+    .filter(Boolean)
+}
+
 // Train modes whose legs board/alight at a station we can reason about. Mirrors the set used to
 // make stations tappable; walking/bus/etc. don't put the rider on a platform.
 const STATION_MODES = new Set([
@@ -45,6 +62,11 @@ export type OutageAssessment = {
   /** The lines the journey runs on through this station, for display ("your Victoria service"). */
   journeyLines: string[]
   units: AssessedUnit[]
+  /**
+   * How many lifts on this journey's specific path are broken, and how many exist in total on
+   * that path. "On your path" means verdict on-your-platform or shared-route.
+   */
+  journeyRelevantLifts: { broken: number; total: number }
 }
 
 /**
@@ -119,15 +141,33 @@ function roleAt(
   return { role, lines: [...new Set(lines)] }
 }
 
-/** The lines served by the platform(s) a connection endpoint names, looked up on the station. */
-function servedLines(station: StationDetail | undefined, platformName: string): string[] {
+/**
+ * The lines served by a connection endpoint, looked up on the station. Tries two strategies:
+ * 1. Platform name match — "Westbound Platform 1" → District, Circle.
+ * 2. Line name in text — "Elizabeth line ticket hall" contains "Elizabeth" → Elizabeth.
+ * Both use normalised containment so "elizabeth line ticket hall".includes("elizabeth") matches.
+ */
+function servedLines(station: StationDetail | undefined, endpoint: string): string[] {
   if (!station) return []
-  const target = normaliseStationName(platformName)
-  return station.platforms
+  const target = normaliseStationName(endpoint)
+
+  // Strategy 1: match against platform names
+  const byPlatformName = station.platforms
     .filter((p) => {
       const n = normaliseStationName(p.name)
       return n.includes(target) || target.includes(n)
     })
+    .flatMap((p) => p.lines)
+  if (byPlatformName.length > 0) return byPlatformName
+
+  // Strategy 2: the endpoint text mentions a line name (e.g. "Elizabeth line ticket hall")
+  return station.platforms
+    .filter((p) =>
+      p.lines.some((line) => {
+        const l = normaliseStationName(line)
+        return target.includes(l) || l.includes(target)
+      }),
+    )
     .flatMap((p) => p.lines)
 }
 
@@ -136,11 +176,46 @@ function verdictFor(
   station: StationDetail | undefined,
   journeyLines: string[],
 ): UnitVerdict {
-  if (unit.platformEndpoints.length === 0) return 'shared-route'
-  const lines = unit.platformEndpoints.flatMap((p) => servedLines(station, p))
-  if (lines.length === 0) return 'unknown'
+  // First pass: use the pre-computed platform-keyword endpoints (most precise).
+  if (unit.platformEndpoints.length > 0) {
+    const lines = unit.platformEndpoints.flatMap((p) => servedLines(station, p))
+    if (lines.length > 0 && journeyLines.length > 0) {
+      return linesOverlap(lines, journeyLines) ? 'on-your-platform' : 'other-platform'
+    }
+  }
+  // Second pass: extract all endpoints (both sides of →) and try line-name matching.
+  // This catches connections like "Lift 6: Entrance tunnel → Elizabeth line ticket hall" where
+  // neither side contains "platform" but one side names a line.
+  const allLines = allLiftEndpoints(unit.connection).flatMap((p) => servedLines(station, p))
+  if (allLines.length === 0) return 'shared-route' // generic connector (booking hall, street)
   if (journeyLines.length === 0) return 'unknown'
-  return linesOverlap(lines, journeyLines) ? 'on-your-platform' : 'other-platform'
+  return linesOverlap(allLines, journeyLines) ? 'on-your-platform' : 'other-platform'
+}
+
+/**
+ * Count all lifts at a station that are on the user's journey path: shared-route connectors
+ * (no platform endpoint — everyone uses them) plus platform-specific lifts whose platform
+ * serves a line the journey uses. Lifts with platform endpoints that we can't match to any line
+ * (unknown) are excluded (strict mode).
+ */
+function journeyRelevantLiftCount(
+  station: StationDetail | undefined,
+  journeyLines: string[],
+): number {
+  if (!station?.lifts) return 0
+  let count = 0
+  for (const lift of station.lifts) {
+    const lines = allLiftEndpoints(lift.connection).flatMap((p) => servedLines(station, p))
+    if (lines.length === 0) {
+      // No lines found in any endpoint → generic connector (booking hall ↔ street etc.)
+      // Everyone must use it, so always count it.
+      count++
+    } else if (journeyLines.length > 0 && linesOverlap(lines, journeyLines)) {
+      count++
+    }
+    // else: serves a specific line the journey doesn't use → don't count
+  }
+  return count
 }
 
 /**
@@ -163,11 +238,22 @@ export function assessOutages(
     const station = stations.find(
       (s) => normaliseStationName(s.name) === normaliseStationName(outage.stationName),
     )
+    const assessedUnits = outage.units.map((unit) => ({
+      ...unit,
+      verdict: verdictFor(unit, station, lines),
+    }))
+    const journeyBroken = assessedUnits.filter(
+      (u) =>
+        u.equipmentType === 'lift' &&
+        (u.verdict === 'on-your-platform' || u.verdict === 'shared-route'),
+    ).length
+    const journeyTotal = journeyRelevantLiftCount(station, lines)
     assessed.push({
       stationName: outage.stationName,
       role,
       journeyLines: lines,
-      units: outage.units.map((unit) => ({ ...unit, verdict: verdictFor(unit, station, lines) })),
+      units: assessedUnits,
+      journeyRelevantLifts: { broken: journeyBroken, total: journeyTotal },
     })
   }
   return assessed

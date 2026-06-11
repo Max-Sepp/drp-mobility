@@ -79,6 +79,23 @@ class FailureRepository:
             .all()
         )
 
+    def equipment_counts_by_station_and_type(self) -> dict[tuple[int, int], int]:
+        """Return a mapping of (station_id, equipment_type_id) → total count.
+
+        Used to compute how many pieces of a given equipment type exist at a station, so callers
+        can tell whether a failure represents all equipment being down or only some.
+        """
+        rows = (
+            self._db.query(
+                Equipment.station_id,
+                Equipment.equipment_type_id,
+                func.count(Equipment.id).label("cnt"),
+            )
+            .group_by(Equipment.station_id, Equipment.equipment_type_id)
+            .all()
+        )
+        return {(station_id, equipment_type_id): cnt for station_id, equipment_type_id, cnt in rows}
+
     def list_active_reports(self, failure_id: int) -> list[OutageReport]:
         """Return active (non-deleted) reports for a failure, newest first."""
         return (
