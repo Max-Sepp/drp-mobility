@@ -146,12 +146,9 @@ function TimelineConnector({
   const { Colors, Radii } = useTheme()
   const mobilityStyle = useMobilityStyle()
   const connectorSeed = `${mode}${walkDuration ?? legDuration}${departureTime ?? ''}${arrivalTime ?? ''}`
-  const walkLabel = mobilityStyle.funLabels
-    ? mobilityStyle.funLabels[stablePickIndex(mobilityStyle.funLabels, connectorSeed)]
-    : mobilityStyle.label
-  const walkIcon = mobilityStyle.funIcons
-    ? mobilityStyle.funIcons[stablePickIndex(mobilityStyle.funIcons, connectorSeed)]
-    : mobilityStyle.icon
+  const funPair = mobilityStyle.funPairs?.[stablePickIndex(mobilityStyle.funPairs, connectorSeed)]
+  const walkLabel = funPair?.label ?? mobilityStyle.label
+  const walkIcon = funPair?.icon ?? mobilityStyle.icon
   const isWalking = mode === 'walking'
   const isBus = mode === 'bus' || mode === 'coach'
   const hasDisruptions = disruptions.some((d) => d.description)

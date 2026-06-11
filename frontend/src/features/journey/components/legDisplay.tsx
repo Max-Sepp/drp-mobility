@@ -264,12 +264,9 @@ function LegChip({ leg, compact = true }: { leg: Leg; compact?: boolean }) {
   const { Colors, Radii } = useTheme()
   const mobilityStyle = useMobilityStyle()
   const legSeed = `${leg.mode.name}${leg.duration}${leg.departureTime ?? ''}${leg.arrivalTime ?? ''}`
-  const walkLabel = mobilityStyle.funLabels
-    ? mobilityStyle.funLabels[stablePickIndex(mobilityStyle.funLabels, legSeed)]
-    : mobilityStyle.label
-  const walkIcon = mobilityStyle.funIcons
-    ? mobilityStyle.funIcons[stablePickIndex(mobilityStyle.funIcons, legSeed)]
-    : mobilityStyle.icon
+  const funPair = mobilityStyle.funPairs?.[stablePickIndex(mobilityStyle.funPairs, legSeed)]
+  const walkLabel = funPair?.label ?? mobilityStyle.label
+  const walkIcon = funPair?.icon ?? mobilityStyle.icon
   const icon = modeIcon(leg.mode.name)
   const isWalking = leg.mode.name === 'walking'
   const isBus = leg.mode.name === 'bus' || leg.mode.name === 'coach'

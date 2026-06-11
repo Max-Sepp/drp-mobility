@@ -19,8 +19,7 @@ export type MobilityStyle = {
   label: string
   description: string
   icon: keyof typeof MaterialIcons.glyphMap
-  funLabels?: string[]
-  funIcons?: (keyof typeof MaterialIcons.glyphMap)[]
+  funPairs?: { label: string; icon: keyof typeof MaterialIcons.glyphMap }[]
 }
 
 export const MOBILITY_STYLES: Record<MobilityStyleId, MobilityStyle> = {
@@ -72,17 +71,27 @@ export const MOBILITY_STYLES: Record<MobilityStyleId, MobilityStyle> = {
     label: 'Move',
     description: 'A different word and icon every time',
     icon: 'auto-awesome',
-    funLabels: [
-      'Zoom', 'Dance', 'Galumph', 'Sashay', 'Mosey', 'Waddle',
-      'Shimmy', 'Prance', 'Toddle', 'Scuttle', 'Whoosh', 'Skedaddle',
-      'Lumber', 'Swagger', 'Trot', 'Frolic', 'Traipse', 'Stomp',
-      'Scamper', 'Saunter', 'Bound', 'Lurch', 'Hustle', 'Tiptoe',
-      'Strut', 'Bumble', 'Shuffle', 'Skip', 'Meander', 'Dart',
-    ],
-    funIcons: [
-      'accessible-forward', 'assist-walker', 'nordic-walking', 'directions-walk',
-      'directions-run', 'skateboarding', 'celebration', 'bolt',
-      'waving-hand', 'auto-awesome', 'sledding', 'emoji-emotions', 'rocket',
+    funPairs: [
+      { label: 'Zoom',      icon: 'rocket' },
+      { label: 'Dash',      icon: 'bolt' },
+      { label: 'Dance',     icon: 'celebration' },
+      { label: 'Sashay',    icon: 'auto-awesome' },
+      { label: 'Mosey',     icon: 'beach-access' },
+      { label: 'Waddle',    icon: 'accessible-forward' },
+      { label: 'Shimmy',    icon: 'emoji-emotions' },
+      { label: 'Prance',    icon: 'nordic-walking' },
+      { label: 'Whoosh',    icon: 'air' },
+      { label: 'Skedaddle', icon: 'directions-run' },
+      { label: 'Lumber',    icon: 'assist-walker' },
+      { label: 'Swagger',   icon: 'local-fire-department' },
+      { label: 'Trot',      icon: 'pets' },
+      { label: 'Stomp',     icon: 'fitness-center' },
+      { label: 'Saunter',   icon: 'explore' },
+      { label: 'Tiptoe',    icon: 'spa' },
+      { label: 'Shuffle',   icon: 'shuffle' },
+      { label: 'Skip',      icon: 'sledding' },
+      { label: 'Bumble',    icon: 'hive' },
+      { label: 'Toddle',    icon: 'child-care' },
     ],
   },
 }
