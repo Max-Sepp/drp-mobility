@@ -21,20 +21,20 @@ export function RouteTags({ tags }: { tags?: RouteTag[] }) {
   const { Colors, Radii } = useTheme()
   if (!tags || tags.length === 0) return null
   return (
-    <XStack flexWrap="wrap" gap="$1.5">
+    <XStack flexWrap="wrap" gap="$2">
       {tags.map((tag) => (
         <XStack
           key={tag}
-          px="$2"
-          py="$1"
+          px="$3"
+          py="$1.5"
           style={{
             backgroundColor: Colors.blueBg,
-            borderColor: Colors.border,
+            borderColor: Colors.blue,
             borderWidth: Borders.thin,
             borderRadius: Radii.pill,
           }}
         >
-          <Text fontSize={11} fontWeight="700" color={Colors.blue}>
+          <Text fontSize={14} fontWeight="700" color={Colors.blue}>
             {TAG_LABELS[tag]}
           </Text>
         </XStack>

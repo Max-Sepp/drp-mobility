@@ -24,7 +24,6 @@ import {
   fareLabel,
   legLineColor,
   modeIcon,
-  ModePipe,
   RouteTags,
   stripStationSuffix,
 } from '@/features/journey/components/legDisplay'
@@ -106,12 +105,12 @@ function TimelineWaypoint({
         )}
       </View>
       <View style={{ flex: 1, paddingLeft: 6 }}>
-        <Text fontSize={15} fontWeight="600" color={Colors.text}>
+        <Text fontSize={17} fontWeight="600" color={Colors.text}>
           {name}
         </Text>
       </View>
       {time ? (
-        <Text fontSize={13} fontWeight="500" color={Colors.secondaryText}>
+        <Text fontSize={15} fontWeight="500" color={Colors.secondaryText}>
           {time}
         </Text>
       ) : null}
@@ -126,6 +125,7 @@ function TimelineConnector({
   direction,
   walkDuration,
   stopCount,
+  stopPoints,
   legDuration,
   departureTime,
   arrivalTime,
@@ -136,6 +136,7 @@ function TimelineConnector({
   direction?: string | null
   walkDuration?: number
   stopCount: number
+  stopPoints: { name?: string }[]
   legDuration: number
   departureTime?: string | null
   arrivalTime?: string | null
@@ -150,6 +151,8 @@ function TimelineConnector({
   const isBus = mode === 'bus' || mode === 'coach'
   const badgeBg = isBus ? Colors.searchBg : lineColor
   const badgeText = isBus ? Colors.text : 'white'
+  const canExpand = stopCount > 0 && stopPoints.length > 0
+  const [expanded, setExpanded] = useState(false)
   const stopLabel =
     stopCount > 0
       ? `${stopCount} ${stopCount === 1 ? 'stop' : 'stops'} · ${legDuration} min`
@@ -187,8 +190,8 @@ function TimelineConnector({
       <View style={{ flex: 1, paddingLeft: 6, paddingVertical: 8, gap: 4 }}>
         {isWalking ? (
           <XStack items="center" gap={5}>
-            <MaterialIcons name={walkIcon} size={14} color={Colors.secondaryText} />
-            <Text fontSize={13} color={Colors.secondaryText}>
+            <MaterialIcons name={walkIcon} size={16} color={Colors.secondaryText} />
+            <Text fontSize={15} color={Colors.secondaryText}>
               {walkLabel} {walkDuration} min
             </Text>
           </XStack>
@@ -201,33 +204,71 @@ function TimelineConnector({
                   style={{
                     backgroundColor: badgeBg,
                     borderRadius: 4,
-                    paddingHorizontal: 7,
-                    paddingVertical: 2,
+                    paddingHorizontal: 8,
+                    paddingVertical: 3,
                     borderWidth: isBus ? Borders.thin : 0,
                     borderColor: isBus ? Colors.border : undefined,
                   }}
                 >
-                  <Text fontSize={11} fontWeight="700" color={badgeText}>
+                  <Text fontSize={13} fontWeight="700" color={badgeText}>
                     {routeName}
                   </Text>
                 </View>
               ) : null}
               {direction ? (
-                <Text fontSize={13} color={Colors.secondaryText}>
+                <Text fontSize={15} color={Colors.secondaryText}>
                   towards {stripStationSuffix(direction)}
                 </Text>
               ) : null}
             </XStack>
 
-            {/* Stops + duration */}
-            <XStack items="center" gap={4}>
+            {/* Stops + duration — icon is its own button, text is separate */}
+            <XStack items="center" gap={8}>
               {stopCount > 0 ? (
-                <MaterialIcons name="add-circle-outline" size={13} color={Colors.secondaryText} />
+                <TouchableOpacity
+                  onPress={() => setExpanded((v) => !v)}
+                  activeOpacity={0.6}
+                  accessibilityRole="button"
+                  accessibilityLabel={expanded ? 'Hide intermediate stops' : 'Show intermediate stops'}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                >
+                  <MaterialIcons
+                    name={expanded ? 'remove-circle-outline' : 'add-circle-outline'}
+                    size={24}
+                    color={Colors.blue}
+                  />
+                </TouchableOpacity>
               ) : null}
-              <Text fontSize={12} color={Colors.secondaryText}>
+              <Text
+                fontSize={15}
+                fontWeight={canExpand ? '600' : undefined}
+                color={canExpand ? Colors.blue : Colors.secondaryText}
+              >
                 {stopLabel}
               </Text>
             </XStack>
+
+            {expanded ? (
+              <View style={{ marginTop: 4, gap: 0 }}>
+                {stopPoints.map((sp, idx) => (
+                  <XStack key={idx} items="center" gap={8} style={{ paddingVertical: 6 }}>
+                    <View
+                      style={{
+                        width: 8,
+                        height: 8,
+                        borderRadius: 4,
+                        borderWidth: 2,
+                        borderColor: lineColor,
+                        backgroundColor: Colors.card,
+                      }}
+                    />
+                    <Text fontSize={15} color={Colors.text}>
+                      {sp.name ? stripStationSuffix(sp.name) : '—'}
+                    </Text>
+                  </XStack>
+                ))}
+              </View>
+            ) : null}
           </>
         )}
       </View>
@@ -499,6 +540,7 @@ export function JourneyDetailSheet({
         direction={direction}
         walkDuration={isWalking ? leg.duration : undefined}
         stopCount={isWalking ? 0 : stopCount}
+        stopPoints={isWalking ? [] : (leg.path?.stopPoints ?? [])}
         legDuration={isWalking ? 0 : leg.duration}
         departureTime={leg.departureTime}
         arrivalTime={leg.arrivalTime}
@@ -526,8 +568,8 @@ export function JourneyDetailSheet({
   if (waiting >= 1) {
     timelineItems.push(
       <XStack key="waiting" gap="$3" items="center" mt="$1" ml={GUTTER_W}>
-        <MaterialIcons name="schedule" size={14} color={Colors.secondaryText} />
-        <Text fontSize={13} color={Colors.secondaryText}>
+        <MaterialIcons name="schedule" size={16} color={Colors.secondaryText} />
+        <Text fontSize={15} color={Colors.secondaryText}>
           Waiting & connections · {waiting} min
         </Text>
       </XStack>,
@@ -544,17 +586,18 @@ export function JourneyDetailSheet({
       backdropComponent={darkBackdrop}
       onChange={handleChange}
     >
-      {/* Header: prominent duration + arrive/fare + close */}
+      {/* Header: prominent duration + arrive/fare + tags + close */}
       <View style={styles.header}>
         <MaterialIcons name={modeIcon(primaryMode)} size={24} color={Colors.secondaryText} />
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, gap: 4 }}>
           <Text fontSize={26} fontWeight="800" color={Colors.text} style={{ lineHeight: 30 }}>
             {journey.duration} min
           </Text>
-          <Text fontSize={14} color={Colors.secondaryText}>
+          <Text fontSize={16} color={Colors.secondaryText}>
             Arrive {clockTime(journey.arrivalDateTime)}
             {fare ? ` · ${fare}` : ''}
           </Text>
+          {tags && tags.length > 0 ? <RouteTags tags={tags} /> : null}
         </View>
         <TouchableOpacity
           onPress={() => sheetRef.current?.close()}
@@ -571,16 +614,6 @@ export function JourneyDetailSheet({
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
       >
-        {/* Route mode chips — larger size for readability in the detail view */}
-        <ModePipe legs={journey.legs} compact={false} />
-
-        {/* Route tags (Fastest, Fewest changes, etc.) */}
-        {tags && tags.length > 0 ? (
-          <View style={{ marginTop: Spacing.sm }}>
-            <RouteTags tags={tags} />
-          </View>
-        ) : null}
-
         {/* Start + Save action buttons */}
         <View style={styles.actionRow}>
           <TouchableOpacity
@@ -598,7 +631,7 @@ export function JourneyDetailSheet({
             accessibilityLabel="Start journey"
           >
             <MaterialIcons name="navigation" size={18} color="white" />
-            <Text fontSize={15} fontWeight="700" color="white">
+            <Text fontSize={16} fontWeight="700" color="white">
               {startBusy ? 'Starting…' : 'Start'}
             </Text>
           </TouchableOpacity>
@@ -622,7 +655,7 @@ export function JourneyDetailSheet({
               size={18}
               color={Colors.text}
             />
-            <Text fontSize={15} fontWeight="600" color={Colors.text}>
+            <Text fontSize={16} fontWeight="600" color={Colors.text}>
               {saveBusy ? 'Saving…' : saved ? 'Saved' : 'Save'}
             </Text>
           </TouchableOpacity>
