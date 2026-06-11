@@ -768,6 +768,10 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
               autoCorrect={false}
               value={shiftQuery}
               onChangeText={setShiftQuery}
+              onSubmitEditing={() => {
+                if (shiftResults.length > 0) handleSelectShift(shiftResults[0].name)
+              }}
+              returnKeyType="done"
             />
             <ScrollView
               showsVerticalScrollIndicator={false}
