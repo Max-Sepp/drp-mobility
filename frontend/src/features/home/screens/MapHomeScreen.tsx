@@ -240,8 +240,7 @@ export function MapHomeScreen({ navigation, route }: Props) {
   // enough room for the top buttons. When a sheet reaches that height it covers the map entirely
   // (e.g. the route overview), so the re-centre/account buttons are hidden to avoid floating over it.
   const insets = useSafeAreaInsets()
-  const sheetIsFullscreen =
-    mapBottomInset >= Dimensions.get('window').height - insets.top - 66
+  const sheetIsFullscreen = mapBottomInset >= Dimensions.get('window').height - insets.top - 66
 
   // The search sheet is the resting state of the map. Any other flow (a station, a plan, a journey
   // detail/active journey, or a report) takes over the screen, so the search sheet is dismissed
