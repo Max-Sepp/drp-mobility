@@ -120,9 +120,19 @@ export function StationSheet({
     setGoingHere(false)
   }, [station])
 
+  function handleAnimate(fromIndex: number, toIndex: number) {
+    // Fire onClose as soon as the close animation begins (not when it ends) so the
+    // search sheet restores in parallel rather than sequentially after this sheet finishes.
+    if (toIndex === -1 && !programmaticClose.current) {
+      programmaticClose.current = true
+      onClose()
+    }
+  }
+
   function handleChange(index: number) {
     setSnapIndex(index)
     onHeightChange?.(index >= 0 ? snapPoints[index] : 0)
+    // onClose is now called from handleAnimate; guard against any edge-case double-fire.
     if (index === -1 && !programmaticClose.current) onClose()
   }
 
@@ -157,7 +167,7 @@ export function StationSheet({
   }
 
   return (
-    <BottomSheet ref={sheetRef} index={-1} snapPoints={snapPoints} onChange={handleChange}>
+    <BottomSheet ref={sheetRef} index={-1} snapPoints={snapPoints} onChange={handleChange} onAnimate={handleAnimate}>
       <SheetHeader
         title={station ?? ''}
         subtitle="Underground station"

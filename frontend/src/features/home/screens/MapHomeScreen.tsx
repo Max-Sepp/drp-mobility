@@ -501,6 +501,7 @@ export function MapHomeScreen({ navigation, route }: Props) {
     setStationPausedForJourney(false)
     setStationHeight(0)
     mapRef.current?.clearFocus()
+    if (coords) mapRef.current?.recentre()
     // When the station was opened over an active journey, the search sheet is dismissed and the
     // journey sheet is underneath — don't resurrect the search sheet, just reveal the journey.
     if (!activeJourneyParams) sheetRef.current?.restore()
