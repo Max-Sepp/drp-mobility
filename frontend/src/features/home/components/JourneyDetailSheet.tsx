@@ -208,10 +208,12 @@ function TimelineConnector({
       {/* Content */}
       <View style={{ flex: 1, paddingLeft: 6, paddingVertical: 10, gap: 6 }}>
         {isWalking ? (
-          <XStack items="center" gap={5}>
-            <MaterialIcons name={walkIcon} size={16} color={Colors.secondaryText} />
-            <Text fontSize={15} color={Colors.secondaryText}>
-              {walkLabel} {walkDuration} min
+          <XStack items="center" gap={6}>
+            <MaterialIcons name={walkIcon} size={17} color={Colors.text} />
+            <Text fontSize={15} color={Colors.text}>
+              <Text fontWeight="700">{walkLabel}</Text>
+              {'  '}
+              <Text color={Colors.secondaryText}>{walkDuration} min</Text>
             </Text>
           </XStack>
         ) : (
