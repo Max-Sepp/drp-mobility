@@ -128,18 +128,20 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
     const station = stationMarkers.find((s) => s.name === name) ?? null
     setFocusedStation(station)
     if (!station) return
-    // mapPadding is already set to the station sheet height by the time this runs
-    // (MapHomeScreen.openStation updates stationHeight before calling focusStation),
-    // so a single immediate animation centres correctly in the visible area.
-    mapRef.current?.animateToRegion(
-      {
-        latitude: station.lat,
-        longitude: station.lng,
-        latitudeDelta: LAT_DELTA,
-        longitudeDelta: LAT_DELTA,
-      },
-      600,
-    )
+    // Defer one frame so React has committed the updated mapPadding prop to the native
+    // map before the animation fires. Without this, animateToRegion uses stale padding
+    // and the camera jumps a second time when mapPadding catches up (visible on Android).
+    requestAnimationFrame(() => {
+      mapRef.current?.animateToRegion(
+        {
+          latitude: station.lat,
+          longitude: station.lng,
+          latitudeDelta: LAT_DELTA,
+          longitudeDelta: LAT_DELTA,
+        },
+        600,
+      )
+    })
   }, [])
 
   const clearFocus = useCallback(() => setFocusedStation(null), [])
