@@ -1234,9 +1234,10 @@ export function ActiveJourneySheet({
       >
         {/* Non-scrollable header: title + reroute action buttons */}
         <SheetHeader
-          title="Accessibility issues"
+          title="Alternative routes"
           onClose={() => rerouteSheetRef.current?.close()}
           modal
+          titleFontSize={22}
         />
         <YStack
           gap="$2"
@@ -1254,14 +1255,6 @@ export function ActiveJourneySheet({
             elevation: 4,
           }}
         >
-          <Text
-            fontSize={11}
-            fontWeight="700"
-            color={Colors.tertiaryText}
-            style={{ letterSpacing: 0.5 }}
-          >
-            FIND ALTERNATIVE ROUTES
-          </Text>
           {(() => {
             const busy = rerouteState.phase === 'loading'
             return (
