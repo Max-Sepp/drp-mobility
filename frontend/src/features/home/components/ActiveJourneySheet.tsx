@@ -497,7 +497,14 @@ export function ActiveJourneySheet({
     setRerouteState({ phase: 'loading' })
 
     const activeLegs = (currentJourney ?? params.journey).legs
-    const result = await planAlternativesAlongLine(activeLegs, legIndex, toLocation, params.level)
+    const blockedNames = upcomingBlockedAssessments.map((a) => a.stationName)
+    const result = await planAlternativesAlongLine(
+      activeLegs,
+      legIndex,
+      toLocation,
+      params.level,
+      blockedNames,
+    )
 
     setLoadingSource(null)
 

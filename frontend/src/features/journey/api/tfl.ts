@@ -102,12 +102,14 @@ export async function planJourney(
   time?: TimeConstraint | null,
   preference?: JourneyPreference | null,
   includeAlternativeRoutes?: boolean,
+  modes?: string,
 ): Promise<JourneyPlanResult> {
   const params: string[] = []
   if (accessibility) params.push(`accessibilityPreference=${accessibility}`)
   if (time) params.push(...timeQueryParams(time))
   if (preference) params.push(`journeyPreference=${preference}`)
   if (includeAlternativeRoutes) params.push('includeAlternativeRoutes=true')
+  if (modes) params.push(`mode=${modes}`)
   const query = params.length > 0 ? `?${params.join('&')}` : ''
   const url = `${TFL_BASE}/Journey/JourneyResults/${encodeURIComponent(from)}/to/${encodeURIComponent(to)}${query}`
 
@@ -256,6 +258,19 @@ export async function planJourneyOptions(
   return { kind: 'journeys', journeys: tagged }
 }
 
+// All modes TfL's journey planner accepts in the `mode` query parameter.
+const TFL_ALL_MODES = [
+  'tube',
+  'bus',
+  'dlr',
+  'elizabeth-line',
+  'overground',
+  'national-rail',
+  'walking',
+  'replacement-bus',
+  'tflrail',
+]
+
 /**
  * Find alternative routes by identifying earlier stop-off points along the current transit leg(s).
  * Useful when the user is already on a train heading to a station with a reported accessibility
@@ -263,17 +278,44 @@ export async function planJourneyOptions(
  * Court, then bus to Hammersmith" by planning from each intermediate stop to the destination.
  *
  * `fromLegIndex` is the index of the leg the user is currently on. Stop points are collected from
- * every non-walking leg from that index onward (the current leg plus any direct continuations),
- * then capped at 5 candidates to keep parallel API calls manageable. Results are deduplicated,
- * filtered for accessibility, and tagged the same way as `planJourneyOptions`.
+ * every non-walking leg from that index onward, then capped at 5 candidates. The current transit
+ * mode (e.g. "tube") is excluded from the TfL query so it is forced onto bus / surface routes
+ * rather than routing back through the same (blocked) line.
  */
 export async function planAlternativesAlongLine(
   legs: Leg[],
   fromLegIndex: number,
   destination: string,
   accessibility: AccessibilityPreference | null,
+  blockedStationNames?: string[],
 ): Promise<JourneyOptionsResult> {
-  // Gather unique intermediate stop names from all transit legs from current position onward.
+  // Build a set of normalised blocked names for loose candidate filtering.
+  // TfL stop names look like "Hammersmith (Dist&Picc Line) Underground Station"; our blocked
+  // names look like "Hammersmith". We check if either string contains the other (case-insensitive).
+  const blockedLower = (blockedStationNames ?? []).map((n) => n.toLowerCase())
+  const isBlocked = (stopName: string) => {
+    const lower = stopName.toLowerCase()
+    return blockedLower.some((b) => lower.includes(b) || b.includes(lower.split(' ')[0]))
+  }
+
+  // Identify the transit mode we're currently riding so we can exclude it from alternative
+  // queries. Without this, TfL always nominates the same (blocked) line as the fastest option,
+  // which we then filter out, leaving only walking. Excluding the mode (e.g. "tube") forces TfL
+  // to surface bus and surface routes.
+  let currentMode: string | null = null
+  for (let i = fromLegIndex; i < legs.length; i++) {
+    if (legs[i].mode.name !== 'walking') {
+      currentMode = legs[i].mode.name
+      break
+    }
+  }
+  const alternativeModes = currentMode
+    ? TFL_ALL_MODES.filter((m) => m !== currentMode).join(',')
+    : undefined
+
+  // Gather unique intermediate stop names from all transit legs from current position onward,
+  // excluding any stop that is itself a blocked station (TfL sometimes includes the arrival
+  // station in stopPoints, producing a spurious 1-minute-walk "alternative").
   const seen = new Set<string>()
   const candidates: string[] = []
 
@@ -281,7 +323,7 @@ export async function planAlternativesAlongLine(
     const leg = legs[i]
     if (leg.mode.name === 'walking') continue
     for (const stop of leg.path?.stopPoints ?? []) {
-      if (stop.name && !seen.has(stop.name)) {
+      if (stop.name && !seen.has(stop.name) && !isBlocked(stop.name)) {
         seen.add(stop.name)
         candidates.push(stop.name)
       }
@@ -292,11 +334,16 @@ export async function planAlternativesAlongLine(
     return { kind: 'error', message: 'No intermediate stops found along this line.' }
   }
 
-  // Cap to 5 stops so we never fire more than 5 parallel TfL requests.
+  // Cap to 5 stops. Query with alternative modes only — this forces TfL off the blocked line.
+  // Accessibility preference is intentionally omitted here: TfL's step-free filter applies to
+  // tube/rail infrastructure; buses in London are universally accessible (low-floor, ramps) and
+  // passing accessibilityPreference with bus-only modes returns no results.
   const stopsToTry = candidates.slice(0, 5)
 
   const results = await Promise.all(
-    stopsToTry.map((stopName) => planJourney(stopName, destination, accessibility)),
+    stopsToTry.map((stopName) =>
+      planJourney(stopName, destination, null, null, null, false, alternativeModes),
+    ),
   )
 
   // Merge journeys from all stops, deduplicating by route signature.
