@@ -65,6 +65,8 @@ jobs:
   build-and-push:
     needs: test-backend
     if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
+    outputs:
+      image: ${{ steps.img.outputs.sha_image }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -81,7 +83,10 @@ jobs:
 
       - name: Lowercase image name
         id: img
-        run: echo "name=${IMAGE,,}" >> "$GITHUB_OUTPUT"
+        run: |
+          NAME="${IMAGE,,}"
+          echo "name=${NAME}" >> "$GITHUB_OUTPUT"
+          echo "sha_image=${REGISTRY}/${NAME}:sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
         env:
           IMAGE: ${{ matrix.image }}
 
@@ -120,11 +125,30 @@ jobs:
     needs: build-and-push
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      packages: read
     steps:
-      - name: Install Railway CLI
-        run: npm i -g @railway/cli@4.59.0
-
-      - name: Deploy to Railway
-        run: railway redeploy --service drp-mobility-backend --yes
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@0ff4204d59e8e51228ff73bce53f80d53301dee2 # v1.2.5
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          fingerprint: ${{ secrets.EC2_FINGERPRINT }}
+          envs: IMAGE,GHCR_USER,GHCR_TOKEN
+          script: |
+            set -euo pipefail
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+            docker pull "$IMAGE"
+            docker stop backend 2>/dev/null || true
+            docker rm backend 2>/dev/null || true
+            docker run -d \
+              --name backend \
+              --restart unless-stopped \
+              -p 8000:8000 \
+              --env-file /home/ec2-user/.env \
+              "$IMAGE"
         env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          IMAGE: ${{ needs.build-and-push.outputs.image }}
+          GHCR_USER: ${{ github.actor }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
