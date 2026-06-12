@@ -86,7 +86,7 @@ jobs:
         run: |
           NAME="${IMAGE,,}"
           echo "name=${NAME}" >> "$GITHUB_OUTPUT"
-          echo "sha_image=ghcr.io/${NAME}:sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+          echo "sha_image=${REGISTRY}/${NAME}:sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
         env:
           IMAGE: ${{ matrix.image }}
 
