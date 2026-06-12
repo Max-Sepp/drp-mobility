@@ -145,7 +145,7 @@ jobs:
               --name backend \
               --restart unless-stopped \
               -p 8000:8000 \
-              --env DATABASE_URL \
+              --env-file /home/ec2-user/.env \
               "$IMAGE"
         env:
           IMAGE: ghcr.io/${{ steps.img.outputs.name }}:latest
