@@ -120,11 +120,34 @@ jobs:
     needs: build-and-push
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      packages: read
     steps:
-      - name: Install Railway CLI
-        run: npm i -g @railway/cli@4.59.0
+      - name: Compute image name
+        id: img
+        run: |
+          IMAGE="${{ github.repository }}-backend"
+          echo "name=${IMAGE,,}" >> "$GITHUB_OUTPUT"
 
-      - name: Deploy to Railway
-        run: railway redeploy --service drp-mobility-backend --yes
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          envs: IMAGE,GHCR_USER,GHCR_TOKEN
+          script: |
+            echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+            docker pull "$IMAGE"
+            docker stop backend 2>/dev/null || true
+            docker rm backend 2>/dev/null || true
+            docker run -d \
+              --name backend \
+              --restart unless-stopped \
+              -p 8000:8000 \
+              --env DATABASE_URL \
+              "$IMAGE"
         env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          IMAGE: ghcr.io/${{ steps.img.outputs.name }}:latest
+          GHCR_USER: ${{ github.actor }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
