@@ -1,11 +1,14 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import { useMemo, useState } from 'react'
 import { Separator, Text, XStack, YStack } from 'tamagui'
+import { platformEndpoints } from '@/features/journey/api/accessibility'
 import { LineChips, StepFreeBadge, type PlatformDetail } from '@/features/stations'
+import type { OutageReport } from '@/features/outages/types'
 import { useTheme, Borders, Opacity, Spacing } from '@/theme'
 
 type PlatformAccessCardProps = {
   platforms: PlatformDetail[]
+  reports?: OutageReport[]
 }
 
 function extractDirection(name: string): string {
@@ -109,28 +112,75 @@ function computeInterchange(platforms: PlatformDetail[]): {
   }
 }
 
-function buildSummary(platforms: PlatformDetail[]): string {
+/** Lowercase platform endpoint strings from all unresolved lift reports at this station. */
+function liveDisruptedEndpoints(reports: OutageReport[]): string[] {
+  const out: string[] = []
+  for (const r of reports) {
+    if (r.failure.resolved) continue
+    if (r.failure.equipment.equipment_type.name !== 'lift') continue
+    out.push(...platformEndpoints(r.failure.equipment.connection).map((e) => e.toLowerCase()))
+  }
+  return out
+}
+
+/** True when a lift outage's connection string names this platform. */
+function isPlatformAffected(platform: PlatformDetail, endpoints: string[]): boolean {
+  if (endpoints.length === 0) return false
+  const name = platform.name.toLowerCase()
+  return endpoints.some((ep) => name.includes(ep))
+}
+
+function buildSummary(platforms: PlatformDetail[], disruptedCount: number): string {
   const toTrain = platforms.filter((p) => p.step_free === 'Full' || p.step_free === 'to_train').length
   const toPlatform = platforms.filter((p) => p.step_free === 'to_platform').length
-  const none = platforms.filter((p) => p.step_free === 'none').length
+  const noneAll = platforms.filter((p) => p.step_free === 'none').length
+  const permanentNone = noneAll - disruptedCount
   const n = platforms.length
 
-  if (none === 0 && toPlatform === 0) return `All ${n} step-free to train`
-  if (none === 0 && toTrain === 0) return `All ${n} step-free to platform`
-  if (none === n) return `No step-free access`
+  if (noneAll === 0 && toPlatform === 0) return `All ${n} step-free to train`
+  if (noneAll === 0 && toTrain === 0) return `All ${n} step-free to platform`
+  if (noneAll === n) return disruptedCount === n ? 'All platforms disrupted' : 'No step-free access'
 
   const parts: string[] = []
   if (toTrain > 0) parts.push(`${toTrain} to train`)
   if (toPlatform > 0) parts.push(`${toPlatform} to platform`)
-  if (none > 0) parts.push(`${none} not accessible`)
+  if (disruptedCount > 0) parts.push(`${disruptedCount} disrupted`)
+  if (permanentNone > 0) parts.push(`${permanentNone} not accessible`)
   return parts.join(' · ')
 }
 
-export const PlatformAccessCard = ({ platforms }: PlatformAccessCardProps) => {
+export const PlatformAccessCard = ({ platforms, reports = [] }: PlatformAccessCardProps) => {
   const { Colors, Radii } = useTheme()
-  const inaccessible = platforms.filter((p) => p.step_free === 'none')
-  const toPlatformOnly = platforms.filter((p) => p.step_free === 'to_platform')
   const [expanded, setExpanded] = useState(false)
+
+  // Overlay live lift outages onto the static platform step-free data.
+  const disruptedEndpoints = useMemo(() => liveDisruptedEndpoints(reports), [reports])
+
+  // Set of platform names currently blocked by a reported outage.
+  const disruptedNames = useMemo(
+    () =>
+      new Set(
+        platforms
+          .filter((p) => isPlatformAffected(p, disruptedEndpoints) && p.step_free !== 'none')
+          .map((p) => p.name),
+      ),
+    [platforms, disruptedEndpoints],
+  )
+
+  // effectivePlatforms is used for summary counts and interchange logic.
+  // Disrupted platforms appear as 'none' so the numbers reflect live reality.
+  const effectivePlatforms = useMemo(
+    () =>
+      disruptedNames.size === 0
+        ? platforms
+        : platforms.map((p) =>
+            disruptedNames.has(p.name) ? { ...p, step_free: 'none' as const } : p,
+          ),
+    [platforms, disruptedNames],
+  )
+
+  const inaccessible = effectivePlatforms.filter((p) => p.step_free === 'none')
+  const toPlatformOnly = effectivePlatforms.filter((p) => p.step_free === 'to_platform')
 
   const isAllAccessible = inaccessible.length === 0 && toPlatformOnly.length === 0
   const isAllInaccessible = inaccessible.length === platforms.length
@@ -146,13 +196,13 @@ export const PlatformAccessCard = ({ platforms }: PlatformAccessCardProps) => {
       : Colors.warningDark
 
   const { interchangeLines, allLines, totalLines } = useMemo(
-    () => computeInterchange(platforms),
-    [platforms],
+    () => computeInterchange(effectivePlatforms),
+    [effectivePlatforms],
   )
   const isFullInterchange = totalLines >= 2 && interchangeLines.length === totalLines
   const isSomeInterchange =
     totalLines >= 2 && interchangeLines.length > 0 && interchangeLines.length < totalLines
-  const groups = useMemo(() => computeInterchangeGroups(platforms), [platforms])
+  const groups = useMemo(() => computeInterchangeGroups(effectivePlatforms), [effectivePlatforms])
   const [interchangeExpanded, setInterchangeExpanded] = useState(false)
   const showDropdown = isSomeInterchange && groups.length > 0
 
@@ -172,7 +222,7 @@ export const PlatformAccessCard = ({ platforms }: PlatformAccessCardProps) => {
       }}
     >
       <XStack
-        items="center"
+        items="flex-start"
         gap="$3"
         onPress={() => setExpanded((v) => !v)}
         pressStyle={{ opacity: Opacity.disabledMid }}
@@ -185,17 +235,18 @@ export const PlatformAccessCard = ({ platforms }: PlatformAccessCardProps) => {
             backgroundColor: summaryBg,
             alignItems: 'center',
             justifyContent: 'center',
+            flexShrink: 0,
           }}
         >
           <MaterialIcons name="accessible" size={20} color={summaryColor} />
         </XStack>
-        <YStack flex={1} gap="$0.5">
+        <YStack flex={1} gap="$0.5" style={{ flexShrink: 1 }}>
           <Text fontSize={15} fontWeight="700" color={Colors.text}>
             Platform access
           </Text>
           {!expanded && (
-            <Text fontSize={12} color={Colors.secondaryText}>
-              {buildSummary(platforms)}
+            <Text fontSize={12} color={Colors.secondaryText} style={{ flexShrink: 1 }}>
+              {buildSummary(effectivePlatforms, disruptedNames.size)}
             </Text>
           )}
         </YStack>
@@ -208,20 +259,43 @@ export const PlatformAccessCard = ({ platforms }: PlatformAccessCardProps) => {
 
       {expanded && (
         <YStack gap="$0">
-          {platforms.map((platform, i) => (
-            <YStack key={platform.name}>
-              {i > 0 && <Separator borderColor="$borderColor" my="$2.5" />}
-              <XStack items="center" justify="space-between" gap="$3">
-                <YStack flex={1} gap="$1">
-                  <Text fontSize={14} fontWeight="600" color={Colors.text}>
-                    {platform.name}
-                  </Text>
-                  <LineChips lines={platform.lines} />
-                </YStack>
-                <StepFreeBadge value={platform.step_free} compact />
-              </XStack>
-            </YStack>
-          ))}
+          {platforms.map((original, i) => {
+            const isDisrupted = disruptedNames.has(original.name)
+            return (
+              <YStack key={original.name}>
+                {i > 0 && <Separator borderColor="$borderColor" my="$2.5" />}
+                <XStack items="center" justify="space-between" gap="$3">
+                  <YStack flex={1} gap="$1">
+                    <Text fontSize={14} fontWeight="600" color={Colors.text}>
+                      {original.name}
+                    </Text>
+                    <LineChips lines={original.lines} />
+                  </YStack>
+                  {isDisrupted ? (
+                    <YStack items="flex-end" gap="$1">
+                      <XStack
+                        items="center"
+                        gap="$1"
+                        px="$2"
+                        py="$1"
+                        style={{ backgroundColor: Colors.warningBg, borderRadius: Radii.xs }}
+                      >
+                        <MaterialIcons name="warning" size={11} color={Colors.warningDark} />
+                        <Text fontSize={11} fontWeight="600" color={Colors.warningDark}>
+                          Reported outage
+                        </Text>
+                      </XStack>
+                      <XStack style={{ opacity: 0.4 }}>
+                        <StepFreeBadge value={original.step_free} compact />
+                      </XStack>
+                    </YStack>
+                  ) : (
+                    <StepFreeBadge value={original.step_free} compact />
+                  )}
+                </XStack>
+              </YStack>
+            )
+          })}
         </YStack>
       )}
 
@@ -237,8 +311,8 @@ export const PlatformAccessCard = ({ platforms }: PlatformAccessCardProps) => {
           >
             <XStack
               style={{
-                width: 28,
-                height: 28,
+                width: 36,
+                height: 36,
                 borderRadius: Radii.small,
                 backgroundColor: isFullInterchange
                   ? Colors.successBg
@@ -251,7 +325,7 @@ export const PlatformAccessCard = ({ platforms }: PlatformAccessCardProps) => {
             >
               <MaterialIcons
                 name="accessible"
-                size={16}
+                size={20}
                 color={
                   isFullInterchange
                     ? Colors.success

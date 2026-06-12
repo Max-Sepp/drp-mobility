@@ -100,6 +100,11 @@ export function StationSheet({
       allReports.filter((r) => r.failure.equipment.station.name === station && r.source !== 'tfl'),
     [allReports, station],
   )
+  // All reports for this station (including TfL-sourced) used for platform disruption overlay.
+  const stationReports = useMemo(
+    () => allReports.filter((r) => r.failure.equipment.station.name === station),
+    [allReports, station],
+  )
   const { alerts } = useStationAlerts(stationDetail?.id)
   const badgeSeverity = useMemo(() => overallSeverity(reports), [reports])
   const hasIssues = reports.length > 0 || alerts.length > 0
@@ -184,31 +189,29 @@ export function StationSheet({
       {(stationDetail?.step_free || hasIssues) && (
         <XStack gap="$2" flexWrap="wrap" px="$4" pb="$2">
           {stationDetail?.step_free && <StepFreeBadge value={stationDetail.step_free} />}
-          {hasIssues && (
-            <XStack
-              items="center"
-              gap="$1.5"
-              px="$2"
-              py="$1"
-              style={{
-                backgroundColor: issueSeverity === 'warning' ? Colors.warningBg : Colors.dangerBg,
-                borderRadius: 6,
-              }}
+          <XStack
+            items="center"
+            gap="$1.5"
+            px="$2"
+            py="$1"
+            style={{
+              backgroundColor: issueSeverity === 'warning' ? Colors.warningBg : Colors.dangerBg,
+              borderRadius: 6,
+            }}
+          >
+            <MaterialIcons
+              name="warning"
+              size={16}
+              color={issueSeverity === 'warning' ? Colors.warningDark : Colors.dangerDark}
+            />
+            <Text
+              fontSize={13}
+              fontWeight="600"
+              color={issueSeverity === 'warning' ? Colors.warningDark : Colors.dangerDark}
             >
-              <MaterialIcons
-                name="warning"
-                size={16}
-                color={issueSeverity === 'warning' ? Colors.warningDark : Colors.dangerDark}
-              />
-              <Text
-                fontSize={13}
-                fontWeight="600"
-                color={issueSeverity === 'warning' ? Colors.warningDark : Colors.dangerDark}
-              >
-                Known issues
-              </Text>
-            </XStack>
-          )}
+              Known issues
+            </Text>
+          </XStack>
         </XStack>
       )}
 
@@ -252,7 +255,7 @@ export function StationSheet({
         contentContainerStyle={{ paddingBottom: insets.bottom + Spacing.xl }}
       >
         {stationDetail && <StationInfoCard station={stationDetail} />}
-        {stationDetail && <PlatformAccessCard key={station} platforms={stationDetail.platforms} />}
+        {stationDetail && <PlatformAccessCard key={station} platforms={stationDetail.platforms} reports={stationReports} />}
         <StationAlertBanner alerts={alerts} />
         <ReportsStatus loading={loading} reports={reports} />
         {stationDetail && <StationAdditionalInfoCard station={stationDetail} />}
