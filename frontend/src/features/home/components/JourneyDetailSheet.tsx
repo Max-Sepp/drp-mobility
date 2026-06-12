@@ -2,6 +2,7 @@
 // Single snap at full height minus top buttons. Dark backdrop, swipe/tap to close.
 
 import { MaterialIcons } from '@expo/vector-icons'
+import Svg, { Circle, Path, Rect } from 'react-native-svg'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { Text, XStack } from 'tamagui'
@@ -90,6 +91,21 @@ function DashedVerticalLine({ color }: { color: string }) {
 }
 
 type WaypointKind = 'origin' | 'transit' | 'destination'
+type WaypointType = 'tube' | 'bus' | 'default'
+
+function TflRoundel() {
+  return (
+    <Svg width={28} height={23} viewBox="0 0 615.3 500">
+      <Circle cx={308.15} cy={250} r={161.3} fill="white" />
+      <Path
+        d="m469.5 250c0 89.1-72.3 161.3-161.3 161.3-89.1 0-161.3-72.2-161.3-161.3s72.1-161.3 161.2-161.3 161.4 72.2 161.4 161.3m-161.4-250c-138.1 0-250 111.9-250 250s111.9 250 250 250 250-111.9 250-250-111.9-250-250-250"
+        fill="#e1251f"
+        fillRule="nonzero"
+      />
+      <Rect y={199.5} width={615.3} height={101.1} fill="#000f9f" />
+    </Svg>
+  )
+}
 
 function TimelineWaypoint({
   kind,
@@ -97,12 +113,14 @@ function TimelineWaypoint({
   time,
   dotColor,
   stopNumber,
+  waypointType = 'default',
 }: {
   kind: WaypointKind
   name: string
   time?: string
   dotColor: string
   stopNumber?: string
+  waypointType?: WaypointType
 }) {
   const { Colors } = useTheme()
   return (
@@ -121,6 +139,10 @@ function TimelineWaypoint({
               backgroundColor: Colors.card,
             }}
           />
+        ) : waypointType === 'tube' ? (
+          <TflRoundel />
+        ) : waypointType === 'bus' ? (
+          <MaterialIcons name="directions-bus" size={20} color={dotColor} />
         ) : (
           <View
             style={{
@@ -602,6 +624,12 @@ export function JourneyDetailSheet({
       : nextLeg && isBusLeg(nextLeg)
         ? nextLeg.departurePoint?.stopLetter
         : undefined
+    const arrivalWaypointType: WaypointType =
+      isLast || !nextLeg || nextLeg.mode.name === 'walking'
+        ? 'default'
+        : isBusLeg(nextLeg)
+          ? 'bus'
+          : 'tube'
 
     timelineItems.push(
       <TimelineWaypoint
@@ -611,6 +639,7 @@ export function JourneyDetailSheet({
         time={leg.arrivalTime ? clockTime(leg.arrivalTime) : undefined}
         dotColor={dotColor}
         stopNumber={arrivalStopNumber}
+        waypointType={arrivalWaypointType}
       />,
     )
   })
