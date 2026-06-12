@@ -1,11 +1,12 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
-import MapView, { Marker, PoiClickEvent, Region } from 'react-native-maps'
+import MapView, { Marker, Polyline, PoiClickEvent, Region } from 'react-native-maps'
 import Svg, { Circle, Path, Rect } from 'react-native-svg'
 import { fuzzyScore } from '@/lib/fuzzy'
 import { useAppHeading, useAppLocation } from '@/lib/LocationContext'
 import stationMarkers from '@/features/map/data/stationMarkers.json'
 import { UserLocationMarker } from '@/features/map/components/UserLocationMarker'
+import type { LatLng, RouteGeometry, RouteMarker } from '@/features/journey/lib/routeGeometry'
 
 type StationMarkerEntry = (typeof stationMarkers)[number]
 
@@ -42,6 +43,25 @@ export type StationMapHandle = {
   recentre: () => void
   focusStation: (name: string) => void
   clearFocus: () => void
+  fitToRoute: (coords: LatLng[]) => void
+}
+
+// A waypoint dot drawn at a route's start / end / interchange. Start and end are filled with the
+// adjoining line colour; interchanges are white-filled with a coloured ring so changes stand out.
+function RouteWaypoint({ kind }: { kind: RouteMarker['kind'] }) {
+  const size = kind === 'interchange' ? 16 : 14
+  return (
+    <Svg width={size} height={size}>
+      <Circle
+        cx={size / 2}
+        cy={size / 2}
+        r={size / 2 - 2}
+        fill={kind === 'interchange' ? 'white' : '#1f1f1f'}
+        stroke={kind === 'interchange' ? '#1f1f1f' : 'white'}
+        strokeWidth={2}
+      />
+    </Svg>
+  )
 }
 
 const LONDON: Region = {
@@ -100,10 +120,12 @@ type Props = {
   // of the device location. GPS is often unavailable underground, so this is the reliable
   // anchor for staff. The manual recentre button still uses GPS.
   anchor?: { latitude: number; longitude: number } | null
+  // The journey to draw, derived from the active/previewed journey. Null clears the overlay.
+  route?: RouteGeometry | null
 }
 
 export const StationMap = forwardRef<StationMapHandle, Props>(function StationMap(
-  { onStationPress, bottomInset, anchor },
+  { onStationPress, bottomInset, anchor, route },
   ref,
 ) {
   const coords = useAppLocation()
@@ -146,11 +168,23 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
 
   const clearFocus = useCallback(() => setFocusedStation(null), [])
 
-  useImperativeHandle(ref, () => ({ recentre: animateToUser, focusStation, clearFocus }), [
-    animateToUser,
-    focusStation,
-    clearFocus,
-  ])
+  // Frame the whole route, leaving room for the top buttons and the sheet covering the bottom.
+  const fitToRoute = useCallback(
+    (coords: LatLng[]) => {
+      if (coords.length === 0) return
+      mapRef.current?.fitToCoordinates(coords, {
+        edgePadding: { top: 120, right: 60, left: 60, bottom: bottomInset + 60 },
+        animated: true,
+      })
+    },
+    [bottomInset],
+  )
+
+  useImperativeHandle(
+    ref,
+    () => ({ recentre: animateToUser, focusStation, clearFocus, fitToRoute }),
+    [animateToUser, focusStation, clearFocus, fitToRoute],
+  )
 
   // Centre on open. The anchor (staff's shift station) always wins and is honoured even if it
   // resolves late (station data loads async) — so it overrides an earlier GPS centring exactly
@@ -192,6 +226,28 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
       showsMyLocationButton={false}
       showsCompass={false}
     >
+      {route?.legs.map((leg, i) => (
+        <Polyline
+          key={`leg-${i}`}
+          coordinates={leg.coords}
+          strokeColor={leg.color}
+          strokeWidth={6}
+          lineCap="round"
+          lineJoin="round"
+          lineDashPattern={leg.isWalking ? [4, 8] : undefined}
+          zIndex={1}
+        />
+      ))}
+      {route?.markers.map((marker, i) => (
+        <Marker
+          key={`waypoint-${i}`}
+          coordinate={marker.coord}
+          anchor={{ x: 0.5, y: 0.5 }}
+          tracksViewChanges={false}
+        >
+          <RouteWaypoint kind={marker.kind} />
+        </Marker>
+      ))}
       {coords && (
         <UserLocationMarker
           latitude={coords.latitude}

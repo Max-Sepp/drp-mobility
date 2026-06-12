@@ -23,6 +23,7 @@ import {
   type SavedPlaces,
 } from '@/features/journey/api/savedPlaces'
 import { humanizeSummary } from '@/features/journey/components/legDisplay'
+import { journeyToRouteGeometry } from '@/features/journey/lib/routeGeometry'
 import { useAuth } from '@/features/auth'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import type { RootStackParamList } from '@/navigation/types'
@@ -286,6 +287,21 @@ export function MapHomeScreen({ navigation, route }: Props) {
   const [activeJourneyParams, setActiveJourneyParams] = useState<ActiveJourneyParams | null>(null)
   const sheetRef = useRef<SearchActionSheetHandle>(null)
   const mapRef = useRef<StationMapHandle>(null)
+
+  // Geometry for the route currently being previewed or travelled, drawn on the map behind the
+  // sheets. The live active journey wins over a detail preview so the in-progress trip is shown;
+  // null when neither is open, which unmounts the overlay.
+  const mapRoute = useMemo(() => {
+    const journey = activeJourneyParams?.journey ?? activeDetail?.journey ?? null
+    if (!journey) return null
+    return journeyToRouteGeometry(journey, { fallback: Colors.blue, walk: Colors.secondaryText })
+  }, [activeJourneyParams, activeDetail, Colors.blue, Colors.secondaryText])
+
+  // Frame the route whenever it appears or changes (e.g. picking a different option, or starting
+  // the journey). Intentionally overrides the open-time GPS/anchor centring while a route is shown.
+  useEffect(() => {
+    if (mapRoute) mapRef.current?.fitToRoute(mapRoute.bounds)
+  }, [mapRoute])
   const { status, user } = useAuth()
   const coords = useAppLocation()
   const { workStation } = useWorkShift()
@@ -526,6 +542,7 @@ export function MapHomeScreen({ navigation, route }: Props) {
         onStationPress={openStation}
         bottomInset={mapBottomInset}
         anchor={shiftAnchor}
+        route={mapRoute}
       />
 
       <SearchActionSheet
