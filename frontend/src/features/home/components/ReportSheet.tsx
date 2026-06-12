@@ -19,6 +19,7 @@ import {
   journeyPlatformsAtStation,
 } from '@/features/journey/api/journeyLifts'
 import { useStations } from '@/features/stations'
+import { useEquipment } from '@/features/reporting/useEquipment'
 import { EquipmentPicker } from '@/features/reporting/components/EquipmentPicker'
 import { FormSection } from '@/features/reporting/components/FormSection'
 import { PhotoPicker } from '@/features/reporting/components/PhotoPicker'
@@ -153,31 +154,52 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
 
   const [step, setStep] = useState<Step>('type')
   const [issueType, setIssueType] = useState<IssueType | null>(null)
-  const [equipment, setEquipment] = useState<Equipment[]>([])
   const [equipmentId, setEquipmentId] = useState<number | null>(null)
-  const [loadingEquipment, setLoadingEquipment] = useState(false)
   const [description, setDescription] = useState('')
   const [area, setArea] = useState('')
   const [photo, setPhoto] = useState<ImagePicker.ImagePickerAsset | null>(null)
   const [submitting, setSubmitting] = useState(false)
-  const [hasLifts, setHasLifts] = useState<boolean | undefined>(undefined)
-  const [hasEscalators, setHasEscalators] = useState<boolean | undefined>(undefined)
   // The in-progress journey (if any), used to surface the equipment on the rider's current route
   // first. Null when no journey is underway — the list keeps its plain alphabetical order.
   const [activeJourney, setActiveJourney] = useState<ActiveJourney | null>(null)
   const { stations } = useStations()
+  // The full equipment list is cached/revalidated reference data; filter it client-side rather
+  // than refetching it over the network each time the sheet opens.
+  const {
+    equipment: allEquipment,
+    loading: equipmentLoading,
+    error: equipmentError,
+  } = useEquipment()
+
+  const stationEquipment = useMemo(
+    () => (station ? allEquipment.filter((e) => e.station.name === station) : []),
+    [allEquipment, station],
+  )
+  // `undefined` until the list is known, so the issue tiles stay enabled (not wrongly disabled)
+  // while the list is loading or after a fetch failure.
+  const equipmentReady = !equipmentLoading && !equipmentError
+  const hasLifts = equipmentReady
+    ? stationEquipment.some((e) => e.equipment_type.name === 'lift')
+    : undefined
+  const hasEscalators = equipmentReady
+    ? stationEquipment.some((e) => e.equipment_type.name === 'escalator')
+    : undefined
+
+  // The pickable rows for the chosen lift/escalator issue, alphabetised (numeric-aware).
+  const equipment = useMemo<Equipment[]>(() => {
+    if (issueType !== 'lift' && issueType !== 'escalator') return []
+    return stationEquipment
+      .filter((e) => e.equipment_type.name === issueType)
+      .sort((a, b) => a.connection.localeCompare(b.connection, undefined, { numeric: true }))
+  }, [stationEquipment, issueType])
 
   function resetForm() {
     setIssueType(null)
-    setEquipment([])
     setEquipmentId(null)
-    setLoadingEquipment(false)
     setDescription('')
     setArea('')
     setPhoto(null)
     setSubmitting(false)
-    setHasLifts(undefined)
-    setHasEscalators(undefined)
   }
 
   useEffect(() => {
@@ -185,28 +207,23 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       resetForm()
       setStep('type')
-      let active = true
-      // Fetch equipment availability BEFORE opening the sheet so tiles are already
-      // grey/enabled the moment the sheet becomes visible.
-      apiClient.GET('/equipment').then(({ data }) => {
-        if (!active) return
-        if (data) {
-          setHasLifts(
-            data.some((e) => e.station.name === station && e.equipment_type.name === 'lift'),
-          )
-          setHasEscalators(
-            data.some((e) => e.station.name === station && e.equipment_type.name === 'escalator'),
-          )
-        }
-        sheetRef.current?.snapToIndex(0)
-      })
-      return () => {
-        active = false
-      }
+      // Equipment availability comes from the cached list (see hasLifts/hasEscalators), so the
+      // sheet opens immediately instead of waiting on a network round-trip.
+      sheetRef.current?.snapToIndex(0)
     } else {
       sheetRef.current?.close()
     }
   }, [station])
+
+  // For overcrowding/custom there's a single station-level equipment row; auto-select it once the
+  // (possibly still-loading) cached equipment list is available.
+  useEffect(() => {
+    if ((issueType === 'overcrowding' || issueType === 'custom') && equipmentId == null) {
+      const equip = stationEquipment.find((e) => e.equipment_type.name === issueType)
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      if (equip) setEquipmentId(equip.id)
+    }
+  }, [issueType, equipmentId, stationEquipment])
 
   // Re-check for an in-progress journey each time the sheet opens for a station (one may have
   // started since last open).
@@ -259,36 +276,15 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
     return false
   }
 
-  async function selectType(type: IssueType) {
+  function selectType(type: IssueType) {
     setIssueType(type)
     setEquipmentId(null)
     setDescription('')
     setPhoto(null)
     setStep('form')
     sheetRef.current?.snapToIndex(1)
-
-    if (station) {
-      setLoadingEquipment(true)
-      const { data } = await apiClient.GET('/equipment')
-      if (data) {
-        if (type === 'lift' || type === 'escalator') {
-          setEquipment(
-            data
-              .filter((e) => e.station.name === station && e.equipment_type.name === type)
-              .sort((a, b) =>
-                a.connection.localeCompare(b.connection, undefined, { numeric: true }),
-              ),
-          )
-        } else {
-          // overcrowding and custom: auto-select the single station-level equipment row
-          const equip = data.find(
-            (e) => e.station.name === station && e.equipment_type.name === type,
-          )
-          if (equip) setEquipmentId(equip.id)
-        }
-      }
-      setLoadingEquipment(false)
-    }
+    // The lift/escalator list (`equipment`) and the overcrowding/custom auto-select are both
+    // derived from the cached equipment list — no network call needed here.
   }
 
   function goBack() {
@@ -441,7 +437,7 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
               <>
                 <EquipmentPicker
                   label={issueType === 'lift' ? 'Which lift?' : 'Which escalator?'}
-                  loading={loadingEquipment}
+                  loading={equipmentLoading}
                   equipment={orderedEquipment}
                   selectedId={equipmentId}
                   onSelect={setEquipmentId}

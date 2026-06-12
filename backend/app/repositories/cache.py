@@ -1,5 +1,10 @@
 import functools
+import time
 from typing import Any
+
+# Immutable reference data still gets a weekly invalidation so no cached copy lives forever:
+# after this window the next call re-queries the database (and any derived ETag is rebuilt).
+CACHE_TTL_SECONDS = 7 * 24 * 60 * 60
 
 
 class cached_list:
@@ -7,6 +12,9 @@ class cached_list:
     class the first time it is called.  Subsequent calls return the cached value without
     hitting the database.  The cache lives on the class (not the instance), so it
     survives across requests in the same process — suitable for immutable reference data.
+
+    The cached value is held alongside the time it was computed and is refreshed once it is
+    older than ``CACHE_TTL_SECONDS`` (weekly), so the database is consulted at least that often.
 
     Usage:
         @cached_list
@@ -31,8 +39,11 @@ class cached_list:
         fn = self._fn
 
         def _call():
-            if getattr(objtype, attr, None) is None:
-                setattr(objtype, attr, fn(obj))
-            return getattr(objtype, attr)
+            # Each entry is a (value, computed_at) pair stored on the class.
+            entry = getattr(objtype, attr, None)
+            if entry is None or time.monotonic() - entry[1] >= CACHE_TTL_SECONDS:
+                entry = (fn(obj), time.monotonic())
+                setattr(objtype, attr, entry)
+            return entry[0]
 
         return _call

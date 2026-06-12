@@ -1,6 +1,5 @@
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { useEffect, useState } from 'react'
 import { apiClient } from '@/api/client'
+import { type FetchResult, useCachedResource } from '@/api/cachedResource'
 import type { components } from '@/api/schema.d'
 
 export type StationDetail = components['schemas']['StationDetail']
@@ -12,61 +11,24 @@ type UseStations = {
   error: boolean
 }
 
-const CACHE_KEY = 'stations_v1'
+// Bumped from `stations_v1`: the stored shape is now an { etag, data, cachedAt } envelope.
+const CACHE_KEY = 'stations_v2'
+
+async function fetchStations(etag: string | null): Promise<FetchResult<StationDetail[]>> {
+  const { data, response } = await apiClient.GET('/stations', {
+    headers: etag ? { 'If-None-Match': etag } : {},
+  })
+  return { data, response }
+}
 
 /**
  * Fetches the full station list (with platforms) from the backend.
- * Loads from AsyncStorage on mount (instant, works offline), then refreshes
- * from the API in the background and persists the latest data.
+ * Loads from AsyncStorage on mount (instant, works offline), then revalidates with an ETag —
+ * an unchanged list comes back as a 304 and the cached copy is reused.
  */
 export function useStations(): UseStations {
-  const [stations, setStations] = useState<StationDetail[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(false)
-
-  useEffect(() => {
-    let active = true
-    let hadCache = false
-
-    async function load() {
-      try {
-        const cached = await AsyncStorage.getItem(CACHE_KEY)
-        if (active && cached) {
-          setStations(JSON.parse(cached))
-          setLoading(false)
-          hadCache = true
-        }
-      } catch {}
-
-      try {
-        const { data } = await apiClient.GET('/stations')
-        if (!active) return
-        if (data) {
-          setStations(data)
-          setLoading(false)
-          AsyncStorage.setItem(CACHE_KEY, JSON.stringify(data)).catch(() => {})
-        } else if (!hadCache) {
-          setError(true)
-          setLoading(false)
-        }
-      } catch {
-        // Network failure (e.g. backend unreachable). Keep cached data if we
-        // have it; otherwise surface the error state.
-        if (!active) return
-        if (!hadCache) {
-          setError(true)
-          setLoading(false)
-        }
-      }
-    }
-
-    load()
-    return () => {
-      active = false
-    }
-  }, [])
-
-  return { stations, loading, error }
+  const { data, loading, error } = useCachedResource(CACHE_KEY, fetchStations)
+  return { stations: data ?? [], loading, error }
 }
 
 /** The distinct lines a station serves, gathered across all its platforms. */
