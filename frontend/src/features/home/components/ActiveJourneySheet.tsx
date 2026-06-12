@@ -1232,38 +1232,26 @@ export function ActiveJourneySheet({
           }
         }}
       >
+        {/* Non-scrollable header: title + reroute action buttons */}
         <SheetHeader
           title="Accessibility issues"
           onClose={() => rerouteSheetRef.current?.close()}
           modal
         />
-        <BottomSheetScrollView
-          showsVerticalScrollIndicator={false}
-          style={{ flex: 1 }}
-          contentContainerStyle={{
-            paddingHorizontal: Spacing.lg,
-            paddingTop: Spacing.xs,
-            paddingBottom: Spacing.xl,
-          }}
-        >
-          <RouteAlerts
-            assessments={upcomingBlockedAssessments}
-            disruptions={[]}
-            hideHeader
-            defaultExpanded
-          />
-        </BottomSheetScrollView>
-
-        {/* Option buttons pinned to bottom of issues sheet */}
         <YStack
           gap="$2"
           px="$4"
-          pt="$3"
+          pt="$2"
           style={{
-            paddingBottom: insets.bottom + Spacing.md,
-            backgroundColor: Colors.card,
-            borderTopWidth: StyleSheet.hairlineWidth,
-            borderTopColor: Colors.border,
+            paddingBottom: Spacing.md,
+            zIndex: 1,
+            borderBottomWidth: StyleSheet.hairlineWidth,
+            borderBottomColor: Colors.secondaryText,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 3 },
+            shadowOpacity: 0.08,
+            shadowRadius: 6,
+            elevation: 4,
           }}
         >
           <Text
@@ -1340,6 +1328,24 @@ export function ActiveJourneySheet({
             )
           })()}
         </YStack>
+
+        {/* Scrollable issues list */}
+        <BottomSheetScrollView
+          showsVerticalScrollIndicator={false}
+          style={{ flex: 1, backgroundColor: Colors.background }}
+          contentContainerStyle={{
+            paddingHorizontal: Spacing.lg,
+            paddingTop: Spacing.sm,
+            paddingBottom: insets.bottom + Spacing.xl,
+          }}
+        >
+          <RouteAlerts
+            assessments={upcomingBlockedAssessments}
+            disruptions={[]}
+            hideHeader
+            defaultExpanded
+          />
+        </BottomSheetScrollView>
       </BottomSheet>
 
       {/* Alternatives sheet — modal-style popup, no handlebar, opens over the issues sheet. */}
