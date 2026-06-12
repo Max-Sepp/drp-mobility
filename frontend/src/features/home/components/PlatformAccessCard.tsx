@@ -109,11 +109,41 @@ function computeInterchange(platforms: PlatformDetail[]): {
   }
 }
 
+function buildSummary(platforms: PlatformDetail[]): string {
+  const toTrain = platforms.filter((p) => p.step_free === 'Full' || p.step_free === 'to_train').length
+  const toPlatform = platforms.filter((p) => p.step_free === 'to_platform').length
+  const none = platforms.filter((p) => p.step_free === 'none').length
+  const n = platforms.length
+
+  if (none === 0 && toPlatform === 0) return `All ${n} step-free to train`
+  if (none === 0 && toTrain === 0) return `All ${n} step-free to platform`
+  if (none === n) return `No step-free access`
+
+  const parts: string[] = []
+  if (toTrain > 0) parts.push(`${toTrain} to train`)
+  if (toPlatform > 0) parts.push(`${toPlatform} to platform`)
+  if (none > 0) parts.push(`${none} not accessible`)
+  return parts.join(' · ')
+}
+
 export const PlatformAccessCard = ({ platforms }: PlatformAccessCardProps) => {
   const { Colors, Radii } = useTheme()
-  // Only platforms with no step-free access at all count as "not accessible"
   const inaccessible = platforms.filter((p) => p.step_free === 'none')
+  const toPlatformOnly = platforms.filter((p) => p.step_free === 'to_platform')
   const [expanded, setExpanded] = useState(false)
+
+  const isAllAccessible = inaccessible.length === 0 && toPlatformOnly.length === 0
+  const isAllInaccessible = inaccessible.length === platforms.length
+  const summaryBg = isAllAccessible
+    ? Colors.successBg
+    : isAllInaccessible
+      ? Colors.dangerBg
+      : Colors.warningBg
+  const summaryColor = isAllAccessible
+    ? Colors.success
+    : isAllInaccessible
+      ? Colors.danger
+      : Colors.warningDark
 
   const { interchangeLines, allLines, totalLines } = useMemo(
     () => computeInterchange(platforms),
@@ -143,20 +173,29 @@ export const PlatformAccessCard = ({ platforms }: PlatformAccessCardProps) => {
     >
       <XStack
         items="center"
-        justify="space-between"
         gap="$3"
         onPress={() => setExpanded((v) => !v)}
         pressStyle={{ opacity: Opacity.disabledMid }}
       >
-        <YStack gap="$0.5">
+        <XStack
+          style={{
+            width: 36,
+            height: 36,
+            borderRadius: Radii.small,
+            backgroundColor: summaryBg,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <MaterialIcons name="accessible" size={20} color={summaryColor} />
+        </XStack>
+        <YStack flex={1} gap="$0.5">
           <Text fontSize={15} fontWeight="700" color={Colors.text}>
             Platform access
           </Text>
           {!expanded && (
             <Text fontSize={12} color={Colors.secondaryText}>
-              {inaccessible.length === 0
-                ? `All ${platforms.length} platforms step-free`
-                : `${inaccessible.length} of ${platforms.length} platforms not accessible`}
+              {buildSummary(platforms)}
             </Text>
           )}
         </YStack>
