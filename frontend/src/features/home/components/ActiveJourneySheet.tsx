@@ -35,6 +35,7 @@ import { assessOutages, DIRECT_VERDICTS } from '@/features/journey/api/outageRel
 import type { StationOutage } from '@/features/journey/api/accessibility'
 import { useOutages } from '@/features/outages'
 import {
+  planAlternativesAlongLine,
   planJourneyOptions,
   routeSignature,
   type Journey,
@@ -158,6 +159,8 @@ export function ActiveJourneySheet({
   const [gpsActive, setGpsActive] = useState(false)
   const [currentJourney, setCurrentJourney] = useState<Journey | null>(null)
   const [rerouteState, setRerouteState] = useState<RerouteState>({ phase: 'idle' })
+  const [loadingSource, setLoadingSource] = useState<'from-location' | 'along-line' | null>(null)
+  const [alongLineHint, setAlongLineHint] = useState(false)
   const [previewJourney, setPreviewJourney] = useState<JourneyDetailParams | null>(null)
   const [rerouteHeaderH, setRerouteHeaderH] = useState(0)
   const [rerouteResultsH, setRerouteResultsH] = useState<number | null>(null)
@@ -429,6 +432,7 @@ export function ActiveJourneySheet({
       return
     }
 
+    setLoadingSource('from-location')
     setRerouteState({ phase: 'loading' })
 
     const activeLegs = (currentJourney ?? params.journey).legs
@@ -439,11 +443,14 @@ export function ActiveJourneySheet({
     const toLocation = rerouteToLocation
 
     if (!fromLocation || !toLocation) {
+      setLoadingSource(null)
       setRerouteState({ phase: 'none-found' })
       return
     }
 
     const result = await planJourneyOptions(fromLocation, toLocation, params.level, null, true)
+
+    setLoadingSource(null)
 
     if (result.kind !== 'journeys') {
       setRerouteState({ phase: 'none-found' })
@@ -465,6 +472,54 @@ export function ActiveJourneySheet({
 
     if (alternatives.length > 0) {
       alternativesCacheRef.current = { alternatives, fetchedAt: Date.now() }
+      setRerouteState({ phase: 'found', alternatives })
+    } else {
+      setRerouteState({ phase: 'none-found' })
+    }
+  }
+
+  async function handleFindAlongLine() {
+    if (!params) return
+
+    if (currentLeg?.mode.name === 'walking') {
+      setAlongLineHint(true)
+      return
+    }
+
+    setAlongLineHint(false)
+    const toLocation = rerouteToLocation
+    if (!toLocation) {
+      setRerouteState({ phase: 'none-found' })
+      return
+    }
+
+    setLoadingSource('along-line')
+    setRerouteState({ phase: 'loading' })
+
+    const activeLegs = (currentJourney ?? params.journey).legs
+    const result = await planAlternativesAlongLine(activeLegs, legIndex, toLocation, params.level)
+
+    setLoadingSource(null)
+
+    if (result.kind !== 'journeys') {
+      setRerouteState({ phase: 'none-found' })
+      return
+    }
+
+    const baseSig = routeSignature(currentJourney ?? params.journey)
+    const blockedAsOutages: StationOutage[] = upcomingBlockedAssessments.map((a) => ({
+      stationName: a.stationName,
+      equipmentTypes: [],
+      units: [],
+      totalByType: {},
+    }))
+    const alternatives = result.journeys.filter(
+      ({ journey }) =>
+        routeSignature(journey) !== baseSig &&
+        matchOutages(journey, blockedAsOutages).length === 0,
+    )
+
+    if (alternatives.length > 0) {
       setRerouteState({ phase: 'found', alternatives })
     } else {
       setRerouteState({ phase: 'none-found' })
@@ -1228,6 +1283,7 @@ export function ActiveJourneySheet({
         onChange={(index) => {
           if (index === -1 && onClosed('reroute-issues')) {
             setRerouteState({ phase: 'idle' })
+            setAlongLineHint(false)
             alternativesCacheRef.current = null
           }
         }}
@@ -1256,32 +1312,34 @@ export function ActiveJourneySheet({
           }}
         >
           {(() => {
-            const busy = rerouteState.phase === 'loading'
+            const anyBusy = rerouteState.phase === 'loading'
+            const busyFromLocation = anyBusy && loadingSource === 'from-location'
+            const busyAlongLine = anyBusy && loadingSource === 'along-line'
             return (
               <>
                 <TouchableOpacity
                   style={[
                     styles.rerouteSheetBtn,
                     {
-                      backgroundColor: busy ? Colors.dangerBorder : Colors.dangerDark,
-                      opacity: busy ? Opacity.disabledMid : 1,
+                      backgroundColor: busyFromLocation ? Colors.dangerBorder : Colors.dangerDark,
+                      opacity: anyBusy ? Opacity.disabledMid : 1,
                     },
                   ]}
-                  onPress={busy ? undefined : handleFindAlternative}
+                  onPress={anyBusy ? undefined : handleFindAlternative}
                   activeOpacity={0.8}
                   accessibilityRole="button"
                   accessibilityLabel="Find alternative route from your location"
                 >
-                  {busy ? (
+                  {busyFromLocation ? (
                     <Spinner size="small" color="white" />
                   ) : (
                     <MaterialIcons name="my-location" size={16} color="white" />
                   )}
                   <YStack flex={1}>
                     <Text fontSize={14} fontWeight="700" color="white">
-                      {busy ? 'Searching…' : 'From your location'}
+                      {busyFromLocation ? 'Searching…' : 'From your location'}
                     </Text>
-                    {!busy && (
+                    {!busyFromLocation && (
                       <Text fontSize={12} color="white" style={{ opacity: 0.8 }}>
                         Plan a new route avoiding the issue
                       </Text>
@@ -1296,27 +1354,45 @@ export function ActiveJourneySheet({
                       backgroundColor: Colors.searchBg,
                       borderWidth: Borders.medium,
                       borderColor: Colors.border,
-                      opacity: Opacity.disabled,
+                      opacity: anyBusy ? Opacity.disabledMid : 1,
                     },
                   ]}
-                  disabled
-                  activeOpacity={1}
+                  onPress={anyBusy ? undefined : handleFindAlongLine}
+                  activeOpacity={0.8}
                   accessibilityRole="button"
-                  accessibilityLabel="Find step-free stops along this line — coming soon"
+                  accessibilityLabel="Find step-free stops along this line"
                 >
-                  <MaterialIcons name="train" size={16} color={Colors.secondaryText} />
+                  {busyAlongLine ? (
+                    <Spinner size="small" color={Colors.text} />
+                  ) : (
+                      <MaterialIcons name="train" size={16} color={Colors.secondaryText} />
+                  )}
                   <YStack flex={1}>
                     <Text fontSize={14} fontWeight="700" color={Colors.text}>
-                      Along this line
+                      {busyAlongLine ? 'Searching…' : 'Along this line'}
                     </Text>
-                    <Text fontSize={12} color={Colors.secondaryText}>
-                      Find step-free stops you can reach from here
-                    </Text>
+                    {!busyAlongLine && (
+                      <Text fontSize={12} color={Colors.secondaryText}>
+                        Find step-free stops you can reach from here
+                      </Text>
+                    )}
                   </YStack>
-                  <Text fontSize={11} fontWeight="600" color={Colors.tertiaryText}>
-                    Coming soon
-                  </Text>
                 </TouchableOpacity>
+
+                {alongLineHint && (
+                  <XStack
+                    gap="$2"
+                    px="$1"
+                    pt="$1"
+                    pb="$1"
+                    items="center"
+                  >
+                    <MaterialIcons name="info-outline" size={14} color={Colors.secondaryText} />
+                    <Text fontSize={12} color={Colors.secondaryText} flex={1}>
+                      {"You're on a walking leg — continue on to your current train or bus leg to reroute along it."}
+                    </Text>
+                  </XStack>
+                )}
               </>
             )
           })()}

@@ -255,3 +255,78 @@ export async function planJourneyOptions(
   })
   return { kind: 'journeys', journeys: tagged }
 }
+
+/**
+ * Find alternative routes by identifying earlier stop-off points along the current transit leg(s).
+ * Useful when the user is already on a train heading to a station with a reported accessibility
+ * outage — rather than replanning from scratch, this surfaces options like "get off at Barons
+ * Court, then bus to Hammersmith" by planning from each intermediate stop to the destination.
+ *
+ * `fromLegIndex` is the index of the leg the user is currently on. Stop points are collected from
+ * every non-walking leg from that index onward (the current leg plus any direct continuations),
+ * then capped at 5 candidates to keep parallel API calls manageable. Results are deduplicated,
+ * filtered for accessibility, and tagged the same way as `planJourneyOptions`.
+ */
+export async function planAlternativesAlongLine(
+  legs: Leg[],
+  fromLegIndex: number,
+  destination: string,
+  accessibility: AccessibilityPreference | null,
+): Promise<JourneyOptionsResult> {
+  // Gather unique intermediate stop names from all transit legs from current position onward.
+  const seen = new Set<string>()
+  const candidates: string[] = []
+
+  for (let i = fromLegIndex; i < legs.length; i++) {
+    const leg = legs[i]
+    if (leg.mode.name === 'walking') continue
+    for (const stop of leg.path?.stopPoints ?? []) {
+      if (stop.name && !seen.has(stop.name)) {
+        seen.add(stop.name)
+        candidates.push(stop.name)
+      }
+    }
+  }
+
+  if (candidates.length === 0) {
+    return { kind: 'error', message: 'No intermediate stops found along this line.' }
+  }
+
+  // Cap to 5 stops so we never fire more than 5 parallel TfL requests.
+  const stopsToTry = candidates.slice(0, 5)
+
+  const results = await Promise.all(
+    stopsToTry.map((stopName) => planJourney(stopName, destination, accessibility)),
+  )
+
+  // Merge journeys from all stops, deduplicating by route signature.
+  const bySignature = new Map<string, Journey>()
+  let lastError = 'No alternative stops found along this line.'
+  for (const result of results) {
+    if (result.kind !== 'journeys') {
+      lastError = result.message
+      continue
+    }
+    for (const journey of result.journeys) {
+      const key = routeSignature(journey)
+      if (!bySignature.has(key)) bySignature.set(key, journey)
+    }
+  }
+
+  const journeys = [...bySignature.values()]
+  if (journeys.length === 0) return { kind: 'error', message: lastError }
+
+  const minDuration = Math.min(...journeys.map((j) => j.duration))
+  const minWalking = Math.min(...journeys.map(walkingMinutes))
+  const minChanges = Math.min(...journeys.map(changeCount))
+
+  const tagged: TaggedJourney[] = journeys.map((journey) => {
+    const tags: RouteTag[] = []
+    if (journey.duration <= minDuration * (1 + TAG_TOLERANCE)) tags.push('fastest')
+    if (changeCount(journey) === minChanges) tags.push('fewest-changes')
+    if (walkingMinutes(journey) <= minWalking * (1 + TAG_TOLERANCE)) tags.push('least-walking')
+    return { journey, tags }
+  })
+
+  return { kind: 'journeys', journeys: tagged }
+}
