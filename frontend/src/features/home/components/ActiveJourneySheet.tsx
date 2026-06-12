@@ -59,6 +59,7 @@ import {
 } from '@/features/journey/components/legDisplay'
 import { RouteAlerts } from '@/features/journey/components/RouteAlerts'
 import { haversineMeters } from '@/lib/geo'
+import { useAppLocation } from '@/lib/LocationContext'
 import { useTheme, Borders, Heights, Opacity, Spacing } from '@/theme'
 import { JOURNEY_CACHE_TTL_MS } from '@/config'
 import { useSheetStack } from '@/components/SheetStack'
@@ -173,6 +174,7 @@ export function ActiveJourneySheet({
 
   const { stations } = useStations()
   const stationNames = useMemo(() => stations.map((s) => s.name), [stations])
+  const userCoords = useAppLocation()
   const resolveStation = useCallback(
     (name: string) => resolveStationName(name, stationNames),
     [stationNames],
@@ -314,6 +316,15 @@ export function ActiveJourneySheet({
     const arr = lastLeg?.arrivalPoint
     return arr?.lat != null && arr?.lon != null ? `${arr.lat},${arr.lon}` : null
   }, [params, legs])
+
+  // Destination coordinates as a lat/lon pair — needed to synthesise walking legs in
+  // `planAlternativesAlongLine`. Taken from the original journey's final arrival point, which
+  // TfL always populates for transit legs.
+  const rerouteDestCoords = useMemo(() => {
+    const lastLeg = legs[legs.length - 1]
+    const arr = lastLeg?.arrivalPoint
+    return arr?.lat != null && arr?.lon != null ? { lat: arr.lat, lon: arr.lon } : null
+  }, [legs])
 
   const showRerouteAlert = useMemo(
     () => upcomingBlockedAssessments.length > 0 && rerouteToLocation != null,
@@ -498,12 +509,24 @@ export function ActiveJourneySheet({
 
     const activeLegs = (currentJourney ?? params.journey).legs
     const blockedNames = upcomingBlockedAssessments.map((a) => a.stationName)
+    // Fall back to the current leg's departure point if GPS isn't available — that's where the
+    // rider effectively is when they boarded this leg.
+    const currentDep = activeLegs[legIndex]?.departurePoint
+    const originCoords =
+      userCoords != null
+        ? { lat: userCoords.latitude, lon: userCoords.longitude }
+        : currentDep?.lat != null && currentDep?.lon != null
+          ? { lat: currentDep.lat, lon: currentDep.lon }
+          : null
     const result = await planAlternativesAlongLine(
       activeLegs,
       legIndex,
       toLocation,
-      params.level,
+      params.level ?? null,
       blockedNames,
+      stations,
+      originCoords,
+      rerouteDestCoords,
     )
 
     setLoadingSource(null)

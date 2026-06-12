@@ -3,6 +3,8 @@
 // unauthenticated rate limit. This is deliberately NOT the openapi-fetch `apiClient`,
 // which is typed to our own backend schema.
 
+import { normaliseStationName } from '@/features/journey/api/accessibility'
+
 const TFL_BASE = 'https://api.tfl.gov.uk'
 
 /** A single transit mode used on a leg, e.g. `walking`, `tube`, `bus`. */
@@ -258,110 +260,282 @@ export async function planJourneyOptions(
   return { kind: 'journeys', journeys: tagged }
 }
 
-// All modes TfL's journey planner accepts in the `mode` query parameter.
-const TFL_ALL_MODES = [
-  'tube',
-  'bus',
-  'dlr',
-  'elizabeth-line',
-  'overground',
-  'national-rail',
-  'walking',
-  'replacement-bus',
-  'tflrail',
-]
+/** Minimal shape of a station used by the rerouting helpers. Satisfied by `StationDetail`. */
+export type StationLookup = {
+  name: string
+  latitude?: number | null
+  longitude?: number | null
+  platforms: { step_free: string; lines: string[] }[]
+}
+
+type LatLon = { lat: number; lon: number }
+
+/** Great-circle distance in kilometres between two points (Haversine). */
+function haversineKm(a: LatLon, b: LatLon): number {
+  const R = 6371
+  const toRad = (d: number) => (d * Math.PI) / 180
+  const dLat = toRad(b.lat - a.lat)
+  const dLon = toRad(b.lon - a.lon)
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLon / 2) ** 2
+  return 2 * R * Math.asin(Math.sqrt(h))
+}
+
+function stationCoords(s: StationLookup): LatLon | null {
+  return s.latitude != null && s.longitude != null ? { lat: s.latitude, lon: s.longitude } : null
+}
+
+/** Match a TfL `commonName` against the station list using the same loose containment rule as `resolveStationName`. */
+function findStationByName(stations: StationLookup[], tflName: string): StationLookup | null {
+  const target = normaliseStationName(tflName)
+  const exact = stations.find((s) => normaliseStationName(s.name) === target)
+  if (exact) return exact
+  return (
+    stations.find((s) => {
+      const n = normaliseStationName(s.name)
+      return n.includes(target) || target.includes(n)
+    }) ?? null
+  )
+}
 
 /**
- * Find alternative routes by identifying earlier stop-off points along the current transit leg(s).
- * Useful when the user is already on a train heading to a station with a reported accessibility
- * outage — rather than replanning from scratch, this surfaces options like "get off at Barons
- * Court, then bus to Hammersmith" by planning from each intermediate stop to the destination.
+ * A station is a safe rerouting destination for a wheelchair user when at least one platform is
+ * either fully step-free OR step-free to the train (both mean no step onto the train).
+ */
+function hasStepFreeBoarding(s: StationLookup): boolean {
+  return s.platforms.some((p) => p.step_free === 'full' || p.step_free === 'to_train')
+}
+
+/** A station serves ≥ 2 lines across its platforms — i.e. you can change lines here. */
+function isInterchange(s: StationLookup): boolean {
+  return new Set(s.platforms.flatMap((p) => p.lines)).size >= 2
+}
+
+/**
+ * Step-free stations within `maxKm` of the anchor, sorted nearest first, excluding any whose name
+ * is in `excludeNames` (typically the blocked station itself).
+ */
+function nearbyStepFreeStations(
+  anchor: LatLon,
+  stations: StationLookup[],
+  excludeNames: string[],
+  maxKm: number,
+): { station: StationLookup; coords: LatLon; distanceKm: number }[] {
+  const excludeNorm = new Set(excludeNames.map(normaliseStationName))
+  const out: { station: StationLookup; coords: LatLon; distanceKm: number }[] = []
+  for (const s of stations) {
+    if (excludeNorm.has(normaliseStationName(s.name))) continue
+    if (!hasStepFreeBoarding(s)) continue
+    const c = stationCoords(s)
+    if (!c) continue
+    const d = haversineKm(anchor, c)
+    if (d <= maxKm) out.push({ station: s, coords: c, distanceKm: d })
+  }
+  out.sort((a, b) => a.distanceKm - b.distanceKm)
+  return out
+}
+
+/**
+ * Walking forward from the user's current leg, find the last interchange station they will pass
+ * through before reaching any blocked station. Returns the station name as TfL knows it, suitable
+ * to pass back to the journey planner, or null when there's no interchange before the block.
  *
- * `fromLegIndex` is the index of the leg the user is currently on. Stop points are collected from
- * every non-walking leg from that index onward, then capped at 5 candidates. The current transit
- * mode (e.g. "tube") is excluded from the TfL query so it is forced onto bus / surface routes
- * rather than routing back through the same (blocked) line.
+ * Replanning from a real interchange surfaces genuine line-switching alternatives — something
+ * that querying from a non-interchange intermediate stop cannot produce.
+ */
+function lastInterchangeBefore(
+  legs: Leg[],
+  fromLegIndex: number,
+  blockedStationNames: string[],
+  stations: StationLookup[],
+): string | null {
+  const blockedNorm = blockedStationNames.map(normaliseStationName)
+  const matchesBlocked = (name: string) => {
+    const n = normaliseStationName(name)
+    return blockedNorm.some((b) => n.includes(b) || b.includes(n))
+  }
+
+  let last: string | null = null
+  for (let i = fromLegIndex; i < legs.length; i++) {
+    const leg = legs[i]
+    if (leg.mode.name === 'walking') continue
+    const points: string[] = []
+    if (leg.departurePoint?.commonName) points.push(leg.departurePoint.commonName)
+    for (const sp of leg.path?.stopPoints ?? []) {
+      if (sp.name) points.push(sp.name)
+    }
+    for (const name of points) {
+      if (matchesBlocked(name)) return last
+      const s = findStationByName(stations, name)
+      if (s && isInterchange(s)) last = name
+    }
+  }
+  return last
+}
+
+/** TfL local-wallclock time format ("YYYY-MM-DDTHH:MM:SS", no timezone). */
+function toLondonLocal(d: Date): string {
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
+}
+
+/** Parse a TfL local-wallclock string into a Date whose components match (no UTC shift). */
+function parseLondonLocal(s: string): Date {
+  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?/)
+  if (!m) return new Date(s)
+  return new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +(m[6] ?? 0))
+}
+
+/** Straight-line distance × 1.3 (street-routing fudge) ÷ 5 km/h walking speed, in whole minutes. */
+function walkMinutes(from: LatLon, to: LatLon): number {
+  const distKm = haversineKm(from, to)
+  return Math.max(1, Math.round(((distKm * 1.3) / 5) * 60))
+}
+
+/** A single-leg walking-only Journey from origin to destination. */
+function synthesizeWalkJourney(origin: LatLon, dest: LatLon): Journey {
+  const minutes = walkMinutes(origin, dest)
+  const start = new Date()
+  const end = new Date(start.getTime() + minutes * 60_000)
+  const startStr = toLondonLocal(start)
+  const endStr = toLondonLocal(end)
+  return {
+    startDateTime: startStr,
+    arrivalDateTime: endStr,
+    duration: minutes,
+    legs: [
+      {
+        duration: minutes,
+        mode: { name: 'walking' },
+        instruction: { summary: `Walk to destination (approx. ${minutes} min)` },
+        departureTime: startStr,
+        arrivalTime: endStr,
+        departurePoint: { lat: origin.lat, lon: origin.lon, commonName: 'Your location' },
+        arrivalPoint: { lat: dest.lat, lon: dest.lon, commonName: 'Destination' },
+      },
+    ],
+  }
+}
+
+/** Append a synthetic walking leg from `from` to `destCoords` onto `journey`, extending duration / arrival. */
+function appendWalkingLeg(
+  journey: Journey,
+  from: { name: string; coords: LatLon },
+  destCoords: LatLon,
+): Journey {
+  const minutes = walkMinutes(from.coords, destCoords)
+  const lastLeg = journey.legs[journey.legs.length - 1]
+  const prevArrivalStr = lastLeg?.arrivalTime ?? journey.arrivalDateTime
+  const prevArrival = parseLondonLocal(prevArrivalStr)
+  const newArrival = new Date(prevArrival.getTime() + minutes * 60_000)
+  const newArrivalStr = toLondonLocal(newArrival)
+  const walkLeg: Leg = {
+    duration: minutes,
+    mode: { name: 'walking' },
+    instruction: { summary: `Walk to destination (approx. ${minutes} min)` },
+    departureTime: prevArrivalStr,
+    arrivalTime: newArrivalStr,
+    departurePoint: { lat: from.coords.lat, lon: from.coords.lon, commonName: from.name },
+    arrivalPoint: { lat: destCoords.lat, lon: destCoords.lon, commonName: 'Destination' },
+  }
+  return {
+    ...journey,
+    duration: journey.duration + minutes,
+    arrivalDateTime: newArrivalStr,
+    legs: [...journey.legs, walkLeg],
+  }
+}
+
+/**
+ * Find alternative routes when a station on the user's current journey has reported accessibility
+ * outages. Runs three strategies in parallel and merges:
+ *
+ * - **Substitute destination (A)**: pick step-free stations near the blocked one (from our own
+ *   `stations.json`), plan to each, then synthesise a final walking leg to the original destination.
+ *   Lets the rider end at a different (working) station and walk the last stretch.
+ * - **Earlier interchange (B)**: identify the last interchange the rider will pass through before
+ *   the block, then replan from there to the original destination with all modes enabled and
+ *   `includeAlternativeRoutes=true`. Gives TfL the room to surface a real line-switch.
+ * - **Walk fallback (C)**: a single walking-only journey from origin to destination, always
+ *   included as a safety net so the alternatives sheet is never empty.
+ *
+ * `originCoords` is the rider's current position (GPS); `destCoords` are the coordinates of the
+ * journey's true destination. Either can be null — strategies needing them will silently skip.
+ * Results are deduplicated by route signature and tagged (fastest / fewest-changes / least-walking).
  */
 export async function planAlternativesAlongLine(
   legs: Leg[],
   fromLegIndex: number,
   destination: string,
   accessibility: AccessibilityPreference | null,
-  blockedStationNames?: string[],
+  blockedStationNames: string[],
+  stations: StationLookup[],
+  originCoords: LatLon | null,
+  destCoords: LatLon | null,
 ): Promise<JourneyOptionsResult> {
-  // Build a set of normalised blocked names for loose candidate filtering.
-  // TfL stop names look like "Hammersmith (Dist&Picc Line) Underground Station"; our blocked
-  // names look like "Hammersmith". We check if either string contains the other (case-insensitive).
-  const blockedLower = (blockedStationNames ?? []).map((n) => n.toLowerCase())
-  const isBlocked = (stopName: string) => {
-    const lower = stopName.toLowerCase()
-    return blockedLower.some((b) => lower.includes(b) || b.includes(lower.split(' ')[0]))
-  }
-
-  // Identify the transit mode we're currently riding so we can exclude it from alternative
-  // queries. Without this, TfL always nominates the same (blocked) line as the fastest option,
-  // which we then filter out, leaving only walking. Excluding the mode (e.g. "tube") forces TfL
-  // to surface bus and surface routes.
-  let currentMode: string | null = null
-  for (let i = fromLegIndex; i < legs.length; i++) {
-    if (legs[i].mode.name !== 'walking') {
-      currentMode = legs[i].mode.name
-      break
-    }
-  }
-  const alternativeModes = currentMode
-    ? TFL_ALL_MODES.filter((m) => m !== currentMode).join(',')
-    : undefined
-
-  // Gather unique intermediate stop names from all transit legs from current position onward,
-  // excluding any stop that is itself a blocked station (TfL sometimes includes the arrival
-  // station in stopPoints, producing a spurious 1-minute-walk "alternative").
-  const seen = new Set<string>()
-  const candidates: string[] = []
-
-  for (let i = fromLegIndex; i < legs.length; i++) {
-    const leg = legs[i]
-    if (leg.mode.name === 'walking') continue
-    for (const stop of leg.path?.stopPoints ?? []) {
-      if (stop.name && !seen.has(stop.name) && !isBlocked(stop.name)) {
-        seen.add(stop.name)
-        candidates.push(stop.name)
+  // Strategy A — substitute destination
+  const strategyA: Promise<Journey[]> = (async () => {
+    if (!originCoords || !destCoords || blockedStationNames.length === 0) return []
+    // Anchor on the blocked station's known coordinates so substitutes cluster near it. Fall back
+    // to the rider's destination if we don't recognise the blocked station name.
+    const blockedCoords = blockedStationNames
+      .map((n) => {
+        const s = findStationByName(stations, n)
+        return s ? stationCoords(s) : null
+      })
+      .filter((c): c is LatLon => c !== null)
+    const anchor = blockedCoords[0] ?? destCoords
+    const substitutes = nearbyStepFreeStations(anchor, stations, blockedStationNames, 1.5).slice(
+      0,
+      3,
+    )
+    if (substitutes.length === 0) return []
+    const originStr = `${originCoords.lat},${originCoords.lon}`
+    const results = await Promise.all(
+      substitutes.map((sub) =>
+        planJourney(originStr, sub.station.name, accessibility, null, null, true),
+      ),
+    )
+    const out: Journey[] = []
+    for (let i = 0; i < results.length; i++) {
+      const result = results[i]
+      const sub = substitutes[i]
+      if (result.kind !== 'journeys') continue
+      for (const journey of result.journeys) {
+        out.push(
+          appendWalkingLeg(journey, { name: sub.station.name, coords: sub.coords }, destCoords),
+        )
       }
     }
-  }
+    return out
+  })()
 
-  if (candidates.length === 0) {
-    return { kind: 'error', message: 'No intermediate stops found along this line.' }
-  }
+  // Strategy B — earlier interchange
+  const strategyB: Promise<Journey[]> = (async () => {
+    if (blockedStationNames.length === 0) return []
+    const interchange = lastInterchangeBefore(legs, fromLegIndex, blockedStationNames, stations)
+    if (!interchange) return []
+    const result = await planJourney(interchange, destination, accessibility, null, null, true)
+    return result.kind === 'journeys' ? result.journeys : []
+  })()
 
-  // Cap to 5 stops. Query with alternative modes only — this forces TfL off the blocked line.
-  // Accessibility preference is intentionally omitted here: TfL's step-free filter applies to
-  // tube/rail infrastructure; buses in London are universally accessible (low-floor, ramps) and
-  // passing accessibilityPreference with bus-only modes returns no results.
-  const stopsToTry = candidates.slice(0, 5)
+  // Strategy C — walking fallback (always included when we have both endpoints)
+  const strategyC: Journey[] =
+    originCoords && destCoords ? [synthesizeWalkJourney(originCoords, destCoords)] : []
 
-  const results = await Promise.all(
-    stopsToTry.map((stopName) =>
-      planJourney(stopName, destination, null, null, null, false, alternativeModes),
-    ),
-  )
+  const [resultsA, resultsB] = await Promise.all([strategyA, strategyB])
 
-  // Merge journeys from all stops, deduplicating by route signature.
   const bySignature = new Map<string, Journey>()
-  let lastError = 'No alternative stops found along this line.'
-  for (const result of results) {
-    if (result.kind !== 'journeys') {
-      lastError = result.message
-      continue
-    }
-    for (const journey of result.journeys) {
-      const key = routeSignature(journey)
-      if (!bySignature.has(key)) bySignature.set(key, journey)
-    }
+  for (const journey of [...resultsA, ...resultsB, ...strategyC]) {
+    const key = routeSignature(journey)
+    if (!bySignature.has(key)) bySignature.set(key, journey)
   }
 
   const journeys = [...bySignature.values()]
-  if (journeys.length === 0) return { kind: 'error', message: lastError }
+  if (journeys.length === 0) {
+    return { kind: 'error', message: 'No alternative routes found.' }
+  }
 
   const minDuration = Math.min(...journeys.map((j) => j.duration))
   const minWalking = Math.min(...journeys.map(walkingMinutes))
