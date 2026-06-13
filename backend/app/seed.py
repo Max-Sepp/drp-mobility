@@ -132,13 +132,10 @@ def seed_defaults(db: Session) -> None:
         )
 
     def lift_connection(unit: dict) -> str:
-        """Build a connection string. Prefer the curated, rider-readable
-        `description` (e.g. "Booking Hall ↔ Eastbound platforms"); otherwise fall
-        back to a raw "from → to" route or the legacy {connection} format."""
+        """Build a connection string from the structured from/to fields.
+        Falls back to the legacy {connection} string for hand-curated overrides."""
         if "connection" in unit:
             return f"{unit['name']}: {unit['connection']}"
-        if unit.get("description"):
-            return f"{unit['name']}: {unit['description']}"
         return f"{unit['name']}: {unit.get('from', '')} → {unit.get('to', '')}"
 
     def escalator_connection(unit: dict) -> str:

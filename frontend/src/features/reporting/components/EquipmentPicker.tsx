@@ -143,10 +143,19 @@ export const EquipmentPicker = ({
               const selected = selectedId === e.id
               const highlighted = highlightedIds?.has(e.id) ?? false
               const isLift = e.equipment_type.name === 'lift'
-              const ends = connectionBody(e.connection, e.equipment_type.name)
+              // Extract "Lift A" / "Escalator 2" from before the colon for use as the primary label.
+              const equipName = e.connection.includes(':')
+                ? e.connection.split(':')[0].trim()
+                : null
+              const body = connectionBody(e.connection, e.equipment_type.name)
+              const ends = body
                 .split(/↔|→/)
                 .map((s) => s.trim())
                 .filter(Boolean)
+              const arrow = isLift ? '↔' : '→'
+              // Single string "from ↔ to" so the arrow always sits between its endpoints,
+              // regardless of where the text wraps.
+              const route = ends.length > 1 ? `${ends[0]} ${arrow} ${ends[1]}` : (ends[0] ?? '')
               const lines = platforms ? linesForEquipment(e.connection, platforms) : []
               return (
                 <XStack
@@ -185,20 +194,12 @@ export const EquipmentPicker = ({
                   </YStack>
 
                   <YStack flex={1} gap="$1">
-                    {/* The connector is part of the text flow (joined to the last word by a
-                        non-breaking space) so it stays at the end of the line when end A wraps,
-                        rather than dropping onto a line of its own. */}
-                    <Text fontSize={15} color={Colors.text}>
-                      {ends[0] ?? ''}
-                      {ends.length > 1 && (
-                        <Text
-                          color={Colors.secondaryText}
-                        >{`\u00A0\u00A0${isLift ? '↔' : '→'}`}</Text>
-                      )}
+                    <Text fontSize={15} fontWeight="600" color={Colors.text}>
+                      {equipName ?? route}
                     </Text>
-                    {ends.length > 1 && (
-                      <Text fontSize={15} color={Colors.text}>
-                        {ends[1]}
+                    {equipName && (
+                      <Text fontSize={13} color={Colors.secondaryText}>
+                        {route}
                       </Text>
                     )}
                     {lines.length > 0 && <LineChips lines={lines} />}
