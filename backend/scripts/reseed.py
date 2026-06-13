@@ -35,11 +35,15 @@ from app.models import failure as _failure  # noqa: E402, F401
 from app.models import line as _line  # noqa: E402, F401
 from app.models import outage_report as _outage_report  # noqa: E402, F401
 from app.models import outage_report_deletion as _outage_report_deletion  # noqa: E402, F401
+from app.models import outage_report_verification as _outage_report_verification  # noqa: E402, F401
 from app.models import platform as _platform  # noqa: E402, F401
 from app.models import push_token as _push_token  # noqa: E402, F401
+from app.models import recent_location as _recent_location  # noqa: E402, F401
 from app.models import saved_journey as _saved_journey  # noqa: E402, F401
+from app.models import saved_place as _saved_place  # noqa: E402, F401
 from app.models import session as _session  # noqa: E402, F401
 from app.models import station as _station  # noqa: E402, F401
+from app.models import station_alert as _station_alert  # noqa: E402, F401
 from app.models import user as _user  # noqa: E402, F401
 from app.seed import seed_defaults  # noqa: E402
 
