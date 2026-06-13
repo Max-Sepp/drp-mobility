@@ -331,8 +331,7 @@ export function JourneyPlannerSheet({
       const outagesPromise = fetchStationOutages()
       setResolved({ from: fromLoc, to: toLoc })
 
-      const fromQuery = tflQuery(fromLoc)
-      const toQuery = tflQuery(toLoc)
+      const [fromQuery, toQuery] = await Promise.all([tflQuery(fromLoc), tflQuery(toLoc)])
       const cacheKey = optionsCacheKey(fromQuery, toQuery, level, timeConstraint)
       const cached = journeyOptionsCache.get(cacheKey)
 
