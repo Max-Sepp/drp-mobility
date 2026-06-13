@@ -424,12 +424,19 @@ export function JourneyPlannerSheet({
                 setFromTflId(undefined)
               }}
               onResolved={setFromPostcode}
+              onSelect={(label, postcode, tflId) => {
+                setFrom(label)
+                setFromPostcode(postcode)
+                setFromTflId(tflId)
+                setFromIsCurrentLocation(false)
+              }}
               isResolved={fromPostcode !== null}
               textColor={fromIsCurrentLocation ? Colors.blue : undefined}
               textBold={fromIsCurrentLocation}
               onCurrentLocation={hasShiftCoords || cachedCoords ? handleCurrentLocation : undefined}
               currentLocationLoading={gettingLocation}
               savedPlaceShortcuts={placeShortcuts}
+              stations={stations}
             />
           </View>
 
@@ -445,10 +452,17 @@ export function JourneyPlannerSheet({
               setToTflId(undefined)
             }}
             onResolved={setToPostcode}
+            onSelect={(label, postcode, tflId) => {
+              setTo(label)
+              setToPostcode(postcode)
+              setToTflId(tflId)
+              setToIsNamedPlace(false)
+            }}
             isResolved={toPostcode !== null}
             textColor={toIsNamedPlace ? Colors.blue : undefined}
             textBold={toIsNamedPlace}
             savedPlaceShortcuts={placeShortcuts}
+            stations={stations}
           />
 
           {/* Swap button — centred between the From input's bottom and the To input's top.
