@@ -12,6 +12,7 @@ import {
   getRecentLocations,
   type RecentLocation,
 } from '@/features/journey/api/recentLocations'
+import { alertOffline, isOfflineError } from '@/lib/offline'
 import { useTheme, Borders, Opacity } from '@/theme'
 
 export type PlaceShortcut = {
@@ -130,8 +131,9 @@ export const LocationInput = ({
     let postcode: string | null = null
     try {
       postcode = await postcodeForSuggestion(suggestion)
-    } catch {
-      // Network error — leave postcode null
+    } catch (err) {
+      // Tapping a suggestion with no connection would otherwise do nothing — tell the user why.
+      if (isOfflineError(err)) alertOffline('find that place')
     }
     setSearching(false)
     if (!postcode) return
