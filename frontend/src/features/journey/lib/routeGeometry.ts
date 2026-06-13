@@ -163,6 +163,18 @@ export function journeyToRouteGeometry(journey: Journey, colors: RouteColors): R
     // heuristic could wrongly collapse.
     const coords = walking ? legCoords(leg) : stripBacktracks(legCoords(leg))
     if (coords.length < 2) continue
+    // Bridge any gap to the previous drawn leg with a straight dashed "walking" connector. TfL
+    // sometimes omits the walking leg between two parts of a journey — e.g. a bus→tube changeover
+    // where you alight at a stop and board at a separate station entrance — leaving the route as
+    // two disconnected polylines. This stitches them so the path always reads as continuous.
+    const prev = legs[legs.length - 1]
+    if (prev) {
+      const prevEnd = prev.coords[prev.coords.length - 1]
+      const nextStart = coords[0]
+      if (!sameCoord(prevEnd, nextStart)) {
+        legs.push({ coords: [prevEnd, nextStart], color: colors.walk, isWalking: true })
+      }
+    }
     legs.push({
       coords,
       isWalking: walking,

@@ -134,6 +134,65 @@ describe('journeyToRouteGeometry', () => {
     expect(coords).toHaveLength(4)
   })
 
+  it('inserts a straight walking connector across a gap between two legs (bus→tube changeover)', () => {
+    // Bus alights at one point, tube boards at a different one, with no walking leg between —
+    // the route would otherwise render as two disconnected polylines.
+    const j = journey([
+      leg({
+        mode: { name: 'bus' },
+        path: {
+          lineString: JSON.stringify([
+            [51.5, -0.1],
+            [51.51, -0.11],
+          ]),
+        },
+      }),
+      leg({
+        mode: { name: 'tube' },
+        path: {
+          lineString: JSON.stringify([
+            [51.515, -0.115],
+            [51.52, -0.12],
+          ]),
+        },
+      }),
+    ])
+    const { legs } = journeyToRouteGeometry(j, COLORS)
+    expect(legs).toHaveLength(3)
+    expect(legs[1]).toEqual({
+      coords: [
+        { latitude: 51.51, longitude: -0.11 },
+        { latitude: 51.515, longitude: -0.115 },
+      ],
+      color: COLORS.walk,
+      isWalking: true,
+    })
+  })
+
+  it('does not insert a connector when consecutive legs already meet', () => {
+    const j = journey([
+      leg({
+        mode: { name: 'victoria' },
+        path: {
+          lineString: JSON.stringify([
+            [51.5, -0.1],
+            [51.53, -0.12],
+          ]),
+        },
+      }),
+      leg({
+        mode: { name: 'northern' },
+        path: {
+          lineString: JSON.stringify([
+            [51.53, -0.12],
+            [51.55, -0.14],
+          ]),
+        },
+      }),
+    ])
+    expect(journeyToRouteGeometry(j, COLORS).legs).toHaveLength(2)
+  })
+
   it('marks start, end, and interchanges from transit-leg endpoints', () => {
     const j = journey([
       leg({
