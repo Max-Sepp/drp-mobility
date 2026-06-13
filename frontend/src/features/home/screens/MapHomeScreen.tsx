@@ -609,9 +609,11 @@ export function MapHomeScreen({ navigation, route }: Props) {
           setActiveDetail(null)
           setActivePlan(null)
           // Fully tear down any station that the plan was started from, so it can't reappear over
-          // the route once the active journey is the only open flow.
+          // the route once the active journey is the only open flow. Clearing the map focus too
+          // removes the station roundel pin, which otherwise lingers on the map after the journey.
           setActiveStation(null)
           setStationPausedForJourney(false)
+          mapRef.current?.clearFocus()
           setActiveJourneyParams(params)
         }}
         onHeightChange={setDetailHeight}

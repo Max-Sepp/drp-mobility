@@ -12,7 +12,11 @@ type StationMarkerEntry = (typeof stationMarkers)[number]
 
 // Rendered from Underground.svg (viewBox 615.3×500). The bar extends beyond the circle
 // on both sides (authentic roundel look), so the rendered width is wider than height.
-function StationRoundel() {
+// `scale` shrinks the roundel as the map zooms out so it stays a reasonable on-screen size
+// instead of swamping the map at low zoom (markers are otherwise fixed-pixel).
+const ROUNDEL_WIDTH = 55
+const ROUNDEL_HEIGHT = 45
+function StationRoundel({ scale }: { scale: number }) {
   return (
     <View
       style={{
@@ -23,7 +27,7 @@ function StationRoundel() {
         elevation: 6,
       }}
     >
-      <Svg width={55} height={45} viewBox="0 0 615.3 500">
+      <Svg width={ROUNDEL_WIDTH * scale} height={ROUNDEL_HEIGHT * scale} viewBox="0 0 615.3 500">
         {/* White fill so the map background doesn't show through the ring centre */}
         <Circle cx={308.15} cy={250} r={161.3} fill="white" />
         {/* Red donut ring */}
@@ -46,18 +50,20 @@ export type StationMapHandle = {
   fitToRoute: (coords: LatLng[]) => void
 }
 
-// A waypoint dot drawn at a route's start / end / interchange. Start and end are filled with the
-// adjoining line colour; interchanges are white-filled with a coloured ring so changes stand out.
+// A waypoint dot drawn at a route's start / end / interchange. The start is a solid dark dot;
+// interchanges and the destination are white-filled with a dark ring so they stand out as the
+// places the rider gets on/off (the destination also carries a TfL roundel above it).
 function RouteWaypoint({ kind }: { kind: RouteMarker['kind'] }) {
-  const size = kind === 'interchange' ? 16 : 14
+  const size = kind === 'start' ? 14 : 16
+  const filled = kind === 'start'
   return (
     <Svg width={size} height={size}>
       <Circle
         cx={size / 2}
         cy={size / 2}
         r={size / 2 - 2}
-        fill={kind === 'interchange' ? 'white' : '#1f1f1f'}
-        stroke={kind === 'interchange' ? '#1f1f1f' : 'white'}
+        fill={filled ? '#1f1f1f' : 'white'}
+        stroke={filled ? 'white' : '#1f1f1f'}
         strokeWidth={2}
       />
     </Svg>
@@ -113,6 +119,15 @@ function findStation(poiName: string, lat: number, lng: number): string | null {
 
 const LAT_DELTA = 0.002
 
+// Roundel sizing vs. zoom. At the focus zoom (LAT_DELTA) the roundel renders full size; zooming
+// further out shrinks it (down to ROUNDEL_MIN_SCALE) so it doesn't dominate the map, and zooming
+// in is capped at full size so it never balloons. sqrt softens the curve so it scales gradually.
+const ROUNDEL_MIN_SCALE = 0.4
+function roundelScaleForDelta(latitudeDelta: number): number {
+  const raw = Math.sqrt(LAT_DELTA / latitudeDelta)
+  return Math.min(1, Math.max(ROUNDEL_MIN_SCALE, raw))
+}
+
 type Props = {
   onStationPress: (name: string) => void
   bottomInset: number
@@ -132,6 +147,8 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
   const heading = useAppHeading()
   const mapRef = useRef<MapView>(null)
   const [focusedStation, setFocusedStation] = useState<StationMarkerEntry | null>(null)
+  // Current camera zoom (latitude span), used to keep the focused roundel a sensible on-screen size.
+  const [roundelScale, setRoundelScale] = useState(() => roundelScaleForDelta(LAT_DELTA))
 
   const animateToUser = useCallback(() => {
     if (!coords) return
@@ -216,6 +233,11 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
     if (station) onStationPress(station)
   }
 
+  // The route's destination, surfaced as a TfL roundel above the white "end" dot so the rider can
+  // always spot where the trip finishes. It lives on the route overlay, so it appears whenever a
+  // route is shown (preview or active journey) and clears automatically when the route does.
+  const destination = route?.markers.find((m) => m.kind === 'end') ?? null
+
   return (
     <MapView
       ref={mapRef}
@@ -223,6 +245,7 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
       initialRegion={LONDON}
       mapPadding={{ top: 0, right: 0, left: 0, bottom: bottomInset }}
       onPoiClick={handlePoiClick}
+      onRegionChangeComplete={(region) => setRoundelScale(roundelScaleForDelta(region.latitudeDelta))}
       showsMyLocationButton={false}
       showsCompass={false}
     >
@@ -248,6 +271,16 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
           <RouteWaypoint kind={marker.kind} />
         </Marker>
       ))}
+      {destination && (
+        <Marker
+          coordinate={destination.coord}
+          // Centre anchor matches the focused-station roundel marker; an out-of-range anchor
+          // makes react-native-maps fall back to its default pin instead of the custom view.
+          anchor={{ x: 0.5, y: 0.5 }}
+        >
+          <StationRoundel scale={roundelScale} />
+        </Marker>
+      )}
       {coords && (
         <UserLocationMarker
           latitude={coords.latitude}
@@ -260,7 +293,7 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
           coordinate={{ latitude: focusedStation.lat, longitude: focusedStation.lng }}
           anchor={{ x: 0.5, y: 0.5 }}
         >
-          <StationRoundel />
+          <StationRoundel scale={roundelScale} />
         </Marker>
       )}
     </MapView>
