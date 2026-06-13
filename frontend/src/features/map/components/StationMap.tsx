@@ -1,5 +1,5 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { Dimensions, StyleSheet, View } from 'react-native'
 import MapView, { Marker, Polyline, PoiClickEvent, Region } from 'react-native-maps'
 import Svg, { Circle, Path, Rect } from 'react-native-svg'
 import { fuzzyScore } from '@/lib/fuzzy'
@@ -185,14 +185,39 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
 
   const clearFocus = useCallback(() => setFocusedStation(null), [])
 
-  // Frame the whole route, leaving room for the top buttons and the sheet covering the bottom.
+  // Frame the whole route in the band left visible above the bottom sheet, centred there. We build
+  // the region by hand and animate to it rather than using fitToCoordinates' edgePadding: that
+  // padding *compounds* with the map's own mapPadding (which already reserves the sheet's height),
+  // so the inset gets counted twice and an oversized total makes the map zoom right out (you end up
+  // seeing half of Europe). Here the latitude span is inflated only by the visible fraction so the
+  // route clears the sheet, and that fraction is clamped so a large/stale inset can never explode
+  // the zoom. mapPadding shifts the centre up into the visible band, as it does for the other
+  // animateToRegion calls.
   const fitToRoute = useCallback(
     (coords: LatLng[]) => {
       if (coords.length === 0) return
-      mapRef.current?.fitToCoordinates(coords, {
-        edgePadding: { top: 120, right: 60, left: 60, bottom: bottomInset + 60 },
-        animated: true,
-      })
+      let minLat = Infinity
+      let maxLat = -Infinity
+      let minLng = Infinity
+      let maxLng = -Infinity
+      for (const c of coords) {
+        if (c.latitude < minLat) minLat = c.latitude
+        if (c.latitude > maxLat) maxLat = c.latitude
+        if (c.longitude < minLng) minLng = c.longitude
+        if (c.longitude > maxLng) maxLng = c.longitude
+      }
+      const screenH = Dimensions.get('window').height
+      const visibleFraction = Math.min(1, Math.max(0.35, (screenH - bottomInset) / screenH))
+      const MARGIN = 1.3
+      mapRef.current?.animateToRegion(
+        {
+          latitude: (minLat + maxLat) / 2,
+          longitude: (minLng + maxLng) / 2,
+          latitudeDelta: Math.max(((maxLat - minLat) * MARGIN) / visibleFraction, 0.01),
+          longitudeDelta: Math.max((maxLng - minLng) * MARGIN, 0.01),
+        },
+        600,
+      )
     },
     [bottomInset],
   )
@@ -233,11 +258,6 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
     if (station) onStationPress(station)
   }
 
-  // The route's destination, surfaced as a TfL roundel above the white "end" dot so the rider can
-  // always spot where the trip finishes. It lives on the route overlay, so it appears whenever a
-  // route is shown (preview or active journey) and clears automatically when the route does.
-  const destination = route?.markers.find((m) => m.kind === 'end') ?? null
-
   return (
     <MapView
       ref={mapRef}
@@ -273,16 +293,6 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
           <RouteWaypoint />
         </Marker>
       ))}
-      {destination && (
-        <Marker
-          coordinate={destination.coord}
-          // Centre anchor matches the focused-station roundel marker; an out-of-range anchor
-          // makes react-native-maps fall back to its default pin instead of the custom view.
-          anchor={{ x: 0.5, y: 0.5 }}
-        >
-          <StationRoundel scale={roundelScale} />
-        </Marker>
-      )}
       {coords && (
         <UserLocationMarker
           latitude={coords.latitude}

@@ -300,11 +300,10 @@ export function MapHomeScreen({ navigation, route }: Props) {
   const { status, user } = useAuth()
   const coords = useAppLocation()
 
-  // Camera behaviour for the route overlay. While previewing a route (detail sheet) we frame the
-  // whole trip so the user can see where it goes. But once the journey is actually under way, the
-  // traveller cares about where *they* are, not the far end of the line — so on start we centre on
-  // their location instead. If we have no GPS fix we fall back to framing the route. We only react
-  // to the journey becoming active (not every GPS tick), so manual panning mid-journey isn't fought.
+  // Camera behaviour for the route overlay. When previewing a route (detail sheet) and when the
+  // journey is first started, we frame the whole trip so the rider sees the entire route centred
+  // on screen. We only react to the journey *becoming* active (not every GPS tick), so manual
+  // panning mid-journey isn't fought.
   const wasActiveRef = useRef(false)
   useEffect(() => {
     if (!mapRoute) {
@@ -313,12 +312,19 @@ export function MapHomeScreen({ navigation, route }: Props) {
     }
     const justStarted = Boolean(activeJourneyParams) && !wasActiveRef.current
     wasActiveRef.current = Boolean(activeJourneyParams)
-    if (activeJourneyParams && coords) {
-      if (justStarted) mapRef.current?.recentre()
+    if (activeJourneyParams) {
+      // Defer one beat on start: the detail sheet we're leaving is still closing, so its tall
+      // reported height lingers in mapBottomInset for a frame. Fitting immediately would frame the
+      // route into the thin strip left above that stale inset and zoom right out. Waiting lets the
+      // inset settle to the compact active-journey sheet so the whole trip is framed and centred.
+      if (justStarted) {
+        const id = setTimeout(() => mapRef.current?.fitToRoute(mapRoute.bounds), 400)
+        return () => clearTimeout(id)
+      }
     } else {
       mapRef.current?.fitToRoute(mapRoute.bounds)
     }
-  }, [mapRoute, activeJourneyParams, coords])
+  }, [mapRoute, activeJourneyParams])
   const { workStation } = useWorkShift()
   const { stations } = useStations()
   const isTrusted = user?.role === 'trusted'
