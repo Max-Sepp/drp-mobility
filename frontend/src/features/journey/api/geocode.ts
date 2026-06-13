@@ -25,7 +25,8 @@ const COORD_RE = /^(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)$/
  * A successfully resolved location: the postcode to query plus a label to show the user.
  * `tflId` is set only when the location is a known TfL station — it's the station's NaPTAN id
  * (e.g. "940GZZLUMED"), preferred over the postcode as the TfL query so the journey ends *at*
- * the station rather than a nearby postcode (see `tflQuery`).
+ * the station rather than a nearby postcode (see `tflQuery`). NaPTAN *hub* codes ("HUB…") are
+ * an exception — see `tflQuery`.
  */
 export type ResolvedLocation = {
   postcode: string
@@ -35,8 +36,66 @@ export type ResolvedLocation = {
 }
 export type ResolveResult = ResolvedLocation | { error: string }
 
-/** The string to send to TfL's Journey Planner for a location: its station id when known, else postcode. */
-export const tflQuery = (loc: ResolvedLocation): string => loc.tflId ?? loc.postcode
+const TFL_BASE = 'https://api.tfl.gov.uk'
+
+/**
+ * TfL's Journey Planner accepts StopPoint ids (e.g. "940…" tube/DLR, "910…" national rail) and
+ * postcodes, but NOT NaPTAN *hub* codes ("HUB…", used by ~90 national-rail hub stations such as
+ * Victoria and Abbey Wood). It treats a hub code as free text and returns an HTTP 300
+ * disambiguation page with no journeys ("no journeys found"). A hub groups the real StopPoints at
+ * a site (tube, rail, bus), each with its own id the planner *does* accept, so we resolve the hub
+ * to one of those — making the journey end *at* the station rather than at a nearby postcode (which
+ * leaves a phantom walk from the station to the postcode).
+ */
+const isHubCode = (tflId: string): boolean => tflId.startsWith('HUB')
+
+/** Resolved hub-id -> StopPoint-id, cached for the session (hubs never change within a run). */
+const hubStopPointCache = new Map<string, string | null>()
+
+/** Order we prefer a hub's child StopPoints in: rail/tube first, bus/coach (490…) never. */
+function pickHubStopPoint(children: { naptanId?: string }[]): string | null {
+  const ids = children.map((c) => c.naptanId).filter((id): id is string => !!id)
+  return (
+    ids.find((id) => id.startsWith('940')) ?? // tube / DLR
+    ids.find((id) => id.startsWith('910')) ?? // national rail
+    ids.find((id) => !id.startsWith('490')) ?? // anything that isn't a bus/coach stop
+    null
+  )
+}
+
+/**
+ * Resolve a NaPTAN hub code to a Journey-Planner-acceptable StopPoint id via TfL's StopPoint API.
+ * Returns `null` if the hub can't be resolved (unknown hub, network error, or no usable child) so
+ * the caller can fall back to the postcode.
+ */
+export async function hubToStopPoint(hubId: string): Promise<string | null> {
+  const cached = hubStopPointCache.get(hubId)
+  if (cached !== undefined) return cached
+
+  let stopPoint: string | null = null
+  try {
+    const res = await fetch(`${TFL_BASE}/StopPoint/${encodeURIComponent(hubId)}`)
+    if (res.ok) {
+      const body = await res.json().catch(() => null)
+      stopPoint = pickHubStopPoint(body?.children ?? [])
+    }
+  } catch {
+    // Leave as null; caller falls back to the postcode.
+  }
+  hubStopPointCache.set(hubId, stopPoint)
+  return stopPoint
+}
+
+/**
+ * The string to send to TfL's Journey Planner for a location: its station id when known, else
+ * postcode. For hub stations the hub code is first resolved to a real StopPoint id (see
+ * `hubToStopPoint`), falling back to the postcode if that lookup fails.
+ */
+export async function tflQuery(loc: ResolvedLocation): Promise<string> {
+  if (!loc.tflId) return loc.postcode
+  if (isHubCode(loc.tflId)) return (await hubToStopPoint(loc.tflId)) ?? loc.postcode
+  return loc.tflId
+}
 
 /** A candidate place for the address autocomplete dropdown. */
 export type LocationSuggestion = {
