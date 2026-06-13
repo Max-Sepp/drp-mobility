@@ -447,6 +447,7 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
                   onSelect={setEquipmentId}
                   emptyText={`No ${issueType}s registered at this station.`}
                   highlightedIds={highlightedIds}
+                  platforms={stationDetail?.platforms}
                 />
                 <FormSection label="Comments (optional)">
                   <TextInput

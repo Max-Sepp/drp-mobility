@@ -3,9 +3,18 @@ import { Spinner, Text, XStack, YStack } from 'tamagui'
 import type { components } from '@/api/schema.d'
 import { connectionBody, connectionDirections, type Direction } from '@/lib/connection'
 import { FormSection } from '@/features/reporting/components/FormSection'
+import { LineChips, type PlatformDetail } from '@/features/stations'
 import { useTheme, Borders, Opacity } from '@/theme'
 
 type Equipment = components['schemas']['EquipmentSummary']
+
+function linesForEquipment(connection: string, platforms: PlatformDetail[]): string[] {
+  const conn = connection.toLowerCase()
+  for (const p of platforms) {
+    if (conn.includes(p.name.toLowerCase())) return p.lines
+  }
+  return []
+}
 
 // Above this many options, show the direction filter chips. Small stations stay clean.
 const FILTER_THRESHOLD = 6
@@ -22,6 +31,8 @@ type EquipmentPickerProps = {
   // Equipment ids relevant to the rider's current journey (the lines they're using at this
   // station). Marked rows get an "On your route" badge; ordering is handled by the caller.
   highlightedIds?: Set<number>
+  // Station platforms used to derive which tube lines each lift serves.
+  platforms?: PlatformDetail[]
 }
 
 export const EquipmentPicker = ({
@@ -32,6 +43,7 @@ export const EquipmentPicker = ({
   onSelect,
   emptyText,
   highlightedIds,
+  platforms,
 }: EquipmentPickerProps) => {
   const { Colors, Radii } = useTheme()
   const [activeDir, setActiveDir] = useState<Direction | null>(null)
@@ -110,6 +122,7 @@ export const EquipmentPicker = ({
                 .split(/↔|→/)
                 .map((s) => s.trim())
                 .filter(Boolean)
+              const lines = platforms ? linesForEquipment(e.connection, platforms) : []
               return (
                 <XStack
                   key={e.id}
@@ -163,6 +176,7 @@ export const EquipmentPicker = ({
                         {ends[1]}
                       </Text>
                     )}
+                    {lines.length > 0 && <LineChips lines={lines} />}
                   </YStack>
 
                   {highlighted && (
