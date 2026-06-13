@@ -50,6 +50,7 @@ import {
 } from '@/features/journey/api/activeJourney'
 import {
   clockTime,
+  humanizePlace,
   humanizeSummary,
   legLineColor,
   modeIcon,
@@ -689,8 +690,10 @@ export function ActiveJourneySheet({
 
   const depCommon = currentLeg.departurePoint?.commonName
   const arrCommon = currentLeg.arrivalPoint?.commonName
-  const depName = depCommon ? stripStationSuffix(depCommon) : null
-  const arrName = arrCommon ? stripStationSuffix(arrCommon) : null
+  // Use the user's chosen label when an endpoint is the postcode we queried TfL with (e.g. a final
+  // walking leg arriving at "E3 4TN" → the address the user entered), else strip the station suffix.
+  const depName = humanizePlace(depCommon, [from, to])
+  const arrName = humanizePlace(arrCommon, [from, to])
   const depResolved = depCommon ? resolveStation(depCommon) : null
   const arrResolved = arrCommon ? resolveStation(arrCommon) : null
   const depTime = currentLeg.departureTime ? clockTime(currentLeg.departureTime) : null
@@ -1136,7 +1139,7 @@ export function ActiveJourneySheet({
                   const legFg = legIsWalking ? Colors.secondaryText : 'white'
                   const legRouteName = leg.routeOptions?.[0]?.name || null
                   const legArrCommon = leg.arrivalPoint?.commonName
-                  const legArrName = legArrCommon ? stripStationSuffix(legArrCommon) : null
+                  const legArrName = humanizePlace(legArrCommon, [from, to])
                   const legArrTime = leg.arrivalTime ? clockTime(leg.arrivalTime) : null
                   return (
                     <XStack

@@ -23,6 +23,7 @@ import {
   type SavedPlaces,
 } from '@/features/journey/api/savedPlaces'
 import { humanizeSummary } from '@/features/journey/components/legDisplay'
+import { journeyToRouteGeometry } from '@/features/journey/lib/routeGeometry'
 import { useAuth } from '@/features/auth'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import type { RootStackParamList } from '@/navigation/types'
@@ -286,8 +287,44 @@ export function MapHomeScreen({ navigation, route }: Props) {
   const [activeJourneyParams, setActiveJourneyParams] = useState<ActiveJourneyParams | null>(null)
   const sheetRef = useRef<SearchActionSheetHandle>(null)
   const mapRef = useRef<StationMapHandle>(null)
+
+  // Geometry for the route currently being previewed or travelled, drawn on the map behind the
+  // sheets. The live active journey wins over a detail preview so the in-progress trip is shown;
+  // null when neither is open, which unmounts the overlay.
+  const mapRoute = useMemo(() => {
+    const journey = activeJourneyParams?.journey ?? activeDetail?.journey ?? null
+    if (!journey) return null
+    return journeyToRouteGeometry(journey, { fallback: Colors.blue, walk: Colors.secondaryText })
+  }, [activeJourneyParams, activeDetail, Colors.blue, Colors.secondaryText])
+
   const { status, user } = useAuth()
   const coords = useAppLocation()
+
+  // Camera behaviour for the route overlay. When previewing a route (detail sheet) and when the
+  // journey is first started, we frame the whole trip so the rider sees the entire route centred
+  // on screen. We only react to the journey *becoming* active (not every GPS tick), so manual
+  // panning mid-journey isn't fought.
+  const wasActiveRef = useRef(false)
+  useEffect(() => {
+    if (!mapRoute) {
+      wasActiveRef.current = false
+      return
+    }
+    const justStarted = Boolean(activeJourneyParams) && !wasActiveRef.current
+    wasActiveRef.current = Boolean(activeJourneyParams)
+    if (activeJourneyParams) {
+      // Defer one beat on start: the detail sheet we're leaving is still closing, so its tall
+      // reported height lingers in mapBottomInset for a frame. Fitting immediately would frame the
+      // route into the thin strip left above that stale inset and zoom right out. Waiting lets the
+      // inset settle to the compact active-journey sheet so the whole trip is framed and centred.
+      if (justStarted) {
+        const id = setTimeout(() => mapRef.current?.fitToRoute(mapRoute.bounds), 400)
+        return () => clearTimeout(id)
+      }
+    } else {
+      mapRef.current?.fitToRoute(mapRoute.bounds)
+    }
+  }, [mapRoute, activeJourneyParams])
   const { workStation } = useWorkShift()
   const { stations } = useStations()
   const isTrusted = user?.role === 'trusted'
@@ -526,6 +563,7 @@ export function MapHomeScreen({ navigation, route }: Props) {
         onStationPress={openStation}
         bottomInset={mapBottomInset}
         anchor={shiftAnchor}
+        route={mapRoute}
       />
 
       <SearchActionSheet
@@ -577,9 +615,11 @@ export function MapHomeScreen({ navigation, route }: Props) {
           setActiveDetail(null)
           setActivePlan(null)
           // Fully tear down any station that the plan was started from, so it can't reappear over
-          // the route once the active journey is the only open flow.
+          // the route once the active journey is the only open flow. Clearing the map focus too
+          // removes the station roundel pin, which otherwise lingers on the map after the journey.
           setActiveStation(null)
           setStationPausedForJourney(false)
+          mapRef.current?.clearFocus()
           setActiveJourneyParams(params)
         }}
         onHeightChange={setDetailHeight}

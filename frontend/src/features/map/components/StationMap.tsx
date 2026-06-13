@@ -1,17 +1,22 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
-import { StyleSheet, View } from 'react-native'
-import MapView, { Marker, PoiClickEvent, Region } from 'react-native-maps'
+import { Dimensions, StyleSheet, View } from 'react-native'
+import MapView, { Marker, Polyline, PoiClickEvent, Region } from 'react-native-maps'
 import Svg, { Circle, Path, Rect } from 'react-native-svg'
 import { fuzzyScore } from '@/lib/fuzzy'
 import { useAppHeading, useAppLocation } from '@/lib/LocationContext'
 import stationMarkers from '@/features/map/data/stationMarkers.json'
 import { UserLocationMarker } from '@/features/map/components/UserLocationMarker'
+import type { LatLng, RouteGeometry } from '@/features/journey/lib/routeGeometry'
 
 type StationMarkerEntry = (typeof stationMarkers)[number]
 
 // Rendered from Underground.svg (viewBox 615.3×500). The bar extends beyond the circle
 // on both sides (authentic roundel look), so the rendered width is wider than height.
-function StationRoundel() {
+// `scale` shrinks the roundel as the map zooms out so it stays a reasonable on-screen size
+// instead of swamping the map at low zoom (markers are otherwise fixed-pixel).
+const ROUNDEL_WIDTH = 55
+const ROUNDEL_HEIGHT = 45
+function StationRoundel({ scale }: { scale: number }) {
   return (
     <View
       style={{
@@ -22,7 +27,7 @@ function StationRoundel() {
         elevation: 6,
       }}
     >
-      <Svg width={55} height={45} viewBox="0 0 615.3 500">
+      <Svg width={ROUNDEL_WIDTH * scale} height={ROUNDEL_HEIGHT * scale} viewBox="0 0 615.3 500">
         {/* White fill so the map background doesn't show through the ring centre */}
         <Circle cx={308.15} cy={250} r={161.3} fill="white" />
         {/* Red donut ring */}
@@ -42,6 +47,27 @@ export type StationMapHandle = {
   recentre: () => void
   focusStation: (name: string) => void
   clearFocus: () => void
+  fitToRoute: (coords: LatLng[]) => void
+}
+
+// A waypoint dot drawn at a route's start / end / interchange. All are white-filled with a dark
+// ring so the start, the destination, and every on/off point read as the same kind of marker (the
+// destination also carries a TfL roundel above it). Both ends of a walking transfer between two
+// sections are emitted as interchanges, so each end of that gap gets its own circle.
+function RouteWaypoint() {
+  const size = 16
+  return (
+    <Svg width={size} height={size}>
+      <Circle
+        cx={size / 2}
+        cy={size / 2}
+        r={size / 2 - 2}
+        fill="white"
+        stroke="#1f1f1f"
+        strokeWidth={2}
+      />
+    </Svg>
+  )
 }
 
 const LONDON: Region = {
@@ -93,6 +119,15 @@ function findStation(poiName: string, lat: number, lng: number): string | null {
 
 const LAT_DELTA = 0.002
 
+// Roundel sizing vs. zoom. At the focus zoom (LAT_DELTA) the roundel renders full size; zooming
+// further out shrinks it (down to ROUNDEL_MIN_SCALE) so it doesn't dominate the map, and zooming
+// in is capped at full size so it never balloons. sqrt softens the curve so it scales gradually.
+const ROUNDEL_MIN_SCALE = 0.4
+function roundelScaleForDelta(latitudeDelta: number): number {
+  const raw = Math.sqrt(LAT_DELTA / latitudeDelta)
+  return Math.min(1, Math.max(ROUNDEL_MIN_SCALE, raw))
+}
+
 type Props = {
   onStationPress: (name: string) => void
   bottomInset: number
@@ -100,16 +135,20 @@ type Props = {
   // of the device location. GPS is often unavailable underground, so this is the reliable
   // anchor for staff. The manual recentre button still uses GPS.
   anchor?: { latitude: number; longitude: number } | null
+  // The journey to draw, derived from the active/previewed journey. Null clears the overlay.
+  route?: RouteGeometry | null
 }
 
 export const StationMap = forwardRef<StationMapHandle, Props>(function StationMap(
-  { onStationPress, bottomInset, anchor },
+  { onStationPress, bottomInset, anchor, route },
   ref,
 ) {
   const coords = useAppLocation()
   const heading = useAppHeading()
   const mapRef = useRef<MapView>(null)
   const [focusedStation, setFocusedStation] = useState<StationMarkerEntry | null>(null)
+  // Current camera zoom (latitude span), used to keep the focused roundel a sensible on-screen size.
+  const [roundelScale, setRoundelScale] = useState(() => roundelScaleForDelta(LAT_DELTA))
 
   const animateToUser = useCallback(() => {
     if (!coords) return
@@ -146,11 +185,48 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
 
   const clearFocus = useCallback(() => setFocusedStation(null), [])
 
-  useImperativeHandle(ref, () => ({ recentre: animateToUser, focusStation, clearFocus }), [
-    animateToUser,
-    focusStation,
-    clearFocus,
-  ])
+  // Frame the whole route in the band left visible above the bottom sheet, centred there. We build
+  // the region by hand and animate to it rather than using fitToCoordinates' edgePadding: that
+  // padding *compounds* with the map's own mapPadding (which already reserves the sheet's height),
+  // so the inset gets counted twice and an oversized total makes the map zoom right out (you end up
+  // seeing half of Europe). Here the latitude span is inflated only by the visible fraction so the
+  // route clears the sheet, and that fraction is clamped so a large/stale inset can never explode
+  // the zoom. mapPadding shifts the centre up into the visible band, as it does for the other
+  // animateToRegion calls.
+  const fitToRoute = useCallback(
+    (coords: LatLng[]) => {
+      if (coords.length === 0) return
+      let minLat = Infinity
+      let maxLat = -Infinity
+      let minLng = Infinity
+      let maxLng = -Infinity
+      for (const c of coords) {
+        if (c.latitude < minLat) minLat = c.latitude
+        if (c.latitude > maxLat) maxLat = c.latitude
+        if (c.longitude < minLng) minLng = c.longitude
+        if (c.longitude > maxLng) maxLng = c.longitude
+      }
+      const screenH = Dimensions.get('window').height
+      const visibleFraction = Math.min(1, Math.max(0.35, (screenH - bottomInset) / screenH))
+      const MARGIN = 1.3
+      mapRef.current?.animateToRegion(
+        {
+          latitude: (minLat + maxLat) / 2,
+          longitude: (minLng + maxLng) / 2,
+          latitudeDelta: Math.max(((maxLat - minLat) * MARGIN) / visibleFraction, 0.01),
+          longitudeDelta: Math.max((maxLng - minLng) * MARGIN, 0.01),
+        },
+        600,
+      )
+    },
+    [bottomInset],
+  )
+
+  useImperativeHandle(
+    ref,
+    () => ({ recentre: animateToUser, focusStation, clearFocus, fitToRoute }),
+    [animateToUser, focusStation, clearFocus, fitToRoute],
+  )
 
   // Centre on open. The anchor (staff's shift station) always wins and is honoured even if it
   // resolves late (station data loads async) — so it overrides an earlier GPS centring exactly
@@ -189,9 +265,34 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
       initialRegion={LONDON}
       mapPadding={{ top: 0, right: 0, left: 0, bottom: bottomInset }}
       onPoiClick={handlePoiClick}
+      onRegionChangeComplete={(region) =>
+        setRoundelScale(roundelScaleForDelta(region.latitudeDelta))
+      }
       showsMyLocationButton={false}
       showsCompass={false}
     >
+      {route?.legs.map((leg, i) => (
+        <Polyline
+          key={`leg-${i}`}
+          coordinates={leg.coords}
+          strokeColor={leg.color}
+          strokeWidth={6}
+          lineCap="round"
+          lineJoin="round"
+          lineDashPattern={leg.isWalking ? [4, 8] : undefined}
+          zIndex={1}
+        />
+      ))}
+      {route?.markers.map((marker, i) => (
+        <Marker
+          key={`waypoint-${i}`}
+          coordinate={marker.coord}
+          anchor={{ x: 0.5, y: 0.5 }}
+          tracksViewChanges={false}
+        >
+          <RouteWaypoint />
+        </Marker>
+      ))}
       {coords && (
         <UserLocationMarker
           latitude={coords.latitude}
@@ -204,7 +305,7 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
           coordinate={{ latitude: focusedStation.lat, longitude: focusedStation.lng }}
           anchor={{ x: 0.5, y: 0.5 }}
         >
-          <StationRoundel />
+          <StationRoundel scale={roundelScale} />
         </Marker>
       )}
     </MapView>
