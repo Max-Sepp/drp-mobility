@@ -297,13 +297,28 @@ export function MapHomeScreen({ navigation, route }: Props) {
     return journeyToRouteGeometry(journey, { fallback: Colors.blue, walk: Colors.secondaryText })
   }, [activeJourneyParams, activeDetail, Colors.blue, Colors.secondaryText])
 
-  // Frame the route whenever it appears or changes (e.g. picking a different option, or starting
-  // the journey). Intentionally overrides the open-time GPS/anchor centring while a route is shown.
-  useEffect(() => {
-    if (mapRoute) mapRef.current?.fitToRoute(mapRoute.bounds)
-  }, [mapRoute])
   const { status, user } = useAuth()
   const coords = useAppLocation()
+
+  // Camera behaviour for the route overlay. While previewing a route (detail sheet) we frame the
+  // whole trip so the user can see where it goes. But once the journey is actually under way, the
+  // traveller cares about where *they* are, not the far end of the line — so on start we centre on
+  // their location instead. If we have no GPS fix we fall back to framing the route. We only react
+  // to the journey becoming active (not every GPS tick), so manual panning mid-journey isn't fought.
+  const wasActiveRef = useRef(false)
+  useEffect(() => {
+    if (!mapRoute) {
+      wasActiveRef.current = false
+      return
+    }
+    const justStarted = Boolean(activeJourneyParams) && !wasActiveRef.current
+    wasActiveRef.current = Boolean(activeJourneyParams)
+    if (activeJourneyParams && coords) {
+      if (justStarted) mapRef.current?.recentre()
+    } else {
+      mapRef.current?.fitToRoute(mapRoute.bounds)
+    }
+  }, [mapRoute, activeJourneyParams, coords])
   const { workStation } = useWorkShift()
   const { stations } = useStations()
   const isTrusted = user?.role === 'trusted'
