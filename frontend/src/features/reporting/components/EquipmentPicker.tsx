@@ -10,10 +10,35 @@ type Equipment = components['schemas']['EquipmentSummary']
 
 function linesForEquipment(connection: string, platforms: PlatformDetail[]): string[] {
   const conn = connection.toLowerCase()
+  // Strip the "Lift X: " prefix then split on the arrow so we check each endpoint separately.
+  // This prevents a direction word in one endpoint (e.g. "Westbound hall") from falsely matching
+  // a numbered platform in the other endpoint ("Westbound Platform 1").
+  const body = conn.includes(':') ? conn.slice(conn.indexOf(':') + 1) : conn
+  const segments = body.split(/↔|→/).map((s) => s.trim())
+
+  const lines = new Set<string>()
   for (const p of platforms) {
-    if (conn.includes(p.name.toLowerCase())) return p.lines
+    const name = p.name.toLowerCase()
+    const numMatch = name.match(/(\d+)$/)
+    const dirMatch = name.match(/^(northbound|southbound|eastbound|westbound)/i)
+
+    for (const seg of segments) {
+      // Exact substring (e.g. "Westbound Platform 1" literally in segment)
+      if (seg.includes(name)) {
+        p.lines.forEach((l) => lines.add(l))
+        break
+      }
+      // Direction + number in the same segment catches plural forms like "platforms 3 and 4"
+      if (numMatch && dirMatch) {
+        const numRe = new RegExp(`\\b${numMatch[1]}\\b`)
+        if (seg.includes(dirMatch[1].toLowerCase()) && numRe.test(seg)) {
+          p.lines.forEach((l) => lines.add(l))
+          break
+        }
+      }
+    }
   }
-  return []
+  return [...lines].sort()
 }
 
 // Above this many options, show the direction filter chips. Small stations stay clean.
