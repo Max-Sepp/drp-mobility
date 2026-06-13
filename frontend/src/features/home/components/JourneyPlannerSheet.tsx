@@ -16,6 +16,7 @@ import { type ResolvedLocation, resolveToPostcode } from '@/features/journey/api
 import { type PlaceShortcut } from '@/features/journey/components/LocationInput'
 import type { SavedPlaces } from '@/features/journey/api/savedPlaces'
 import { useAppLocation } from '@/lib/LocationContext'
+import { alertOffline, isOfflineError } from '@/lib/offline'
 import { useAccessibilityPreference } from '@/lib/AccessibilityPreferenceContext'
 import { useWorkShift } from '@/lib/WorkShiftContext'
 import { useAuth } from '@/features/auth'
@@ -215,6 +216,8 @@ export function JourneyPlannerSheet({
       setFrom(shiftDetail ? `On shift: ${shiftDetail.name}` : 'Current location')
       setFromPostcode(result.postcode)
       setFromIsCurrentLocation(true)
+    } catch (err) {
+      if (isOfflineError(err)) alertOffline('use your current location')
     } finally {
       setGettingLocation(false)
     }

@@ -49,6 +49,7 @@ import {
 import { useStations, type StationDetail } from '@/features/stations/useStations'
 import { fuzzyScore } from '@/lib/fuzzy'
 import { useAppLocation } from '@/lib/LocationContext'
+import { alertOffline, isOfflineError } from '@/lib/offline'
 import { useWorkShift } from '@/lib/WorkShiftContext'
 import { useAuth } from '@/features/auth'
 import { useTheme, Spacing, Typography } from '@/theme'
@@ -684,6 +685,8 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
 
         collapse()
         onLocationSelect(from, to)
+      } catch (err) {
+        if (isOfflineError(err)) alertOffline('plan a journey')
       } finally {
         setGpsLoading(false)
       }
@@ -701,11 +704,17 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
           const to: ResolvedLocation = { postcode: item.postcode, label: item.label }
           let from: ResolvedLocation | undefined
           if (cachedCoords) {
-            const fromResult = await resolveToPostcode(
-              `${cachedCoords.latitude},${cachedCoords.longitude}`,
-            )
-            if (!('error' in fromResult)) {
-              from = { postcode: fromResult.postcode, label: 'Current location' }
+            // Resolving the start from GPS is best-effort: if we're offline, still open the
+            // planner with just the destination — the plan step then surfaces the offline alert.
+            try {
+              const fromResult = await resolveToPostcode(
+                `${cachedCoords.latitude},${cachedCoords.longitude}`,
+              )
+              if (!('error' in fromResult)) {
+                from = { postcode: fromResult.postcode, label: 'Current location' }
+              }
+            } catch (err) {
+              if (!isOfflineError(err)) throw err
             }
           }
           addRecentLocation(item.label, item.postcode)

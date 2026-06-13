@@ -20,6 +20,7 @@ import { useStationAlerts, worstAlertSeverity } from '@/features/outages/station
 import { StepFreeBadge, useStations } from '@/features/stations'
 import { resolveToPostcode, type ResolvedLocation } from '@/features/journey/api/geocode'
 import { useAppLocation } from '@/lib/LocationContext'
+import { alertOffline, isOfflineError } from '@/lib/offline'
 import type { JourneyPlan } from '@/features/home/components/JourneyPlannerSheet'
 import { useTheme, Heights, Spacing } from '@/theme'
 
@@ -161,6 +162,8 @@ export function StationSheet({
       }
 
       onOpenJourney({ initialFrom: from, initialTo: to })
+    } catch (err) {
+      if (isOfflineError(err)) alertOffline('plan a journey')
     } finally {
       setGoingHere(false)
     }
