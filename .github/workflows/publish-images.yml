@@ -151,11 +151,11 @@ jobs:
               --arg token "$GHCR_TOKEN" \
               '{commands: [
                 "set -euo pipefail",
-                ("echo " + $token + " | docker login ghcr.io -u " + $user + " --password-stdin"),
-                ("docker pull " + $img),
+                ("printf %s " + ($token|@sh) + " | docker login ghcr.io -u " + ($user|@sh) + " --password-stdin"),
+                ("docker pull " + ($img|@sh)),
                 "docker stop backend 2>/dev/null || true",
                 "docker rm backend 2>/dev/null || true",
-                ("docker run -d --name backend --restart unless-stopped -p 8000:8000 --env-file /home/ec2-user/.env " + $img)
+                ("docker run -d --name backend --restart unless-stopped -p 8000:8000 --env-file /home/ec2-user/.env " + ($img|@sh))
               ]}')" \
             --query "Command.CommandId" \
             --output text)
