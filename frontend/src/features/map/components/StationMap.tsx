@@ -6,7 +6,7 @@ import { fuzzyScore } from '@/lib/fuzzy'
 import { useAppHeading, useAppLocation } from '@/lib/LocationContext'
 import stationMarkers from '@/features/map/data/stationMarkers.json'
 import { UserLocationMarker } from '@/features/map/components/UserLocationMarker'
-import type { LatLng, RouteGeometry, RouteMarker } from '@/features/journey/lib/routeGeometry'
+import type { LatLng, RouteGeometry } from '@/features/journey/lib/routeGeometry'
 
 type StationMarkerEntry = (typeof stationMarkers)[number]
 
@@ -50,20 +50,20 @@ export type StationMapHandle = {
   fitToRoute: (coords: LatLng[]) => void
 }
 
-// A waypoint dot drawn at a route's start / end / interchange. The start is a solid dark dot;
-// interchanges and the destination are white-filled with a dark ring so they stand out as the
-// places the rider gets on/off (the destination also carries a TfL roundel above it).
-function RouteWaypoint({ kind }: { kind: RouteMarker['kind'] }) {
-  const size = kind === 'start' ? 14 : 16
-  const filled = kind === 'start'
+// A waypoint dot drawn at a route's start / end / interchange. All are white-filled with a dark
+// ring so the start, the destination, and every on/off point read as the same kind of marker (the
+// destination also carries a TfL roundel above it). Both ends of a walking transfer between two
+// sections are emitted as interchanges, so each end of that gap gets its own circle.
+function RouteWaypoint() {
+  const size = 16
   return (
     <Svg width={size} height={size}>
       <Circle
         cx={size / 2}
         cy={size / 2}
         r={size / 2 - 2}
-        fill={filled ? '#1f1f1f' : 'white'}
-        stroke={filled ? 'white' : '#1f1f1f'}
+        fill="white"
+        stroke="#1f1f1f"
         strokeWidth={2}
       />
     </Svg>
@@ -245,7 +245,9 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
       initialRegion={LONDON}
       mapPadding={{ top: 0, right: 0, left: 0, bottom: bottomInset }}
       onPoiClick={handlePoiClick}
-      onRegionChangeComplete={(region) => setRoundelScale(roundelScaleForDelta(region.latitudeDelta))}
+      onRegionChangeComplete={(region) =>
+        setRoundelScale(roundelScaleForDelta(region.latitudeDelta))
+      }
       showsMyLocationButton={false}
       showsCompass={false}
     >
@@ -268,7 +270,7 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
           anchor={{ x: 0.5, y: 0.5 }}
           tracksViewChanges={false}
         >
-          <RouteWaypoint kind={marker.kind} />
+          <RouteWaypoint />
         </Marker>
       ))}
       {destination && (

@@ -175,4 +175,49 @@ describe('journeyToRouteGeometry', () => {
       { coord: { latitude: 51.55, longitude: -0.14 }, kind: 'end' },
     ])
   })
+
+  it('marks both ends of a walking transfer between two transit legs', () => {
+    // Tube leg, then a separate platform/station where the next tube leg boards — the alight
+    // (51.53) and the next board (51.531) differ, so the gap gets a circle at each end.
+    const j = journey([
+      leg({
+        mode: { name: 'victoria' },
+        departurePoint: { lat: 51.5, lon: -0.1 },
+        arrivalPoint: { lat: 51.53, lon: -0.12 },
+        path: {
+          lineString: JSON.stringify([
+            [51.5, -0.1],
+            [51.53, -0.12],
+          ]),
+        },
+      }),
+      leg({
+        mode: { name: 'walking' },
+        path: {
+          lineString: JSON.stringify([
+            [51.53, -0.12],
+            [51.531, -0.121],
+          ]),
+        },
+      }),
+      leg({
+        mode: { name: 'northern' },
+        departurePoint: { lat: 51.531, lon: -0.121 },
+        arrivalPoint: { lat: 51.55, lon: -0.14 },
+        path: {
+          lineString: JSON.stringify([
+            [51.531, -0.121],
+            [51.55, -0.14],
+          ]),
+        },
+      }),
+    ])
+    const geo = journeyToRouteGeometry(j, COLORS)
+    expect(geo.markers).toEqual([
+      { coord: { latitude: 51.5, longitude: -0.1 }, kind: 'start' },
+      { coord: { latitude: 51.53, longitude: -0.12 }, kind: 'interchange' },
+      { coord: { latitude: 51.531, longitude: -0.121 }, kind: 'interchange' },
+      { coord: { latitude: 51.55, longitude: -0.14 }, kind: 'end' },
+    ])
+  })
 })

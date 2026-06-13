@@ -66,6 +66,11 @@ function pointCoord(point: { lat?: number; lon?: number } | undefined): LatLng |
   return { latitude: point.lat, longitude: point.lon }
 }
 
+/** True when two coords are the same point to within ~1 m (i.e. a direct, walk-free interchange). */
+function sameCoord(a: LatLng, b: LatLng): boolean {
+  return Math.abs(a.latitude - b.latitude) < 1e-5 && Math.abs(a.longitude - b.longitude) < 1e-5
+}
+
 // --- Backtrack removal ----------------------------------------------------------------------
 //
 // Distances here are small (a single tube/rail leg), so we project lat/lng onto a local flat
@@ -166,20 +171,26 @@ export function journeyToRouteGeometry(journey: Journey, colors: RouteColors): R
     bounds.push(...coords)
   }
 
-  // Markers sit at the transit legs' endpoints: start of the first transit leg, end of the last,
-  // and the shared point between each pair of consecutive transit legs (the interchanges).
+  // A waypoint circle sits at every transit-leg endpoint: the first leg's board is the journey
+  // start, the last leg's alight is the end, and the rest are interchanges. Emitting both the board
+  // AND the alight of each leg means that when consecutive transit legs are joined by a walking
+  // transfer (a gap between, say, two tube lines) both ends of that gap get a circle. A direct
+  // interchange — where one leg's alight and the next leg's board are the same point — collapses
+  // back to a single circle via the dedupe below.
   const transitLegs = journey.legs.filter((leg) => !isWalkingLeg(leg))
-  const markers: RouteMarker[] = []
-  if (transitLegs.length > 0) {
-    const startCoord = pointCoord(transitLegs[0].departurePoint)
-    if (startCoord) markers.push({ coord: startCoord, kind: 'start' })
-    for (let i = 1; i < transitLegs.length; i++) {
-      const coord = pointCoord(transitLegs[i].departurePoint)
-      if (coord) markers.push({ coord, kind: 'interchange' })
-    }
-    const endCoord = pointCoord(transitLegs[transitLegs.length - 1].arrivalPoint)
-    if (endCoord) markers.push({ coord: endCoord, kind: 'end' })
+  const endpoints: LatLng[] = []
+  for (const leg of transitLegs) {
+    const board = pointCoord(leg.departurePoint)
+    const alight = pointCoord(leg.arrivalPoint)
+    if (board) endpoints.push(board)
+    if (alight) endpoints.push(alight)
   }
+  // Collapse a point that coincides with the one before it (a same-station change with no walk).
+  const deduped = endpoints.filter((p, i) => i === 0 || !sameCoord(p, endpoints[i - 1]))
+  const markers: RouteMarker[] = deduped.map((coord, i) => ({
+    coord,
+    kind: i === 0 ? 'start' : i === deduped.length - 1 ? 'end' : 'interchange',
+  }))
 
   return { legs, markers, bounds }
 }
