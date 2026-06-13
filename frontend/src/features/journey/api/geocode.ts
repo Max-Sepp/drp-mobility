@@ -21,9 +21,22 @@ const POSTCODE_RE = /^[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}$/i
 // "lat,long" decimal pair, e.g. "51.5074,-0.1278".
 const COORD_RE = /^(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)$/
 
-/** A successfully resolved location: the postcode to query plus a label to show the user. */
-export type ResolvedLocation = { postcode: string; label: string; isNamedPlace?: boolean }
+/**
+ * A successfully resolved location: the postcode to query plus a label to show the user.
+ * `tflId` is set only when the location is a known TfL station — it's the station's NaPTAN id
+ * (e.g. "940GZZLUMED"), preferred over the postcode as the TfL query so the journey ends *at*
+ * the station rather than a nearby postcode (see `tflQuery`).
+ */
+export type ResolvedLocation = {
+  postcode: string
+  label: string
+  isNamedPlace?: boolean
+  tflId?: string
+}
 export type ResolveResult = ResolvedLocation | { error: string }
+
+/** The string to send to TfL's Journey Planner for a location: its station id when known, else postcode. */
+export const tflQuery = (loc: ResolvedLocation): string => loc.tflId ?? loc.postcode
 
 /** A candidate place for the address autocomplete dropdown. */
 export type LocationSuggestion = {

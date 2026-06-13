@@ -148,7 +148,13 @@ export function StationSheet({
         )
         return
       }
-      const to: ResolvedLocation = { postcode: toResult.postcode, label: station }
+      // Prefer the station's TfL id so the journey ends at the station itself; the postcode is
+      // kept for the label/snapshot and as a fallback when the id is missing (unmatched seed row).
+      const to: ResolvedLocation = {
+        postcode: toResult.postcode,
+        label: station,
+        tflId: stationDetail?.tfl_id ?? undefined,
+      }
 
       let from: ResolvedLocation | undefined
       if (cachedCoords) {

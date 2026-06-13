@@ -220,6 +220,27 @@ export function humanizeSummary(
 }
 
 /**
+ * Readable name for a single leg endpoint. When the endpoint is the raw postcode we sent to TfL
+ * (e.g. a final walking leg arriving at "E3 4TN"), show the readable place the user actually chose
+ * instead; otherwise strip the "… Underground Station" suffix as usual. Space-insensitive match,
+ * since TfL may format the postcode differently from how we sent it.
+ */
+export function humanizePlace(
+  commonName: string | undefined,
+  locations: (ResolvedLocation | undefined)[],
+): string | null {
+  if (!commonName) return null
+  const trimmed = commonName.trim()
+  for (const loc of locations) {
+    if (!loc || loc.label === loc.postcode) continue
+    const compact = loc.postcode.replace(/\s+/g, '')
+    const pattern = `^${compact.slice(0, -3)}\\s*${compact.slice(-3)}$`
+    if (new RegExp(pattern, 'i').test(trimmed)) return loc.label
+  }
+  return stripStationSuffix(commonName)
+}
+
+/**
  * True when every lift on the user's journey path at a station is broken. Uses journey-relevant
  * counts when available (populated by assessOutages), falls back to station-level total.
  */

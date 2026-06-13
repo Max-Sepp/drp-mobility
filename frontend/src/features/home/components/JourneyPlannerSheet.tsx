@@ -12,7 +12,7 @@ import {
 } from '@/features/journey/api/accessibility'
 import { assessOutages } from '@/features/journey/api/outageRelevance'
 import { useStations } from '@/features/stations'
-import { type ResolvedLocation, resolveToPostcode } from '@/features/journey/api/geocode'
+import { type ResolvedLocation, resolveToPostcode, tflQuery } from '@/features/journey/api/geocode'
 import { type PlaceShortcut } from '@/features/journey/components/LocationInput'
 import type { SavedPlaces } from '@/features/journey/api/savedPlaces'
 import { useAppLocation } from '@/lib/LocationContext'
@@ -79,6 +79,8 @@ function optionsCacheKey(
   time: TimeConstraint | null,
 ): string {
   const timePart = time ?? Math.floor(Date.now() / CACHE_BUCKET_MS)
+  // `from`/`to` are the actual TfL query strings (postcode or station id), so a station-id plan
+  // and a postcode plan for the same place never collide.
   return JSON.stringify([from, to, level, timePart])
 }
 
@@ -146,6 +148,11 @@ export function JourneyPlannerSheet({
   const [to, setTo] = useState('')
   const [fromPostcode, setFromPostcode] = useState<string | null>(null)
   const [toPostcode, setToPostcode] = useState<string | null>(null)
+  // Station NaPTAN ids when the endpoint is a known station — preferred over the postcode as the
+  // TfL query so the journey ends at the station (no trailing walk). Cleared whenever the user
+  // types into the field (the postcode is cleared there too, so a stale id can't survive).
+  const [fromTflId, setFromTflId] = useState<string | undefined>(undefined)
+  const [toTflId, setToTflId] = useState<string | undefined>(undefined)
   const [fromIsCurrentLocation, setFromIsCurrentLocation] = useState(false)
   const [toIsNamedPlace, setToIsNamedPlace] = useState(false)
   const [gettingLocation, setGettingLocation] = useState(false)
@@ -230,6 +237,8 @@ export function JourneyPlannerSheet({
       setTo(plan.initialTo?.label ?? '')
       setFromPostcode(plan.initialFrom?.postcode ?? null)
       setToPostcode(plan.initialTo?.postcode ?? null)
+      setFromTflId(plan.initialFrom?.tflId)
+      setToTflId(plan.initialTo?.tflId)
       setFromIsCurrentLocation(plan.initialFrom?.label === 'Current location')
       setToIsNamedPlace(Boolean(plan.initialTo?.isNamedPlace))
       setLevel(defaultLevel)
@@ -283,11 +292,14 @@ export function JourneyPlannerSheet({
   function swapLocations() {
     const tempText = from
     const tempPostcode = fromPostcode
+    const tempTflId = fromTflId
     setFrom(to)
     setFromPostcode(toPostcode)
+    setFromTflId(toTflId)
     setFromIsCurrentLocation(false)
     setTo(tempText)
     setToPostcode(tempPostcode)
+    setToTflId(tempTflId)
     setToIsNamedPlace(false)
   }
 
@@ -304,18 +316,21 @@ export function JourneyPlannerSheet({
     setResults([])
     setResolved(null)
 
-    const fromLoc: ResolvedLocation = { postcode: fromPostcode!, label: from }
+    const fromLoc: ResolvedLocation = { postcode: fromPostcode!, label: from, tflId: fromTflId }
     const toLoc: ResolvedLocation = {
       postcode: toPostcode!,
       label: to,
       isNamedPlace: toIsNamedPlace || undefined,
+      tflId: toTflId,
     }
 
     try {
       const outagesPromise = fetchStationOutages()
       setResolved({ from: fromLoc, to: toLoc })
 
-      const cacheKey = optionsCacheKey(fromLoc.postcode, toLoc.postcode, level, timeConstraint)
+      const fromQuery = tflQuery(fromLoc)
+      const toQuery = tflQuery(toLoc)
+      const cacheKey = optionsCacheKey(fromQuery, toQuery, level, timeConstraint)
       const cached = journeyOptionsCache.get(cacheKey)
 
       let journeyOptions: CachedOptions
@@ -323,8 +338,8 @@ export function JourneyPlannerSheet({
         journeyOptions = cached
       } else {
         const optResult: JourneyOptionsResult = await planJourneyOptions(
-          fromLoc.postcode,
-          toLoc.postcode,
+          fromQuery,
+          toQuery,
           level,
           timeConstraint,
         )
@@ -404,6 +419,7 @@ export function JourneyPlannerSheet({
               onChangeText={(text) => {
                 setFrom(text)
                 setFromIsCurrentLocation(false)
+                setFromTflId(undefined)
               }}
               onResolved={setFromPostcode}
               isResolved={fromPostcode !== null}
@@ -424,6 +440,7 @@ export function JourneyPlannerSheet({
             onChangeText={(text) => {
               setTo(text)
               setToIsNamedPlace(false)
+              setToTflId(undefined)
             }}
             onResolved={setToPostcode}
             isResolved={toPostcode !== null}
