@@ -1,6 +1,6 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { Dimensions, StyleSheet, View } from 'react-native'
-import MapView, { Marker, Polyline, PoiClickEvent, Region } from 'react-native-maps'
+import MapView, { MapMarkerProps, Marker, Polyline, PoiClickEvent, Region } from 'react-native-maps'
 import Svg, { Circle, Path, Rect } from 'react-native-svg'
 import { fuzzyScore } from '@/lib/fuzzy'
 import { useAppHeading, useAppLocation } from '@/lib/LocationContext'
@@ -68,6 +68,34 @@ function RouteWaypoint() {
       />
     </Svg>
   )
+}
+
+// How long to keep tracksViewChanges=true after a TrackedMarker mounts / re-arms. Long enough for
+// an async-painting SVG child to land before we freeze the marker bitmap, short enough to avoid
+// noticeable cost. Mirrors the pattern in UserLocationMarker.
+const TRACK_DURATION_MS = 600
+
+// A Marker that keeps tracksViewChanges=true for a short window after mounting, then turns it off.
+// On iOS, react-native-maps snapshots a custom child view to draw the marker; an SVG/View child
+// paints asynchronously, so a snapshot taken on the very first frame is empty and the map falls
+// back to the default red system pin. Tracking for a brief window lets the real custom view get
+// captured, so the system pin never appears; we then stop tracking to avoid the per-frame bitmap
+// cost. The timer is unconditional (unlike an onLayout trigger, which never fires on iOS if the
+// child reports no layout — that would pin tracking on permanently and jank the map). `trackKey`
+// re-opens the window when it changes, so a marker whose content updates after mount (e.g. the
+// focused roundel rescaling on zoom) gets a fresh bitmap.
+function TrackedMarker({ trackKey, ...props }: MapMarkerProps & { trackKey?: unknown }) {
+  const [tracksViewChanges, setTracksViewChanges] = useState(true)
+  useEffect(() => {
+    const timer = setTimeout(() => setTracksViewChanges(false), TRACK_DURATION_MS)
+    // Cleanup runs before the next effect (trackKey change) and on unmount, re-arming tracking so
+    // updated content is recaptured.
+    return () => {
+      clearTimeout(timer)
+      setTracksViewChanges(true)
+    }
+  }, [trackKey])
+  return <Marker {...props} tracksViewChanges={tracksViewChanges} />
 }
 
 const LONDON: Region = {
@@ -276,7 +304,7 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
           key={`leg-${i}`}
           coordinates={leg.coords}
           strokeColor={leg.color}
-          strokeWidth={6}
+          strokeWidth={leg.isWalking ? 4 : 6}
           lineCap="round"
           lineJoin="round"
           lineDashPattern={leg.isWalking ? [4, 8] : undefined}
@@ -284,14 +312,9 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
         />
       ))}
       {route?.markers.map((marker, i) => (
-        <Marker
-          key={`waypoint-${i}`}
-          coordinate={marker.coord}
-          anchor={{ x: 0.5, y: 0.5 }}
-          tracksViewChanges={false}
-        >
+        <TrackedMarker key={`waypoint-${i}`} coordinate={marker.coord} anchor={{ x: 0.5, y: 0.5 }}>
           <RouteWaypoint />
-        </Marker>
+        </TrackedMarker>
       ))}
       {coords && (
         <UserLocationMarker
@@ -301,12 +324,13 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
         />
       )}
       {focusedStation && (
-        <Marker
+        <TrackedMarker
           coordinate={{ latitude: focusedStation.lat, longitude: focusedStation.lng }}
           anchor={{ x: 0.5, y: 0.5 }}
+          trackKey={roundelScale}
         >
           <StationRoundel scale={roundelScale} />
-        </Marker>
+        </TrackedMarker>
       )}
     </MapView>
   )
