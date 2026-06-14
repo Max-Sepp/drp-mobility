@@ -36,8 +36,10 @@ export type Leg = {
   arrivalPoint?: Point
   // The line(s) the leg runs on.
   routeOptions?: RouteOption[]
-  // The intermediate stops along the leg's path.
-  path?: { stopPoints?: { name?: string }[] }
+  // The intermediate stops along the leg's path, plus `lineString` — a JSON-encoded array of
+  // [lat, lng] coordinate pairs (TfL order, latitude first) tracing the leg's real path along
+  // the track/road. Present on transit and walking legs; used to draw the route on the map.
+  path?: { stopPoints?: { name?: string }[]; lineString?: string }
   // Disruption data returned by TfL when a leg is affected by a service disruption.
   isDisrupted?: boolean
   disruptions?: { description?: string }[]

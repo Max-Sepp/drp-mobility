@@ -64,7 +64,9 @@ jobs:
 
   build-and-push:
     needs: test-backend
-    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/deploy-test' || startsWith(github.ref, 'refs/tags/')
+    outputs:
+      image: ${{ steps.img.outputs.sha_image }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -81,7 +83,10 @@ jobs:
 
       - name: Lowercase image name
         id: img
-        run: echo "name=${IMAGE,,}" >> "$GITHUB_OUTPUT"
+        run: |
+          NAME="${IMAGE,,}"
+          echo "name=${NAME}" >> "$GITHUB_OUTPUT"
+          echo "sha_image=${REGISTRY}/${NAME}:sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
         env:
           IMAGE: ${{ matrix.image }}
 
@@ -118,13 +123,56 @@ jobs:
 
   deploy:
     needs: build-and-push
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/deploy-test'
     runs-on: ubuntu-latest
+    permissions:
+      packages: read
+      id-token: write
     steps:
-      - name: Install Railway CLI
-        run: npm i -g @railway/cli@4.59.0
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@e7f100cf4c008499ea8adda475de1042d6975c7b # v6.2.0
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-north-1
 
-      - name: Deploy to Railway
-        run: railway redeploy --service drp-mobility-backend --yes
+      - name: Deploy via SSM
         env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          IMAGE: ${{ needs.build-and-push.outputs.image }}
+          GHCR_USER: ${{ github.actor }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INSTANCE_ID: ${{ secrets.EC2_INSTANCE_ID }}
+        run: |
+          COMMAND_ID=$(aws ssm send-command \
+            --instance-ids "$INSTANCE_ID" \
+            --document-name "AWS-RunShellScript" \
+            --parameters "$(jq -n \
+              --arg img "$IMAGE" \
+              --arg user "$GHCR_USER" \
+              --arg token "$GHCR_TOKEN" \
+              '{commands: [
+                "set -euo pipefail",
+                ("printf %s " + ($token|@sh) + " | docker login ghcr.io -u " + ($user|@sh) + " --password-stdin"),
+                ("docker pull " + ($img|@sh)),
+                "docker stop backend 2>/dev/null || true",
+                "docker rm backend 2>/dev/null || true",
+                ("docker run -d --name backend --restart unless-stopped -p 8000:8000 --env-file /home/ec2-user/.env " + ($img|@sh))
+              ]}')" \
+            --query "Command.CommandId" \
+            --output text)
+
+          aws ssm wait command-executed \
+            --command-id "$COMMAND_ID" \
+            --instance-id "$INSTANCE_ID" || true
+
+          RESULT=$(aws ssm get-command-invocation \
+            --command-id "$COMMAND_ID" \
+            --instance-id "$INSTANCE_ID")
+
+          echo "=== Status ==="
+          echo "$RESULT" | jq -r '.Status'
+          echo "=== Stdout ==="
+          echo "$RESULT" | jq -r '.StandardOutputContent'
+          echo "=== Stderr ==="
+          echo "$RESULT" | jq -r '.StandardErrorContent'
+
+          [ "$(echo "$RESULT" | jq -r '.Status')" = "Success" ]

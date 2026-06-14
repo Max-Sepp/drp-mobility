@@ -110,7 +110,15 @@ export function resolveStationName(commonName: string, knownNames: string[]): st
  * is unreachable) so journey results still render — accessibility flagging is additive.
  */
 export async function fetchStationOutages(): Promise<StationOutage[]> {
-  const { data, error } = await apiClient.GET('/failures')
+  // openapi-fetch turns non-2xx *responses* into `{ error }`, but a raw network failure (the
+  // backend unreachable) makes the call *throw* — catch it here so a backend outage never aborts
+  // the journey search, which only awaits this for additive accessibility flagging.
+  let data, error
+  try {
+    ;({ data, error } = await apiClient.GET('/failures'))
+  } catch {
+    return []
+  }
   if (error || !data) return []
 
   const byStation = new Map<string, OutageUnit[]>()

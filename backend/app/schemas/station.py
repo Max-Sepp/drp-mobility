@@ -21,6 +21,11 @@ class StationSchema(BaseModel):
 
     id: int
     name: str
+    # TfL NaPTAN/StopPoint id (e.g. "940GZZLUMED"). Exposed so the client can plan journeys
+    # straight to a station via TfL's Journey Planner, instead of a reverse-geocoded postcode
+    # (which lands beside the station and adds a spurious trailing walk). Nullable for any
+    # unmatched seed rows.
+    tfl_id: str | None = None
     step_free: StepFree
 
 

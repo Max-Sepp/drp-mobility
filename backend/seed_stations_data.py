@@ -10,6 +10,7 @@ PRIMARY ENTRY POINT — run from anywhere:
 
 import csv
 import json
+import re
 from collections import defaultdict
 from pathlib import Path
 
@@ -699,6 +700,120 @@ def get_coordinates(station_uid: str, points_by_station: dict) -> dict | None:
     return None
 
 
+_BOUND_RE = re.compile(r"\b(north|south|east|west|in|out)bound\b", re.IGNORECASE)
+# Line/mode phrases that may prefix a platform (e.g. "Elizabeth line eastbound",
+# "Railway platform C"). Longest first so "Metropolitan line" wins over a bare match.
+_LINE_PHRASES = sorted({*_LINE_PREFIX.values(), "Railway"}, key=len, reverse=True)
+_PLATFORM_NUM_RE = re.compile(r"\bplatforms?\s+([0-9]+[A-Za-z]?|[A-Z])\b", re.IGNORECASE)
+
+
+def _parse_platform_part(p: str) -> tuple[str, str, str] | None:
+    """Decompose a platform-ish part into (line, direction, number).
+
+    "Eastbound Platform 4"        -> ("", "eastbound", "4")
+    "Elizabeth line westbound"    -> ("Elizabeth line", "westbound", "")
+    "Railway platform C"          -> ("Railway", "", "C")
+    Returns None if the part isn't platform-like (no "platform" and no direction).
+    """
+    has_platform = "platform" in p.lower()
+    dm = _BOUND_RE.search(p)
+    if not has_platform and not dm:
+        return None
+    line = next((ph for ph in _LINE_PHRASES if re.search(rf"\b{re.escape(ph)}\b", p, re.I)), "")
+    direction = dm.group(0).lower() if dm else ""
+    nm = _PLATFORM_NUM_RE.search(p)
+    return line, direction, nm.group(1) if nm else ""
+
+
+def _sorted_nums(nums: list[str]) -> list[str]:
+    return sorted(nums, key=lambda n: (not n.isdigit(), int(n) if n.isdigit() else n))
+
+
+def _join_and(items: list[str]) -> str:
+    """Join with commas and a trailing "and": ["3"]->"3", ["3","4"]->"3 and 4",
+    ["3","4","5"]->"3, 4 and 5"."""
+    if len(items) <= 1:
+        return "".join(items)
+    return f"{', '.join(items[:-1])} and {items[-1]}"
+
+
+def _collapse_platforms(parts: list[str]) -> str | None:
+    """Combine several platform parts into one label, preserving line, direction
+    and platform numbers. Returns None when the parts can't be reduced to anything
+    more informative than the raw text (so the caller keeps the original)."""
+    parsed = [_parse_platform_part(p) for p in parts]
+    if any(pp is None for pp in parsed):
+        return None
+
+    lines = {line for line, _, _ in parsed if line}
+    common_line = next(iter(lines)) if len(lines) == 1 else ""
+
+    # Group platform numbers by direction, preserving first-seen order.
+    by_dir: dict[str, list[str]] = {}
+    for _, direction, num in parsed:
+        slot = by_dir.setdefault(direction, [])
+        if num and num not in slot:
+            slot.append(num)
+    has_nums = any(by_dir.values())
+    dirs = [d for d in by_dir if d]
+
+    if not has_nums:
+        if not dirs:
+            return None  # no direction, no number -> nothing better than the raw text
+        word = "platform" if len(dirs) == 1 else "platforms"
+        core = "/".join(dirs) + " " + word
+    else:
+        # One segment per direction, each carrying its own platform numbers.
+        segs = []
+        for direction, nums in by_dir.items():
+            word = "platform" if len(nums) == 1 else "platforms"
+            seg = f"{direction} {word}".strip()
+            if nums:
+                seg += " " + _join_and(_sorted_nums(nums))
+            segs.append(seg)
+        core = ", ".join(segs)
+
+    label = f"{common_line} {core}" if common_line else core
+    return label[0].upper() + label[1:]
+
+
+def _clean_endpoint(raw: str | None) -> str | None:
+    """Turn a resolved area string into a short, rider-readable label.
+
+    The raw `from`/`to` strings carry redundant, comma-joined platform variants
+    (e.g. "Eastbound Platform 4, Eastbound Platform 3" -> "Eastbound platforms 3/4";
+    "Elizabeth line eastbound, Elizabeth line westbound" -> "Elizabeth line
+    eastbound/westbound platforms"). Line/mode and platform numbers are kept. When
+    a collapse wouldn't be more informative than the source, the deduped raw text
+    is returned instead — we never emit a context-free "Platforms".
+    """
+    if not raw or not raw.strip():
+        return None
+    parts = [p.strip() for p in raw.split(",") if p.strip()]
+    if not parts:
+        return None
+
+    # Only collapse multi-part platform lists; a lone "Westbound Platform 1" keeps
+    # its number verbatim, which riders use to navigate.
+    if len(parts) > 1:
+        collapsed = _collapse_platforms(parts)
+        if collapsed:
+            return collapsed
+
+    return ", ".join(dict.fromkeys(parts))
+
+
+def lift_description(from_str: str | None, to_str: str | None) -> str | None:
+    """Build a bidirectional, rider-readable route label for a lift unit, e.g.
+    "Booking Hall ↔ Eastbound platforms". Returns None if either endpoint is
+    missing so the seed can fall back to the raw "from → to" form."""
+    frm = _clean_endpoint(from_str)
+    to = _clean_endpoint(to_str)
+    if not frm or not to:
+        return None
+    return f"{frm} ↔ {to}"
+
+
 def build_lift_units(
     station_uid: str,
     lifts_by_station: dict,
@@ -720,6 +835,9 @@ def build_lift_units(
             "to": to_str,
             "limitedCapacity": parse_bool(lift.get("LimitedCapacityLift", "False")),
         }
+        desc = lift_description(from_str, to_str)
+        if desc:
+            obj["description"] = desc
         if via_str:
             obj["via"] = via_str
         if via2_str and via2_str != via_str:
@@ -788,17 +906,19 @@ def synthesise_lift_units(
     # concourse from which every platform is accessible, so every lift serves all.
     to_str = ", ".join(p["FriendlyName"].strip() for p in plats) if plats else "platform"
 
+    desc = lift_description("Street", to_str)
     result = []
     for i in range(lift_count):
-        result.append(
-            {
-                "id": f"{station_uid}-Lift-{i + 1}",
-                "name": f"Lift {i + 1}",
-                "from": "Street",
-                "to": to_str,
-                "limitedCapacity": False,
-            }
-        )
+        unit = {
+            "id": f"{station_uid}-Lift-{i + 1}",
+            "name": f"Lift {i + 1}",
+            "from": "Street",
+            "to": to_str,
+            "limitedCapacity": False,
+        }
+        if desc:
+            unit["description"] = desc
+        result.append(unit)
     return result
 
 
@@ -1030,6 +1150,13 @@ def apply_overrides(stations: list[dict]) -> None:
         for field in ("lift_units", "escalator_units", "lifts", "escalators"):
             if field in override:
                 station[field] = override[field]
+        # Generate readable descriptions for override-supplied lifts, unless the
+        # override already hand-wrote one (those always win).
+        for unit in station.get("lift_units") or []:
+            if not unit.get("description"):
+                desc = lift_description(unit.get("from"), unit.get("to"))
+                if desc:
+                    unit["description"] = desc
         if "platforms_patch" in override:
             plat_by_id = {p["id"]: p for p in station.get("platforms", [])}
             for plat_id, patch in override["platforms_patch"].items():

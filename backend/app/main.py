@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 
 from app.database import Base, SessionLocal, engine
 from app.events import broker
@@ -96,6 +97,9 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
+# Compress large JSON responses (the ~300-400 KB /stations payload shrinks to ~50-80 KB).
+app.add_middleware(GZipMiddleware, minimum_size=500)
 
 if os.getenv("DEV", "false").lower() == "true":
     app.add_middleware(

@@ -32,14 +32,16 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "DLR northbound platform",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ DLR northbound platform"
       },
       {
         "id": "940GZZDLABR-Lift-2",
         "name": "Lift 2",
         "from": "Booking Hall",
         "to": "DLR southbound platform",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ DLR southbound platform"
       }
     ],
     "id": "940GZZDLABR",
@@ -116,42 +118,48 @@
         "name": "Lift A",
         "from": "Felixstowe Road entrance",
         "to": "Harrow Manorway entrance",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Felixstowe Road entrance ↔ Harrow Manorway entrance"
       },
       {
         "id": "HUBABW-Lift-2",
         "name": "Lift B",
         "from": "Felixstowe Road entrance",
         "to": "Harrow Manorway entrance",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Felixstowe Road entrance ↔ Harrow Manorway entrance"
       },
       {
         "id": "HUBABW-Lift-3",
         "name": "Lift C",
         "from": "Wilton Road entrance",
         "to": "Harrow Manorway entrance",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Wilton Road entrance ↔ Harrow Manorway entrance"
       },
       {
         "id": "HUBABW-Lift-4",
         "name": "Lift D",
         "from": "Wilton Road entrance",
         "to": "Harrow Manorway entrance",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Wilton Road entrance ↔ Harrow Manorway entrance"
       },
       {
         "id": "HUBABW-Lift-6",
         "name": "Lift F",
         "from": "Ticket Hall",
         "to": "Railway platform, Railway platform C",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Ticket Hall ↔ Railway platform C"
       },
       {
         "id": "HUBABW-Lift-5",
         "name": "Lift E",
         "from": "Ticket Hall",
         "to": "Elizabeth line eastbound, Elizabeth line westbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Ticket Hall ↔ Elizabeth line eastbound/westbound platforms"
       }
     ],
     "id": "HUBABW",
@@ -240,14 +248,16 @@
         "name": "Lift A",
         "from": "Ticket Hall (south)",
         "to": "Railway platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Ticket Hall (south) ↔ Railway platform 1"
       },
       {
         "id": "910GACTONML-Lift-2",
         "name": "Lift B",
         "from": "Ticket Hall (south)",
         "to": "Railway platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Ticket Hall (south) ↔ Railway platform 2"
       }
     ],
     "id": "910GACTONML",
@@ -343,14 +353,16 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Westbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Westbound Platform 1"
       },
       {
         "id": "940GZZLUACT-Lift-2",
         "name": "Lift 2",
         "from": "Booking Hall",
         "to": "Eastbound Platform 4",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Eastbound Platform 4"
       }
     ],
     "id": "940GZZLUACT",
@@ -640,14 +652,16 @@
         "name": "Lift 1",
         "from": "Concourse",
         "to": "DLR northbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Concourse ↔ DLR northbound"
       },
       {
         "id": "940GZZDLALL-Lift-2",
         "name": "Lift 2",
         "from": "Concourse",
         "to": "DLR southbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Concourse ↔ DLR southbound"
       }
     ],
     "id": "940GZZDLALL",
@@ -788,14 +802,16 @@
         "name": "Lift 1",
         "from": "Southbound Platform 1",
         "to": "Footbridge",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Southbound Platform 1 ↔ Footbridge"
       },
       {
         "id": "HUBAMR-Lift-2",
         "name": "Lift 2",
         "from": "Footbridge",
         "to": "Metropolitan line northbound, Railway platform",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Northbound platform"
       }
     ],
     "id": "HUBAMR",
@@ -1555,7 +1571,8 @@
         "name": "Lift 1",
         "from": "Entrance (bridge)",
         "to": "Railway platform",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Entrance (bridge) ↔ Railway platform"
       }
     ],
     "id": "HUBBAL",
@@ -1691,35 +1708,40 @@
         "name": "Lift 2",
         "from": "Booking Hall (north)",
         "to": "Concourse (north lower)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall (north) ↔ Concourse (north lower)"
       },
       {
         "id": "HUBBAN-Lift-3",
         "name": "Lift 3",
         "from": "Booking Hall (north)",
         "to": "Concourse (north lower)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall (north) ↔ Concourse (north lower)"
       },
       {
         "id": "HUBBAN-Lift-4",
         "name": "Lift 4",
         "from": "Booking Hall (north)",
         "to": "Concourse (north lower)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall (north) ↔ Concourse (north lower)"
       },
       {
         "id": "HUBBAN-Lift-5",
         "name": "Lift 5",
         "from": "Booking Hall (north)",
         "to": "Concourse (north lower)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall (north) ↔ Concourse (north lower)"
       },
       {
         "id": "HUBBAN-Lift-6",
         "name": "Lift C",
         "from": "Concourse (north lower)",
         "to": "DLR platform 10, DLR 9",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Concourse (north lower) ↔ DLR platform 10, DLR 9"
       },
       {
         "id": "HUBBAN-Lift-7",
@@ -1727,6 +1749,7 @@
         "from": "King William Street entrance",
         "to": "Booking Hall (north)",
         "limitedCapacity": false,
+        "description": "King William Street entrance ↔ Booking Hall (north)",
         "notes": "Lift available on request. Press button to alert staff."
       },
       {
@@ -1734,14 +1757,16 @@
         "name": "Lift 8",
         "from": "Bloomberg Arcade entrance",
         "to": "Bakerloo line mezzanine",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Bloomberg Arcade entrance ↔ Bakerloo line mezzanine"
       },
       {
         "id": "HUBBAN-Lift-9",
         "name": "Lift 9",
         "from": "Bakerloo line mezzanine",
         "to": "Waterloo & City line",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Bakerloo line mezzanine ↔ Waterloo & City line"
       },
       {
         "id": "HUBBAN-Lift 10",
@@ -1749,6 +1774,7 @@
         "from": "Central sub-level booking hall",
         "to": "DLR platform 10, DLR 9",
         "limitedCapacity": false,
+        "description": "Central sub-level booking hall ↔ DLR platform 10, DLR 9",
         "via": "Northern line south platform"
       },
       {
@@ -1756,7 +1782,8 @@
         "name": "Lift G",
         "from": "Central sub-level booking hall",
         "to": "Northern line south platform",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Central sub-level booking hall ↔ Northern line south platform"
       }
     ],
     "id": "HUBBAN",
@@ -1935,14 +1962,16 @@
         "name": "Lift F",
         "from": "Lower level booking hall",
         "to": "East upper level",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Lower level booking hall ↔ East upper level"
       },
       {
         "id": "940GZZLUBBN-Lift-9",
         "name": "Lift G",
         "from": "East upper level",
         "to": "Below-street lower level",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "East upper level ↔ Below-street lower level"
       }
     ],
     "id": "940GZZLUBBN",
@@ -2067,7 +2096,8 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Railway platform G",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Railway platform G"
       }
     ],
     "id": "HUBBKG",
@@ -2155,14 +2185,16 @@
         "name": "Lift 1",
         "from": "National Rail concourse",
         "to": "Railway platform 2, Railway platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platforms 1 and 2"
       },
       {
         "id": "910GBARKRIV-Lift-2",
         "name": "Lift 2",
         "from": "National Rail concourse",
         "to": "Railway platform 2, Railway platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platforms 1 and 2"
       }
     ],
     "id": "910GBARKRIV",
@@ -2399,21 +2431,24 @@
         "name": "Lift A",
         "from": "East entrance",
         "to": "Booking Hall",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "East entrance ↔ Booking Hall"
       },
       {
         "id": "940GZZBPSUST-Lift-2",
         "name": "Lift B",
         "from": "Booking Hall",
         "to": "Landing",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Landing"
       },
       {
         "id": "940GZZBPSUST-Lift-3",
         "name": "Lift C",
         "from": "Booking Hall",
         "to": "Landing",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Landing"
       },
       {
         "id": "940GZZBPSUST-Lift-4",
@@ -2421,6 +2456,7 @@
         "from": "East bus gate",
         "to": "Booking Hall",
         "limitedCapacity": false,
+        "description": "East bus gate ↔ Booking Hall",
         "via": "East bus stop"
       }
     ],
@@ -2944,21 +2980,24 @@
         "name": "Lift 1",
         "from": "Street",
         "to": "Northbound Platform 1, Southbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Northbound platform 1, southbound platform 2"
       },
       {
         "id": "940GZZLUBZP-Lift-2",
         "name": "Lift 2",
         "from": "Street",
         "to": "Northbound Platform 1, Southbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Northbound platform 1, southbound platform 2"
       },
       {
         "id": "940GZZLUBZP-Lift-3",
         "name": "Lift 3",
         "from": "Street",
         "to": "Northbound Platform 1, Southbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Northbound platform 1, southbound platform 2"
       }
     ],
     "id": "940GZZLUBZP",
@@ -3013,7 +3052,8 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Jubilee line",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Jubilee line"
       }
     ],
     "id": "940GZZLUBMY",
@@ -3326,42 +3366,48 @@
         "name": "Lift 6",
         "from": "Underground lower booking hall",
         "to": "Underground east",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Underground lower booking hall ↔ Underground east"
       },
       {
         "id": "HUBBFR-Lift-8",
         "name": "Lift 8",
         "from": "Underground lower booking hall",
         "to": "Underground west",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Underground lower booking hall ↔ Underground west"
       },
       {
         "id": "HUBBFR-Lift-1",
         "name": "Lift 1",
         "from": "Entrance (north)",
         "to": "Railway platform, Railway platform (north)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Entrance (north) ↔ Railway platform, Railway platform (north)"
       },
       {
         "id": "HUBBFR-Lift-2",
         "name": "Lift 2",
         "from": "Entrance (north)",
         "to": "Railway platform (south)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Entrance (north) ↔ Railway platform (south)"
       },
       {
         "id": "HUBBFR-Lift-3",
         "name": "Lift 3",
         "from": "Entrance (south)",
         "to": "Railway platform, Railway platform (north)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Entrance (south) ↔ Railway platform, Railway platform (north)"
       },
       {
         "id": "HUBBFR-Lift-4",
         "name": "Lift 4",
         "from": "Entrance (south)",
         "to": "Railway platform (south)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Entrance (south) ↔ Railway platform (south)"
       }
     ],
     "id": "HUBBFR",
@@ -3545,14 +3591,16 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Railway platform (west)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Railway platform (west)"
       },
       {
         "id": "HUBBHO-Lift-2",
         "name": "Lift 2",
         "from": "Booking Hall",
         "to": "Railway platform (east)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Railway platform (east)"
       }
     ],
     "id": "HUBBHO",
@@ -3621,14 +3669,16 @@
         "name": "Lift 1",
         "from": "Ditchburn Place entrance",
         "to": "DLR eastbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Ditchburn Place entrance ↔ DLR eastbound"
       },
       {
         "id": "940GZZDLBLA-Lift-2",
         "name": "Lift 2",
         "from": "Ditchburn Place entrance",
         "to": "DLR westbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Ditchburn Place entrance ↔ DLR westbound"
       }
     ],
     "id": "940GZZDLBLA",
@@ -3727,14 +3777,16 @@
         "name": "Lift B",
         "from": "Booking Hall",
         "to": "Circle/Jubilee lower concourse",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Circle/Jubilee lower concourse"
       },
       {
         "id": "HUBBDS-Lift-2",
         "name": "Lift C",
         "from": "Circle/Jubilee lower concourse",
         "to": "Northbound Platform 3, Southbound Platform 4",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Circle/Jubilee lower concourse ↔ Northbound platform 3, southbound platform 4"
       },
       {
         "id": "HUBBDS-Lift-3",
@@ -3742,6 +3794,7 @@
         "from": "Elizabeth line inner junction",
         "to": "Eastbound Platform 2, Westbound Platform 1",
         "limitedCapacity": false,
+        "description": "Elizabeth line inner junction ↔ Eastbound platform 2, westbound platform 1",
         "via": "Circle/Jubilee lower concourse"
       },
       {
@@ -3749,7 +3802,8 @@
         "name": "Lift A",
         "from": "Street entrance (central)",
         "to": "Booking Hall",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street entrance (central) ↔ Booking Hall"
       },
       {
         "id": "HUBBDS-Lift-5",
@@ -3757,6 +3811,7 @@
         "from": "Down-side booking hall",
         "to": "Elizabeth line west level",
         "limitedCapacity": false,
+        "description": "Down-side booking hall ↔ Elizabeth line west level",
         "via": "Elizabeth line inner"
       },
       {
@@ -3764,7 +3819,8 @@
         "name": "Lift F",
         "from": "Hanover Square booking hall",
         "to": "Elizabeth line east level",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Hanover Square booking hall ↔ Elizabeth line east level"
       }
     ],
     "id": "HUBBDS",
@@ -3876,14 +3932,16 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Northbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Northbound Platform 1"
       },
       {
         "id": "940GZZLUBOR-Lift-2",
         "name": "Lift 2",
         "from": "Booking Hall",
         "to": "Northbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Northbound Platform 1"
       }
     ],
     "id": "940GZZLUBOR",
@@ -4067,14 +4125,16 @@
         "name": "Lift 1",
         "from": "Bow Road entrance",
         "to": "DLR northbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Bow Road entrance ↔ DLR northbound"
       },
       {
         "id": "940GZZDLBOW-Lift-2",
         "name": "Lift 2",
         "from": "Bow Road entrance",
         "to": "DLR southbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Bow Road entrance ↔ DLR southbound"
       }
     ],
     "id": "940GZZDLBOW",
@@ -4242,35 +4302,40 @@
         "name": "Lift 1",
         "from": "Entrance (west)",
         "to": "Footbridge",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Entrance (west) ↔ Footbridge"
       },
       {
         "id": "910GBRENTX-Lift-2",
         "name": "Lift 2",
         "from": "National Rail concourse",
         "to": "Railway platform 4, Railway platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platforms 3 and 4"
       },
       {
         "id": "910GBRENTX-Lift-3",
         "name": "Lift 3",
         "from": "National Rail concourse",
         "to": "Railway platform 2, Railway platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platforms 1 and 2"
       },
       {
         "id": "910GBRENTX-Lift-4",
         "name": "Lift 4",
         "from": "Entrance (east)",
         "to": "Main station level",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Entrance (east) ↔ Main station level"
       },
       {
         "id": "910GBRENTX-Lift-5",
         "name": "Lift 5",
         "from": "Main station level",
         "to": "Footbridge",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Main station level ↔ Footbridge"
       }
     ],
     "id": "910GBRENTX",
@@ -4346,14 +4411,16 @@
         "name": "Lift B",
         "from": "Footbridge",
         "to": "Railway platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 1"
       },
       {
         "id": "910GBRTWOOD-Lift-2",
         "name": "Lift A",
         "from": "Footbridge",
         "to": "Railway platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 2"
       }
     ],
     "id": "910GBRTWOOD",
@@ -4465,14 +4532,16 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Brixton Road access",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Brixton Road access"
       },
       {
         "id": "HUBBRX-Lift-2",
         "name": "Lift 2",
         "from": "Booking Hall",
         "to": "Victoria line platform 1, Victoria line platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Victoria line platforms 1 and 2"
       }
     ],
     "id": "HUBBRX",
@@ -4557,7 +4626,8 @@
         "name": "Lift 1",
         "from": "Footbridge",
         "to": "Railway platform (north)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform (north)"
       }
     ],
     "id": "910GBROCKLY",
@@ -4637,14 +4707,16 @@
         "name": "Lift 1",
         "from": "Concourse",
         "to": "Railway platform (east)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Concourse ↔ Railway platform (east)"
       },
       {
         "id": "910GBROMLYS-Lift-2",
         "name": "Lift 2",
         "from": "Concourse",
         "to": "Railway platform (west)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Concourse ↔ Railway platform (west)"
       }
     ],
     "id": "910GBROMLYS",
@@ -4701,14 +4773,16 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Eastbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Eastbound Platform 2"
       },
       {
         "id": "940GZZLUBBB-Lift-2",
         "name": "Lift 2",
         "from": "Booking Hall",
         "to": "Westbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Westbound Platform 1"
       }
     ],
     "id": "940GZZLUBBB",
@@ -4833,7 +4907,8 @@
         "name": "Lift A",
         "from": "Upper platform",
         "to": "Railway platform (east), Railway platform (west)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Upper platform ↔ Railway platform (east), Railway platform (west)"
       }
     ],
     "id": "910GBNHAM",
@@ -5055,14 +5130,16 @@
         "name": "Lift 3",
         "from": "Booking Hall",
         "to": "Piccadilly line southbound, Piccadilly line northbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Piccadilly line southbound/northbound platforms"
       },
       {
         "id": "940GZZLUCAR-Lift-4",
         "name": "Lift 4",
         "from": "Booking Hall",
         "to": "Piccadilly line southbound, Piccadilly line northbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Piccadilly line southbound/northbound platforms"
       }
     ],
     "id": "940GZZLUCAR",
@@ -5115,7 +5192,8 @@
         "name": "Lift 2",
         "from": "National Rail concourse",
         "to": "Railway platform",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform"
       }
     ],
     "id": "910GCLDNNRB",
@@ -5169,14 +5247,16 @@
         "name": "Lift 1",
         "from": "Subway",
         "to": "Railway platform (west)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Subway ↔ Railway platform (west)"
       },
       {
         "id": "910GCMDNRD-Lift-2",
         "name": "Lift 2",
         "from": "Subway",
         "to": "Railway platform (east)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Subway ↔ Railway platform (east)"
       }
     ],
     "id": "910GCMDNRD",
@@ -5338,6 +5418,7 @@
         "from": "National Rail concourse",
         "to": "Westbound Platform 1, Jubilee line",
         "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Westbound Platform 1, Jubilee line",
         "via": "Railway platform (south)"
       },
       {
@@ -5345,14 +5426,16 @@
         "name": "Lift 2",
         "from": "National Rail concourse",
         "to": "Railway platform (north)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform (north)"
       },
       {
         "id": "HUBZCW-Lift-4",
         "name": "Lift 4",
         "from": "Surrey Quays entrance",
         "to": "National Rail concourse",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Surrey Quays entrance ↔ National Rail concourse"
       }
     ],
     "id": "HUBZCW",
@@ -5545,14 +5628,16 @@
         "name": "Lift DLR 1",
         "from": "Northern line",
         "to": "DLR M",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Northern line ↔ DLR M"
       },
       {
         "id": "HUBCAW-Lift-DLR 2",
         "name": "Lift DLR 2",
         "from": "Northern line",
         "to": "DLR M",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Northern line ↔ DLR M"
       },
       {
         "id": "HUBCAW-Lift-DLR S2",
@@ -5560,6 +5645,7 @@
         "from": "Shopping centre (west entrance)",
         "to": "DLR northbound",
         "limitedCapacity": false,
+        "description": "Shopping centre (west entrance) ↔ DLR northbound",
         "via": "DLR M"
       },
       {
@@ -5568,6 +5654,7 @@
         "from": "Shopping centre (east entrance)",
         "to": "DLR southbound",
         "limitedCapacity": false,
+        "description": "Shopping centre (east entrance) ↔ DLR southbound",
         "via": "DLR M"
       },
       {
@@ -5575,14 +5662,16 @@
         "name": "Lift LU 1",
         "from": "Port of London Authority building, Jubilee line mezzanine, Underground station entrance",
         "to": "Jubilee line booking hall",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Port of London Authority building, Jubilee line mezzanine, Underground station entrance ↔ Jubilee line booking hall"
       },
       {
         "id": "HUBCAW-Lift-LU 2",
         "name": "Lift LU 2",
         "from": "Jubilee line booking hall",
         "to": "Jubilee line (east), Jubilee line (west)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Jubilee line booking hall ↔ Jubilee line (east), Jubilee line (west)"
       },
       {
         "id": "HUBCAW-Lift-A",
@@ -5590,6 +5679,7 @@
         "from": "Harrods level east",
         "to": "Booking Hall",
         "limitedCapacity": false,
+        "description": "Harrods level east ↔ Booking Hall",
         "via": "Quay East atrium"
       },
       {
@@ -5597,21 +5687,24 @@
         "name": "Lift B",
         "from": "Canada Place",
         "to": "Booking Hall",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Canada Place ↔ Booking Hall"
       },
       {
         "id": "HUBCAW-Lift-C",
         "name": "Lift C",
         "from": "Booking Hall",
         "to": "Elizabeth line eastbound, Elizabeth line westbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Elizabeth line eastbound/westbound platforms"
       },
       {
         "id": "HUBCAW-Lift-D",
         "name": "Lift D",
         "from": "Booking Hall",
         "to": "Elizabeth line eastbound, Elizabeth line westbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Elizabeth line eastbound/westbound platforms"
       }
     ],
     "id": "HUBCAW",
@@ -5775,21 +5868,24 @@
         "name": "Lift 1",
         "from": "Bow Road entrance",
         "to": "Booking Hall",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Bow Road entrance ↔ Booking Hall"
       },
       {
         "id": "HUBCAN-Lift-2",
         "name": "Lift 2",
         "from": "Booking Hall",
         "to": "DLR platform 1, DLR platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ DLR platforms 1 and 2"
       },
       {
         "id": "HUBCAN-Lift-3",
         "name": "Lift 3",
         "from": "Entrance A",
         "to": "Booking Hall",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Entrance A ↔ Booking Hall"
       },
       {
         "id": "HUBCAN-Lift-4",
@@ -5797,6 +5893,7 @@
         "from": "Booking Hall",
         "to": "DLR platform 3, DLR platform 4",
         "limitedCapacity": false,
+        "description": "Booking Hall ↔ DLR platforms 3 and 4",
         "via": "Jubilee line, Eastbound Platform 6"
       }
     ],
@@ -6003,14 +6100,16 @@
         "name": "Lift 2",
         "from": "Booking Hall",
         "to": "Westbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Westbound Platform 1"
       },
       {
         "id": "HUBCST-Lift-1",
         "name": "Lift 1",
         "from": "National Rail",
         "to": "National Rail (east)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail ↔ National Rail (east)"
       }
     ],
     "id": "HUBCST",
@@ -6120,21 +6219,24 @@
         "name": "Lift 1",
         "from": "Entrance",
         "to": "Railway platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Entrance ↔ Railway platform 1"
       },
       {
         "id": "910GCNNB-Lift-2",
         "name": "Lift 2",
         "from": "Entrance",
         "to": "Railway platform 2, Railway platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Entrance ↔ Railway platforms 2 and 3"
       },
       {
         "id": "910GCNNB-Lift-3",
         "name": "Lift 3",
         "from": "Entrance",
         "to": "Railway platform 4",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Entrance ↔ Railway platform 4"
       }
     ],
     "id": "910GCNNB",
@@ -6270,14 +6372,16 @@
         "name": "Lift 1",
         "from": "Station forecourt",
         "to": "Railway platform (east)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Station forecourt ↔ Railway platform (east)"
       },
       {
         "id": "910GCRSHLTN-Lift-2",
         "name": "Lift 2",
         "from": "Station forecourt",
         "to": "Railway platform (west)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Station forecourt ↔ Railway platform (west)"
       }
     ],
     "id": "910GCRSHLTN",
@@ -6333,14 +6437,16 @@
         "name": "Lift 1",
         "from": "Entrance",
         "to": "Railway platform (north)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Entrance ↔ Railway platform (north)"
       },
       {
         "id": "910GCATFORD-Lift-2",
         "name": "Lift 2",
         "from": "Entrance",
         "to": "Railway platform (south)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Entrance ↔ Railway platform (south)"
       }
     ],
     "id": "910GCATFORD",
@@ -6448,21 +6554,24 @@
         "name": "Lift C",
         "from": "Footbridge",
         "to": "Railway platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 1"
       },
       {
         "id": "910GCHDWLHT-Lift-2",
         "name": "Lift A",
         "from": "Footbridge",
         "to": "Railway platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 2"
       },
       {
         "id": "910GCHDWLHT-Lift-3",
         "name": "Lift B",
         "from": "Footbridge",
         "to": "Railway platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 3"
       }
     ],
     "id": "910GCHDWLHT",
@@ -6607,14 +6716,16 @@
         "name": "Lift 1",
         "from": "Street",
         "to": "Northbound Platform 1, Southbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Northbound platform 1, southbound platform 2"
       },
       {
         "id": "940GZZLUCFM-Lift-2",
         "name": "Lift 2",
         "from": "Street",
         "to": "Northbound Platform 1, Southbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Northbound platform 1, southbound platform 2"
       }
     ],
     "id": "940GZZLUCFM",
@@ -6991,7 +7102,8 @@
         "name": "Lift 1",
         "from": "Footbridge",
         "to": "Railway platform (west)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform (west)"
       }
     ],
     "id": "910GCRLN",
@@ -7420,14 +7532,16 @@
         "name": "Lift 1",
         "from": "Upper concourse",
         "to": "Railway platform (north)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Upper concourse ↔ Railway platform (north)"
       },
       {
         "id": "910GCTMSLNK-Lift-2",
         "name": "Lift 2",
         "from": "Upper concourse",
         "to": "Railway platform (south)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Upper concourse ↔ Railway platform (south)"
       }
     ],
     "id": "910GCTMSLNK",
@@ -7554,28 +7668,32 @@
         "name": "Lift 1",
         "from": "National Rail concourse",
         "to": "Railway platform K",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform K"
       },
       {
         "id": "HUBCLJ-Lift-2",
         "name": "Lift 2",
         "from": "Subway",
         "to": "Railway platform K",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Subway ↔ Railway platform K"
       },
       {
         "id": "HUBCLJ-Lift-3",
         "name": "Lift 3",
         "from": "National Rail concourse",
         "to": "Railway platform B",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform B"
       },
       {
         "id": "HUBCLJ-Lift-4",
         "name": "Lift 4",
         "from": "Subway",
         "to": "Railway platform B",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Subway ↔ Railway platform B"
       }
     ],
     "id": "HUBCLJ",
@@ -7810,7 +7928,8 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Car park",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Car park"
       }
     ],
     "id": "940GZZLUCKS",
@@ -7888,7 +8007,8 @@
         "name": "Lift A",
         "from": "Booking Hall",
         "to": "Northbound Platform 1, Southbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Northbound platform 1, southbound platform 2"
       }
     ],
     "id": "940GZZLUCND",
@@ -8049,14 +8169,16 @@
         "name": "Lift 1",
         "from": "Bridge",
         "to": "Railway platform (north)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Bridge ↔ Railway platform (north)"
       },
       {
         "id": "910GCOLSDNS-Lift-2",
         "name": "Lift 2",
         "from": "Bridge",
         "to": "Railway platform (south)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Bridge ↔ Railway platform (south)"
       }
     ],
     "id": "910GCOLSDNS",
@@ -8111,28 +8233,32 @@
         "name": "Lift 1",
         "from": "Street",
         "to": "Westbound Platform 1, Eastbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Westbound platform 1, eastbound platform 2"
       },
       {
         "id": "940GZZLUCGN-Lift-2",
         "name": "Lift 2",
         "from": "Street",
         "to": "Westbound Platform 1, Eastbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Westbound platform 1, eastbound platform 2"
       },
       {
         "id": "940GZZLUCGN-Lift-3",
         "name": "Lift 3",
         "from": "Street",
         "to": "Westbound Platform 1, Eastbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Westbound platform 1, eastbound platform 2"
       },
       {
         "id": "940GZZLUCGN-Lift-4",
         "name": "Lift 4",
         "from": "Street",
         "to": "Westbound Platform 1, Eastbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Westbound platform 1, eastbound platform 2"
       }
     ],
     "id": "940GZZLUCGN",
@@ -8303,14 +8429,16 @@
         "name": "Lift 1",
         "from": "Station concourse",
         "to": "DLR_S",
-        "limitedCapacity": true
+        "limitedCapacity": true,
+        "description": "Station concourse ↔ DLR_S"
       },
       {
         "id": "940GZZDLCLA-Lift-2",
         "name": "Lift 2",
         "from": "Station concourse",
         "to": "DLR northbound",
-        "limitedCapacity": true
+        "limitedCapacity": true,
+        "description": "Station concourse ↔ DLR northbound"
       }
     ],
     "id": "940GZZDLCLA",
@@ -8477,21 +8605,24 @@
         "name": "Lift 1",
         "from": "National Rail concourse",
         "to": "Railway platform (north), Railway platform F (south)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform F"
       },
       {
         "id": "HUBCYP-Lift-2",
         "name": "Lift 2",
         "from": "National Rail concourse",
         "to": "Railway platform (through), Railway platform (south)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform (through), Railway platform (south)"
       },
       {
         "id": "HUBCYP-Lift-3",
         "name": "Lift 3",
         "from": "National Rail concourse",
         "to": "Railway platform F (north)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform F (north)"
       }
     ],
     "id": "HUBCYP",
@@ -8600,28 +8731,32 @@
         "name": "Lift 4",
         "from": "Covered walkway (west)",
         "to": "Eastbound Platform 3, Westbound Platform 4",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Covered walkway (west) ↔ Eastbound platform 3, westbound platform 4"
       },
       {
         "id": "HUBCUS-Lift-1",
         "name": "Lift 1",
         "from": "Victoria line",
         "to": "Covered walkway (centre)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Victoria line ↔ Covered walkway (centre)"
       },
       {
         "id": "HUBCUS-Lift-2",
         "name": "Lift 2",
         "from": "Eastbound Platform 3, Westbound Platform 4",
         "to": "Covered walkway (east)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Eastbound platform 3, westbound platform 4 ↔ Covered walkway (east)"
       },
       {
         "id": "HUBCUS-Lift-3",
         "name": "Lift 3",
         "from": "Booking Hall",
         "to": "Elizabeth line eastbound, Elizabeth line westbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Elizabeth line eastbound/westbound platforms"
       }
     ],
     "id": "HUBCUS",
@@ -8688,6 +8823,7 @@
         "from": "Deptford Creek entrance",
         "to": "Northbound Platform 2, Southbound Platform 1",
         "limitedCapacity": false,
+        "description": "Deptford Creek entrance ↔ Northbound platform 2, southbound platform 1",
         "via": "Concourse"
       }
     ],
@@ -8925,7 +9061,8 @@
         "name": "Lift 1",
         "from": "National Rail concourse",
         "to": "Railway platform",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform"
       }
     ],
     "id": "910GDALS",
@@ -9013,21 +9150,24 @@
         "name": "Lift 1",
         "from": "Entrance",
         "to": "Footbridge",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Entrance ↔ Footbridge"
       },
       {
         "id": "910GDARTFD-Lift-2",
         "name": "Lift 2",
         "from": "Railway platform 1",
         "to": "Footbridge",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Railway platform 1 ↔ Footbridge"
       },
       {
         "id": "910GDARTFD-Lift-3",
         "name": "Lift 3",
         "from": "Railway platform 2",
         "to": "Footbridge",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Railway platform 2 ↔ Footbridge"
       }
     ],
     "id": "910GDARTFD",
@@ -9082,14 +9222,16 @@
         "name": "Lift 1",
         "from": "Eastbound Platform 2",
         "to": "Footbridge",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Eastbound Platform 2 ↔ Footbridge"
       },
       {
         "id": "940GZZLUDBN-Lift-2",
         "name": "Lift 2",
         "from": "Footbridge",
         "to": "Westbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Westbound Platform 1"
       }
     ],
     "id": "940GZZLUDBN",
@@ -9190,21 +9332,24 @@
         "name": "Lift 1",
         "from": "National Rail concourse",
         "to": "Railway platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform 1"
       },
       {
         "id": "910GDENMRKH-Lift-2",
         "name": "Lift 2",
         "from": "National Rail concourse",
         "to": "Railway platform 2–3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform 2–3"
       },
       {
         "id": "910GDENMRKH-Lift-3",
         "name": "Lift 3",
         "from": "National Rail concourse",
         "to": "Railway platform 4",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform 4"
       }
     ],
     "id": "910GDENMRKH",
@@ -9273,14 +9418,16 @@
         "name": "Lift 1",
         "from": "Railway platform (west)",
         "to": "Entrance, Upper platform",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Railway platform (west) ↔ Entrance, Upper platform"
       },
       {
         "id": "910GDEPTFD-Lift-2",
         "name": "Lift 2",
         "from": "Railway platform (east)",
         "to": "Upper platform",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Railway platform (east) ↔ Upper platform"
       }
     ],
     "id": "910GDEPTFD",
@@ -9334,14 +9481,16 @@
         "name": "Lift 1",
         "from": "C",
         "to": "DLR southbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "C ↔ DLR southbound"
       },
       {
         "id": "940GZZDLDEP-Lift-2",
         "name": "Lift 2",
         "from": "C",
         "to": "DLR northbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "C ↔ DLR northbound"
       }
     ],
     "id": "940GZZDLDEP",
@@ -9396,14 +9545,16 @@
         "name": "Lift 1",
         "from": "Concourse",
         "to": "DLR northbound",
-        "limitedCapacity": true
+        "limitedCapacity": true,
+        "description": "Concourse ↔ DLR northbound"
       },
       {
         "id": "940GZZDLDEV-Lift-2",
         "name": "Lift 2",
         "from": "Concourse",
         "to": "DLR southbound",
-        "limitedCapacity": true
+        "limitedCapacity": true,
+        "description": "Concourse ↔ DLR southbound"
       }
     ],
     "id": "940GZZDLDEV",
@@ -9662,28 +9813,32 @@
         "name": "Lift A",
         "from": "Footbridge",
         "to": "Railway platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 1"
       },
       {
         "id": "HUBEAL-Lift-2",
         "name": "Lift B",
         "from": "Footbridge",
         "to": "Railway platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 2"
       },
       {
         "id": "HUBEAL-Lift-3",
         "name": "Lift D",
         "from": "Footbridge",
         "to": "Railway platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 3"
       },
       {
         "id": "HUBEAL-Lift-4",
         "name": "Lift C",
         "from": "Footbridge",
         "to": "Railway platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 3"
       }
     ],
     "id": "HUBEAL",
@@ -9885,28 +10040,32 @@
         "name": "Lift 3",
         "from": "Booking Hall (east)",
         "to": "Piccadilly line",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall (east) ↔ Piccadilly line"
       },
       {
         "id": "940GZZLUECT-Lift-4",
         "name": "Lift 4",
         "from": "Booking Hall (east)",
         "to": "Piccadilly line",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall (east) ↔ Piccadilly line"
       },
       {
         "id": "940GZZLUECT-Lift-5",
         "name": "Lift 5",
         "from": "Gate area (north)",
         "to": "Eastbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Gate area (north) ↔ Eastbound Platform 1"
       },
       {
         "id": "940GZZLUECT-Lift-6",
         "name": "Lift 6",
         "from": "Gate area (north)",
         "to": "Westbound Platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Gate area (north) ↔ Westbound Platform 3"
       }
     ],
     "id": "940GZZLUECT",
@@ -10107,28 +10266,32 @@
         "name": "Lift 1",
         "from": "Entrance",
         "to": "Footbridge",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Entrance ↔ Footbridge"
       },
       {
         "id": "HUBECY-Lift-2",
         "name": "Lift 2",
         "from": "Footbridge",
         "to": "Railway platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 1"
       },
       {
         "id": "HUBECY-Lift-3",
         "name": "Lift 3",
         "from": "Footbridge",
         "to": "Railway platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 2"
       },
       {
         "id": "HUBECY-Lift-4",
         "name": "Lift 4",
         "from": "Footbridge",
         "to": "Railway platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 3"
       }
     ],
     "id": "HUBECY",
@@ -10252,14 +10415,16 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Westbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Westbound Platform 1"
       },
       {
         "id": "940GZZLUEHM-Lift-2",
         "name": "Lift 2",
         "from": "Booking Hall",
         "to": "Eastbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Eastbound Platform 2"
       }
     ],
     "id": "940GZZLUEHM",
@@ -10314,6 +10479,7 @@
         "from": "Blackwall Way entrance",
         "to": "DLR eastbound",
         "limitedCapacity": false,
+        "description": "Blackwall Way entrance ↔ DLR eastbound",
         "via": "Booking Hall"
       },
       {
@@ -10322,6 +10488,7 @@
         "from": "Blackwall Way entrance",
         "to": "DLR westbound",
         "limitedCapacity": false,
+        "description": "Blackwall Way entrance ↔ DLR westbound",
         "via": "Booking Hall"
       },
       {
@@ -10329,7 +10496,8 @@
         "name": "Lift 3",
         "from": "Aspen Way entrance",
         "to": "Booking Hall",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Aspen Way entrance ↔ Booking Hall"
       }
     ],
     "id": "940GZZDLEIN",
@@ -10492,14 +10660,16 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Northern line platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Northern line platform 1"
       },
       {
         "id": "940GZZLUEGW-Lift-2",
         "name": "Lift 2",
         "from": "Booking Hall",
         "to": "Northern line platforms 2–3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Northern line platforms 2–3"
       }
     ],
     "id": "940GZZLUEGW",
@@ -10553,14 +10723,16 @@
         "name": "Lift 1",
         "from": "Street",
         "to": "Northbound Platform 1, Southbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Northbound platform 1, southbound platform 2"
       },
       {
         "id": "940GZZLUERB-Lift-2",
         "name": "Lift 2",
         "from": "Street",
         "to": "Northbound Platform 1, Southbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Northbound platform 1, southbound platform 2"
       }
     ],
     "id": "940GZZLUERB",
@@ -10692,14 +10864,16 @@
         "name": "Lift 1",
         "from": "National Rail concourse",
         "to": "Railway platform (south)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform (south)"
       },
       {
         "id": "910GEDMNGRN-Lift-2",
         "name": "Lift 2",
         "from": "National Rail concourse",
         "to": "Railway platform (north)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform (north)"
       }
     ],
     "id": "910GEDMNGRN",
@@ -10824,14 +10998,16 @@
         "name": "Lift 5",
         "from": "Booking Hall (south)",
         "to": "Southbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall (south) ↔ Southbound Platform 2"
       },
       {
         "id": "HUBEPH-Lift-6",
         "name": "Lift 6",
         "from": "Booking Hall (south)",
         "to": "Southbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall (south) ↔ Southbound Platform 2"
       }
     ],
     "id": "HUBEPH",
@@ -11060,21 +11236,24 @@
         "name": "Lift 1",
         "from": "Footbridge",
         "to": "Railway platform (south)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform (south)"
       },
       {
         "id": "910GELTR-Lift-2",
         "name": "Lift 2",
         "from": "Footbridge",
         "to": "Railway platform (north)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform (north)"
       },
       {
         "id": "910GELTR-Lift-3",
         "name": "Lift 3",
         "from": "Footbridge",
         "to": "Railway platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 3"
       }
     ],
     "id": "910GELTR",
@@ -11616,14 +11795,16 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Gower Street entrance",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Gower Street entrance"
       },
       {
         "id": "940GZZLUESQ-Lift-2",
         "name": "Lift 2",
         "from": "Booking Hall",
         "to": "Westbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Westbound Platform 1"
       }
     ],
     "id": "940GZZLUESQ",
@@ -11799,14 +11980,16 @@
         "name": "Lift A",
         "from": "North booking hall",
         "to": "Eastbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "North booking hall ↔ Eastbound Platform 1"
       },
       {
         "id": "HUBZFD-Lift-2",
         "name": "Lift B",
         "from": "Booking Hall",
         "to": "Westbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Westbound Platform 2"
       },
       {
         "id": "HUBZFD-Lift-3",
@@ -11814,6 +11997,7 @@
         "from": "Footbridge",
         "to": "Lower walkway",
         "limitedCapacity": false,
+        "description": "Footbridge ↔ Lower walkway",
         "via": "Railway platform (south)"
       },
       {
@@ -11822,6 +12006,7 @@
         "from": "Footbridge",
         "to": "Lower walkway",
         "limitedCapacity": false,
+        "description": "Footbridge ↔ Lower walkway",
         "via": "Railway platform (south)"
       },
       {
@@ -11829,28 +12014,32 @@
         "name": "Lift D",
         "from": "Footbridge",
         "to": "Railway platform (north)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform (north)"
       },
       {
         "id": "HUBZFD-Lift-7",
         "name": "Lift F",
         "from": "Lower level booking hall",
         "to": "East upper level",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Lower level booking hall ↔ East upper level"
       },
       {
         "id": "HUBZFD-Lift-6",
         "name": "Lift E",
         "from": "East upper level",
         "to": "Elizabeth line lower level",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "East upper level ↔ Elizabeth line lower level"
       },
       {
         "id": "HUBZFD-Lift-8",
         "name": "Lift G",
         "from": "East upper level",
         "to": "Below-street lower level",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "East upper level ↔ Below-street lower level"
       }
     ],
     "id": "HUBZFD",
@@ -12004,14 +12193,16 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Southbound Platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Southbound Platform 3"
       },
       {
         "id": "940GZZLUFYC-Lift-2",
         "name": "Lift 2",
         "from": "Booking Hall",
         "to": "Northbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Northbound Platform 1"
       }
     ],
     "id": "940GZZLUFYC",
@@ -12221,35 +12412,40 @@
         "name": "Lift 1",
         "from": "Corridor (north)",
         "to": "Northbound Platform 2, Eastbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Corridor (north) ↔ Northbound platform 2, eastbound platform 1"
       },
       {
         "id": "HUBFPK-Lift-3",
         "name": "Lift 3",
         "from": "Corridor (north)",
         "to": "Southbound Platform 4, Westbound Platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Corridor (north) ↔ Southbound platform 4, westbound platform 3"
       },
       {
         "id": "HUBFPK-Lift1A",
         "name": "Lift 1A",
         "from": "Corridor (north)",
         "to": "Railway platform (south)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Corridor (north) ↔ Railway platform (south)"
       },
       {
         "id": "HUBFPK-Lift 2",
         "name": "Lift 2",
         "from": "Corridor (north)",
         "to": "Entrance",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Corridor (north) ↔ Entrance"
       },
       {
         "id": "HUBFPK-Lift 7",
         "name": "Lift 7",
         "from": "Corridor (north)",
         "to": "Railway platform (north)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Corridor (north) ↔ Railway platform (north)"
       }
     ],
     "id": "HUBFPK",
@@ -12324,21 +12520,24 @@
         "name": "Lift A",
         "from": "Corridor",
         "to": "Railway platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Corridor ↔ Railway platform 1"
       },
       {
         "id": "910GFRSTGT-Lift-2",
         "name": "Lift B",
         "from": "Corridor",
         "to": "Railway platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Corridor ↔ Railway platform 2"
       },
       {
         "id": "910GFRSTGT-Lift-3",
         "name": "Lift C",
         "from": "Entrance F",
         "to": "Railway platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Entrance F ↔ Railway platform 3"
       }
     ],
     "id": "910GFRSTGT",
@@ -12411,14 +12610,16 @@
         "name": "Lift 1",
         "from": "Station footbridge",
         "to": "Railway platform (north)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Station footbridge ↔ Railway platform (north)"
       },
       {
         "id": "910GFORESTH-Lift-2",
         "name": "Lift 2",
         "from": "Station footbridge",
         "to": "Railway platform (south)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Station footbridge ↔ Railway platform (south)"
       }
     ],
     "id": "910GFORESTH",
@@ -12473,14 +12674,16 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Eastbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Eastbound Platform 2"
       },
       {
         "id": "940GZZLUFBY-Lift-2",
         "name": "Lift 2",
         "from": "Booking Hall",
         "to": "Westbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Westbound Platform 1"
       }
     ],
     "id": "940GZZLUFBY",
@@ -12533,14 +12736,16 @@
         "name": "Lift 1",
         "from": "Concourse",
         "to": "DLR eastbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Concourse ↔ DLR eastbound"
       },
       {
         "id": "940GZZDLGAL-Lift-2",
         "name": "Lift 2",
         "from": "Concourse",
         "to": "DLR westbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Concourse ↔ DLR westbound"
       }
     ],
     "id": "940GZZDLGAL",
@@ -12722,21 +12927,24 @@
         "name": "Lift C",
         "from": "Footbridge",
         "to": "Railway platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 1"
       },
       {
         "id": "910GGIDEAPK-Lift-2",
         "name": "Lift B",
         "from": "Footbridge",
         "to": "Railway platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 3"
       },
       {
         "id": "910GGIDEAPK-Lift-3",
         "name": "Lift A",
         "from": "Footbridge",
         "to": "Entrance (south)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Entrance (south)"
       }
     ],
     "id": "910GGIDEAPK",
@@ -12875,13 +13083,15 @@
         "id": "940GZZLUGTR-Lift-1",
         "name": "Lift 1",
         "from": "Street",
-        "to": "Eastbound Platform 5, Westbound Platform 4"
+        "to": "Eastbound Platform 5, Westbound Platform 4",
+        "description": "Street ↔ Eastbound platform 5, westbound platform 4"
       },
       {
         "id": "940GZZLUGTR-Lift-2",
         "name": "Lift 2",
         "from": "Street",
-        "to": "Eastbound Platform 5, Westbound Platform 4"
+        "to": "Eastbound Platform 5, Westbound Platform 4",
+        "description": "Street ↔ Eastbound platform 5, westbound platform 4"
       }
     ]
   },
@@ -12941,14 +13151,16 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Platform 1"
       },
       {
         "id": "940GZZLUGGN-Lift-2",
         "name": "Lift 2",
         "from": "Booking Hall",
         "to": "Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Platform 2"
       }
     ],
     "id": "940GZZLUGGN",
@@ -13049,28 +13261,32 @@
         "name": "Lift 1",
         "from": "Street",
         "to": "Northbound Platform 1, Southbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Northbound platform 1, southbound platform 2"
       },
       {
         "id": "940GZZLUGDG-Lift-2",
         "name": "Lift 2",
         "from": "Street",
         "to": "Northbound Platform 1, Southbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Northbound platform 1, southbound platform 2"
       },
       {
         "id": "940GZZLUGDG-Lift-3",
         "name": "Lift 3",
         "from": "Street",
         "to": "Northbound Platform 1, Southbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Northbound platform 1, southbound platform 2"
       },
       {
         "id": "940GZZLUGDG-Lift-4",
         "name": "Lift 4",
         "from": "Street",
         "to": "Northbound Platform 1, Southbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Northbound platform 1, southbound platform 2"
       }
     ],
     "id": "940GZZLUGDG",
@@ -13145,14 +13361,16 @@
         "name": "Lift A",
         "from": "Footbridge",
         "to": "Railway platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 2"
       },
       {
         "id": "910GGODMAYS-Lift-2",
         "name": "Lift B",
         "from": "Footbridge",
         "to": "Railway platform 4",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 4"
       }
     ],
     "id": "910GGODMAYS",
@@ -13230,14 +13448,16 @@
         "name": "Lift 1",
         "from": "Subway",
         "to": "Railway platform H",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Subway ↔ Railway platform H"
       },
       {
         "id": "910GGOSPLOK-Lift-2",
         "name": "Lift 2",
         "from": "Subway",
         "to": "Railway platform (south)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Subway ↔ Railway platform (south)"
       }
     ],
     "id": "910GGOSPLOK",
@@ -13637,21 +13857,24 @@
         "name": "Lift 1",
         "from": "Lower concourse",
         "to": "Eastbound Platform 2, Westbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Lower concourse ↔ Eastbound platform 2, westbound platform 1"
       },
       {
         "id": "940GZZLUGPK-Lift-2",
         "name": "Lift 2",
         "from": "Lower concourse",
         "to": "Jubilee line",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Lower concourse ↔ Jubilee line"
       },
       {
         "id": "940GZZLUGPK-Lift-4",
         "name": "Lift 4",
         "from": "District/Piccadilly interchange",
         "to": "Booking Hall",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "District/Piccadilly interchange ↔ Booking Hall"
       },
       {
         "id": "940GZZLUGPK-Lift-5",
@@ -13659,6 +13882,7 @@
         "from": "Booking Hall",
         "to": "Lower concourse",
         "limitedCapacity": false,
+        "description": "Booking Hall ↔ Lower concourse",
         "via": "Victoria line"
       },
       {
@@ -13667,6 +13891,7 @@
         "from": "Booking Hall",
         "to": "Lower concourse",
         "limitedCapacity": false,
+        "description": "Booking Hall ↔ Lower concourse",
         "via": "Victoria line"
       }
     ],
@@ -13833,7 +14058,8 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Platform south",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Platform south"
       }
     ],
     "id": "HUBGFD",
@@ -13919,14 +14145,16 @@
         "name": "Lift 1",
         "from": "Walkway (west)",
         "to": "DLR E, Railway platform (west)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Walkway (west) ↔ DLR E, Railway platform (west)"
       },
       {
         "id": "HUBGNW-Lift-2",
         "name": "Lift 2",
         "from": "Walkway (west)",
         "to": "DLR westbound platform",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Walkway (west) ↔ DLR westbound platform"
       }
     ],
     "id": "HUBGNW",
@@ -14075,14 +14303,16 @@
         "name": "Lift 1",
         "from": "National Rail concourse",
         "to": "Railway platform (west)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform (west)"
       },
       {
         "id": "910GHACKNYC-Lift-2",
         "name": "Lift 2",
         "from": "National Rail concourse",
         "to": "Railway platform (east)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform (east)"
       }
     ],
     "id": "910GHACKNYC",
@@ -14163,7 +14393,8 @@
         "name": "Lift 1",
         "from": "Station entrance (inner)",
         "to": "Railway platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Station entrance (inner) ↔ Railway platform 1"
       }
     ],
     "id": "910GHAKNYNM",
@@ -14219,14 +14450,16 @@
         "name": "Lift 1",
         "from": "Entrance (west)",
         "to": "Railway platform (west)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Entrance (west) ↔ Railway platform (west)"
       },
       {
         "id": "910GHACKNYW-Lift-2",
         "name": "Lift 2",
         "from": "Entrance (east)",
         "to": "Railway platform (east)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Entrance (east) ↔ Railway platform (east)"
       }
     ],
     "id": "910GHACKNYW",
@@ -14280,14 +14513,16 @@
         "name": "Lift 1",
         "from": "National Rail concourse",
         "to": "Railway platform (north)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform (north)"
       },
       {
         "id": "910GHAGGERS-Lift-2",
         "name": "Lift 2",
         "from": "National Rail concourse",
         "to": "Railway platform (south)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform (south)"
       }
     ],
     "id": "910GHAGGERS",
@@ -14365,21 +14600,24 @@
         "name": "Lift 1",
         "from": "Landing",
         "to": "Central line platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Landing ↔ Central line platform 1"
       },
       {
         "id": "940GZZLUHLT-Lift-2",
         "name": "Lift 2",
         "from": "Landing",
         "to": "Central line platforms 2–3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Landing ↔ Central line platforms 2–3"
       },
       {
         "id": "940GZZLUHLT-Lift-3",
         "name": "Lift 3",
         "from": "Booking Hall",
         "to": "Landing",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Landing"
       }
     ],
     "id": "940GZZLUHLT",
@@ -14614,14 +14852,16 @@
         "name": "Lift 1",
         "from": "Westbound hall",
         "to": "Eastbound Platform 4, Eastbound Platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Westbound hall ↔ Eastbound platforms 3 and 4"
       },
       {
         "id": "HUBHMS-Lift-2",
         "name": "Lift 2",
         "from": "Westbound hall",
         "to": "Westbound Platform 1, Westbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Westbound hall ↔ Westbound platforms 1 and 2"
       }
     ],
     "id": "HUBHMS",
@@ -14675,28 +14915,32 @@
         "name": "Lift 1",
         "from": "Street",
         "to": "Northbound Platform 1, Southbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Northbound platform 1, southbound platform 2"
       },
       {
         "id": "940GZZLUHTD-Lift-2",
         "name": "Lift 2",
         "from": "Street",
         "to": "Northbound Platform 1, Southbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Northbound platform 1, southbound platform 2"
       },
       {
         "id": "940GZZLUHTD-Lift-3",
         "name": "Lift 3",
         "from": "Street",
         "to": "Northbound Platform 1, Southbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Northbound platform 1, southbound platform 2"
       },
       {
         "id": "940GZZLUHTD-Lift-4",
         "name": "Lift 4",
         "from": "Street",
         "to": "Northbound Platform 1, Southbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Northbound platform 1, southbound platform 2"
       }
     ],
     "id": "940GZZLUHTD",
@@ -14750,14 +14994,16 @@
         "name": "Lift 1",
         "from": "Entrance",
         "to": "Railway platform (west)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Entrance ↔ Railway platform (west)"
       },
       {
         "id": "910GHMPSTDH-Lift-2",
         "name": "Lift 2",
         "from": "Entrance",
         "to": "Railway platform (east)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Entrance ↔ Railway platform (east)"
       }
     ],
     "id": "910GHMPSTDH",
@@ -14882,14 +15128,16 @@
         "name": "Lift B",
         "from": "North entrance",
         "to": "Railway platform",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "North entrance ↔ Railway platform"
       },
       {
         "id": "910GHANWELL-Lift-1",
         "name": "Lift A",
         "from": "Booking Hall (south)",
         "to": "Railway platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall (south) ↔ Railway platform 1"
       }
     ],
     "id": "910GHANWELL",
@@ -15025,21 +15273,24 @@
         "name": "Lift C",
         "from": "Footbridge",
         "to": "Railway platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 1"
       },
       {
         "id": "910GHRLDWOD-Lift-2",
         "name": "Lift A",
         "from": "Footbridge",
         "to": "Railway platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 2"
       },
       {
         "id": "910GHRLDWOD-Lift-3",
         "name": "Lift B",
         "from": "Footbridge",
         "to": "Railway platform 4",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 4"
       }
     ],
     "id": "910GHRLDWOD",
@@ -15214,28 +15465,32 @@
         "name": "Lift 1",
         "from": "Upper platform (northbound), Railway platform D (north)",
         "to": "Footbridge",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Railway northbound platforms, platform D ↔ Footbridge"
       },
       {
         "id": "HUBHRW-Lift-2",
         "name": "Lift 2",
         "from": "Footbridge",
         "to": "Upper platform (southbound), Railway platform D (south)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway southbound platforms, platform D"
       },
       {
         "id": "HUBHRW-Lift-3",
         "name": "Lift 3",
         "from": "Footbridge",
         "to": "Railway platform A (north)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform A (north)"
       },
       {
         "id": "HUBHRW-Lift-4",
         "name": "Lift 4",
         "from": "Footbridge",
         "to": "Railway platform A (south)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform A (south)"
       }
     ],
     "id": "HUBHRW",
@@ -15334,28 +15589,32 @@
         "name": "Lift 1",
         "from": "Booking Hall (colonnade)",
         "to": "Booking Hall",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall (colonnade) ↔ Booking Hall"
       },
       {
         "id": "HUBHOH-Lift-2",
         "name": "Lift 2",
         "from": "Walkway",
         "to": "Railway platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Walkway ↔ Railway platform 1"
       },
       {
         "id": "HUBHOH-Lift-3",
         "name": "Lift 3",
         "from": "Walkway",
         "to": "Metropolitan line platforms 3–4",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Walkway ↔ Metropolitan line platforms 3–4"
       },
       {
         "id": "HUBHOH-Lift-4",
         "name": "Lift 4",
         "from": "Walkway",
         "to": "Metropolitan line platforms 5–6",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Walkway ↔ Metropolitan line platforms 5–6"
       }
     ],
     "id": "HUBHOH",
@@ -15562,21 +15821,24 @@
         "name": "Lift A",
         "from": "Footbridge",
         "to": "Railway platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 1"
       },
       {
         "id": "910GHAYESAH-Lift-2",
         "name": "Lift B",
         "from": "Footbridge",
         "to": "Railway platform 2–3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 2–3"
       },
       {
         "id": "910GHAYESAH-Lift-3",
         "name": "Lift C",
         "from": "Ticket Hall",
         "to": "Entrance (south)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Ticket Hall ↔ Entrance (south)"
       },
       {
         "id": "910GHAYESAH-Lift-4",
@@ -15584,6 +15846,7 @@
         "from": "Footbridge",
         "to": "Railway platform 4–5",
         "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 4–5",
         "via": "Ticket Hall"
       }
     ],
@@ -15684,14 +15947,16 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Terminal access",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Terminal access"
       },
       {
         "id": "HUBHX4-Lift-2",
         "name": "Lift 2",
         "from": "Railway platform",
         "to": "Terminal access",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Railway platform ↔ Terminal access"
       }
     ],
     "id": "HUBHX4",
@@ -15810,14 +16075,16 @@
         "name": "Lift 1",
         "from": "Terminal 5 access",
         "to": "Piccadilly line",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Terminal 5 access ↔ Piccadilly line"
       },
       {
         "id": "HUBHX5-Lift-2",
         "name": "Lift 2",
         "from": "Terminal 5 access",
         "to": "Railway platform",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Terminal 5 access ↔ Railway platform"
       }
     ],
     "id": "HUBHX5",
@@ -15933,14 +16200,16 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Piccadilly line, Piccadilly line platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Piccadilly line, Piccadilly line platform 1"
       },
       {
         "id": "HUBH13-Lift-2",
         "name": "Lift 2",
         "from": "Entrance",
         "to": "Railway platform",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Entrance ↔ Railway platform"
       }
     ],
     "id": "HUBH13",
@@ -16147,7 +16416,8 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Northbound Platform 1, Southbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Northbound platform 1, southbound platform 2"
       }
     ],
     "id": "940GZZLUHCL",
@@ -16236,14 +16506,16 @@
         "name": "Lift 1",
         "from": "National Rail concourse",
         "to": "Railway platform",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform"
       },
       {
         "id": "910GHERNEH-Lift-2",
         "name": "Lift 2",
         "from": "National Rail concourse",
         "to": "Railway platform",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform"
       }
     ],
     "id": "910GHERNEH",
@@ -16298,14 +16570,16 @@
         "name": "Lift 1",
         "from": "Concourse",
         "to": "DLR southbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Concourse ↔ DLR southbound"
       },
       {
         "id": "940GZZDLHEQ-Lift-2",
         "name": "Lift 2",
         "from": "Concourse",
         "to": "DLR northbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Concourse ↔ DLR northbound"
       }
     ],
     "id": "940GZZDLHEQ",
@@ -16590,21 +16864,24 @@
         "name": "Lift 1",
         "from": "National Rail concourse",
         "to": "Railway platform H (through)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform H (through)"
       },
       {
         "id": "HUBHHY-Lift-2",
         "name": "Lift 2",
         "from": "National Rail concourse",
         "to": "Railway platform H (west)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform H (west)"
       },
       {
         "id": "HUBHHY-Lift-3",
         "name": "Lift 3",
         "from": "National Rail concourse",
         "to": "Railway platform H (east)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform H (east)"
       }
     ],
     "id": "HUBHHY",
@@ -16744,14 +17021,16 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Eastbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Eastbound Platform 2"
       },
       {
         "id": "940GZZLUHGD-Lift-2",
         "name": "Lift 2",
         "from": "Booking Hall",
         "to": "Westbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Westbound Platform 1"
       }
     ],
     "id": "940GZZLUHGD",
@@ -16958,14 +17237,16 @@
         "name": "Lift 1",
         "from": "Street",
         "to": "Westbound Platform 1, Eastbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Westbound platform 1, eastbound platform 2"
       },
       {
         "id": "940GZZLUHPK-Lift-2",
         "name": "Lift 2",
         "from": "Street",
         "to": "Westbound Platform 1, Eastbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Westbound platform 1, eastbound platform 2"
       }
     ],
     "id": "940GZZLUHPK",
@@ -17019,14 +17300,16 @@
         "name": "Lift 1",
         "from": "Street",
         "to": "Westbound Platform 1, Eastbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Westbound platform 1, eastbound platform 2"
       },
       {
         "id": "940GZZLUHWY-Lift-2",
         "name": "Lift 2",
         "from": "Street",
         "to": "Westbound Platform 1, Eastbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Westbound platform 1, eastbound platform 2"
       }
     ],
     "id": "940GZZLUHWY",
@@ -17081,14 +17364,16 @@
         "name": "Lift 1",
         "from": "National Rail concourse",
         "to": "Railway platform (north)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform (north)"
       },
       {
         "id": "910GHONROPK-Lift-2",
         "name": "Lift 2",
         "from": "National Rail concourse",
         "to": "Railway platform (south)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform (south)"
       }
     ],
     "id": "910GHONROPK",
@@ -17281,14 +17566,16 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Eastbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Eastbound Platform 2"
       },
       {
         "id": "940GZZLUHWE-Lift-2",
         "name": "Lift 2",
         "from": "Booking Hall",
         "to": "Westbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Westbound Platform 1"
       }
     ],
     "id": "940GZZLUHWE",
@@ -17360,6 +17647,7 @@
         "from": "Booking Hall",
         "to": "Piccadilly line eastbound, Piccadilly line westbound",
         "limitedCapacity": true,
+        "description": "Booking Hall ↔ Piccadilly line eastbound/westbound platforms",
         "notes": "Entrance/exit via staff assisted stairlift for manual wheelchair users only. Request staff assistance via the Help point or buzzer next to the stairlift. The maximum operating weight of the stairlift is 225kg."
       }
     ],
@@ -17413,14 +17701,16 @@
         "name": "Lift 1",
         "from": "National Rail concourse",
         "to": "Railway platform (north)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform (north)"
       },
       {
         "id": "910GHOXTON-Lift-2",
         "name": "Lift 2",
         "from": "National Rail concourse",
         "to": "Railway platform (south)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform (south)"
       }
     ],
     "id": "910GHOXTON",
@@ -17551,14 +17841,16 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Eastbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Eastbound Platform 2"
       },
       {
         "id": "940GZZLUICK-Lift-2",
         "name": "Lift 2",
         "from": "Booking Hall",
         "to": "Westbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Westbound Platform 1"
       }
     ],
     "id": "940GZZLUICK",
@@ -17633,21 +17925,24 @@
         "name": "Lift A",
         "from": "Footbridge",
         "to": "Railway platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 1"
       },
       {
         "id": "910GILFORD-Lift-2",
         "name": "Lift B",
         "from": "Footbridge",
         "to": "Railway platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 2"
       },
       {
         "id": "910GILFORD-Lift-3",
         "name": "Lift C",
         "from": "Footbridge",
         "to": "Railway platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 3"
       }
     ],
     "id": "910GILFORD",
@@ -17738,14 +18033,16 @@
         "name": "Lift 1",
         "from": "National Rail concourse",
         "to": "Railway platform (south)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform (south)"
       },
       {
         "id": "HUBIMP-Lift-2",
         "name": "Lift 2",
         "from": "National Rail concourse",
         "to": "Railway platform (north)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform (north)"
       }
     ],
     "id": "HUBIMP",
@@ -17799,7 +18096,8 @@
         "name": "Lift 1",
         "from": "Manchester Road entrance",
         "to": "Northbound Platform 2, Southbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Manchester Road entrance ↔ Northbound platform 2, southbound platform 1"
       }
     ],
     "id": "940GZZDLISL",
@@ -17880,6 +18178,7 @@
         "from": "Footbridge",
         "to": "Railway platform 1",
         "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 1",
         "via": "Entrance (back)"
       },
       {
@@ -17887,14 +18186,16 @@
         "name": "Lift B",
         "from": "Footbridge",
         "to": "Railway platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 2"
       },
       {
         "id": "910GIVER-Lift-4",
         "name": "Lift C",
         "from": "Footbridge",
         "to": "Railway platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 3"
       }
     ],
     "id": "910GIVER",
@@ -17981,14 +18282,16 @@
         "name": "Lift 1",
         "from": "Street",
         "to": "Northbound Platform 1, Southbound Platform 2, Northbound Platform 3, Southbound Platform 4",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Northbound platforms 1 and 3, southbound platforms 2 and 4"
       },
       {
         "id": "940GZZLUKNG-Lift-2",
         "name": "Lift 2",
         "from": "Street",
         "to": "Northbound Platform 1, Southbound Platform 2, Northbound Platform 3, Southbound Platform 4",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Northbound platforms 1 and 3, southbound platforms 2 and 4"
       }
     ],
     "id": "940GZZLUKNG",
@@ -18105,7 +18408,8 @@
         "name": "Lift 1",
         "from": "Bridge",
         "to": "Railway platform (east)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Bridge ↔ Railway platform (east)"
       }
     ],
     "id": "910GKENR",
@@ -18520,7 +18824,8 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Jubilee line, Northbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Jubilee line, Northbound Platform 1"
       }
     ],
     "id": "940GZZLUKBN",
@@ -18669,14 +18974,16 @@
         "name": "Lift 1",
         "from": "Bridge (east)",
         "to": "Northbound Platform 2, Southbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Bridge (east) ↔ Northbound platform 2, southbound platform 1"
       },
       {
         "id": "940GZZDLKGV-Lift-2",
         "name": "Lift 2",
         "from": "Pier entrance",
         "to": "Bridge (east)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Pier entrance ↔ Bridge (east)"
       }
     ],
     "id": "940GZZDLKGV",
@@ -19090,6 +19397,7 @@
         "from": "Concourse",
         "to": "Railway platform (south lower)",
         "limitedCapacity": false,
+        "description": "Concourse ↔ Railway platform (south lower)",
         "via": "Mezzanine"
       },
       {
@@ -19097,49 +19405,56 @@
         "name": "Lift B",
         "from": "Mezzanine",
         "to": "Railway platform (north lower)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Mezzanine ↔ Railway platform (north lower)"
       },
       {
         "id": "HUBKGX-Lift-C",
         "name": "Lift C",
         "from": "Concourse",
         "to": "Railway platform",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Concourse ↔ Railway platform"
       },
       {
         "id": "HUBKGX-Lift-D",
         "name": "Lift D",
         "from": "Concourse",
         "to": "Railway platform D",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Concourse ↔ Railway platform D"
       },
       {
         "id": "HUBKGX-Lift-1",
         "name": "Lift 1",
         "from": "Western ticket hall",
         "to": "Eastbound Platform 2, Westbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Western ticket hall ↔ Eastbound platform 2, westbound platform 1"
       },
       {
         "id": "HUBKGX-Lift-10",
         "name": "Lift 10",
         "from": "Station concourse",
         "to": "Northern line ticket hall",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Station concourse ↔ Northern line ticket hall"
       },
       {
         "id": "HUBKGX-Lift-11",
         "name": "Lift 11",
         "from": "St Pancras Highspeed",
         "to": "Northern line ticket hall",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "St Pancras Highspeed ↔ Northern line ticket hall"
       },
       {
         "id": "HUBKGX-Lift-2",
         "name": "Lift 2",
         "from": "International/Eurostar concourse",
         "to": "Western ticket hall",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "International/Eurostar concourse ↔ Western ticket hall"
       },
       {
         "id": "HUBKGX-Lift-3",
@@ -19147,6 +19462,7 @@
         "from": "International/Eurostar concourse",
         "to": "North passage (north)",
         "limitedCapacity": false,
+        "description": "International/Eurostar concourse ↔ North passage (north)",
         "via": "Thameslink ticket hall"
       },
       {
@@ -19154,28 +19470,32 @@
         "name": "Lift 5",
         "from": "North passage (north)",
         "to": "Northbound Platform 7, Southbound Platform 8",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "North passage (north) ↔ Northbound platform 7, southbound platform 8"
       },
       {
         "id": "HUBKGX-Lift-6",
         "name": "Lift 6",
         "from": "Northern line ticket hall",
         "to": "North passage (east)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Northern line ticket hall ↔ North passage (east)"
       },
       {
         "id": "HUBKGX-Lift-7",
         "name": "Lift 7",
         "from": "North passage (east)",
         "to": "Westbound Platform 5, Eastbound Platform 6",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "North passage (east) ↔ Westbound platform 5, eastbound platform 6"
       },
       {
         "id": "HUBKGX-Lift-8",
         "name": "Lift 8",
         "from": "North passage (east)",
         "to": "Northbound Platform 3, Southbound Platform 4",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "North passage (east) ↔ Northbound platform 3, southbound platform 4"
       }
     ],
     "id": "HUBKGX",
@@ -19401,14 +19721,16 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Northbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Northbound Platform 1"
       },
       {
         "id": "940GZZLUKBY-Lift-2",
         "name": "Lift 2",
         "from": "Booking Hall",
         "to": "Southbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Southbound Platform 2"
       }
     ],
     "id": "940GZZLUKBY",
@@ -19497,21 +19819,24 @@
         "name": "Lift A1",
         "from": "Booking Hall",
         "to": "Harrods level mezzanine",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Harrods level mezzanine"
       },
       {
         "id": "940GZZLUKNB-Lift-2",
         "name": "Lift A2",
         "from": "Booking Hall",
         "to": "Harrods level mezzanine",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Harrods level mezzanine"
       },
       {
         "id": "940GZZLUKNB-Lift-3",
         "name": "Lift B",
         "from": "Platform M",
         "to": "Platform L",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Platform M ↔ Platform L"
       }
     ],
     "id": "940GZZLUKNB",
@@ -19649,14 +19974,16 @@
         "name": "Lift 1",
         "from": "Street",
         "to": "Northbound Platform 1, Southbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Northbound platform 1, southbound platform 2"
       },
       {
         "id": "940GZZLULBN-Lift-2",
         "name": "Lift 2",
         "from": "Street",
         "to": "Northbound Platform 1, Southbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Northbound platform 1, southbound platform 2"
       }
     ],
     "id": "940GZZLULBN",
@@ -19710,14 +20037,16 @@
         "name": "Lift 1",
         "from": "Street",
         "to": "Westbound Platform 1, Eastbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Westbound platform 1, eastbound platform 2"
       },
       {
         "id": "940GZZLULGT-Lift-2",
         "name": "Lift 2",
         "from": "Street",
         "to": "Westbound Platform 1, Eastbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Westbound platform 1, eastbound platform 2"
       }
     ],
     "id": "940GZZLULGT",
@@ -19770,14 +20099,16 @@
         "name": "Lift 1",
         "from": "Bridge",
         "to": "DLR northbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Bridge ↔ DLR northbound"
       },
       {
         "id": "940GZZDLLDP-Lift-2",
         "name": "Lift 2",
         "from": "Bridge",
         "to": "DLR southbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Bridge ↔ DLR southbound"
       }
     ],
     "id": "940GZZDLLDP",
@@ -19857,21 +20188,24 @@
         "name": "Lift A",
         "from": "Footbridge (lower)",
         "to": "Railway platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge (lower) ↔ Railway platform 3"
       },
       {
         "id": "910GLANGLEY-Lift-2",
         "name": "Lift B",
         "from": "Footbridge (lower)",
         "to": "Railway platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge (lower) ↔ Railway platform 2"
       },
       {
         "id": "910GLANGLEY-Lift-3",
         "name": "Lift C",
         "from": "Footbridge (lower)",
         "to": "Railway platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge (lower) ↔ Railway platform 1"
       }
     ],
     "id": "910GLANGLEY",
@@ -20331,35 +20665,40 @@
         "name": "Lift 1",
         "from": "Branch Road entrance",
         "to": "DLR eastbound platform",
-        "limitedCapacity": true
+        "limitedCapacity": true,
+        "description": "Branch Road entrance ↔ DLR eastbound platform"
       },
       {
         "id": "HUBLHS-Lift-2",
         "name": "Lift 2",
         "from": "Branch Road entrance",
         "to": "DLR westbound platform",
-        "limitedCapacity": true
+        "limitedCapacity": true,
+        "description": "Branch Road entrance ↔ DLR westbound platform"
       },
       {
         "id": "HUBLHS-Lift-3",
         "name": "Lift 3",
         "from": "Butcher Row entrance",
         "to": "DLR eastbound platform",
-        "limitedCapacity": true
+        "limitedCapacity": true,
+        "description": "Butcher Row entrance ↔ DLR eastbound platform"
       },
       {
         "id": "HUBLHS-Lift-4",
         "name": "Lift 4",
         "from": "Butcher Row entrance",
         "to": "DLR westbound platform",
-        "limitedCapacity": true
+        "limitedCapacity": true,
+        "description": "Butcher Row entrance ↔ DLR westbound platform"
       },
       {
         "id": "HUBLHS-Lift-5",
         "name": "Lift 5",
         "from": "Butcher Row entrance",
         "to": "Railway platform (east)",
-        "limitedCapacity": true
+        "limitedCapacity": true,
+        "description": "Butcher Row entrance ↔ Railway platform (east)"
       }
     ],
     "id": "HUBLHS",
@@ -20660,28 +20999,32 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Railway platform",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Railway platform"
       },
       {
         "id": "HUBLST-Lift-C",
         "name": "Lift E",
         "from": "Elizabeth line eastbound, Elizabeth line westbound",
         "to": "Elizabeth line mezzanine",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Elizabeth line eastbound/westbound platforms ↔ Elizabeth line mezzanine"
       },
       {
         "id": "HUBLST-Lift-B",
         "name": "Lift F",
         "from": "Elizabeth line mezzanine",
         "to": "Elizabeth line booking hall",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Elizabeth line mezzanine ↔ Elizabeth line booking hall"
       },
       {
         "id": "HUBLST-Lift-A",
         "name": "Lift G",
         "from": "Elizabeth line booking hall",
         "to": "Elizabeth line upper concourse",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Elizabeth line booking hall ↔ Elizabeth line upper concourse"
       }
     ],
     "id": "HUBLST",
@@ -20969,35 +21312,40 @@
         "name": "Lift 2",
         "from": "Jubilee line booking hall",
         "to": "Eastbound Platform 4, Westbound Platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Jubilee line booking hall ↔ Eastbound platform 4, westbound platform 3"
       },
       {
         "id": "HUBLBG-Lift-3",
         "name": "Lift 3",
         "from": "Borough concourse",
         "to": "Booking Hall (north)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Borough concourse ↔ Booking Hall (north)"
       },
       {
         "id": "HUBLBG-Lift-4",
         "name": "Lift 4",
         "from": "Booking Hall (north)",
         "to": "Northbound Platform 1, Southbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall (north) ↔ Northbound platform 1, southbound platform 2"
       },
       {
         "id": "HUBLBG-Lift-5",
         "name": "Lift 5",
         "from": "National Rail concourse",
         "to": "Railway platform 4–5",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform 4–5"
       },
       {
         "id": "HUBLBG-Lift-6",
         "name": "Lift 6",
         "from": "National Rail concourse",
         "to": "Upper floor",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Upper floor"
       }
     ],
     "id": "HUBLBG",
@@ -21206,14 +21554,16 @@
         "name": "Lift 1",
         "from": "Airport terminal entrance",
         "to": "DLR eastbound, DLR westbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Airport terminal entrance ↔ DLR eastbound/westbound platforms"
       },
       {
         "id": "HUBLCY-Lift-2",
         "name": "Lift 2",
         "from": "Airport terminal entrance",
         "to": "DLR eastbound, DLR westbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Airport terminal entrance ↔ DLR eastbound/westbound platforms"
       }
     ],
     "id": "HUBLCY",
@@ -21504,14 +21854,16 @@
         "name": "Lift 1",
         "from": "Station Parade",
         "to": "Railway platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Station Parade ↔ Railway platform 2"
       },
       {
         "id": "910GMDNHEAD-Lift-2",
         "name": "Lift 2",
         "from": "Station Parade",
         "to": "Railway platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Station Parade ↔ Railway platform 3"
       }
     ],
     "id": "910GMDNHEAD",
@@ -21689,21 +22041,24 @@
         "name": "Lift A",
         "from": "Footbridge",
         "to": "Railway platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 1"
       },
       {
         "id": "910GMANRPK-Lift-2",
         "name": "Lift B",
         "from": "Footbridge",
         "to": "Railway platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 2"
       },
       {
         "id": "910GMANRPK-Lift-3",
         "name": "Lift C",
         "from": "Footbridge",
         "to": "Railway platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 3"
       }
     ],
     "id": "910GMANRPK",
@@ -21901,14 +22256,16 @@
         "name": "Lift C",
         "from": "Footbridge",
         "to": "Railway platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 2"
       },
       {
         "id": "910GMRYLAND-Lift-1",
         "name": "Lift B",
         "from": "Footbridge",
         "to": "Railway platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 1"
       },
       {
         "id": "910GMRYLAND-Lift-3",
@@ -21916,6 +22273,7 @@
         "from": "Lower entrance",
         "to": "Railway platform 3",
         "limitedCapacity": false,
+        "description": "Lower entrance ↔ Railway platform 3",
         "via": "Ticket Hall"
       }
     ],
@@ -22365,7 +22723,8 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "North platform",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ North platform"
       }
     ],
     "id": "940GZZLUMHL",
@@ -22463,14 +22822,16 @@
         "name": "Lift 1",
         "from": "Footbridge",
         "to": "Entrance G",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Entrance G"
       },
       {
         "id": "910GESTFLDS-Lift-2",
         "name": "Lift 2",
         "from": "Footbridge",
         "to": "Entrance L",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Entrance L"
       }
     ],
     "id": "910GESTFLDS",
@@ -22823,6 +23184,7 @@
         "from": "Booking Hall (west)",
         "to": "Platform mezzanine (west)",
         "limitedCapacity": false,
+        "description": "Booking Hall (west) ↔ Platform mezzanine (west)",
         "via": "Westbound Platform 2"
       },
       {
@@ -22830,14 +23192,16 @@
         "name": "Lift A",
         "from": "Booking Hall (west)",
         "to": "Eastbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall (west) ↔ Eastbound Platform 1"
       },
       {
         "id": "HUBZMG-Lift-5",
         "name": "Lift C",
         "from": "Metropolitan line platform (west)",
         "to": "Northbound Platform 7, Southbound Platform 8",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Metropolitan line platform (west) ↔ Northbound platform 7, southbound platform 8"
       },
       {
         "id": "HUBZMG-Lift-2",
@@ -22845,6 +23209,7 @@
         "from": "Upper mezzanine (east)",
         "to": "Lower mezzanine (east)",
         "limitedCapacity": false,
+        "description": "Upper mezzanine (east) ↔ Lower mezzanine (east)",
         "via": "Metropolitan line platform (east)"
       }
     ],
@@ -22969,14 +23334,16 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Northern line platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Northern line platform 1"
       },
       {
         "id": "940GZZLUMDN-Lift-2",
         "name": "Lift 2",
         "from": "Booking Hall",
         "to": "Northern line platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Northern line platform 2"
       }
     ],
     "id": "940GZZLUMDN",
@@ -23142,14 +23509,16 @@
         "name": "Lift 1",
         "from": "Street",
         "to": "Northbound Platform 1, Southbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Northbound platform 1, southbound platform 2"
       },
       {
         "id": "940GZZLUMTC-Lift-2",
         "name": "Lift 2",
         "from": "Street",
         "to": "Northbound Platform 1, Southbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Northbound platform 1, southbound platform 2"
       }
     ],
     "id": "940GZZLUMTC",
@@ -23372,14 +23741,16 @@
         "name": "Lift 1",
         "from": "Subway",
         "to": "National Rail concourse",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Subway ↔ National Rail concourse"
       },
       {
         "id": "HUBNWX-Lift-2",
         "name": "Lift 2",
         "from": "Subway",
         "to": "Railway platform (north)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Subway ↔ Railway platform (north)"
       }
     ],
     "id": "HUBNWX",
@@ -23502,21 +23873,24 @@
         "name": "Lift 1",
         "from": "National Rail concourse",
         "to": "Railway platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform 1"
       },
       {
         "id": "HUBNXG-Lift-2",
         "name": "Lift 2",
         "from": "National Rail concourse",
         "to": "Railway platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform 3"
       },
       {
         "id": "HUBNXG-Lift-3",
         "name": "Lift 3",
         "from": "National Rail concourse",
         "to": "Railway platform 5",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform 5"
       }
     ],
     "id": "HUBNXG",
@@ -23642,14 +24016,16 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Eastbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Eastbound Platform 2"
       },
       {
         "id": "940GZZLUNBP-Lift-2",
         "name": "Lift 2",
         "from": "Booking Hall",
         "to": "Westbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Westbound Platform 1"
       }
     ],
     "id": "940GZZLUNBP",
@@ -23727,7 +24103,8 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Southbound platform, Northbound platform",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Southbound/northbound platforms"
       }
     ],
     "id": "940GZZNEUGST",
@@ -23949,21 +24326,24 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Eastbound Platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Eastbound Platform 3"
       },
       {
         "id": "940GZZLUNGW-Lift-2",
         "name": "Lift 2",
         "from": "Booking Hall",
         "to": "Jubilee line west tunnel",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Jubilee line west tunnel"
       },
       {
         "id": "940GZZLUNGW-Lift-4",
         "name": "Lift 4",
         "from": "Outer entrance, Bus entrance",
         "to": "Booking Hall",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Outer entrance, Bus entrance ↔ Booking Hall"
       }
     ],
     "id": "940GZZLUNGW",
@@ -24857,7 +25237,8 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Piccadilly line southbound, Piccadilly line northbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Piccadilly line southbound/northbound platforms"
       }
     ],
     "id": "940GZZLUOAK",
@@ -25090,21 +25471,24 @@
         "name": "Lift 1",
         "from": "Railway platform 1",
         "to": "Footbridge",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Railway platform 1 ↔ Footbridge"
       },
       {
         "id": "910GORPNGTN-Lift 2",
         "name": "Lift 2",
         "from": "Railway platform 2",
         "to": "Footbridge",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Railway platform 2 ↔ Footbridge"
       },
       {
         "id": "910GORPNGTN-Lift 3",
         "name": "Lift 3",
         "from": "Railway platform 3",
         "to": "Footbridge",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Railway platform 3 ↔ Footbridge"
       }
     ],
     "id": "910GORPNGTN",
@@ -25159,14 +25543,16 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Westbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Westbound Platform 1"
       },
       {
         "id": "940GZZLUOSY-Lift-2",
         "name": "Lift 2",
         "from": "Booking Hall",
         "to": "Eastbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Eastbound Platform 2"
       }
     ],
     "id": "940GZZLUOSY",
@@ -25733,14 +26119,16 @@
         "name": "Lift 2",
         "from": "The Lawn (concourse)",
         "to": "D - L",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "The Lawn (concourse) ↔ D - L"
       },
       {
         "id": "HUBPAD-Lift-3",
         "name": "Lift 3",
         "from": "Booking Hall",
         "to": "Platform area",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Platform area"
       },
       {
         "id": "HUBPAD-Lift-6",
@@ -25748,6 +26136,7 @@
         "from": "Entrance tunnel",
         "to": "Elizabeth line ticket hall",
         "limitedCapacity": false,
+        "description": "Entrance tunnel ↔ Elizabeth line ticket hall",
         "via": "West entrance"
       },
       {
@@ -25756,6 +26145,7 @@
         "from": "Entrance tunnel",
         "to": "Elizabeth line ticket hall",
         "limitedCapacity": false,
+        "description": "Entrance tunnel ↔ Elizabeth line ticket hall",
         "via": "Elizabeth line entrance"
       },
       {
@@ -25763,28 +26153,32 @@
         "name": "Lift 8",
         "from": "Elizabeth line ticket hall",
         "to": "Elizabeth line lower level",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Elizabeth line ticket hall ↔ Elizabeth line lower level"
       },
       {
         "id": "HUBPAD-Lift-9",
         "name": "Lift 9",
         "from": "Elizabeth line ticket hall",
         "to": "Elizabeth line lower level",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Elizabeth line ticket hall ↔ Elizabeth line lower level"
       },
       {
         "id": "HUBPAD-Lift-12",
         "name": "Lift 12",
         "from": "Elizabeth line lower level",
         "to": "Bakerloo line lower",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Elizabeth line lower level ↔ Bakerloo line lower"
       },
       {
         "id": "HUBPAD-Lift-X",
         "name": "Lift X",
         "from": "Bakerloo line lower upper",
         "to": "Southbound Platform 4, Northbound Platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Bakerloo line lower upper ↔ Southbound platform 4, northbound platform 3"
       },
       {
         "id": "HUBPAD-Lift-Y",
@@ -25792,6 +26186,7 @@
         "from": "Bakerloo/tube approach north",
         "to": "Lawn ticket hall",
         "limitedCapacity": false,
+        "description": "Bakerloo/tube approach north ↔ Lawn ticket hall",
         "via": "Arcade"
       },
       {
@@ -25799,7 +26194,8 @@
         "name": "Lift Z",
         "from": "Bakerloo line landing",
         "to": "Southbound Platform 4, Northbound Platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Bakerloo line landing ↔ Southbound platform 4, northbound platform 3"
       }
     ],
     "id": "HUBPAD",
@@ -26276,28 +26672,32 @@
         "name": "Lift 1",
         "from": "Entrance (west)",
         "to": "Footbridge",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Entrance (west) ↔ Footbridge"
       },
       {
         "id": "910GPETSWD-Lift-2",
         "name": "Lift 2",
         "from": "Railway platform 1",
         "to": "Footbridge",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Railway platform 1 ↔ Footbridge"
       },
       {
         "id": "910GPETSWD-Lift-3",
         "name": "Lift 3",
         "from": "Railway platform 2",
         "to": "Footbridge",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Railway platform 2 ↔ Footbridge"
       },
       {
         "id": "910GPETSWD-Lift-4",
         "name": "Lift 4",
         "from": "Entrance (east)",
         "to": "Footbridge",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Entrance (east) ↔ Footbridge"
       }
     ],
     "id": "910GPETSWD",
@@ -26628,14 +27028,16 @@
         "name": "Lift 1",
         "from": "Bridge",
         "to": "Northbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Bridge ↔ Northbound Platform 1"
       },
       {
         "id": "940GZZLUPNR-Lift-2",
         "name": "Lift 2",
         "from": "Bridge",
         "to": "Southbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Bridge ↔ Southbound Platform 2"
       }
     ],
     "id": "940GZZLUPNR",
@@ -26784,14 +27186,16 @@
         "name": "Lift 1",
         "from": "Entrance T",
         "to": "Railway platform (west)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Entrance T ↔ Railway platform (west)"
       },
       {
         "id": "910GPLMS-Lift-2",
         "name": "Lift 2",
         "from": "Entrance P",
         "to": "Railway platform (east)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Entrance P ↔ Railway platform (east)"
       }
     ],
     "id": "910GPLMS",
@@ -26845,14 +27249,16 @@
         "name": "Lift 1",
         "from": "North Woolwich Road entrance",
         "to": "DLR westbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "North Woolwich Road entrance ↔ DLR westbound"
       },
       {
         "id": "940GZZDLPDK-Lift-2",
         "name": "Lift 2",
         "from": "North Woolwich Road entrance",
         "to": "DLR eastbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "North Woolwich Road entrance ↔ DLR eastbound"
       }
     ],
     "id": "940GZZDLPDK",
@@ -26929,6 +27335,7 @@
         "from": "Concourse",
         "to": "Bridge",
         "limitedCapacity": true,
+        "description": "Concourse ↔ Bridge",
         "via": "DLR platform (east side), Eastbound Platform 1"
       },
       {
@@ -26937,6 +27344,7 @@
         "from": "Concourse",
         "to": "Bridge",
         "limitedCapacity": true,
+        "description": "Concourse ↔ Bridge",
         "via": "DLR platform (west), Westbound Platform 4"
       }
     ],
@@ -27060,14 +27468,16 @@
         "name": "Lift 1",
         "from": "Bridge",
         "to": "Eastbound Platform 1, Westbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Bridge ↔ Eastbound platform 1, westbound platform 2"
       },
       {
         "id": "940GZZDLPRE-Lift-2",
         "name": "Lift 2",
         "from": "Bridge",
         "to": "Interchange area",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Bridge ↔ Interchange area"
       }
     ],
     "id": "940GZZDLPRE",
@@ -27121,14 +27531,16 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "DLR eastbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ DLR eastbound"
       },
       {
         "id": "940GZZDLPUD-Lift-2",
         "name": "Lift 2",
         "from": "Booking Hall",
         "to": "DLR westbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ DLR westbound"
       }
     ],
     "id": "940GZZDLPUD",
@@ -27233,28 +27645,32 @@
         "name": "Lift 1",
         "from": "National Rail concourse",
         "to": "Railway platform",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform"
       },
       {
         "id": "910GPURLEY-Lift-2",
         "name": "Lift 2",
         "from": "National Rail concourse",
         "to": "Railway platform",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform"
       },
       {
         "id": "910GPURLEY-Lift-3",
         "name": "Lift 3",
         "from": "National Rail concourse",
         "to": "Railway platform",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform"
       },
       {
         "id": "910GPURLEY-Lift-4",
         "name": "Lift 4",
         "from": "National Rail concourse",
         "to": "Railway platform",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform"
       }
     ],
     "id": "910GPURLEY",
@@ -27446,7 +27862,8 @@
         "name": "Lift 1",
         "from": "Entrance",
         "to": "Railway platform",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Entrance ↔ Railway platform"
       }
     ],
     "id": "910GPCKHMQD",
@@ -27581,14 +27998,16 @@
         "name": "Lift 1",
         "from": "Street",
         "to": "Westbound Platform 1, Eastbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Westbound platform 1, eastbound platform 2"
       },
       {
         "id": "940GZZLUQWY-Lift-2",
         "name": "Lift 2",
         "from": "Street",
         "to": "Westbound Platform 1, Eastbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Westbound platform 1, eastbound platform 2"
       }
     ],
     "id": "940GZZLUQWY",
@@ -27774,35 +28193,40 @@
         "name": "Lift 1",
         "from": "Footbridge",
         "to": "Entrance (central)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Entrance (central)"
       },
       {
         "id": "910GRDNGSTN-Lift-2",
         "name": "Lift 2",
         "from": "Footbridge",
         "to": "Railway platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 1"
       },
       {
         "id": "910GRDNGSTN-Lift-3",
         "name": "Lift 3",
         "from": "Footbridge",
         "to": "Railway platform 4–6",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 4–6"
       },
       {
         "id": "910GRDNGSTN-Lift-4",
         "name": "Lift 4",
         "from": "Footbridge",
         "to": "Railway platform 8",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 8"
       },
       {
         "id": "910GRDNGSTN-Lift-5",
         "name": "Lift 5",
         "from": "Footbridge",
         "to": "Railway platform 1–2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 1–2"
       }
     ],
     "id": "910GRDNGSTN",
@@ -27988,14 +28412,16 @@
         "name": "Lift 1",
         "from": "Street",
         "to": "Northbound Platform 1, Southbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Northbound platform 1, southbound platform 2"
       },
       {
         "id": "940GZZLURGP-Lift-2",
         "name": "Lift 2",
         "from": "Street",
         "to": "Northbound Platform 1, Southbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Northbound platform 1, southbound platform 2"
       }
     ],
     "id": "940GZZLURGP",
@@ -28108,14 +28534,16 @@
         "name": "Lift 1",
         "from": "National Rail concourse",
         "to": "Railway platform (west)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform (west)"
       },
       {
         "id": "HUBRMD-Lift-2",
         "name": "Lift 2",
         "from": "National Rail concourse",
         "to": "Railway platform (east), District line platforms 4–5, District line platforms 6–7, Railway platform (through)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Platforms 4 and 6"
       }
     ],
     "id": "HUBRMD",
@@ -28403,6 +28831,7 @@
         "from": "Entrance (main)",
         "to": "Railway platform 5",
         "limitedCapacity": false,
+        "description": "Entrance (main) ↔ Railway platform 5",
         "via": "Upper platform"
       },
       {
@@ -28410,7 +28839,8 @@
         "name": "Lift B",
         "from": "Entrance (main)",
         "to": "Railway platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Entrance (main) ↔ Railway platform 3"
       }
     ],
     "id": "910GROMFORD",
@@ -28499,14 +28929,16 @@
         "name": "Lift 1",
         "from": "Concourse",
         "to": "DLR eastbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Concourse ↔ DLR eastbound"
       },
       {
         "id": "940GZZDLRAL-Lift-2",
         "name": "Lift 2",
         "from": "Concourse",
         "to": "DLR westbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Concourse ↔ DLR westbound"
       }
     ],
     "id": "940GZZDLRAL",
@@ -28607,21 +29039,24 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "DLR eastbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ DLR eastbound"
       },
       {
         "id": "940GZZDLRVC-Lift-2",
         "name": "Lift 2",
         "from": "Booking Hall",
         "to": "Dock entrance",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Dock entrance"
       },
       {
         "id": "940GZZDLRVC-Lift-3",
         "name": "Lift 3",
         "from": "Booking Hall",
         "to": "Royal Victoria Dock",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Royal Victoria Dock"
       }
     ],
     "id": "940GZZDLRVC",
@@ -28878,21 +29313,24 @@
         "name": "Lift 1",
         "from": "Street",
         "to": "Eastbound Platform 1, Westbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Eastbound platform 1, westbound platform 2"
       },
       {
         "id": "940GZZLURSQ-Lift-2",
         "name": "Lift 2",
         "from": "Street",
         "to": "Eastbound Platform 1, Westbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Eastbound platform 1, westbound platform 2"
       },
       {
         "id": "940GZZLURSQ-Lift-3",
         "name": "Lift 3",
         "from": "Street",
         "to": "Eastbound Platform 1, Westbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Eastbound platform 1, westbound platform 2"
       }
     ],
     "id": "940GZZLURSQ",
@@ -29012,21 +29450,24 @@
         "name": "Lift B",
         "from": "Footbridge",
         "to": "Railway platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 2"
       },
       {
         "id": "910GSVNKNGS-Lift-1",
         "name": "Lift A",
         "from": "Footbridge",
         "to": "Railway platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 1"
       },
       {
         "id": "910GSVNKNGS-Lift-3",
         "name": "Lift C",
         "from": "Footbridge",
         "to": "Railway platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 3"
       }
     ],
     "id": "910GSVNKNGS",
@@ -29259,7 +29700,8 @@
         "name": "Lift 1",
         "from": "Cable Street entrance",
         "to": "Eastbound Platform 1, Westbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Cable Street entrance ↔ Eastbound platform 1, westbound platform 2"
       }
     ],
     "id": "HUBSDE",
@@ -29357,21 +29799,24 @@
         "name": "Lift 1",
         "from": "Upper platform",
         "to": "Railway platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Upper platform ↔ Railway platform 1"
       },
       {
         "id": "910GSHENFLD-Lift-2",
         "name": "Lift 2",
         "from": "Upper platform",
         "to": "Railway platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Upper platform ↔ Railway platform 3"
       },
       {
         "id": "910GSHENFLD-Lift-3",
         "name": "Lift 3",
         "from": "Upper platform",
         "to": "Railway platform 5",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Upper platform ↔ Railway platform 5"
       }
     ],
     "id": "910GSHENFLD",
@@ -29485,6 +29930,7 @@
         "from": "Bridge",
         "to": "Railway platform (north)",
         "limitedCapacity": false,
+        "description": "Bridge ↔ Railway platform (north)",
         "via": "National Rail concourse"
       },
       {
@@ -29492,7 +29938,8 @@
         "name": "Lift 2",
         "from": "Bridge",
         "to": "Railway platform (south)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Bridge ↔ Railway platform (south)"
       }
     ],
     "id": "HUBSPB",
@@ -29608,14 +30055,16 @@
         "name": "Lift 1",
         "from": "National Rail concourse",
         "to": "Railway platform (north)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform (north)"
       },
       {
         "id": "910GSHRDHST-Lift-2",
         "name": "Lift 2",
         "from": "National Rail concourse",
         "to": "Railway platform (south)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform (south)"
       }
     ],
     "id": "910GSHRDHST",
@@ -29707,21 +30156,24 @@
         "name": "Lift 1",
         "from": "Railway platform 1",
         "to": "Outbound platform",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Railway platform 1 ↔ Outbound platform"
       },
       {
         "id": "910GSHRTLND-Lift-2",
         "name": "Lift 2",
         "from": "Railway platform 2",
         "to": "Outbound platform",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Railway platform 2 ↔ Outbound platform"
       },
       {
         "id": "910GSHRTLND-Lift-3",
         "name": "Lift 3",
         "from": "Station concourse entrance",
         "to": "Outbound platform",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Station concourse entrance ↔ Outbound platform"
       }
     ],
     "id": "910GSHRTLND",
@@ -29922,21 +30374,24 @@
         "name": "Lift 1",
         "from": "Footbridge",
         "to": "Railway platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 1"
       },
       {
         "id": "910GSLOUGH-Lift-3",
         "name": "Lift 2",
         "from": "Footbridge",
         "to": "Railway platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 2"
       },
       {
         "id": "910GSLOUGH-Lift-4",
         "name": "Lift 3",
         "from": "Footbridge",
         "to": "Railway platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 3"
       }
     ],
     "id": "910GSLOUGH",
@@ -30484,14 +30939,16 @@
         "name": "Lift 1",
         "from": "Station concourse",
         "to": "DLR southbound",
-        "limitedCapacity": true
+        "limitedCapacity": true,
+        "description": "Station concourse ↔ DLR southbound"
       },
       {
         "id": "940GZZDLSOQ-Lift-2",
         "name": "Lift 2",
         "from": "Station concourse",
         "to": "DLR northbound",
-        "limitedCapacity": true
+        "limitedCapacity": true,
+        "description": "Station concourse ↔ DLR northbound"
       }
     ],
     "id": "940GZZDLSOQ",
@@ -30625,14 +31082,16 @@
         "name": "Lift 1",
         "from": "Subway",
         "to": "Railway platform (west)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Subway ↔ Railway platform (west)"
       },
       {
         "id": "910GSTOTNHM-Lift-2",
         "name": "Lift 2",
         "from": "Subway",
         "to": "Railway platform (east)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Subway ↔ Railway platform (east)"
       }
     ],
     "id": "910GSTOTNHM",
@@ -30835,21 +31294,24 @@
         "name": "Lift A",
         "from": "Footbridge",
         "to": "Railway platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 1"
       },
       {
         "id": "910GSTHALL-Lift-2",
         "name": "Lift B",
         "from": "Footbridge",
         "to": "Railway platform 2–3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 2–3"
       },
       {
         "id": "910GSTHALL-Lift-3",
         "name": "Lift C",
         "from": "Footbridge",
         "to": "Railway platform 4",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 4"
       }
     ],
     "id": "910GSTHALL",
@@ -30939,7 +31401,8 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "District line northbound, District line southbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ District line northbound/southbound platforms"
       }
     ],
     "id": "940GZZLUSFS",
@@ -31055,14 +31518,16 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Westbound Platform 1, Jubilee line",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Westbound Platform 1, Jubilee line"
       },
       {
         "id": "940GZZLUSWK-Lift-2",
         "name": "Lift 2",
         "from": "The Cut access",
         "to": "Booking Hall",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "The Cut access ↔ Booking Hall"
       }
     ],
     "id": "940GZZLUSWK",
@@ -31246,14 +31711,16 @@
         "name": "Lift 1",
         "from": "Footbridge",
         "to": "Railway platform 3–4",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 3–4"
       },
       {
         "id": "910GSTMRYC-Lift-2",
         "name": "Lift 2",
         "from": "Footbridge",
         "to": "Railway platform 1–2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 1–2"
       }
     ],
     "id": "910GSTMRYC",
@@ -31688,21 +32155,24 @@
         "name": "Lift 1",
         "from": "DLR northbound platform, DLR southbound platform",
         "to": "Booking Hall",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "DLR northbound/southbound platforms ↔ Booking Hall"
       },
       {
         "id": "940GZZDLSTL-Lift-2",
         "name": "Lift 2",
         "from": "Station approach",
         "to": "Booking Hall",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Station approach ↔ Booking Hall"
       },
       {
         "id": "940GZZDLSTL-Lift-3",
         "name": "Lift 3",
         "from": "Booking Hall",
         "to": "Star Lane entrance",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Star Lane entrance"
       }
     ],
     "id": "940GZZDLSTL",
@@ -32081,119 +32551,136 @@
         "name": "Lift J",
         "from": "Subway (west)",
         "to": "Eastbound Platform 6",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Subway (west) ↔ Eastbound Platform 6"
       },
       {
         "id": "HUBSRA-Lift-12",
         "name": "Lift G",
         "from": "Subway (west)",
         "to": "Railway platform O, Railway platform (north)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Subway (west) ↔ Railway platform O"
       },
       {
         "id": "HUBSRA-Lift-16",
         "name": "Lift B",
         "from": "Westfield subway",
         "to": "Subway (west)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Westfield subway ↔ Subway (west)"
       },
       {
         "id": "HUBSRA-Lift-17",
         "name": "Lift A",
         "from": "Westfield subway",
         "to": "Subway (middle)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Westfield subway ↔ Subway (middle)"
       },
       {
         "id": "HUBSRA-Lift-3",
         "name": "Lift F",
         "from": "Subway (west)",
         "to": "Westbound Platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Subway (west) ↔ Westbound Platform 3"
       },
       {
         "id": "HUBSRA-Lift-2",
         "name": "Lift E",
         "from": "Subway (middle)",
         "to": "Eastbound Platform 6",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Subway (middle) ↔ Eastbound Platform 6"
       },
       {
         "id": "HUBSRA-Lift-18",
         "name": "Lift K",
         "from": "Subway (middle)",
         "to": "Westbound Platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Subway (middle) ↔ Westbound Platform 3"
       },
       {
         "id": "HUBSRA-Lift-4",
         "name": "Lift N",
         "from": "Mezzanine",
         "to": "Ticket Hall (east)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Mezzanine ↔ Ticket Hall (east)"
       },
       {
         "id": "HUBSRA-Lift-5",
         "name": "Lift O",
         "from": "Mezzanine",
         "to": "Ticket Hall (west), Jubilee line",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Mezzanine ↔ Ticket Hall (west), Jubilee line"
       },
       {
         "id": "HUBSRA-Lift-6",
         "name": "Lift M",
         "from": "Mezzanine",
         "to": "Ticket Hall (east)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Mezzanine ↔ Ticket Hall (east)"
       },
       {
         "id": "HUBSRA-Lift-7",
         "name": "Lift P",
         "from": "Mezzanine",
         "to": "Ticket Hall (west), Jubilee line",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Mezzanine ↔ Ticket Hall (west), Jubilee line"
       },
       {
         "id": "HUBSRA-Lift-8",
         "name": "Lift L",
         "from": "Subway (west)",
         "to": "Ticket Hall (west), Jubilee line",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Subway (west) ↔ Ticket Hall (west), Jubilee line"
       },
       {
         "id": "HUBSRA-Lift-9",
         "name": "Lift C",
         "from": "Subway (middle)",
         "to": "Railway platform O, Railway platform (north)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Subway (middle) ↔ Railway platform O"
       },
       {
         "id": "HUBSRA-Lift-1",
         "name": "Lift D",
         "from": "Subway (middle)",
         "to": "Railway platform X",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Subway (middle) ↔ Railway platform X"
       },
       {
         "id": "HUBSRA-Lift-11",
         "name": "Lift H",
         "from": "Subway (west)",
         "to": "Railway platform X",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Subway (west) ↔ Railway platform X"
       },
       {
         "id": "HUBSRA-Lift-13",
         "name": "Lift R",
         "from": "Subway (east)",
         "to": "Railway platform (south)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Subway (east) ↔ Railway platform (south)"
       },
       {
         "id": "HUBSRA-Lift-14",
         "name": "Lift S",
         "from": "Subway (east)",
         "to": "Railway platform (south)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Subway (east) ↔ Railway platform (south)"
       }
     ],
     "id": "HUBSRA",
@@ -32309,14 +32796,16 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "DLR southbound platform",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ DLR southbound platform"
       },
       {
         "id": "940GZZDLSHS-Lift-2",
         "name": "Lift 2",
         "from": "Booking Hall",
         "to": "DLR northbound platform",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ DLR northbound platform"
       }
     ],
     "id": "940GZZDLSHS",
@@ -32371,21 +32860,24 @@
         "name": "Lift 1",
         "from": "Booking Hall (east), Booking Hall (west)",
         "to": "DLR platform 1, DLR platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall (east), Booking Hall (west) ↔ DLR platforms 1 and 2"
       },
       {
         "id": "940GZZDLSIT-Lift-2",
         "name": "Lift 2",
         "from": "Booking Hall (east), Booking Hall (west)",
         "to": "DLR platform 1, DLR platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall (east), Booking Hall (west) ↔ DLR platforms 1 and 2"
       },
       {
         "id": "940GZZDLSIT-Lift-3",
         "name": "Lift 3",
         "from": "Booking Hall (east), Booking Hall (west)",
         "to": "DLR platform 1, DLR platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall (east), Booking Hall (west) ↔ DLR platforms 1 and 2"
       }
     ],
     "id": "940GZZDLSIT",
@@ -32477,14 +32969,16 @@
         "name": "Lift 1",
         "from": "Entrance (main)",
         "to": "Railway platform (south)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Entrance (main) ↔ Railway platform (south)"
       },
       {
         "id": "910GSTRETHM-Lift-2",
         "name": "Lift 2",
         "from": "Entrance (main)",
         "to": "Railway platform (north)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Entrance (main) ↔ Railway platform (north)"
       }
     ],
     "id": "910GSTRETHM",
@@ -32539,14 +33033,16 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Westbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Westbound Platform 1"
       },
       {
         "id": "940GZZLUSUH-Lift-2",
         "name": "Lift 2",
         "from": "Booking Hall",
         "to": "Eastbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Eastbound Platform 2"
       }
     ],
     "id": "940GZZLUSUH",
@@ -32832,14 +33328,16 @@
         "name": "Lift 1",
         "from": "Footbridge",
         "to": "Railway platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 1"
       },
       {
         "id": "910GSWLY-Lift-2",
         "name": "Lift 2",
         "from": "Footbridge",
         "to": "Railway platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 2"
       }
     ],
     "id": "910GSWLY",
@@ -33043,21 +33541,24 @@
         "name": "Lift A",
         "from": "Footbridge",
         "to": "Railway platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 3"
       },
       {
         "id": "910GTAPLOW-Lift-2",
         "name": "Lift B",
         "from": "Footbridge",
         "to": "Railway platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 2"
       },
       {
         "id": "910GTAPLOW-Lift-3",
         "name": "Lift C",
         "from": "Footbridge",
         "to": "Railway platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 1"
       }
     ],
     "id": "910GTAPLOW",
@@ -33307,14 +33808,16 @@
         "name": "Lift 1",
         "from": "National Rail concourse",
         "to": "Railway platform (east)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform (east)"
       },
       {
         "id": "910GTOOTING-Lift-2",
         "name": "Lift 2",
         "from": "National Rail concourse",
         "to": "Railway platform (west)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform (west)"
       }
     ],
     "id": "910GTOOTING",
@@ -33542,21 +34045,24 @@
         "name": "Lift B",
         "from": "North passage (east)",
         "to": "Booking Hall",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "North passage (east) ↔ Booking Hall"
       },
       {
         "id": "HUBTCR-Lift-2",
         "name": "Lift E",
         "from": "Booking Hall",
         "to": "Upper concourse",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Upper concourse"
       },
       {
         "id": "HUBTCR-Lift-3",
         "name": "Lift A",
         "from": "F-O/C",
         "to": "Booking Hall",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "F-O/C ↔ Booking Hall"
       },
       {
         "id": "HUBTCR-Lift-4",
@@ -33564,6 +34070,7 @@
         "from": "Booking Hall",
         "to": "Northern line platform",
         "limitedCapacity": false,
+        "description": "Booking Hall ↔ Northern line platform",
         "via": "Upper concourse"
       },
       {
@@ -33571,35 +34078,40 @@
         "name": "Lift F",
         "from": "Upper concourse",
         "to": "Eastbound Platform 2, Westbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Upper concourse ↔ Eastbound platform 2, westbound platform 1"
       },
       {
         "id": "HUBTCR-Lift-7",
         "name": "Lift J",
         "from": "Down-side booking hall",
         "to": "Elizabeth line west level",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Down-side booking hall ↔ Elizabeth line west level"
       },
       {
         "id": "HUBTCR-Lift-8",
         "name": "Lift H",
         "from": "Elizabeth line west level",
         "to": "Elizabeth line west level",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Elizabeth line west level ↔ Elizabeth line west level"
       },
       {
         "id": "HUBTCR-Lift-10",
         "name": "Lift C",
         "from": "Elizabeth line east level",
         "to": "Booking Hall",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Elizabeth line east level ↔ Booking Hall"
       },
       {
         "id": "HUBTCR-Lift-12",
         "name": "Lift G",
         "from": "Elizabeth line east level",
         "to": "Northern line platform",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Elizabeth line east level ↔ Northern line platform"
       }
     ],
     "id": "HUBTCR",
@@ -33745,21 +34257,24 @@
         "name": "Lift 1",
         "from": "Underground booking office",
         "to": "Northbound Platform 1, Southbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Underground booking office ↔ Northbound platform 1, southbound platform 2"
       },
       {
         "id": "HUBTOM-Lift-2",
         "name": "Lift 2",
         "from": "North bridge",
         "to": "Railway platform (north)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "North bridge ↔ Railway platform (north)"
       },
       {
         "id": "HUBTOM-Lift-3",
         "name": "Lift 3",
         "from": "North bridge",
         "to": "Railway platform (south)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "North bridge ↔ Railway platform (south)"
       }
     ],
     "id": "HUBTOM",
@@ -33931,14 +34446,16 @@
         "name": "Lift 1",
         "from": "Minories entrance",
         "to": "DLR 2",
-        "limitedCapacity": true
+        "limitedCapacity": true,
+        "description": "Minories entrance ↔ DLR 2"
       },
       {
         "id": "HUBTOG-Lift-2",
         "name": "Lift 2",
         "from": "Minories entrance",
         "to": "DLR 2",
-        "limitedCapacity": true
+        "limitedCapacity": true,
+        "description": "Minories entrance ↔ DLR 2"
       }
     ],
     "id": "HUBTOG",
@@ -34007,14 +34524,16 @@
         "name": "Lift 1",
         "from": "Trinity Square access",
         "to": "Eastbound Platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Trinity Square access ↔ Eastbound Platform 3"
       },
       {
         "id": "940GZZLUTWH-Lift-2",
         "name": "Lift 2",
         "from": "Jubilee Walkway entrance",
         "to": "Westbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Jubilee Walkway entrance ↔ Westbound Platform 1"
       }
     ],
     "id": "940GZZLUTWH",
@@ -34068,14 +34587,16 @@
         "name": "Lift 1",
         "from": "Street",
         "to": "Northbound Platform 1, Southbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Northbound platform 1, southbound platform 2"
       },
       {
         "id": "940GZZLUTFP-Lift-2",
         "name": "Lift 2",
         "from": "Street",
         "to": "Northbound Platform 1, Southbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Street ↔ Northbound platform 1, southbound platform 2"
       }
     ],
     "id": "940GZZLUTFP",
@@ -34356,21 +34877,24 @@
         "name": "Lift 1",
         "from": "Footbridge",
         "to": "Railway platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 2"
       },
       {
         "id": "910GTWYFORD-Lift-2",
         "name": "Lift 2",
         "from": "Footbridge",
         "to": "Railway platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 3"
       },
       {
         "id": "910GTWYFORD-Lift-3",
         "name": "Lift 3",
         "from": "Footbridge",
         "to": "Station entrance",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Station entrance"
       }
     ],
     "id": "910GTWYFORD",
@@ -34513,21 +35037,24 @@
         "name": "Lift 1",
         "from": "Bridge (west)",
         "to": "Railway platform (west)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Bridge (west) ↔ Railway platform (west)"
       },
       {
         "id": "HUBUPM-Lift-2",
         "name": "Lift 2",
         "from": "Bridge (west)",
         "to": "District line platforms 3, Railway platform (east)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Bridge (west) ↔ Platform 3"
       },
       {
         "id": "HUBUPM-Lift-3",
         "name": "Lift 3",
         "from": "Bridge (west)",
         "to": "District line platforms 4–5",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Bridge (west) ↔ District line platforms 4–5"
       }
     ],
     "id": "HUBUPM",
@@ -34983,42 +35510,48 @@
         "name": "Lift 1",
         "from": "Bus station bridge (east)",
         "to": "Booking Hall",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Bus station bridge (east) ↔ Booking Hall"
       },
       {
         "id": "HUBVXH-Lift-2",
         "name": "Lift 2",
         "from": "Booking Hall",
         "to": "Southbound, Southbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Southbound platform 2"
       },
       {
         "id": "HUBVXH-Lift-3",
         "name": "Lift 3",
         "from": "Railway platform",
         "to": "National Rail concourse, Entrance",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Railway platform ↔ National Rail concourse, Entrance"
       },
       {
         "id": "HUBVXH-Lift-4",
         "name": "Lift 4",
         "from": "Railway platform",
         "to": "National Rail concourse",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Railway platform ↔ National Rail concourse"
       },
       {
         "id": "HUBVXH-Lift-5",
         "name": "Lift 5",
         "from": "Railway platform",
         "to": "National Rail concourse",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Railway platform ↔ National Rail concourse"
       },
       {
         "id": "HUBVXH-Lift-6",
         "name": "Lift 6",
         "from": "Railway platform",
         "to": "National Rail concourse",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Railway platform ↔ National Rail concourse"
       }
     ],
     "id": "HUBVXH",
@@ -35346,14 +35879,16 @@
         "name": "Lift A1B2",
         "from": "District/Victoria interchange",
         "to": "Victoria line booking hall",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "District/Victoria interchange ↔ Victoria line booking hall"
       },
       {
         "id": "HUBVIC-Lift-C3",
         "name": "Lift C3",
         "from": "Cardinal Place",
         "to": "Booking Hall (north)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Cardinal Place ↔ Booking Hall (north)"
       },
       {
         "id": "HUBVIC-Lift-D4",
@@ -35361,6 +35896,7 @@
         "from": "Victoria line booking hall",
         "to": "Southern interchange",
         "limitedCapacity": false,
+        "description": "Victoria line booking hall ↔ Southern interchange",
         "via": "District line westbound"
       },
       {
@@ -35368,7 +35904,8 @@
         "name": "Lift E5",
         "from": "Booking Hall (north)",
         "to": "Northern interchange",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall (north) ↔ Northern interchange"
       },
       {
         "id": "HUBVIC-Lift-F6",
@@ -35376,6 +35913,7 @@
         "from": "Northbound Platform 3, Southbound Platform 4",
         "to": "District line eastbound",
         "limitedCapacity": false,
+        "description": "Northbound platform 3, southbound platform 4 ↔ District line eastbound",
         "via": "District/Victoria link"
       },
       {
@@ -35383,7 +35921,8 @@
         "name": "Lift G7",
         "from": "Northern interchange",
         "to": "Northbound Platform 3, Southbound Platform 4",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Northern interchange ↔ Northbound platform 3, southbound platform 4"
       }
     ],
     "id": "HUBVIC",
@@ -36040,7 +36579,8 @@
         "name": "Lift 1",
         "from": "Waterloo & City line arrival area",
         "to": "Metropolitan line booking hall",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Waterloo & City line arrival area ↔ Metropolitan line booking hall"
       },
       {
         "id": "HUBWAT-Lift-2",
@@ -36048,6 +36588,7 @@
         "from": "Jubilee line booking hall",
         "to": "Eastbound Platform 6, Westbound Platform 5",
         "limitedCapacity": false,
+        "description": "Jubilee line booking hall ↔ Eastbound platform 6, westbound platform 5",
         "via": "Jubilee line interchange"
       },
       {
@@ -36056,6 +36597,7 @@
         "from": "Metropolitan line booking hall, National Rail departure platforms",
         "to": "Railway platform",
         "limitedCapacity": false,
+        "description": "Metropolitan line booking hall, National Rail departure platforms ↔ Railway platform",
         "via": "Through station concourse"
       },
       {
@@ -36063,7 +36605,8 @@
         "name": "Lift 4",
         "from": "Booking Hall (Waterloo Road side)",
         "to": "Railway platform",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall (Waterloo Road side) ↔ Railway platform"
       }
     ],
     "id": "HUBWAT",
@@ -36471,21 +37014,24 @@
         "name": "Lift 1",
         "from": "Subway",
         "to": "Railway platform D, Railway platform A",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Subway ↔ Railway platforms A and D"
       },
       {
         "id": "HUBWFJ-Lift-2",
         "name": "Lift 2",
         "from": "Subway",
         "to": "Railway platform A",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Subway ↔ Railway platform A"
       },
       {
         "id": "HUBWFJ-Lift-3",
         "name": "Lift 3",
         "from": "Subway",
         "to": "Railway platform A (south)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Subway ↔ Railway platform A (south)"
       }
     ],
     "id": "HUBWFJ",
@@ -36655,28 +37201,32 @@
         "name": "Lift 1",
         "from": "National Rail concourse",
         "to": "Upper platform (northbound), Railway platform D (north)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway northbound platforms, platform D"
       },
       {
         "id": "HUBWMB-Lift-2",
         "name": "Lift 2",
         "from": "National Rail concourse",
         "to": "Upper platform (southbound), Railway platform D (south)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway southbound platforms, platform D"
       },
       {
         "id": "HUBWMB-Lift-3",
         "name": "Lift 3",
         "from": "National Rail concourse",
         "to": "Railway platform A (north)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform A (north)"
       },
       {
         "id": "HUBWMB-Lift-4",
         "name": "Lift 4",
         "from": "National Rail concourse",
         "to": "Railway platform A (south)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform A (south)"
       }
     ],
     "id": "HUBWMB",
@@ -36815,6 +37365,7 @@
         "from": "Booking Hall",
         "to": "Metropolitan line platforms 1",
         "limitedCapacity": false,
+        "description": "Booking Hall ↔ Metropolitan line platforms 1",
         "notes": "Platform not always in use depending on time of day."
       },
       {
@@ -36822,14 +37373,16 @@
         "name": "Lift 2",
         "from": "Booking Hall",
         "to": "Northbound Platform 3, Metropolitan line platforms 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Metropolitan line northbound platform 3, platform 2"
       },
       {
         "id": "940GZZLUWYP-Lift-3",
         "name": "Lift 3",
         "from": "Booking Hall",
         "to": "Southbound Platform 4, Metropolitan line platforms 5",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Metropolitan line southbound platform 4, platform 5"
       },
       {
         "id": "940GZZLUWYP-Lift-4",
@@ -36837,6 +37390,7 @@
         "from": "Booking Hall",
         "to": "Metropolitan line platforms 6",
         "limitedCapacity": false,
+        "description": "Booking Hall ↔ Metropolitan line platforms 6",
         "notes": "Platform not always in use depending on time of day."
       },
       {
@@ -36844,7 +37398,8 @@
         "name": "Lift 5",
         "from": "Booking Hall",
         "to": "Stadium exit (east)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Stadium exit (east)"
       }
     ],
     "id": "940GZZLUWYP",
@@ -37026,14 +37581,16 @@
         "name": "Lift 3",
         "from": "National Rail concourse",
         "to": "Railway platform (south)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform (south)"
       },
       {
         "id": "HUBWBP-Lift-4",
         "name": "Lift 4",
         "from": "National Rail concourse",
         "to": "Railway platform (north)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform (north)"
       }
     ],
     "id": "HUBWBP",
@@ -37194,35 +37751,40 @@
         "name": "Lift D",
         "from": "Ticket Hall",
         "to": "Footbridge",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Ticket Hall ↔ Footbridge"
       },
       {
         "id": "910GWDRYTON-Lift-B",
         "name": "Lift B",
         "from": "Footbridge",
         "to": "Railway platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 2"
       },
       {
         "id": "910GWDRYTON-Lift-C",
         "name": "Lift C",
         "from": "Footbridge",
         "to": "Railway platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 3"
       },
       {
         "id": "910GWDRYTON-Lift-A",
         "name": "Lift A",
         "from": "Subway",
         "to": "Railway platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Subway ↔ Railway platform 1"
       },
       {
         "id": "910GWDRYTON-Lift-E",
         "name": "Lift E",
         "from": "Subway",
         "to": "Ticket Hall",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Subway ↔ Ticket Hall"
       }
     ],
     "id": "910GWDRYTON",
@@ -37324,7 +37886,8 @@
         "name": "Lift A",
         "from": "Footbridge",
         "to": "Railway platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 1"
       },
       {
         "id": "910GWEALING-Lift-2",
@@ -37332,6 +37895,7 @@
         "from": "Footbridge",
         "to": "Railway platform 2",
         "limitedCapacity": false,
+        "description": "Footbridge ↔ Railway platform 2",
         "via": "Drayton Green Road entrance"
       }
     ],
@@ -37554,35 +38118,40 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Footbridge",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Footbridge"
       },
       {
         "id": "HUBWEH-Lift-2",
         "name": "Lift 2",
         "from": "Footbridge",
         "to": "Eastbound Platform 6, Westbound Platform 5",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Eastbound platform 6, westbound platform 5"
       },
       {
         "id": "HUBWEH-Lift-4",
         "name": "Lift 4",
         "from": "Booking Hall",
         "to": "Eastbound Platform 2, Westbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Eastbound platform 2, westbound platform 1"
       },
       {
         "id": "HUBWEH-Lift-5",
         "name": "Lift 5",
         "from": "Footbridge",
         "to": "Northbound Platform 4, Southbound Platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Footbridge ↔ Northbound platform 4, southbound platform 3"
       },
       {
         "id": "HUBWEH-Lift-6",
         "name": "Lift 6",
         "from": "Booking Hall",
         "to": "Railway platform",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Railway platform"
       }
     ],
     "id": "HUBWEH",
@@ -37761,21 +38330,24 @@
         "name": "Lift 1",
         "from": "FB I",
         "to": "Railway platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "FB I ↔ Railway platform 1"
       },
       {
         "id": "910GWHMPSTM-Lift-2",
         "name": "Lift 2",
         "from": "FB I",
         "to": "Railway platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "FB I ↔ Railway platform 2"
       },
       {
         "id": "910GWHMPSTM-Lift-3",
         "name": "Lift 3",
         "from": "FB I",
         "to": "Railway platform 3",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "FB I ↔ Railway platform 3"
       }
     ],
     "id": "910GWHMPSTM",
@@ -37920,14 +38492,16 @@
         "name": "Lift 1",
         "from": "Concourse",
         "to": "DLR southbound",
-        "limitedCapacity": true
+        "limitedCapacity": true,
+        "description": "Concourse ↔ DLR southbound"
       },
       {
         "id": "940GZZDLWIQ-Lift-2",
         "name": "Lift 2",
         "from": "Concourse",
         "to": "DLR northbound",
-        "limitedCapacity": true
+        "limitedCapacity": true,
+        "description": "Concourse ↔ DLR northbound"
       }
     ],
     "id": "940GZZDLWIQ",
@@ -38117,14 +38691,16 @@
         "name": "Lift 1",
         "from": "Entrance",
         "to": "DLR westbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Entrance ↔ DLR westbound"
       },
       {
         "id": "940GZZDLWSV-Lift-2",
         "name": "Lift 2",
         "from": "Entrance",
         "to": "DLR eastbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Entrance ↔ DLR eastbound"
       }
     ],
     "id": "940GZZDLWSV",
@@ -38319,28 +38895,32 @@
         "name": "Lift 1",
         "from": "Westferry Road side entrance, Westferry Road entrance",
         "to": "DLR eastbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Westferry Road side entrance, Westferry Road entrance ↔ DLR eastbound"
       },
       {
         "id": "940GZZDLWFE-Lift-2",
         "name": "Lift 2",
         "from": "Westferry Road side entrance, Westferry Road entrance",
         "to": "DLR westbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Westferry Road side entrance, Westferry Road entrance ↔ DLR westbound"
       },
       {
         "id": "940GZZDLWFE-Lift-3",
         "name": "Lift 3",
         "from": "Westferry Road side entrance, Westferry Road entrance",
         "to": "DLR eastbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Westferry Road side entrance, Westferry Road entrance ↔ DLR eastbound"
       },
       {
         "id": "940GZZDLWFE-Lift-4",
         "name": "Lift 4",
         "from": "Westferry Road side entrance, Westferry Road entrance",
         "to": "DLR westbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Westferry Road side entrance, Westferry Road entrance ↔ DLR westbound"
       }
     ],
     "id": "940GZZDLWFE",
@@ -38419,21 +38999,24 @@
         "name": "Lift 2",
         "from": "Booking Hall",
         "to": "Brixton Road access",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Brixton Road access"
       },
       {
         "id": "HUBWSM-Lift-3",
         "name": "Lift 3",
         "from": "Booking Hall",
         "to": "Eastbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Eastbound Platform 2"
       },
       {
         "id": "HUBWSM-Lift-4",
         "name": "Lift 4",
         "from": "Booking Hall",
         "to": "Westbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Westbound Platform 1"
       },
       {
         "id": "HUBWSM-Lift-5",
@@ -38441,6 +39024,7 @@
         "from": "Westbound Platform 1",
         "to": "Westbound Platform 4",
         "limitedCapacity": false,
+        "description": "Westbound Platform 1 ↔ Westbound Platform 4",
         "via": "Eastbound Platform 3"
       }
     ],
@@ -38722,14 +39306,16 @@
         "name": "Lift 1",
         "from": "National Rail concourse",
         "to": "Railway platform (south)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform (south)"
       },
       {
         "id": "910GWHHRTLA-Lift-2",
         "name": "Lift 2",
         "from": "National Rail concourse",
         "to": "Railway platform (north)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway platform (north)"
       }
     ],
     "id": "910GWHHRTLA",
@@ -38863,6 +39449,7 @@
         "from": "Lower concourse",
         "to": "Elizabeth line eastbound, Elizabeth line westbound",
         "limitedCapacity": false,
+        "description": "Lower concourse ↔ Elizabeth line eastbound/westbound platforms",
         "via": "Railway platform (south)"
       },
       {
@@ -38871,6 +39458,7 @@
         "from": "Lower concourse",
         "to": "Elizabeth line eastbound, Elizabeth line westbound",
         "limitedCapacity": false,
+        "description": "Lower concourse ↔ Elizabeth line eastbound/westbound platforms",
         "via": "Railway platform (south)"
       },
       {
@@ -38878,14 +39466,16 @@
         "name": "Lift E",
         "from": "Lower concourse",
         "to": "Railway platform (north)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Lower concourse ↔ Railway platform (north)"
       },
       {
         "id": "HUBZWL-Lift-4",
         "name": "Lift B",
         "from": "Ticket Hall",
         "to": "Lower concourse",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Ticket Hall ↔ Lower concourse"
       },
       {
         "id": "HUBZWL-Lift-5",
@@ -38893,6 +39483,7 @@
         "from": "Ticket Hall",
         "to": "Railway platform (north)",
         "limitedCapacity": false,
+        "description": "Ticket Hall ↔ Railway platform (north)",
         "via": "Eastbound Platform 1, Westbound Platform 2"
       },
       {
@@ -38900,21 +39491,24 @@
         "name": "Lift D",
         "from": "Ticket Hall",
         "to": "Eastbound Platform 1, Westbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Ticket Hall ↔ Eastbound platform 1, westbound platform 2"
       },
       {
         "id": "HUBZWL-Lift-6",
         "name": "Lift G",
         "from": "Eastbound Platform 1, Westbound Platform 2",
         "to": "Railway platform (south)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Eastbound platform 1, westbound platform 2 ↔ Railway platform (south)"
       },
       {
         "id": "HUBZWL-Lift-7",
         "name": "Lift A",
         "from": "Whitechapel access",
         "to": "Ticket Hall",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Whitechapel access ↔ Ticket Hall"
       }
     ],
     "id": "HUBZWL",
@@ -39085,14 +39679,16 @@
         "name": "Lift 1",
         "from": "National Rail concourse",
         "to": "Northbound Platform 3, Railway platform L, Southbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "National Rail concourse ↔ Railway northbound platform 3, platform L, southbound platform 1"
       },
       {
         "id": "HUBWIJ-Lift-2",
         "name": "Lift 2",
         "from": "Subway",
         "to": "Railway platform H",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Subway ↔ Railway platform H"
       }
     ],
     "id": "HUBWIJ",
@@ -39283,28 +39879,32 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "District line platforms 1–2, District line platforms 3–4",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ District line platforms 1 and 3"
       },
       {
         "id": "HUBWIM-Lift-2",
         "name": "Lift 2",
         "from": "Booking Hall",
         "to": "Tram stop, Railway platform (south)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Tram stop, Railway platform (south)"
       },
       {
         "id": "HUBWIM-Lift-3",
         "name": "Lift 3",
         "from": "Booking Hall",
         "to": "Railway platform (southbound)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Railway platform (southbound)"
       },
       {
         "id": "HUBWIM-Lift-4",
         "name": "Lift 4",
         "from": "Booking Hall",
         "to": "Railway platform (northbound)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Railway platform (northbound)"
       }
     ],
     "id": "HUBWIM",
@@ -39440,7 +40040,8 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "District line southbound, District line northbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ District line southbound/northbound platforms"
       }
     ],
     "id": "940GZZLUWIP",
@@ -39568,28 +40169,32 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Eastbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Eastbound Platform 1"
       },
       {
         "id": "940GZZLUWLA-Lift-2",
         "name": "Lift 2",
         "from": "Booking Hall",
         "to": "Eastbound Platform 1",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Eastbound Platform 1"
       },
       {
         "id": "940GZZLUWLA-Lift-3",
         "name": "Lift 3",
         "from": "Booking Hall",
         "to": "Westbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Westbound Platform 2"
       },
       {
         "id": "940GZZLUWLA-Lift-4",
         "name": "Lift 4",
         "from": "Booking Hall",
         "to": "Westbound Platform 2",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Westbound Platform 2"
       }
     ],
     "id": "940GZZLUWLA",
@@ -39891,7 +40496,8 @@
         "name": "Lift 1",
         "from": "Booking Hall",
         "to": "Elizabeth line eastbound, Elizabeth line westbound",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Booking Hall ↔ Elizabeth line eastbound/westbound platforms"
       }
     ],
     "id": "910GWOLWXR",
@@ -39969,14 +40575,16 @@
         "name": "Lift B",
         "from": "DLR concourse",
         "to": "Railway platform (west)",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "DLR concourse ↔ Railway platform (west)"
       },
       {
         "id": "HUBWWA-Lift-2",
         "name": "Lift C",
         "from": "Beresford Square entrance",
         "to": "DLR",
-        "limitedCapacity": false
+        "limitedCapacity": false,
+        "description": "Beresford Square entrance ↔ DLR"
       },
       {
         "id": "HUBWWA-Lift-3",
@@ -39984,6 +40592,7 @@
         "from": "Station concourse",
         "to": "DLR",
         "limitedCapacity": false,
+        "description": "Station concourse ↔ DLR",
         "via": "DLR interchange concourse"
       }
     ],

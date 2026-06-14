@@ -29,9 +29,9 @@ def test_real_lift_carries_name_and_decoded_connection(
     connections = _lift_connections(_equipment_for(client, db_session, "Acton Town"))
 
     assert len(connections) == 2
-    # Each connection names the lift and describes a decoded, directional route.
+    # Each connection names the lift and describes a decoded, bidirectional route.
     assert all(c.startswith("Lift ") for c in connections)
-    assert all(" → " in c for c in connections)
+    assert all(" ↔ " in c for c in connections)
     assert any("Booking Hall" in c and "Platform" in c for c in connections)
 
 
@@ -54,7 +54,7 @@ def test_seed_adds_non_tube_feed_station_with_real_lifts(
 
     connections = _lift_connections(_equipment_for(client, db_session, "Bromley South"))
     assert len(connections) == 2
-    assert all(c.startswith("Lift ") and " → " in c for c in connections)
+    assert all(c.startswith("Lift ") and " ↔ " in c for c in connections)
 
 
 def test_named_lifts_merge_onto_a_single_station(client: TestClient, db_session: Session) -> None:
@@ -72,9 +72,9 @@ def test_named_lifts_merge_onto_a_single_station(client: TestClient, db_session:
 
 def test_each_lift_seeded_as_its_own_equipment_row(client: TestClient, db_session: Session) -> None:
     # Named lifts from the feed each become their own Equipment row.
-    # Synthesised fallbacks (street → platform) are excluded from this count.
+    # Synthesised fallbacks (street ↔ platform) are excluded from this count.
     all_equipment = client.get("/equipment").json()
     lifts = [e for e in all_equipment if e["equipment_type"]["name"] == "lift"]
-    feed_lifts = [e for e in lifts if "street → " not in e["connection"].lower()]
+    feed_lifts = [e for e in lifts if "street ↔ " not in e["connection"].lower()]
     assert len(feed_lifts) == 569
     assert len(lifts) >= 569
