@@ -105,9 +105,12 @@ export function JourneyPlannerSheet({
   const styles = useMemo(
     () =>
       StyleSheet.create({
-        content: {
+        searchPanel: {
           paddingHorizontal: Spacing.lg,
           paddingTop: Spacing.md,
+          paddingBottom: Spacing.sm,
+          zIndex: 20,
+          overflow: 'visible',
         },
         // Floating swap button hovering between From and To on the right side.
         swapBtn: {
@@ -405,17 +408,19 @@ export function JourneyPlannerSheet({
 
   // ── Render ────────────────────────────────────────────────────────────
 
-  // Three snaps: collapsed (title bar only), form, full results.
-  // No enablePanDownToClose — swiping down collapses to the title bar instead of closing.
-  const COLLAPSED_H = 76
+  // Three snaps: form only (min), form + results (mid), fullscreen.
+  // formH is measured at runtime so the minimum snap is exactly the search panel height —
+  // swiping down locks at the search button, not a collapsed stub.
+  const [formH, setFormH] = useState(300)
   const snapPoints = useMemo(() => {
     const h = Dimensions.get('window').height
-    return [COLLAPSED_H, h * 0.75, h - insets.top - 66]
-  }, [insets.top])
+    return [formH + insets.bottom, h * 0.75, h - insets.top]
+  }, [formH, insets.bottom, insets.top])
 
   return (
-    <BottomSheet ref={sheetRef} index={-1} snapPoints={snapPoints} onChange={handleChange}>
-      {/* Outside the scroll view so it never gets double-padded */}
+    <BottomSheet ref={sheetRef} index={-1} snapPoints={snapPoints} onChange={handleChange} topInset={insets.top}>
+      {/* Measuring wrapper: drives the minimum snap point so the form is always fully visible */}
+      <View onLayout={(e) => setFormH(e.nativeEvent.layout.height)}>
       <SheetHeader
         title="Plan a journey"
         onClose={() => {
@@ -426,13 +431,10 @@ export function JourneyPlannerSheet({
         }}
       />
 
-      <BottomSheetScrollView
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + Spacing.xl }]}
-      >
+      {/* Fixed: inputs, filters, search — never scrolls away */}
+      <View style={styles.searchPanel}>
         {/* Citymapper-style: inputs fill full width, swap button floats between them on the right */}
-        <View style={{ position: 'relative', zIndex: 20 }}>
+        <View style={{ position: 'relative', zIndex: 20, overflow: 'visible' }}>
           <View
             onLayout={(e) => setFromH(e.nativeEvent.layout.height)}
             style={{ zIndex: 10, position: 'relative' }}
@@ -521,8 +523,19 @@ export function JourneyPlannerSheet({
             {loading ? 'Searching…' : 'Search'}
           </Text>
         </TouchableOpacity>
+      </View>
+      </View>{/* end measuring wrapper */}
 
-        {/* Results */}
+      {results.length > 0 && (
+        <View style={{ height: Borders.medium, backgroundColor: Colors.border }} />
+      )}
+
+      {/* Scrollable: results only */}
+      <BottomSheetScrollView
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ paddingHorizontal: Spacing.lg, paddingBottom: insets.bottom + Spacing.xl }}
+      >
         {results.map(({ journey, outages, tags }, i) => (
           <JourneyResultCard
             key={i}
