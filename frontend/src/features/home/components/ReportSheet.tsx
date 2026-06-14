@@ -28,6 +28,7 @@ import { EquipmentPicker } from '@/features/reporting/components/EquipmentPicker
 import { FormSection } from '@/features/reporting/components/FormSection'
 import { PhotoPicker } from '@/features/reporting/components/PhotoPicker'
 import { useTheme, Borders, Heights, Opacity, Spacing } from '@/theme'
+import { useSheetStack } from '@/components/SheetStack'
 
 type Equipment = components['schemas']['EquipmentSummary']
 type Step = 'type' | 'form' | 'success'
@@ -158,6 +159,16 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
   )
   const insets = useSafeAreaInsets()
   const sheetRef = useRef<BottomSheetRef>(null)
+  const { register, push, onClosed } = useSheetStack()
+
+  useEffect(() => {
+    return register(
+      'report',
+      () => sheetRef.current?.snapToIndex(0),
+      () => sheetRef.current?.close(),
+    )
+  }, [register])
+
   const dimmedBackdrop = useCallback(
     (props: BottomSheetBackdropProps) => (
       <BottomSheetBackdrop {...props} opacity={0.4} disappearsOnIndex={-1} appearsOnIndex={0} pressBehavior="close" />
@@ -179,6 +190,8 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
   // The in-progress journey (if any), used to surface the equipment on the rider's current route
   // first. Null when no journey is underway — the list keeps its plain alphabetical order.
   const [activeJourney, setActiveJourney] = useState<ActiveJourney | null>(null)
+  // Tracks whether we already fired onClosed early (via onAnimate) so handleChange doesn't double-fire.
+  const firedEarlyClose = useRef(false)
   const { stations } = useStations()
 
   function resetForm() {
@@ -212,7 +225,7 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
             data.some((e) => e.station.name === station && e.equipment_type.name === 'escalator'),
           )
         }
-        sheetRef.current?.snapToIndex(0)
+        push('report')
       })
       return () => {
         active = false
@@ -262,9 +275,18 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
     )
   }, [equipment, highlightedIds])
 
+  function handleAnimate(fromIndex: number, toIndex: number) {
+    // Fire early — station sheet starts opening while report is still sliding away.
+    if (toIndex === -1 && !firedEarlyClose.current) {
+      firedEarlyClose.current = true
+      if (onClosed('report')) onClose()
+    }
+  }
+
   function handleChange(index: number) {
     onHeightChange?.(index >= 0 ? (step === 'form' ? SCREEN_H - insets.top - TOP_BUTTON_RESERVE : SCREEN_H * 0.55) : 0)
-    if (index === -1) onClose()
+    if (index === -1 && !firedEarlyClose.current && onClosed('report')) onClose()
+    if (index >= 0) firedEarlyClose.current = false
   }
 
   function isTypeDisabled(type: IssueType): boolean {
@@ -383,6 +405,7 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
       enableDynamicSizing={true}
       enablePanDownToClose
       backdropComponent={dimmedBackdrop}
+      onAnimate={handleAnimate}
       onChange={handleChange}
     >
       {step === 'type' && (
