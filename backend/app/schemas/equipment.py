@@ -13,3 +13,4 @@ class EquipmentSummary(BaseModel):
     station: StationSchema
     equipment_type: EquipmentTypeSchema
     connection: str
+    display_name: str | None = None

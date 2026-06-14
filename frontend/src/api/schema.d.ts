@@ -568,6 +568,8 @@ export interface components {
             equipment_type: components["schemas"]["EquipmentTypeSchema"];
             /** Connection */
             connection: string;
+            /** Display Name */
+            display_name?: string | null;
         };
         /**
          * EquipmentTypeSchema
