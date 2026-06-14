@@ -1,47 +1,12 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
-import { Dimensions, StyleSheet, View } from 'react-native'
+import { Dimensions, StyleSheet } from 'react-native'
 import MapView, { MapMarkerProps, Marker, Polyline, PoiClickEvent, Region } from 'react-native-maps'
-import Svg, { Circle, Path, Rect } from 'react-native-svg'
+import Svg, { Circle } from 'react-native-svg'
 import { fuzzyScore } from '@/lib/fuzzy'
 import { useAppHeading, useAppLocation } from '@/lib/LocationContext'
 import stationMarkers from '@/features/map/data/stationMarkers.json'
 import { UserLocationMarker } from '@/features/map/components/UserLocationMarker'
 import type { LatLng, RouteGeometry } from '@/features/journey/lib/routeGeometry'
-
-type StationMarkerEntry = (typeof stationMarkers)[number]
-
-// Rendered from Underground.svg (viewBox 615.3×500). The bar extends beyond the circle
-// on both sides (authentic roundel look), so the rendered width is wider than height.
-// `scale` shrinks the roundel as the map zooms out so it stays a reasonable on-screen size
-// instead of swamping the map at low zoom (markers are otherwise fixed-pixel).
-const ROUNDEL_WIDTH = 55
-const ROUNDEL_HEIGHT = 45
-function StationRoundel({ scale }: { scale: number }) {
-  return (
-    <View
-      style={{
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.4,
-        shadowRadius: 4,
-        elevation: 6,
-      }}
-    >
-      <Svg width={ROUNDEL_WIDTH * scale} height={ROUNDEL_HEIGHT * scale} viewBox="0 0 615.3 500">
-        {/* White fill so the map background doesn't show through the ring centre */}
-        <Circle cx={308.15} cy={250} r={161.3} fill="white" />
-        {/* Red donut ring */}
-        <Path
-          d="m469.5 250c0 89.1-72.3 161.3-161.3 161.3-89.1 0-161.3-72.2-161.3-161.3s72.1-161.3 161.2-161.3 161.4 72.2 161.4 161.3m-161.4-250c-138.1 0-250 111.9-250 250s111.9 250 250 250 250-111.9 250-250-111.9-250-250-250"
-          fill="#e1251f"
-          fillRule="nonzero"
-        />
-        {/* Blue bar */}
-        <Rect y={199.5} width={615.3} height={101.1} fill="#000f9f" />
-      </Svg>
-    </View>
-  )
-}
 
 export type StationMapHandle = {
   recentre: () => void
@@ -147,14 +112,11 @@ function findStation(poiName: string, lat: number, lng: number): string | null {
 
 const LAT_DELTA = 0.002
 
-// Roundel sizing vs. zoom. At the focus zoom (LAT_DELTA) the roundel renders full size; zooming
-// further out shrinks it (down to ROUNDEL_MIN_SCALE) so it doesn't dominate the map, and zooming
-// in is capped at full size so it never balloons. sqrt softens the curve so it scales gradually.
-const ROUNDEL_MIN_SCALE = 0.4
-function roundelScaleForDelta(latitudeDelta: number): number {
-  const raw = Math.sqrt(LAT_DELTA / latitudeDelta)
-  return Math.min(1, Math.max(ROUNDEL_MIN_SCALE, raw))
-}
+// Upper bound on route waypoint dots (start + end + per-leg interchanges). Comfortably above any
+// realistic journey; the pool is fixed-size and always mounted (see the render) so unused slots are
+// simply hidden. A route with more waypoints than this would just drop the extras — not a concern
+// in practice.
+const WAYPOINT_POOL_SIZE = 24
 
 type Props = {
   onStationPress: (name: string) => void
@@ -174,9 +136,6 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
   const coords = useAppLocation()
   const heading = useAppHeading()
   const mapRef = useRef<MapView>(null)
-  const [focusedStation, setFocusedStation] = useState<StationMarkerEntry | null>(null)
-  // Current camera zoom (latitude span), used to keep the focused roundel a sensible on-screen size.
-  const [roundelScale, setRoundelScale] = useState(() => roundelScaleForDelta(LAT_DELTA))
 
   const animateToUser = useCallback(() => {
     if (!coords) return
@@ -193,7 +152,6 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
 
   const focusStation = useCallback((name: string) => {
     const station = stationMarkers.find((s) => s.name === name) ?? null
-    setFocusedStation(station)
     if (!station) return
     // Defer one frame so React has committed the updated mapPadding prop to the native
     // map before the animation fires. Without this, animateToRegion uses stale padding
@@ -211,7 +169,9 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
     })
   }, [])
 
-  const clearFocus = useCallback(() => setFocusedStation(null), [])
+  // Retained on the handle for the search/close flow; there is no longer a focus marker to clear,
+  // so this is a no-op. (Camera recentring on close is handled by the caller.)
+  const clearFocus = useCallback(() => {}, [])
 
   // Frame the whole route in the band left visible above the bottom sheet, centred there. We build
   // the region by hand and animate to it rather than using fitToCoordinates' edgePadding: that
@@ -293,9 +253,6 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
       initialRegion={LONDON}
       mapPadding={{ top: 0, right: 0, left: 0, bottom: bottomInset }}
       onPoiClick={handlePoiClick}
-      onRegionChangeComplete={(region) =>
-        setRoundelScale(roundelScaleForDelta(region.latitudeDelta))
-      }
       showsMyLocationButton={false}
       showsCompass={false}
     >
@@ -311,11 +268,28 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
           zIndex={1}
         />
       ))}
-      {route?.markers.map((marker, i) => (
-        <TrackedMarker key={`waypoint-${i}`} coordinate={marker.coord} anchor={{ x: 0.5, y: 0.5 }}>
-          <RouteWaypoint />
-        </TrackedMarker>
-      ))}
+      {/* Waypoint dots are drawn from a fixed pool of permanently-mounted markers. We never
+          conditionally render them per route: on the New Architecture, react-native-maps (1.20.x)
+          fails to tear down a removed custom-child marker and leaves a default red pin behind as a
+          ghost — which is what stranded a pin at the previous journey's destination when a route
+          cleared. Instead every slot stays mounted; we move it (`coordinate`) and show/hide it
+          (`opacity`) as the route changes. The dot child is always rendered so the snapshot is
+          never empty (the other way the red fallback appears), and `trackKey` re-arms the snapshot
+          window when a slot's position changes so the moved dot re-captures cleanly. */}
+      {Array.from({ length: WAYPOINT_POOL_SIZE }, (_, i) => {
+        const marker = route?.markers[i]
+        return (
+          <TrackedMarker
+            key={`waypoint-${i}`}
+            coordinate={marker?.coord ?? { latitude: LONDON.latitude, longitude: LONDON.longitude }}
+            anchor={{ x: 0.5, y: 0.5 }}
+            opacity={marker ? 1 : 0}
+            trackKey={marker ? `${marker.coord.latitude},${marker.coord.longitude}` : 'hidden'}
+          >
+            <RouteWaypoint />
+          </TrackedMarker>
+        )
+      })}
       {coords && (
         <UserLocationMarker
           latitude={coords.latitude}
@@ -323,15 +297,10 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
           heading={heading}
         />
       )}
-      {focusedStation && (
-        <TrackedMarker
-          coordinate={{ latitude: focusedStation.lat, longitude: focusedStation.lng }}
-          anchor={{ x: 0.5, y: 0.5 }}
-          trackKey={roundelScale}
-        >
-          <StationRoundel scale={roundelScale} />
-        </TrackedMarker>
-      )}
+      {/* No focused-station marker: on the New Architecture, react-native-maps (1.20.x) leaves a
+          ghost default red pin behind when a custom-child marker is removed/moved, and no amount of
+          tracksViewChanges juggling reliably prevents it. The search/focus flow just animates the
+          camera to the station instead — the named POI label on the basemap already identifies it. */}
     </MapView>
   )
 })
