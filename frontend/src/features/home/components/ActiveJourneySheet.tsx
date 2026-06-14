@@ -42,6 +42,7 @@ import {
   type RouteTag,
   type TaggedJourney,
 } from '@/features/journey/api/tfl'
+import { tflQuery } from '@/features/journey/api/geocode'
 import type { RerouteState } from '@/features/journey/components/RerouteAlert'
 import { JourneyResultCard } from '@/features/journey/components/JourneyResultCard'
 import {
@@ -311,23 +312,37 @@ export function ActiveJourneySheet({
     [outageAssessments, futureStationNames],
   )
 
-  // Destination for the reroute planner: prefer the stored postcode, fall back to the
-  // last leg's arrival coordinates (TfL accepts both formats).
+  // The reroute destination must always be the *original* journey's endpoint — derived from
+  // `params.journey`, never `currentJourney` — so it doesn't drift to an intermediate stop after
+  // the rider selects an alternative route.
+  const originalLegs = useMemo(() => params?.journey?.legs ?? [], [params?.journey])
+
+  // Sync "is a destination known?" gate for the reroute alert. Prefer the stored postcode, fall
+  // back to the original journey's final arrival coordinates (TfL accepts both formats). The exact
+  // query string sent to TfL is resolved in `resolveRerouteDestination`, which prefers the
+  // station id.
   const rerouteToLocation = useMemo(() => {
     if (params?.to?.postcode) return params.to.postcode
-    const lastLeg = legs[legs.length - 1]
-    const arr = lastLeg?.arrivalPoint
+    const arr = originalLegs[originalLegs.length - 1]?.arrivalPoint
     return arr?.lat != null && arr?.lon != null ? `${arr.lat},${arr.lon}` : null
-  }, [params, legs])
+  }, [params?.to, originalLegs])
 
   // Destination coordinates as a lat/lon pair — needed to synthesise walking legs in
   // `planAlternativesAlongLine`. Taken from the original journey's final arrival point, which
   // TfL always populates for transit legs.
   const rerouteDestCoords = useMemo(() => {
-    const lastLeg = legs[legs.length - 1]
-    const arr = lastLeg?.arrivalPoint
+    const arr = originalLegs[originalLegs.length - 1]?.arrivalPoint
     return arr?.lat != null && arr?.lon != null ? { lat: arr.lat, lon: arr.lon } : null
-  }, [legs])
+  }, [originalLegs])
+
+  // Resolve the reroute destination exactly the way the original journey did: prefer the station
+  // id (`tflQuery` resolves NaPTAN hub codes such as Heathrow's `HUBH13` to a real StopPoint) so
+  // the route ends *at* the station rather than a nearby postcode. Falls back to the postcode, then
+  // to the original journey's final arrival coordinates.
+  const resolveRerouteDestination = useCallback(async (): Promise<string | null> => {
+    if (params?.to) return tflQuery(params.to)
+    return rerouteToLocation
+  }, [params?.to, rerouteToLocation])
 
   const showRerouteAlert = useMemo(
     () => upcomingBlockedAssessments.length > 0 && rerouteToLocation != null,
@@ -453,23 +468,20 @@ export function ActiveJourneySheet({
     setRerouteState({ phase: 'loading' })
 
     const activeLegs = (currentJourney ?? params.journey).legs
-    const dep = activeLegs[legIndex]?.departurePoint
-    // Always reroute from the current leg's departure point (where the user is now),
-    // never from the original starting point.
-    const fromLocation = dep?.lat != null && dep?.lon != null ? `${dep.lat},${dep.lon}` : null
-    const toLocation = rerouteToLocation
+    // Reroute from the rider's real GPS position; fall back to the current leg's departure point
+    // (where they boarded this leg) when location is unavailable — never the original start.
+    const currentDep = activeLegs[legIndex]?.departurePoint
+    const originCoords =
+      userCoords != null
+        ? { lat: userCoords.latitude, lon: userCoords.longitude }
+        : currentDep?.lat != null && currentDep?.lon != null
+          ? { lat: currentDep.lat, lon: currentDep.lon }
+          : null
+    const fromLocation = originCoords ? `${originCoords.lat},${originCoords.lon}` : null
+    const toLocation = await resolveRerouteDestination()
 
     if (!fromLocation || !toLocation) {
       setLoadingSource(null)
-      setRerouteState({ phase: 'none-found' })
-      return
-    }
-
-    const result = await planJourneyOptions(fromLocation, toLocation, params.level, null, true)
-
-    setLoadingSource(null)
-
-    if (result.kind !== 'journeys') {
       setRerouteState({ phase: 'none-found' })
       return
     }
@@ -480,12 +492,36 @@ export function ActiveJourneySheet({
       units: [],
       totalByType: {},
     }))
-
     const baseSig = routeSignature(currentJourney ?? params.journey)
-    const alternatives = result.journeys.filter(
-      ({ journey }) =>
-        routeSignature(journey) !== baseSig && matchOutages(journey, blockedAsOutages).length === 0,
-    )
+    const keepAvoiding = (journeys: TaggedJourney[]) =>
+      journeys.filter(
+        ({ journey }) =>
+          routeSignature(journey) !== baseSig &&
+          matchOutages(journey, blockedAsOutages).length === 0,
+      )
+
+    const result = await planJourneyOptions(fromLocation, toLocation, params.level, null, true)
+    let alternatives = result.kind === 'journeys' ? keepAvoiding(result.journeys) : []
+
+    // A plain point-to-point replan often returns only near-identical routes (TfL doesn't know to
+    // avoid the blocked station), leaving nothing after filtering. Fall back to the richer
+    // along-line strategies (substitute step-free stations + walking) before giving up.
+    if (alternatives.length === 0) {
+      const blockedNames = upcomingBlockedAssessments.map((a) => a.stationName)
+      const fallback = await planAlternativesAlongLine(
+        activeLegs,
+        legIndex,
+        toLocation,
+        params.level ?? null,
+        blockedNames,
+        stations,
+        originCoords,
+        rerouteDestCoords,
+      )
+      if (fallback.kind === 'journeys') alternatives = keepAvoiding(fallback.journeys)
+    }
+
+    setLoadingSource(null)
 
     if (alternatives.length > 0) {
       alternativesCacheRef.current = { alternatives, fetchedAt: Date.now() }
@@ -504,14 +540,15 @@ export function ActiveJourneySheet({
     }
 
     setAlongLineHint(false)
-    const toLocation = rerouteToLocation
+    setLoadingSource('along-line')
+    setRerouteState({ phase: 'loading' })
+
+    const toLocation = await resolveRerouteDestination()
     if (!toLocation) {
+      setLoadingSource(null)
       setRerouteState({ phase: 'none-found' })
       return
     }
-
-    setLoadingSource('along-line')
-    setRerouteState({ phase: 'loading' })
 
     const activeLegs = (currentJourney ?? params.journey).legs
     const blockedNames = upcomingBlockedAssessments.map((a) => a.stationName)
