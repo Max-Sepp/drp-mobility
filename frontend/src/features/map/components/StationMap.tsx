@@ -304,10 +304,10 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
           key={`leg-${i}`}
           coordinates={leg.coords}
           strokeColor={leg.color}
-          strokeWidth={leg.isWalking ? 4 : 6}
+          strokeWidth={leg.isWalking ? 3 : 6}
           lineCap="round"
           lineJoin="round"
-          lineDashPattern={leg.isWalking ? [4, 8] : undefined}
+          lineDashPattern={leg.isWalking ? [2, 5] : undefined}
           zIndex={1}
         />
       ))}
