@@ -262,12 +262,21 @@ export async function planJourneyOptions(
   return { kind: 'journeys', journeys: tagged }
 }
 
+/** A step-free walking link from one platform to another at the same station. */
+type PlatformInterchange = { to: string; distance_m: number }
+
 /** Minimal shape of a station used by the rerouting helpers. Satisfied by `StationDetail`. */
 export type StationLookup = {
   name: string
   latitude?: number | null
   longitude?: number | null
-  platforms: { step_free: string; lines: string[] }[]
+  platforms: {
+    name?: string
+    step_free: string
+    lines: string[]
+    direction?: string | null
+    interchange_to?: PlatformInterchange[] | null
+  }[]
 }
 
 type LatLon = { lat: number; lon: number }
@@ -551,5 +560,317 @@ export async function planAlternativesAlongLine(
     return { journey, tags }
   })
 
+  return { kind: 'journeys', journeys: tagged }
+}
+
+// ── "Stuck on the platform" rerouting ──────────────────────────────────────────────────────────
+//
+// When a rider has ridden into a station and is stranded on the platform (the lift/escalator they
+// need to exit or interchange is out), the help they need is a route that STARTS from that
+// platform: typically stay on / re-board and ride to the nearest step-free station, then continue
+// by another mode. `planRouteFromPlatform` reasons about which platforms the rider can actually
+// reach step-free (their own, plus the opposite direction / other lines reachable via a step-free
+// platform interchange), rides each line to the nearest step-free station, and plans onward from
+// there to the real destination.
+
+/** Loose station-name match (same containment rule as `findStationByName`). */
+function sameStationName(a: string, b: string): boolean {
+  const x = normaliseStationName(a)
+  const y = normaliseStationName(b)
+  return x === y || x.includes(y) || y.includes(x)
+}
+
+/** Two line names refer to the same line (case/spacing-insensitive). */
+function sameLineName(a: string, b: string): boolean {
+  return normaliseStationName(a) === normaliseStationName(b)
+}
+
+/**
+ * Normalise a TfL line name to its Journey-Planner line id, e.g. "Hammersmith & City" →
+ * "hammersmith-city", "Waterloo & City" → "waterloo-city", "London Overground" →
+ * "london-overground". Returns null for an empty name.
+ */
+function tflLineId(name: string | undefined): string | null {
+  if (!name) return null
+  const id = name
+    .toLowerCase()
+    .replace(/&/g, ' ')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '')
+  return id || null
+}
+
+/** The leg mode used to render a ride on a given line (for colour/icon in the result card). */
+function legModeForLine(lineName: string): string {
+  const n = normaliseStationName(lineName)
+  if (n.includes('elizabeth')) return 'elizabeth-line'
+  if (n.includes('overground') || n.includes('liberty') || n.includes('lioness') ||
+    n.includes('mildmay') || n.includes('suffragette') || n.includes('weaver') ||
+    n.includes('windrush')) return 'overground'
+  if (n === 'dlr') return 'dlr'
+  return 'tube'
+}
+
+/** Ordered station names of one branch of a line's route sequence. */
+type LineBranch = { names: string[] }
+
+/** Cache of lineId → its route-sequence branches (line topology doesn't change within a session). */
+const lineBranchCache = new Map<string, LineBranch[]>()
+
+/**
+ * Fetch a line's ordered stop sequence (one entry per branch) from TfL. Direction is irrelevant
+ * for ordering — we anchor travel direction on the rider's previous stop — so we fetch `inbound`
+ * only. Returns `[]` (cached) on any failure so callers degrade gracefully.
+ */
+async function fetchLineBranches(lineId: string): Promise<LineBranch[]> {
+  const cached = lineBranchCache.get(lineId)
+  if (cached) return cached
+  let branches: LineBranch[] = []
+  try {
+    const res = await fetch(
+      `${TFL_BASE}/Line/${encodeURIComponent(lineId)}/Route/Sequence/inbound?serviceTypes=Regular&excludeCrowding=true`,
+    )
+    if (res.ok) {
+      const body = await res.json().catch(() => null)
+      const seqs: { stopPoint?: { name?: string }[] }[] = body?.stopPointSequences ?? []
+      branches = seqs.map((s) => ({
+        names: (s.stopPoint ?? []).map((sp) => sp.name ?? '').filter((n) => n.length > 0),
+      }))
+    }
+  } catch {
+    // Leave empty; caller falls back to nearby step-free stations.
+  }
+  lineBranchCache.set(lineId, branches)
+  return branches
+}
+
+/** The first station in `names` (in order) that exists in our data and is step-free to board. */
+function firstStepFreeAlong(
+  names: string[],
+  stations: StationLookup[],
+  excludeNorm: Set<string>,
+): StationLookup | null {
+  for (const name of names) {
+    const s = findStationByName(stations, name)
+    if (!s || excludeNorm.has(normaliseStationName(s.name))) continue
+    if (hasStepFreeBoarding(s)) return s
+  }
+  return null
+}
+
+/** Rough on-train minutes between two points: straight-line km at ~40 km/h (stops included). */
+function trainMinutes(a: LatLon, b: LatLon): number {
+  return Math.max(2, Math.round((haversineKm(a, b) / 40) * 60))
+}
+
+/** A step-free station the stranded rider can ride to, and how they reach the platform for it. */
+type Escape = {
+  station: StationLookup
+  coords: LatLon
+  lineName: string
+  // The platform they must cross to (step-free) first, or null when they stay where they are.
+  viaPlatform: string | null
+}
+
+/** Prepend a synthetic ride leg (stuck station → escape station) onto an onward journey. */
+function prependRideLeg(
+  journey: Journey,
+  from: { name: string; coords: LatLon },
+  escape: Escape,
+): Journey {
+  const minutes = trainMinutes(from.coords, escape.coords)
+  const firstLeg = journey.legs[0]
+  const arriveStr = firstLeg?.departureTime ?? journey.startDateTime
+  const departStr = toLondonLocal(new Date(parseLondonLocal(arriveStr).getTime() - minutes * 60_000))
+  const summary = escape.viaPlatform
+    ? `Change to ${escape.viaPlatform} (step-free), then ride to ${escape.station.name}`
+    : `Stay on the ${escape.lineName} to ${escape.station.name}`
+  const rideLeg: Leg = {
+    duration: minutes,
+    mode: { name: legModeForLine(escape.lineName) },
+    instruction: { summary },
+    departureTime: departStr,
+    arrivalTime: arriveStr,
+    departurePoint: { lat: from.coords.lat, lon: from.coords.lon, commonName: from.name },
+    arrivalPoint: { lat: escape.coords.lat, lon: escape.coords.lon, commonName: escape.station.name },
+    routeOptions: [{ name: escape.lineName }],
+  }
+  return {
+    ...journey,
+    startDateTime: departStr,
+    duration: journey.duration + minutes,
+    legs: [rideLeg, ...journey.legs],
+  }
+}
+
+/** Does any transit leg of `journey` call at one of `blockedNorm` (normalised names)? */
+function journeyTouchesBlocked(journey: Journey, blockedNorm: Set<string>): boolean {
+  for (const leg of journey.legs) {
+    if (leg.mode.name === 'walking') continue
+    for (const point of [leg.departurePoint, leg.arrivalPoint]) {
+      const name = point?.commonName
+      if (name && [...blockedNorm].some((b) => sameStationName(name, b))) return true
+    }
+  }
+  return false
+}
+
+/**
+ * Plan routes for a rider stranded on the platform they rode in on. `currentLeg` is the leg that
+ * carried them to the blocked station — its arrival point is where they're stuck, its departure
+ * point fixes the direction of travel, and `routeOptions[0].name` is the line. Produces journeys
+ * that ride from the platform to the nearest step-free station (staying put, or after a step-free
+ * platform interchange to the opposite direction / another line), then continue to `destination`.
+ */
+export async function planRouteFromPlatform(
+  currentLeg: Leg,
+  destination: string,
+  accessibility: AccessibilityPreference | null,
+  blockedStationNames: string[],
+  stations: StationLookup[],
+): Promise<JourneyOptionsResult> {
+  const stuckName = currentLeg.arrivalPoint?.commonName
+  const stuckStation = stuckName ? findStationByName(stations, stuckName) : null
+  const stuckCoords =
+    currentLeg.arrivalPoint?.lat != null && currentLeg.arrivalPoint?.lon != null
+      ? { lat: currentLeg.arrivalPoint.lat, lon: currentLeg.arrivalPoint.lon }
+      : stuckStation
+        ? stationCoords(stuckStation)
+        : null
+  if (!stuckName || !stuckStation || !stuckCoords) {
+    return { kind: 'error', message: 'Could not work out which platform you are on.' }
+  }
+
+  const lineName = currentLeg.routeOptions?.[0]?.name ?? ''
+  const prevName = currentLeg.departurePoint?.commonName ?? null
+  const excludeNorm = new Set([normaliseStationName(stuckStation.name)])
+  const escapes: Escape[] = []
+  const pushEscape = (station: StationLookup, ln: string, viaPlatform: string | null) => {
+    const c = stationCoords(station)
+    const norm = normaliseStationName(station.name)
+    if (!c || excludeNorm.has(norm)) return
+    excludeNorm.add(norm)
+    escapes.push({ station, coords: c, lineName: ln || lineName, viaPlatform })
+  }
+
+  // Step-free platforms the rider can reach from the platform(s) serving their line.
+  const stuckPlatforms = stuckStation.platforms.filter((p) =>
+    p.lines.some((l) => sameLineName(l, lineName)),
+  )
+  const stuckDir = stuckPlatforms.find((p) => p.direction)?.direction ?? null
+  const reachableNorm = new Set(
+    stuckPlatforms.flatMap((p) => (p.interchange_to ?? []).map((ic) => normaliseStationName(ic.to))),
+  )
+  const reachablePlatforms = stuckStation.platforms.filter(
+    (p) => p.name && reachableNorm.has(normaliseStationName(p.name)),
+  )
+  const canCrossToOppositeSameLine = reachablePlatforms.some(
+    (p) => p.lines.some((l) => sameLineName(l, lineName)) && p.direction && p.direction !== stuckDir,
+  )
+  const oppositePlatformName = reachablePlatforms.find(
+    (p) => p.lines.some((l) => sameLineName(l, lineName)) && p.direction && p.direction !== stuckDir,
+  )?.name
+
+  // Strategy 1 — ride this line. Forward (stay on the platform) and, when a step-free crossing to
+  // the opposite platform exists, backward (the way they came) too.
+  const lineId = tflLineId(lineName)
+  if (lineId) {
+    const located = (await fetchLineBranches(lineId))
+      .map((branch) => ({
+        branch,
+        stuckIdx: branch.names.findIndex((n) => sameStationName(n, stuckName)),
+        prevIdx: prevName != null ? branch.names.findIndex((n) => sameStationName(n, prevName)) : -1,
+      }))
+      .filter((x) => x.stuckIdx >= 0)
+    // When the previous stop pins the direction on some branch, trust only those branches — the
+    // others would have to guess and could send the rider the wrong way along the line.
+    const prevPinned = located.some((x) => x.prevIdx >= 0)
+    for (const { branch, stuckIdx, prevIdx } of located) {
+      if (prevPinned && prevIdx < 0) continue
+      const after = branch.names.slice(stuckIdx + 1)
+      const before = branch.names.slice(0, stuckIdx).reverse()
+      // "Forward" is away from the previous stop; default to `after` when it isn't on this branch.
+      const forward = prevIdx > stuckIdx ? before : after
+      const backward = prevIdx > stuckIdx ? after : before
+      const f = firstStepFreeAlong(forward, stations, excludeNorm)
+      if (f) pushEscape(f, lineName, null)
+      if (canCrossToOppositeSameLine) {
+        const b = firstStepFreeAlong(backward, stations, excludeNorm)
+        if (b) pushEscape(b, lineName, oppositePlatformName ?? null)
+      }
+    }
+  }
+
+  // Strategy 2 — change to another line via a step-free platform interchange, then ride it to the
+  // nearest step-free station (either direction, since we can't fix direction on a new line).
+  const otherLines = new Map<string, string>() // normalised line → { platform name, raw line }
+  const otherLineInfo: { line: string; viaPlatform: string }[] = []
+  for (const p of reachablePlatforms) {
+    for (const l of p.lines) {
+      if (sameLineName(l, lineName) || otherLines.has(normaliseStationName(l))) continue
+      otherLines.set(normaliseStationName(l), l)
+      if (p.name) otherLineInfo.push({ line: l, viaPlatform: p.name })
+    }
+  }
+  for (const { line, viaPlatform } of otherLineInfo) {
+    const id = tflLineId(line)
+    if (!id) continue
+    const branches = await fetchLineBranches(id)
+    for (const branch of branches) {
+      const idx = branch.names.findIndex((n) => sameStationName(n, stuckName))
+      if (idx < 0) continue
+      for (const side of [branch.names.slice(idx + 1), branch.names.slice(0, idx).reverse()]) {
+        const s = firstStepFreeAlong(side, stations, excludeNorm)
+        if (s) pushEscape(s, line, viaPlatform)
+      }
+    }
+  }
+
+  // Fallback — couldn't read any line sequence (network/unknown line): offer the nearest step-free
+  // stations geographically, with a best-effort ride leg.
+  if (escapes.length === 0) {
+    for (const near of nearbyStepFreeStations(stuckCoords, stations, [stuckStation.name], 3).slice(0, 3)) {
+      pushEscape(near.station, lineName, null)
+    }
+  }
+
+  if (escapes.length === 0) {
+    return { kind: 'error', message: 'No step-free way off this platform was found.' }
+  }
+
+  // Plan onward from each escape station to the real destination and stitch the ride leg on front.
+  const blockedOtherNorm = new Set(
+    blockedStationNames.map(normaliseStationName).filter((n) => !sameStationName(n, stuckName)),
+  )
+  const planned = await Promise.all(
+    escapes.slice(0, 4).map(async (escape) => {
+      const result = await planJourney(escape.station.name, destination, accessibility, null, null, true)
+      if (result.kind !== 'journeys') return []
+      return result.journeys
+        .filter((j) => !journeyTouchesBlocked(j, blockedOtherNorm))
+        .map((j) => prependRideLeg(j, { name: stuckStation.name, coords: stuckCoords }, escape))
+    }),
+  )
+
+  const bySignature = new Map<string, Journey>()
+  for (const journey of planned.flat()) {
+    const key = routeSignature(journey)
+    if (!bySignature.has(key)) bySignature.set(key, journey)
+  }
+  const journeys = [...bySignature.values()]
+  if (journeys.length === 0) {
+    return { kind: 'error', message: 'No step-free way off this platform was found.' }
+  }
+
+  const minDuration = Math.min(...journeys.map((j) => j.duration))
+  const minWalking = Math.min(...journeys.map(walkingMinutes))
+  const minChanges = Math.min(...journeys.map(changeCount))
+  const tagged: TaggedJourney[] = journeys.map((journey) => {
+    const tags: RouteTag[] = []
+    if (journey.duration <= minDuration * (1 + TAG_TOLERANCE)) tags.push('fastest')
+    if (changeCount(journey) === minChanges) tags.push('fewest-changes')
+    if (walkingMinutes(journey) <= minWalking * (1 + TAG_TOLERANCE)) tags.push('least-walking')
+    return { journey, tags }
+  })
   return { kind: 'journeys', journeys: tagged }
 }

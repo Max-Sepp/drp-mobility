@@ -1,7 +1,7 @@
 import enum
 
+from sqlalchemy import JSON, ForeignKey, String, UniqueConstraint
 from sqlalchemy import Enum as SAEnum
-from sqlalchemy import ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -37,6 +37,12 @@ class Platform(Base):
         SAEnum(PlatformStepFree, native_enum=False, values_callable=lambda e: [m.value for m in e]),
         default=PlatformStepFree.NONE,
     )
+    # Compass direction of travel from this platform (e.g. "Eastbound"). Null when unknown.
+    direction: Mapped[str | None] = mapped_column(String, nullable=True)
+    # Step-free walking distances to other platforms at the same station, as stored in
+    # stations.json: a list of { "to": "<platform name>", "distanceM": <int> }. Lets the client
+    # reason about which platforms a stranded rider can reach step-free (other direction / line).
+    interchange_to: Mapped[list | None] = mapped_column(JSON, nullable=True)
 
     # A station has at most one platform of a given name.
     __table_args__ = (UniqueConstraint("station_id", "name"),)

@@ -37,6 +37,7 @@ import { useOutages } from '@/features/outages'
 import {
   planAlternativesAlongLine,
   planJourneyOptions,
+  planRouteFromPlatform,
   routeSignature,
   type Journey,
   type RouteTag,
@@ -531,10 +532,32 @@ export function ActiveJourneySheet({
     }
   }
 
-  async function handleFindAlongLine() {
+  // "Stuck on the platform?" — the rider has ridden into the blocked station and can't get off
+  // step-free. Plan routes that start by riding from this platform to the nearest step-free
+  // station (see `planRouteFromPlatform`). Anchors on the current leg (its arrival point is where
+  // they're stuck) rather than the departure point used by the other button.
+  async function handleStuckOnPlatform() {
     if (!params) return
 
-    if (currentLeg?.mode.name === 'walking') {
+    const activeLegs = (currentJourney ?? params.journey).legs
+    const blockedNames = upcomingBlockedAssessments.map((a) => a.stationName)
+    // The rider is stranded on the platform they rode *into* the blocked station on. Anchor on the
+    // transit leg (from here onward) that arrives at the nearest blocked station — its arrival
+    // point is that platform, its departure point fixes the direction, its routeOptions give the
+    // line. This is more robust than the current leg, whose arrival drifts past the block once GPS
+    // auto-advance fires on arrival.
+    const stuckLeg = activeLegs
+      .slice(legIndex)
+      .find(
+        (leg) =>
+          leg.mode.name !== 'walking' &&
+          leg.arrivalPoint?.commonName != null &&
+          blockedNames.includes(resolveStation(leg.arrivalPoint.commonName) ?? ''),
+      )
+    // Fall back to the current leg when we can't pin a blocked arrival; if that's a walk, there's
+    // no platform to be stuck on.
+    const anchorLeg = stuckLeg ?? (currentLeg?.mode.name !== 'walking' ? currentLeg : undefined)
+    if (!anchorLeg) {
       setAlongLineHint(true)
       return
     }
@@ -550,47 +573,24 @@ export function ActiveJourneySheet({
       return
     }
 
-    const activeLegs = (currentJourney ?? params.journey).legs
-    const blockedNames = upcomingBlockedAssessments.map((a) => a.stationName)
-    // Fall back to the current leg's departure point if GPS isn't available — that's where the
-    // rider effectively is when they boarded this leg.
-    const currentDep = activeLegs[legIndex]?.departurePoint
-    const originCoords =
-      userCoords != null
-        ? { lat: userCoords.latitude, lon: userCoords.longitude }
-        : currentDep?.lat != null && currentDep?.lon != null
-          ? { lat: currentDep.lat, lon: currentDep.lon }
-          : null
-    const result = await planAlternativesAlongLine(
-      activeLegs,
-      legIndex,
+    const result = await planRouteFromPlatform(
+      anchorLeg,
       toLocation,
       params.level ?? null,
       blockedNames,
       stations,
-      originCoords,
-      rerouteDestCoords,
     )
 
     setLoadingSource(null)
 
-    if (result.kind !== 'journeys') {
-      setRerouteState({ phase: 'none-found' })
-      return
-    }
-
+    // Don't filter on `matchOutages` here: every result legitimately starts at the blocked station
+    // (that's where the rider is stuck). `planRouteFromPlatform` already drops routes that touch
+    // *other* blocked stations. Just exclude the current route.
     const baseSig = routeSignature(currentJourney ?? params.journey)
-    const blockedAsOutages: StationOutage[] = upcomingBlockedAssessments.map((a) => ({
-      stationName: a.stationName,
-      equipmentTypes: [],
-      units: [],
-      totalByType: {},
-    }))
-    const alternatives = result.journeys.filter(
-      ({ journey }) =>
-        routeSignature(journey) !== baseSig &&
-        matchOutages(journey, blockedAsOutages).length === 0,
-    )
+    const alternatives =
+      result.kind === 'journeys'
+        ? result.journeys.filter(({ journey }) => routeSignature(journey) !== baseSig)
+        : []
 
     if (alternatives.length > 0) {
       setRerouteState({ phase: 'found', alternatives })
@@ -1436,10 +1436,10 @@ export function ActiveJourneySheet({
                       opacity: anyBusy ? Opacity.disabledMid : 1,
                     },
                   ]}
-                  onPress={anyBusy ? undefined : handleFindAlongLine}
+                  onPress={anyBusy ? undefined : handleStuckOnPlatform}
                   activeOpacity={0.8}
                   accessibilityRole="button"
-                  accessibilityLabel="Find step-free stops along this line"
+                  accessibilityLabel="Stuck on the platform — get a route from the platform"
                 >
                   {busyAlongLine ? (
                     <Spinner size="small" color={Colors.text} />
@@ -1448,11 +1448,11 @@ export function ActiveJourneySheet({
                   )}
                   <YStack flex={1}>
                     <Text fontSize={14} fontWeight="700" color={Colors.text}>
-                      {busyAlongLine ? 'Searching…' : 'Along this line'}
+                      {busyAlongLine ? 'Searching…' : 'Stuck on the platform?'}
                     </Text>
                     {!busyAlongLine && (
                       <Text fontSize={12} color={Colors.secondaryText}>
-                        Find step-free stops you can reach from here
+                        Get a route from the platform
                       </Text>
                     )}
                   </YStack>
@@ -1468,7 +1468,7 @@ export function ActiveJourneySheet({
                   >
                     <MaterialIcons name="info-outline" size={14} color={Colors.secondaryText} />
                     <Text fontSize={12} color={Colors.secondaryText} flex={1}>
-                      {"You're on a walking leg — continue on to your current train or bus leg to reroute along it."}
+                      {"You're on a walking leg — this option works once you're on a train or bus and stuck on a platform."}
                     </Text>
                   </XStack>
                 )}
