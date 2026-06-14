@@ -398,7 +398,6 @@ export function JourneyDetailSheet({
   useEffect(() => {
     if (!params) return
     let active = true
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLiveOutages(null)
     fetchStationOutages().then((all) => {
       if (active) setLiveOutages(matchOutages(params.journey, all))
@@ -416,7 +415,6 @@ export function JourneyDetailSheet({
       return
     }
     sheetRef.current?.snapToIndex(0)
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setStartBusy(false)
     setSaveBusy(false)
 

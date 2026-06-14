@@ -120,14 +120,12 @@ export function SetPlaceModal({ visible, placeKey, onSave, onDismiss }: Props) {
 
   useEffect(() => {
     if (!visible) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setQuery('')
     }
   }, [visible])
 
   useEffect(() => {
     if (query.length < 3) return
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSearching(true)
     const timer = setTimeout(async () => {
       const results = await searchLocations(query)

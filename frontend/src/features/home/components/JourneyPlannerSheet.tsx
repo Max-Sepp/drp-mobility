@@ -235,7 +235,6 @@ export function JourneyPlannerSheet({
   useEffect(() => {
     if (plan) {
       closedByButton.current = false
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFrom(plan.initialFrom?.label ?? '')
       setTo(plan.initialTo?.label ?? '')
       setFromPostcode(plan.initialFrom?.postcode ?? null)

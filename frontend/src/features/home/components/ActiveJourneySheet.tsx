@@ -200,7 +200,6 @@ export function ActiveJourneySheet({
       return
     }
     sheetRef.current?.snapToIndex(0)
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSnapIndex(0)
     setLegIndex(0)
     setGpsActive(false)
@@ -342,7 +341,6 @@ export function ActiveJourneySheet({
   // Three snaps: compact (handle + summary row + optional banner + footer), half-screen, near-full.
   // Banner height is only added when an accessibility alert is active, so snap 0 grows dynamically.
   // Footer = paddingTop 8 + button 48 + border 1 + paddingBottom 8 + insets.bottom = 65 + insets.bottom.
-  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const snapPoints = useMemo(
     () => [
       24 + 58 + (showRerouteAlert ? REROUTE_BANNER_H : 0) + 65 + insets.bottom,
@@ -381,7 +379,6 @@ export function ActiveJourneySheet({
     if (!showRerouteAlert) {
       dismissAll()
       alternativesCacheRef.current = null
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setRerouteState({ phase: 'idle' })
     }
   }, [showRerouteAlert, dismissAll])

@@ -209,7 +209,6 @@ export function AddCustomPlaceModal({ visible, existingNames = [], onSave, onDis
 
   useEffect(() => {
     if (!visible) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setName('')
       setIcon('star')
       setQuery('')
@@ -219,7 +218,6 @@ export function AddCustomPlaceModal({ visible, existingNames = [], onSave, onDis
 
   useEffect(() => {
     if (query.length < 3) return
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSearching(true)
     const timer = setTimeout(async () => {
       const results = await searchLocations(query)
