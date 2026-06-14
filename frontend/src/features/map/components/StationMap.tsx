@@ -1,5 +1,5 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
-import { Dimensions, StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native'
 import MapView, { MapMarkerProps, Marker, Polyline, PoiClickEvent, Region } from 'react-native-maps'
 import Svg, { Circle } from 'react-native-svg'
 import { fuzzyScore } from '@/lib/fuzzy'
@@ -173,42 +173,36 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
   // so this is a no-op. (Camera recentring on close is handled by the caller.)
   const clearFocus = useCallback(() => {}, [])
 
-  // Frame the whole route in the band left visible above the bottom sheet, centred there. We build
-  // the region by hand and animate to it rather than using fitToCoordinates' edgePadding: that
-  // padding *compounds* with the map's own mapPadding (which already reserves the sheet's height),
-  // so the inset gets counted twice and an oversized total makes the map zoom right out (you end up
-  // seeing half of Europe). Here the latitude span is inflated only by the visible fraction so the
-  // route clears the sheet, and that fraction is clamped so a large/stale inset can never explode
-  // the zoom. mapPadding shifts the centre up into the visible band, as it does for the other
-  // animateToRegion calls.
-  const fitToRoute = useCallback(
-    (coords: LatLng[]) => {
-      if (coords.length === 0) return
-      let minLat = Infinity
-      let maxLat = -Infinity
-      let minLng = Infinity
-      let maxLng = -Infinity
-      for (const c of coords) {
-        if (c.latitude < minLat) minLat = c.latitude
-        if (c.latitude > maxLat) maxLat = c.latitude
-        if (c.longitude < minLng) minLng = c.longitude
-        if (c.longitude > maxLng) maxLng = c.longitude
-      }
-      const screenH = Dimensions.get('window').height
-      const visibleFraction = Math.min(1, Math.max(0.35, (screenH - bottomInset) / screenH))
-      const MARGIN = 1.3
-      mapRef.current?.animateToRegion(
-        {
-          latitude: (minLat + maxLat) / 2,
-          longitude: (minLng + maxLng) / 2,
-          latitudeDelta: Math.max(((maxLat - minLat) * MARGIN) / visibleFraction, 0.01),
-          longitudeDelta: Math.max((maxLng - minLng) * MARGIN, 0.01),
-        },
-        600,
-      )
-    },
-    [bottomInset],
-  )
+  // Frame the whole route, centred in the band left visible above the bottom sheet. The map's own
+  // mapPadding already reserves the sheet's height, so animateToRegion fits the region into the
+  // visible band and centres it there — we must NOT also scale the span by the visible fraction, as
+  // an earlier version did: that double-counts the inset and zooms the trip out to a tiny dot. We
+  // ask for a span 1.2x the route's bounding box on each axis, so the route fills the frame with a
+  // little breathing room; the map fits whichever axis is tighter and centres the other. A small
+  // floor keeps a one-stop hop from zooming in absurdly far.
+  const fitToRoute = useCallback((coords: LatLng[]) => {
+    if (coords.length === 0) return
+    let minLat = Infinity
+    let maxLat = -Infinity
+    let minLng = Infinity
+    let maxLng = -Infinity
+    for (const c of coords) {
+      if (c.latitude < minLat) minLat = c.latitude
+      if (c.latitude > maxLat) maxLat = c.latitude
+      if (c.longitude < minLng) minLng = c.longitude
+      if (c.longitude > maxLng) maxLng = c.longitude
+    }
+    const MARGIN = 1.2
+    mapRef.current?.animateToRegion(
+      {
+        latitude: (minLat + maxLat) / 2,
+        longitude: (minLng + maxLng) / 2,
+        latitudeDelta: Math.max((maxLat - minLat) * MARGIN, 0.005),
+        longitudeDelta: Math.max((maxLng - minLng) * MARGIN, 0.005),
+      },
+      600,
+    )
+  }, [])
 
   useImperativeHandle(
     ref,
