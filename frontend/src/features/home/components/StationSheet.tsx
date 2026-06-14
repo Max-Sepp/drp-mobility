@@ -197,29 +197,31 @@ export function StationSheet({
       {(stationDetail?.step_free || hasIssues) && (
         <XStack gap="$2" flexWrap="wrap" px="$4" pb="$2">
           {stationDetail?.step_free && <StepFreeBadge value={stationDetail.step_free} />}
-          <XStack
-            items="center"
-            gap="$1.5"
-            px="$2"
-            py="$1"
-            style={{
-              backgroundColor: issueSeverity === 'warning' ? Colors.warningBg : Colors.dangerBg,
-              borderRadius: 6,
-            }}
-          >
-            <MaterialIcons
-              name="warning"
-              size={16}
-              color={issueSeverity === 'warning' ? Colors.warningDark : Colors.dangerDark}
-            />
-            <Text
-              fontSize={13}
-              fontWeight="600"
-              color={issueSeverity === 'warning' ? Colors.warningDark : Colors.dangerDark}
+          {hasIssues && (
+            <XStack
+              items="center"
+              gap="$1.5"
+              px="$2"
+              py="$1"
+              style={{
+                backgroundColor: issueSeverity === 'warning' ? Colors.warningBg : Colors.dangerBg,
+                borderRadius: 6,
+              }}
             >
-              Known issues
-            </Text>
-          </XStack>
+              <MaterialIcons
+                name="warning"
+                size={16}
+                color={issueSeverity === 'warning' ? Colors.warningDark : Colors.dangerDark}
+              />
+              <Text
+                fontSize={13}
+                fontWeight="600"
+                color={issueSeverity === 'warning' ? Colors.warningDark : Colors.dangerDark}
+              >
+                Known issues
+              </Text>
+            </XStack>
+          )}
         </XStack>
       )}
 
