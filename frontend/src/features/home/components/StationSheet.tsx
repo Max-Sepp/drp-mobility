@@ -117,7 +117,6 @@ export function StationSheet({
       programmaticClose.current = true
       sheetRef.current?.close()
     }
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setGoingHere(false)
   }, [station])
 

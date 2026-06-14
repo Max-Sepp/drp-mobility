@@ -43,7 +43,6 @@ export function useStationAlerts(stationId: number | undefined): {
 
   useEffect(() => {
     if (stationId == null) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setAlerts([])
       return
     }

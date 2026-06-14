@@ -75,7 +75,6 @@ export const EquipmentPicker = ({
 
   // Reset the filter when the picker switches between lift and escalator (or stations).
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setActiveDir(null)
   }, [label])
 

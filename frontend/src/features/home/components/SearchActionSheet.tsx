@@ -588,7 +588,6 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
 
     useEffect(() => {
       if (query.length < 3) return
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSearching(true)
       const timer = setTimeout(async () => {
         const matched = stations

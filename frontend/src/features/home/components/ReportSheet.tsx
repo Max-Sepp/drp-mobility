@@ -204,7 +204,6 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
 
   useEffect(() => {
     if (station) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       resetForm()
       setStep('type')
       // Equipment availability comes from the cached list (see hasLifts/hasEscalators), so the
@@ -220,7 +219,6 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
   useEffect(() => {
     if ((issueType === 'overcrowding' || issueType === 'custom') && equipmentId == null) {
       const equip = stationEquipment.find((e) => e.equipment_type.name === issueType)
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (equip) setEquipmentId(equip.id)
     }
   }, [issueType, equipmentId, stationEquipment])
