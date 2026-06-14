@@ -46,7 +46,6 @@ export function NoteModal({
   // Clear the field whenever the dialog is dismissed so the next open starts empty.
   useEffect(() => {
     if (!visible) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setNote('')
     }
   }, [visible])

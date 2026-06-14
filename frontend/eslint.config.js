@@ -12,12 +12,4 @@ module.exports = defineConfig([
     // schema.d.ts is generated (npm run generate:api); everything else is build output.
     ignores: ['dist/*', '.expo/*', '.tamagui/*', 'src/api/schema.d.ts'],
   },
-  {
-    rules: {
-      // New React-compiler-era rule that flags legitimate data-fetch and debounce
-      // effects in this codebase. Keep it visible as a warning rather than blocking
-      // CI; revisit the flagged effects rather than blanket-disabling.
-      'react-hooks/set-state-in-effect': 'warn',
-    },
-  },
 ])
