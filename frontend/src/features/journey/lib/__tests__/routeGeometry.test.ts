@@ -193,7 +193,7 @@ describe('journeyToRouteGeometry', () => {
     expect(journeyToRouteGeometry(j, COLORS).legs).toHaveLength(2)
   })
 
-  it('marks start, end, and interchanges from transit-leg endpoints', () => {
+  it('marks the route start/end (incl. a leading walk) and transit-leg interchanges', () => {
     const j = journey([
       leg({
         mode: { name: 'walking' },
@@ -229,7 +229,9 @@ describe('journeyToRouteGeometry', () => {
     ])
     const geo = journeyToRouteGeometry(j, COLORS)
     expect(geo.markers).toEqual([
-      { coord: { latitude: 51.5, longitude: -0.1 }, kind: 'start' },
+      // Start now sits at the leading walk's origin, not the first transit board.
+      { coord: { latitude: 51.49, longitude: -0.1 }, kind: 'start' },
+      { coord: { latitude: 51.5, longitude: -0.1 }, kind: 'interchange' },
       { coord: { latitude: 51.53, longitude: -0.12 }, kind: 'interchange' },
       { coord: { latitude: 51.55, longitude: -0.14 }, kind: 'end' },
     ])
@@ -277,6 +279,39 @@ describe('journeyToRouteGeometry', () => {
       { coord: { latitude: 51.53, longitude: -0.12 }, kind: 'interchange' },
       { coord: { latitude: 51.531, longitude: -0.121 }, kind: 'interchange' },
       { coord: { latitude: 51.55, longitude: -0.14 }, kind: 'end' },
+    ])
+  })
+
+  it('marks the destination at the end of a trailing walking leg', () => {
+    // The common case: alight the last train, then walk to the destination. The end circle must
+    // sit at the walk's end (the destination), not the last transit alight.
+    const j = journey([
+      leg({
+        mode: { name: 'victoria' },
+        departurePoint: { lat: 51.5, lon: -0.1 },
+        arrivalPoint: { lat: 51.53, lon: -0.12 },
+        path: {
+          lineString: JSON.stringify([
+            [51.5, -0.1],
+            [51.53, -0.12],
+          ]),
+        },
+      }),
+      leg({
+        mode: { name: 'walking' },
+        path: {
+          lineString: JSON.stringify([
+            [51.53, -0.12],
+            [51.54, -0.13],
+          ]),
+        },
+      }),
+    ])
+    const geo = journeyToRouteGeometry(j, COLORS)
+    expect(geo.markers).toEqual([
+      { coord: { latitude: 51.5, longitude: -0.1 }, kind: 'start' },
+      { coord: { latitude: 51.53, longitude: -0.12 }, kind: 'interchange' },
+      { coord: { latitude: 51.54, longitude: -0.13 }, kind: 'end' },
     ])
   })
 })
