@@ -155,6 +155,7 @@ export function JourneyPlannerSheet({
   const [fromTflId, setFromTflId] = useState<string | undefined>(undefined)
   const [toTflId, setToTflId] = useState<string | undefined>(undefined)
   const [fromIsCurrentLocation, setFromIsCurrentLocation] = useState(false)
+  const [toIsCurrentLocation, setToIsCurrentLocation] = useState(false)
   const [toIsNamedPlace, setToIsNamedPlace] = useState(false)
   const [gettingLocation, setGettingLocation] = useState(false)
   const [level, setLevel] = useState<AccessibilityPreference | null>(defaultLevel)
@@ -208,27 +209,45 @@ export function JourneyPlannerSheet({
 
   // ── Current-location helper ────────────────────────────────────────────
 
-  const handleCurrentLocation = useCallback(async () => {
+  const resolveCurrentLocation = useCallback(async () => {
     const coord =
       hasShiftCoords && shiftDetail
         ? `${shiftDetail.latitude},${shiftDetail.longitude}`
         : cachedCoords
           ? `${cachedCoords.latitude},${cachedCoords.longitude}`
           : null
-    if (!coord) return
-    setGettingLocation(true)
+    if (!coord) return null
     try {
       const result = await resolveToPostcode(coord)
-      if ('error' in result) return
-      setFrom(shiftDetail ? `On shift: ${shiftDetail.name}` : 'Current location')
-      setFromPostcode(result.postcode)
-      setFromIsCurrentLocation(true)
+      if ('error' in result) return null
+      return { postcode: result.postcode, label: shiftDetail ? `On shift: ${shiftDetail.name}` : 'Current location' }
     } catch (err) {
       if (isOfflineError(err)) alertOffline('use your current location')
-    } finally {
-      setGettingLocation(false)
+      return null
     }
   }, [cachedCoords, hasShiftCoords, shiftDetail])
+
+  const handleCurrentLocation = useCallback(async () => {
+    setGettingLocation(true)
+    const loc = await resolveCurrentLocation()
+    if (loc) {
+      setFrom(loc.label)
+      setFromPostcode(loc.postcode)
+      setFromIsCurrentLocation(true)
+    }
+    setGettingLocation(false)
+  }, [resolveCurrentLocation])
+
+  const handleCurrentLocationTo = useCallback(async () => {
+    setGettingLocation(true)
+    const loc = await resolveCurrentLocation()
+    if (loc) {
+      setTo(loc.label)
+      setToPostcode(loc.postcode)
+      setToIsCurrentLocation(true)
+    }
+    setGettingLocation(false)
+  }, [resolveCurrentLocation])
 
   // ── Open/close driven by plan prop ────────────────────────────────────
 
@@ -243,6 +262,7 @@ export function JourneyPlannerSheet({
       setFromTflId(plan.initialFrom?.tflId)
       setToTflId(plan.initialTo?.tflId)
       setFromIsCurrentLocation(plan.initialFrom?.label === 'Current location')
+      setToIsCurrentLocation(false)
       setToIsNamedPlace(Boolean(plan.initialTo?.isNamedPlace))
       setLevel(defaultLevel)
       setTimeConstraint(null)
@@ -296,13 +316,15 @@ export function JourneyPlannerSheet({
     const tempText = from
     const tempPostcode = fromPostcode
     const tempTflId = fromTflId
+    const tempIsCurrentLocation = fromIsCurrentLocation
     setFrom(to)
     setFromPostcode(toPostcode)
     setFromTflId(toTflId)
-    setFromIsCurrentLocation(false)
+    setFromIsCurrentLocation(toIsCurrentLocation)
     setTo(tempText)
     setToPostcode(tempPostcode)
     setToTflId(tempTflId)
+    setToIsCurrentLocation(tempIsCurrentLocation)
     setToIsNamedPlace(false)
   }
 
@@ -427,6 +449,7 @@ export function JourneyPlannerSheet({
               isResolved={fromPostcode !== null}
               textColor={fromIsCurrentLocation ? Colors.blue : undefined}
               textBold={fromIsCurrentLocation}
+              readOnly={fromIsCurrentLocation}
               onCurrentLocation={hasShiftCoords || cachedCoords ? handleCurrentLocation : undefined}
               currentLocationLoading={gettingLocation}
               savedPlaceShortcuts={placeShortcuts}
@@ -441,13 +464,17 @@ export function JourneyPlannerSheet({
             value={to}
             onChangeText={(text) => {
               setTo(text)
+              setToIsCurrentLocation(false)
               setToIsNamedPlace(false)
               setToTflId(undefined)
             }}
             onResolved={setToPostcode}
             isResolved={toPostcode !== null}
-            textColor={toIsNamedPlace ? Colors.blue : undefined}
-            textBold={toIsNamedPlace}
+            textColor={toIsCurrentLocation || toIsNamedPlace ? Colors.blue : undefined}
+            textBold={toIsCurrentLocation || toIsNamedPlace}
+            readOnly={toIsCurrentLocation}
+            onCurrentLocation={hasShiftCoords || cachedCoords ? handleCurrentLocationTo : undefined}
+            currentLocationLoading={gettingLocation}
             savedPlaceShortcuts={placeShortcuts}
           />
 

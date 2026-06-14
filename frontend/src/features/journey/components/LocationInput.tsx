@@ -34,6 +34,7 @@ type LocationInputProps = {
   onCurrentLocation?: () => void
   currentLocationLoading?: boolean
   savedPlaceShortcuts?: PlaceShortcut[]
+  readOnly?: boolean
 }
 
 export const LocationInput = ({
@@ -48,6 +49,7 @@ export const LocationInput = ({
   onCurrentLocation,
   currentLocationLoading,
   savedPlaceShortcuts,
+  readOnly,
 }: LocationInputProps) => {
   const { Colors, Radii } = useTheme()
   const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([])
@@ -217,7 +219,13 @@ export const LocationInput = ({
               if (matchedSavedPlaces.length > 0) chooseSavedPlace(matchedSavedPlaces[0])
               else if (suggestions.length > 0) choose(suggestions[0])
             }}
-            selection={focused ? undefined : { start: 0, end: 0 }}
+            selection={
+              readOnly && focused
+                ? { start: 0, end: value.length }
+                : focused
+                  ? undefined
+                  : { start: 0, end: 0 }
+            }
             placeholder="Address, postcode, or lat,long"
             placeholderTextColor="$gray9"
             autoCapitalize="none"
