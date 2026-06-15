@@ -521,13 +521,14 @@ export function ActiveJourneySheet({
   }, [onArrived])
 
   // Tapping above collapses to snap 0; sheet cannot be dragged below snap 0.
+  // Backdrop only appears at snap 1+ so the map remains swipeable at snap 0.
   const collapseBackdrop = useCallback(
     (props: BottomSheetBackdropProps) => (
       <BottomSheetBackdrop
         {...props}
         opacity={0}
-        disappearsOnIndex={-1}
-        appearsOnIndex={0}
+        disappearsOnIndex={0}
+        appearsOnIndex={1}
         pressBehavior="collapse"
       />
     ),
