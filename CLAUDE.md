@@ -6,7 +6,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Imperial College Year 2 DRP (Design & Realisation Project) coursework — a student-team prototype, not a production product.
 
-The app's goal is to help mobility-impaired users travel with independence and confidence by giving them trustworthy accessibility information about transit stations and live updates on outages that affect step-free access (e.g. lifts and escalators failing). The current backend models this as user-submitted **outage reports** attached to a station's equipment; the mobile app's flow is centred on a rider quickly submitting and viewing these. Treat the accessibility-focused user (wheelchair users, mobility aids, prams) as the primary persona when weighing UX trade-offs — fast, low-friction reporting and clear, trustworthy live status matter more than feature breadth.
+The app's goal is to help mobility-impaired users travel with independence and confidence by giving them trustworthy accessibility information about TfL transit stations and live updates on outages that affect step-free access (e.g. lifts and escalators failing). The product spans:
+
+- **Outage reports** — user-submitted reports attached to a station's equipment, grouped into `Failure` incidents. Fast, low-friction reporting and clear live status are the core flow.
+- **Live TfL ingest** — the backend polls TfL's disruption feed and folds matched lift outages into the same `Failure`/report model, plus broader `StationAlert`s; live changes stream to clients over SSE.
+- **Journey planning** — the app calls TfL's Journey Planner API directly and cross-references legs against live outage data, with an accessibility (step-free) preference filter.
+- **Push notifications** — riders who save a journey through an affected station get an Expo push when an outage is first reported there.
+
+Treat the accessibility-focused user (wheelchair users, mobility aids, prams) as the primary persona when weighing UX trade-offs — fast, low-friction reporting and clear, trustworthy live status matter more than feature breadth.
+
+A full component and data-flow map lives in [`ARCHITECTURE.md`](ARCHITECTURE.md) — read it for the end-to-end picture (services, SSE broker, TfL ingest, push, journey planning).
 
 ## Repo layout
 
