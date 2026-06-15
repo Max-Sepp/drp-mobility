@@ -63,7 +63,7 @@ import { useTheme, Borders, Heights, Opacity, Spacing } from '@/theme'
 import { JOURNEY_CACHE_TTL_MS } from '@/config'
 import { useSheetStack } from '@/components/SheetStack'
 
-const ARRIVAL_RADIUS_M = 120
+const ARRIVAL_RADIUS_M = 40
 const SCREEN_H = Dimensions.get('window').height
 const SNAP_HALF = SCREEN_H * 0.52
 // Extra height added to snap 0 when the reroute banner is visible in the footer.
