@@ -883,6 +883,48 @@ def platforms_are_same_level_connected(
     return False
 
 
+def build_same_level_map(
+    station_uid: str, platforms_by_station: dict, same_level_paths: dict
+) -> dict[str, list[str]]:
+    """Map each customer-facing platform to the friendly names of other platforms at the
+    same station reachable from it *at the same level* (SameLevelPaths only — no lift or
+    ramp involved).
+
+    A stranded rider whose exit/interchange lift is out can still walk to any platform on
+    this list, so it is the reliable "what can I reach right now" set for the
+    stuck-on-platform reroute (unlike step-free interchange data, which can itself depend
+    on a lift). Platform UniqueIds are nodes in the same-level graph (e.g.
+    'HUBABW-Plat01-WB-national-rail' appears in SameLevelPaths.csv), so we BFS from each
+    platform over `same_level_paths` and keep the platform pids we reach.
+    """
+    plats = [
+        p
+        for p in platforms_by_station.get(station_uid, [])
+        if parse_bool(p.get("IsCustomerFacing", "False"))
+    ]
+    name_by_pid = {p["UniqueId"]: p["FriendlyName"].strip() for p in plats}
+    plat_pids = set(name_by_pid)
+
+    result: dict[str, list[str]] = {}
+    for pid in plat_pids:
+        reached: set[str] = set()
+        queue = [pid]
+        seen = {pid}
+        while queue:
+            node = queue.pop()
+            for nxt in same_level_paths.get(node, set()):
+                if nxt in seen:
+                    continue
+                seen.add(nxt)
+                if nxt in plat_pids:
+                    reached.add(nxt)
+                queue.append(nxt)
+        names = [name_by_pid[other] for other in reached]
+        if names:
+            result[pid] = sorted(names)
+    return result
+
+
 def synthesise_lift_units(
     station_uid: str,
     lift_count: int,
@@ -1001,6 +1043,7 @@ def build_platforms(
     services_by_platform: dict,
     reachable: set | None = None,
     interchange_dist: dict | None = None,
+    same_level_map: dict | None = None,
 ) -> list[dict]:
     result = []
     for plat in platforms_by_station.get(station_uid, []):
@@ -1067,6 +1110,13 @@ def build_platforms(
                         dists.append({"to": other["FriendlyName"].strip(), "distanceM": d})
             if dists:
                 obj["interchangeTo"] = dists
+
+        # Platforms reachable from this one at the same level (lift-independent) — the set a
+        # stranded rider can still walk to when their exit/interchange lift is out.
+        if same_level_map:
+            same_level = same_level_map.get(pid)
+            if same_level:
+                obj["sameLevelPlatforms"] = same_level
 
         result.append({k: v for k, v in obj.items() if v is not None})
 
@@ -1271,12 +1321,14 @@ def main() -> None:
             station["coordinates"] = coords
 
         reachable = reachable_from_outside(uid, step_free_graph)
+        same_level_map = build_same_level_map(uid, platforms_by_station, same_level_paths)
         enriched_plats = build_platforms(
             uid,
             platforms_by_station,
             services_by_platform,
             reachable=reachable,
             interchange_dist=interchange_dist,
+            same_level_map=same_level_map,
         )
         if enriched_plats:
             station["platforms"] = enriched_plats

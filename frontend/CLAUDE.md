@@ -63,6 +63,16 @@ is really toggling that state. New flows should be added as sheets, not stack sc
 - Sheet payload shapes (`JourneyDetailParams`, `ActiveJourneyParams`) are defined and exported from
   `JourneyDetailSheet.tsx` — the sheets, not the navigator, own these types now.
 
+## Active journey and rerouting (`ActiveJourneySheet.tsx`)
+
+`ActiveJourneySheet` is the most complex sheet in the app. It owns three snap points (compact / half / near-full), a pinned footer with Previous/Arrived controls, GPS auto-advance, and the full rerouting flow. Key facts when editing it:
+
+- **Three snap points.** Snap 0 is compact (handle + current-leg summary row + optional alert banner + footer). Snap 1 is half-screen. Snap 2 is near-full. Snap 0 grows by `REROUTE_BANNER_H` when an accessibility alert is active — this is baked into the `snapPoints` memo.
+- **Footer is pinned.** `footerComponent` renders the reroute alert banner (when active) plus the Previous/Arrived controls. It never scrolls. Don't move those controls into the scroll view.
+- **Rerouting uses two stacked sheets** registered with `SheetStack` as `reroute-issues` and `reroute-alternatives`. The banner in the footer opens `reroute-issues`; finding alternatives opens `reroute-alternatives` on top. `dismissAll()` closes both when the blocking outage resolves or is passed.
+- **Accessibility issues sheet layout.** The `reroute-issues` sheet has a fixed non-scrollable header (title + the two reroute action buttons), followed by a `BottomSheetScrollView` for the issues list. The scrollable body uses `Colors.searchBg` as its background to visually separate it from the header. The two action buttons are at the top because they are the primary interaction — the issues list is supporting context.
+- **Alternatives sheet sizing** is dynamic: it snaps to a height derived from the header + results layout measurements so it hugs its content rather than leaving dead space.
+
 ## UI components (`src/components/`)
 
 App-level building blocks shared across features: `BottomSheet` and `SheetHeader` (the `@gorhom/bottom-sheet` wrappers every sheet is built on), `SheetStack` (the `SheetStackProvider` + ordering for stacked sheets), `ScreenHeader` and `Heading` (text/header primitives), and `TflBadge` (line/mode badge). Prefer composing one of these over reaching for raw `View`/`Text`.
