@@ -113,7 +113,7 @@ export function StationSheet({
   // The index prop alone is unreliable for re-triggering gorhom after mount.
   useEffect(() => {
     if (station) {
-      push('station')  // puts it on the stack; registered open() handles snapToIndex + flag
+      push('station') // puts it on the stack; registered open() handles snapToIndex + flag
     } else {
       programmaticClose.current = true
       sheetRef.current?.close()
@@ -126,8 +126,14 @@ export function StationSheet({
   useEffect(() => {
     return register(
       'station',
-      () => { programmaticClose.current = false; sheetRef.current?.snapToIndex(1) },
-      () => { programmaticClose.current = true; sheetRef.current?.close() },
+      () => {
+        programmaticClose.current = false
+        sheetRef.current?.snapToIndex(1)
+      },
+      () => {
+        programmaticClose.current = true
+        sheetRef.current?.close()
+      },
     )
   }, [register])
 

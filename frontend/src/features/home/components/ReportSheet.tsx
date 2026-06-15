@@ -50,8 +50,18 @@ const ISSUE_TYPES: {
   label: string
   disabledLabel?: string
 }[] = [
-  { type: 'lift', icon: 'elevator', label: 'Lift\nBroken', disabledLabel: 'No lifts at\nthis station' },
-  { type: 'escalator', icon: 'escalator', label: 'Escalator\nBroken', disabledLabel: 'No escalators\nat this station' },
+  {
+    type: 'lift',
+    icon: 'elevator',
+    label: 'Lift\nBroken',
+    disabledLabel: 'No lifts at\nthis station',
+  },
+  {
+    type: 'escalator',
+    icon: 'escalator',
+    label: 'Escalator\nBroken',
+    disabledLabel: 'No escalators\nat this station',
+  },
   { type: 'overcrowding', icon: 'groups', label: 'Overcrowding' },
   { type: 'custom', icon: 'edit-note', label: 'Custom\nIssue' },
 ]
@@ -172,7 +182,13 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
 
   const dimmedBackdrop = useCallback(
     (props: BottomSheetBackdropProps) => (
-      <BottomSheetBackdrop {...props} opacity={0.4} disappearsOnIndex={-1} appearsOnIndex={0} pressBehavior="close" />
+      <BottomSheetBackdrop
+        {...props}
+        opacity={0.4}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        pressBehavior="close"
+      />
     ),
     [],
   )
@@ -299,7 +315,13 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
   }
 
   function handleChange(index: number) {
-    onHeightChange?.(index >= 0 ? (step === 'form' ? SCREEN_H - insets.top - TOP_BUTTON_RESERVE : SCREEN_H * 0.55) : 0)
+    onHeightChange?.(
+      index >= 0
+        ? step === 'form'
+          ? SCREEN_H - insets.top - TOP_BUTTON_RESERVE
+          : SCREEN_H * 0.55
+        : 0,
+    )
     if (index === -1 && !firedEarlyClose.current && onClosed('report')) onClose()
     if (index >= 0) firedEarlyClose.current = false
   }
@@ -421,7 +443,11 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
                     onPress={disabled ? undefined : () => selectType(type)}
                     activeOpacity={disabled ? 1 : 0.75}
                     accessibilityRole="button"
-                    accessibilityLabel={disabled && disabledLabel ? disabledLabel.replace('\n', ' ') : label.replace('\n', ' ')}
+                    accessibilityLabel={
+                      disabled && disabledLabel
+                        ? disabledLabel.replace('\n', ' ')
+                        : label.replace('\n', ' ')
+                    }
                     disabled={disabled}
                   >
                     <View style={{ alignItems: 'center', gap: 8, paddingHorizontal: 8 }}>

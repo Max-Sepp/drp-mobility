@@ -144,7 +144,8 @@ export const EquipmentPicker = ({
               const highlighted = highlightedIds?.has(e.id) ?? false
               // display_name holds the human description ("Lift 1: Booking Hall ↔ Eastbound
               // platforms 3 and 4"). Fall back to the structured connection body if absent.
-              const displaySource = e.display_name ?? connectionBody(e.connection, e.equipment_type.name)
+              const displaySource =
+                e.display_name ?? connectionBody(e.connection, e.equipment_type.name)
               const displayParts = displaySource
                 .split(/↔|→/)
                 .map((s) => s.trim())
@@ -156,11 +157,10 @@ export const EquipmentPicker = ({
               const equipName = namePrefix
               const displayBody = namePrefix
                 ? displayParts[0].slice(displayParts[0].indexOf(':') + 1).trim()
-                : displayParts[0] ?? ''
+                : (displayParts[0] ?? '')
               const from = displayBody
-              const to = displayParts.length > 1
-                ? (namePrefix ? displayParts[1] : displayParts[1])
-                : null
+              const to =
+                displayParts.length > 1 ? (namePrefix ? displayParts[1] : displayParts[1]) : null
               const lines = platforms ? linesForEquipment(e.connection, platforms) : []
               return (
                 <XStack
