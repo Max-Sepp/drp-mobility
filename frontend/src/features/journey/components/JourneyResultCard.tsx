@@ -77,7 +77,12 @@ export const JourneyResultCard = ({
 
         <XStack gap="$3" items="center">
           <YStack items="center" justify="center" style={{ width: 54 }}>
-            <Text fontSize={30} fontWeight="800" color={Colors.text} style={{ lineHeight: 34 }}>
+            <Text
+              fontSize={journey.duration >= 100 ? 22 : 30}
+              fontWeight="800"
+              color={Colors.text}
+              style={{ lineHeight: 34 }}
+            >
               {journey.duration}
             </Text>
             <Text fontSize={11} fontWeight="600" color={Colors.secondaryText}>
