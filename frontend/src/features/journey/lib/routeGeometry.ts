@@ -184,25 +184,23 @@ export function journeyToRouteGeometry(journey: Journey, colors: RouteColors): R
   }
 
   // A waypoint circle sits at the journey's true start and end plus every transit-leg endpoint.
-  // The start/end come from the drawn geometry's first and last points so they land at the actual
-  // ends of the route even when it begins or ends with a walking leg (e.g. a final walk from the
-  // last station to the destination) — a transit-only derivation would drop those circles.
-  // Emitting both the board AND the alight of each transit leg means that when consecutive transit
-  // legs are joined by a walking transfer (a gap between, say, two tube lines) both ends of that
-  // gap get a circle. A direct interchange — where one leg's alight and the next leg's board are
-  // the same point — collapses back to a single circle via the dedupe below; likewise the start/end
-  // collapse into a coincident transit endpoint when the journey begins/ends on a transit leg.
-  const transitLegs = journey.legs.filter((leg) => !isWalkingLeg(leg))
+  // All positions are taken from the rendered leg geometry (lineString coords) so markers land
+  // exactly on the drawn polylines — using leg.departurePoint/arrivalPoint instead would place
+  // markers at TfL metadata coordinates that can differ from where the lineString actually starts
+  // and ends. Emitting both ends of every transit leg means that when two transit legs are joined
+  // by a walking transfer both ends of that gap each get a circle. A direct interchange collapses
+  // back to a single circle via the dedupe below; likewise the start/end collapse when the journey
+  // begins or ends on a transit leg.
   const routeStart = legs[0]?.coords[0]
   const lastLeg = legs[legs.length - 1]
   const routeEnd = lastLeg?.coords[lastLeg.coords.length - 1]
   const endpoints: LatLng[] = []
   if (routeStart) endpoints.push(routeStart)
-  for (const leg of transitLegs) {
-    const board = pointCoord(leg.departurePoint)
-    const alight = pointCoord(leg.arrivalPoint)
-    if (board) endpoints.push(board)
-    if (alight) endpoints.push(alight)
+  for (const renderedLeg of legs) {
+    if (!renderedLeg.isWalking) {
+      endpoints.push(renderedLeg.coords[0])
+      endpoints.push(renderedLeg.coords[renderedLeg.coords.length - 1])
+    }
   }
   if (routeEnd) endpoints.push(routeEnd)
   // Collapse a point that coincides with the one before it (a same-station change with no walk).
