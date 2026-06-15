@@ -188,11 +188,17 @@ function PlacesRow({
                 >
                   <MaterialIcons name={icon} size={24} color={saved ? Colors.card : Colors.blue} />
                 </View>
-                <Text style={[Typography.label, { color: Colors.text, marginTop: 4, fontSize: 13 }]}>
+                <Text
+                  style={[Typography.label, { color: Colors.text, marginTop: 4, fontSize: 13 }]}
+                >
                   {label}
                 </Text>
                 {!saved && (
-                  <Text style={[Typography.label, { color: Colors.blue, marginTop: 1, fontSize: 13 }]}>Add</Text>
+                  <Text
+                    style={[Typography.label, { color: Colors.blue, marginTop: 1, fontSize: 13 }]}
+                  >
+                    Add
+                  </Text>
                 )}
               </TouchableOpacity>
             )
@@ -231,7 +237,9 @@ function PlacesRow({
             <View style={placesStyles.placesTileIcon}>
               <MaterialIcons name="add" size={24} color={Colors.blue} />
             </View>
-            <Text style={[Typography.label, { color: Colors.text, marginTop: 4, fontSize: 13 }]}>Add</Text>
+            <Text style={[Typography.label, { color: Colors.text, marginTop: 4, fontSize: 13 }]}>
+              Add
+            </Text>
           </TouchableOpacity>
         </ScrollView>
       </NativeViewGestureHandler>
@@ -281,7 +289,10 @@ function SavedRow({ item, onPress }: { item: SavedJourney; onPress: () => void }
         <Text style={[Typography.bodyBold, { color: Colors.text, fontSize: 17 }]} numberOfLines={1}>
           {from}
         </Text>
-        <Text style={[Typography.caption, { color: Colors.secondaryText, fontSize: 14 }]} numberOfLines={1}>
+        <Text
+          style={[Typography.caption, { color: Colors.secondaryText, fontSize: 14 }]}
+          numberOfLines={1}
+        >
           → {to} · {item.journey.duration} min · {time}
         </Text>
       </View>
@@ -321,7 +332,9 @@ function StationResultRow({ station, onPress }: { station: StationDetail; onPres
         <Text style={[Typography.bodyBold, { color: Colors.text, fontSize: 17 }]} numberOfLines={1}>
           {station.name}
         </Text>
-        <Text style={[Typography.caption, { color: Colors.secondaryText, fontSize: 14 }]}>Station</Text>
+        <Text style={[Typography.caption, { color: Colors.secondaryText, fontSize: 14 }]}>
+          Station
+        </Text>
       </View>
       <MaterialIcons name="chevron-right" size={20} color={Colors.tertiaryText} />
     </TouchableOpacity>
@@ -369,7 +382,10 @@ function LocationResultRow({
           {suggestion.label}
         </Text>
         {suggestion.subtitle ? (
-          <Text style={[Typography.caption, { color: Colors.secondaryText, fontSize: 14 }]} numberOfLines={1}>
+          <Text
+            style={[Typography.caption, { color: Colors.secondaryText, fontSize: 14 }]}
+            numberOfLines={1}
+          >
             {suggestion.subtitle}
           </Text>
         ) : null}
@@ -932,7 +948,11 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
                   <Text
                     style={[
                       Typography.caption,
-                      { color: Colors.secondaryText, paddingVertical: 6, paddingHorizontal: Spacing.lg },
+                      {
+                        color: Colors.secondaryText,
+                        paddingVertical: 6,
+                        paddingHorizontal: Spacing.lg,
+                      },
                     ]}
                   >
                     No saved journeys yet — plan one to save it here.
