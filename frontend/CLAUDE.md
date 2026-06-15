@@ -124,12 +124,12 @@ There is no web build. The app ships through EAS — slug `drp-mobility`, projec
 
 Import design tokens from `@/theme` — never hardcode values in components. Theming is **runtime-switchable** between multiple themes (`lightBrutalist`, `darkBrutalist`, `light`, `dark`, defined in `src/theme/themes.ts`), so tokens split into two kinds:
 
-**Theme-dependent — read with the `useTheme()` hook** (changes when the user switches theme; *not* static imports):
+**Theme-dependent — read with the `useTheme()` hook** (changes when the user switches theme; _not_ static imports):
 
-| `useTheme()` field | Contents                                                                            |
-| ------------------ | ----------------------------------------------------------------------------------- |
-| `Colors`           | Palette + semantic colours (incl. `mapGrid`)                                         |
-| `Radii`            | Border radii (`card`, `button`, `input`, `pill`, …)                                  |
+| `useTheme()` field | Contents                                                                              |
+| ------------------ | ------------------------------------------------------------------------------------- |
+| `Colors`           | Palette + semantic colours (incl. `mapGrid`)                                          |
+| `Radii`            | Border radii (`card`, `button`, `input`, `pill`, …)                                   |
 | `Shadows`          | `card`, `heavy`, `top`, `marker` — hard-offset for neo-brutalist, soft blur otherwise |
 
 `ThemeProvider` (mounted near the root of `App.tsx`) supplies these; `useThemeControls()` returns `{ themeId, setTheme }` for switching. Because colours are now per-theme, **do not** import a static `Colors`; read them via `useTheme()` inside the component so they react to theme changes.
