@@ -101,6 +101,11 @@ export function StationSheet({
       allReports.filter((r) => r.failure.equipment.station.name === station && r.source !== 'tfl'),
     [allReports, station],
   )
+  // All reports for this station (including TfL-sourced) used for platform disruption overlay.
+  const stationReports = useMemo(
+    () => allReports.filter((r) => r.failure.equipment.station.name === station),
+    [allReports, station],
+  )
   const { alerts } = useStationAlerts(stationDetail?.id)
   const badgeSeverity = useMemo(() => overallSeverity(reports), [reports])
   const hasIssues = reports.length > 0 || alerts.length > 0
@@ -260,7 +265,13 @@ export function StationSheet({
         contentContainerStyle={{ paddingBottom: insets.bottom + Spacing.xl }}
       >
         {stationDetail && <StationInfoCard station={stationDetail} />}
-        {stationDetail && <PlatformAccessCard key={station} platforms={stationDetail.platforms} />}
+        {stationDetail && (
+          <PlatformAccessCard
+            key={station}
+            platforms={stationDetail.platforms}
+            reports={stationReports}
+          />
+        )}
         <StationAlertBanner alerts={alerts} />
         <ReportsStatus loading={loading} reports={reports} />
         {stationDetail && <StationAdditionalInfoCard station={stationDetail} />}
