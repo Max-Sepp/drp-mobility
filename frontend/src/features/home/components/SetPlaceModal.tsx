@@ -159,7 +159,12 @@ export function SetPlaceModal({ visible, placeKey, onSave, onDismiss }: Props) {
       presentationStyle={Platform.OS === 'ios' ? 'pageSheet' : 'fullScreen'}
       onRequestClose={onDismiss}
     >
-      <View style={[styles.container, { paddingTop: insets.top + Spacing.lg, paddingBottom: insets.bottom + Spacing.lg }]}>
+      <View
+        style={[
+          styles.container,
+          { paddingTop: insets.top + Spacing.lg, paddingBottom: insets.bottom + Spacing.lg },
+        ]}
+      >
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>{title}</Text>
