@@ -28,6 +28,8 @@ import { useAuth } from '@/features/auth'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import type { RootStackParamList } from '@/navigation/types'
 import type { ResolvedLocation } from '@/features/journey/api/geocode'
+import type { Journey } from '@/features/journey/api/tfl'
+import type { LatLng } from '@/features/journey/lib/routeGeometry'
 import { useTheme, Spacing, Typography } from '@/theme'
 import {
   SearchActionSheet,
@@ -300,29 +302,45 @@ export function MapHomeScreen({ navigation, route }: Props) {
   const { status, user } = useAuth()
   const coords = useAppLocation()
 
-  // Camera behaviour for the route overlay. When previewing a route (detail sheet) and when the
-  // journey is first started, we frame the whole trip so the rider sees the entire route centred
-  // on screen. We only react to the journey *becoming* active (not every GPS tick), so manual
-  // panning mid-journey isn't fought.
+  // Camera behaviour for the route overlay. We frame the whole trip only when the journey *becomes*
+  // active (start or resume), not while it's merely being previewed: the detail sheet is a single
+  // near-fullscreen snap, so fitting the route while it's open would cram the trip into the thin
+  // strip of map left above it and zoom right out to all of London. Reacting only to the journey
+  // becoming active (not every GPS tick) also means manual panning mid-journey isn't fought.
   const wasActiveRef = useRef(false)
+  // The journey object last framed by the camera, so a mid-journey reroute (which swaps the journey
+  // while it's already active) re-frames to the new route rather than being treated as a GPS tick.
+  const fittedJourneyRef = useRef<Journey | null>(null)
+  // Bounds awaiting a camera fit. The actual fit runs once the sheet height (and thus the map's
+  // bottom padding) settles — see the mapBottomInset effect below — so the route is framed into the
+  // band the sheet really leaves visible, not a stale, taller inset.
+  const pendingFitRef = useRef<LatLng[] | null>(null)
   useEffect(() => {
     if (!mapRoute) {
       wasActiveRef.current = false
+      fittedJourneyRef.current = null
+      pendingFitRef.current = null
       return
     }
+    const journey = activeJourneyParams?.journey ?? null
     const justStarted = Boolean(activeJourneyParams) && !wasActiveRef.current
+    const rerouted =
+      Boolean(activeJourneyParams) && !justStarted && journey !== fittedJourneyRef.current
     wasActiveRef.current = Boolean(activeJourneyParams)
-    if (activeJourneyParams) {
-      // Defer one beat on start: the detail sheet we're leaving is still closing, so its tall
-      // reported height lingers in mapBottomInset for a frame. Fitting immediately would frame the
-      // route into the thin strip left above that stale inset and zoom right out. Waiting lets the
-      // inset settle to the compact active-journey sheet so the whole trip is framed and centred.
-      if (justStarted) {
-        const id = setTimeout(() => mapRef.current?.fitToRoute(mapRoute.bounds), 400)
-        return () => clearTimeout(id)
-      }
-    } else {
-      mapRef.current?.fitToRoute(mapRoute.bounds)
+    // On start the detail sheet we're leaving is still closing, and on a reroute the active sheet is
+    // collapsing from a taller snap (or shedding the alert banner); either way its reported height —
+    // which drives the map's bottom padding — is mid-flight. Fitting now would frame the route into
+    // the thin strip above that stale inset and zoom out too far. Queue the bounds and let the
+    // inset-settle effect fit once the height lands; the timer is a fallback for when it never moves.
+    if (justStarted || rerouted) {
+      fittedJourneyRef.current = journey
+      pendingFitRef.current = mapRoute.bounds
+      const id = setTimeout(() => {
+        if (!pendingFitRef.current) return
+        mapRef.current?.fitToRoute(pendingFitRef.current)
+        pendingFitRef.current = null
+      }, 500)
+      return () => clearTimeout(id)
     }
   }, [mapRoute, activeJourneyParams])
   const { workStation } = useWorkShift()
@@ -343,12 +361,40 @@ export function MapHomeScreen({ navigation, route }: Props) {
   const [plannerHeight, setPlannerHeight] = useState(0)
   const [detailHeight, setDetailHeight] = useState(0)
   const [activeJourneyHeight, setActiveJourneyHeight] = useState(0)
-  // When a station is open the search sheet is being dismissed — exclude its height so
-  // mapPadding jumps straight to stationHeight in the same render that opens the station,
-  // preventing a second padding-driven camera shift on Android.
-  const mapBottomInset = activeStation
-    ? Math.max(stationHeight, reportHeight, plannerHeight, detailHeight, activeJourneyHeight)
-    : Math.max(searchHeight, plannerHeight, detailHeight, activeJourneyHeight)
+  // Any flow other than search (a station, plan, journey detail/active, or report) dismisses the
+  // search sheet and takes over the screen. While one is open the search sheet's last height must
+  // be excluded from the inset — otherwise its ~50% height keeps inflating mapPadding even though
+  // it's gone, which (a) jumps the camera twice on Android and (b) makes the route fit on journey
+  // start frame into the wrong band and zoom right out instead of framing the trip.
+  const overlayActive = Boolean(
+    activeStation || activePlan || activeDetail || activeJourneyParams || activeReport,
+  )
+  // Once a journey is active, only the sheets that can sit over it count — the active-journey sheet
+  // itself, or a station/report opened on top. The planner and detail sheets are torn down on start
+  // but keep reporting their tall height for a frame or two while their close animation runs; if we
+  // let that linger in the inset, the route fit on start frames into the thin strip left above the
+  // stale height and zooms the trip down to a dot. Excluding them lets the inset settle straight to
+  // the compact active-journey height so the fit frames the whole trip.
+  const mapBottomInset = activeJourneyParams
+    ? Math.max(activeJourneyHeight, stationHeight, reportHeight)
+    : overlayActive
+      ? Math.max(stationHeight, reportHeight, plannerHeight, detailHeight)
+      : searchHeight
+
+  // Run a queued route fit (from start / reroute) once the bottom inset settles, so the camera
+  // frames the route against the sheet's final height rather than a transient taller one. The fit
+  // uses `mapPadding` (driven by mapBottomInset), so reacting to its change guarantees correct
+  // framing; the fallback timer in the queueing effect covers the case where the inset never moves.
+  useEffect(() => {
+    if (!pendingFitRef.current) return
+    const bounds = pendingFitRef.current
+    pendingFitRef.current = null
+    const id = requestAnimationFrame(() => mapRef.current?.fitToRoute(bounds))
+    return () => cancelAnimationFrame(id)
+  }, [mapBottomInset])
+  // The sheets that expand to full height all snap to `SCREEN_H - insets.top - 66`, leaving just
+  // enough room for the top buttons. When a sheet reaches that height it covers the map entirely
+  // (e.g. the route overview), so the re-centre/account buttons are hidden to avoid floating over it.
   const insets = useSafeAreaInsets()
   const sheetIsFullscreen = mapBottomInset >= Dimensions.get('window').height - insets.top - 10
 
@@ -365,9 +411,6 @@ export function MapHomeScreen({ navigation, route }: Props) {
   // detail/active journey, or a report) takes over the screen, so the search sheet is dismissed
   // while one is open and restored only once they all close. Driving this declaratively from state
   // avoids the imperative dismiss()/restore() calls racing with sheet close animations.
-  const overlayActive = Boolean(
-    activeStation || activePlan || activeDetail || activeJourneyParams || activeReport,
-  )
   useEffect(() => {
     if (overlayActive) sheetRef.current?.dismiss()
     else sheetRef.current?.restore()
@@ -602,6 +645,9 @@ export function MapHomeScreen({ navigation, route }: Props) {
           setActiveJourneyParams(null)
           setActive(null)
         }}
+        onRerouteSelected={(journey) =>
+          setActiveJourneyParams((prev) => (prev ? { ...prev, journey } : prev))
+        }
         onHeightChange={setActiveJourneyHeight}
       />
 

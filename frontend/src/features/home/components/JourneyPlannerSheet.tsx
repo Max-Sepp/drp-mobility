@@ -257,7 +257,6 @@ export function JourneyPlannerSheet({
   useEffect(() => {
     if (plan) {
       closedByButton.current = false
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFrom(plan.initialFrom?.label ?? '')
       setTo(plan.initialTo?.label ?? '')
       setFromPostcode(plan.initialFrom?.postcode ?? null)
@@ -448,6 +447,12 @@ export function JourneyPlannerSheet({
                 setFromTflId(undefined)
               }}
               onResolved={setFromPostcode}
+              onSelect={(label, postcode, tflId) => {
+                setFrom(label)
+                setFromPostcode(postcode)
+                setFromTflId(tflId)
+                setFromIsCurrentLocation(false)
+              }}
               isResolved={fromPostcode !== null}
               textColor={fromIsCurrentLocation ? Colors.blue : undefined}
               textBold={fromIsCurrentLocation}
@@ -455,6 +460,7 @@ export function JourneyPlannerSheet({
               onCurrentLocation={hasShiftCoords || cachedCoords ? handleCurrentLocation : undefined}
               currentLocationLoading={gettingLocation}
               savedPlaceShortcuts={placeShortcuts}
+              stations={stations}
             />
           </View>
 
@@ -471,6 +477,12 @@ export function JourneyPlannerSheet({
               setToTflId(undefined)
             }}
             onResolved={setToPostcode}
+            onSelect={(label, postcode, tflId) => {
+              setTo(label)
+              setToPostcode(postcode)
+              setToTflId(tflId)
+              setToIsNamedPlace(false)
+            }}
             isResolved={toPostcode !== null}
             textColor={toIsCurrentLocation || toIsNamedPlace ? Colors.blue : undefined}
             textBold={toIsCurrentLocation || toIsNamedPlace}
@@ -478,6 +490,7 @@ export function JourneyPlannerSheet({
             onCurrentLocation={hasShiftCoords || cachedCoords ? handleCurrentLocationTo : undefined}
             currentLocationLoading={gettingLocation}
             savedPlaceShortcuts={placeShortcuts}
+            stations={stations}
           />
 
           {/* Swap button — centred between the From input's bottom and the To input's top.

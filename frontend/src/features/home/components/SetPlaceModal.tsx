@@ -120,14 +120,12 @@ export function SetPlaceModal({ visible, placeKey, onSave, onDismiss }: Props) {
 
   useEffect(() => {
     if (!visible) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setQuery('')
     }
   }, [visible])
 
   useEffect(() => {
     if (query.length < 3) return
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSearching(true)
     const timer = setTimeout(async () => {
       const results = await searchLocations(query)
@@ -161,7 +159,12 @@ export function SetPlaceModal({ visible, placeKey, onSave, onDismiss }: Props) {
       presentationStyle={Platform.OS === 'ios' ? 'pageSheet' : 'fullScreen'}
       onRequestClose={onDismiss}
     >
-      <View style={[styles.container, { paddingBottom: insets.bottom + Spacing.lg }]}>
+      <View
+        style={[
+          styles.container,
+          { paddingTop: insets.top + Spacing.lg, paddingBottom: insets.bottom + Spacing.lg },
+        ]}
+      >
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>{title}</Text>

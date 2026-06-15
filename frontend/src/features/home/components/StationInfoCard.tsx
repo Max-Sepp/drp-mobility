@@ -21,6 +21,7 @@ export const StationInfoCard = ({ station }: Props) => {
     <YStack
       mx="$4"
       mt="$4"
+      gap="$1.5"
       style={{
         backgroundColor: Colors.card,
         borderRadius: Radii.button,
@@ -29,30 +30,23 @@ export const StationInfoCard = ({ station }: Props) => {
         padding: Spacing.lg,
       }}
     >
-      <XStack justify="space-between" items="flex-start" gap="$3">
-        <YStack flex={1} gap="$1.5">
-          <Text fontSize={12} fontWeight="700" letterSpacing={0.5} color={Colors.secondaryText}>
-            LINES
-          </Text>
-          <LineChips lines={lines} />
-        </YStack>
+      <XStack justify="space-between" items="center">
+        <Text fontSize={12} fontWeight="700" letterSpacing={0.5} color={Colors.secondaryText}>
+          LINES
+        </Text>
         {zonesText && (
-          <YStack gap="$1.5" items="flex-end">
-            <Text fontSize={12} fontWeight="700" letterSpacing={0.5} color={Colors.secondaryText}>
-              ZONE
+          <XStack
+            px="$2"
+            py="$1"
+            style={{ backgroundColor: Colors.blueBg, borderRadius: Radii.xs }}
+          >
+            <Text fontSize={12} fontWeight="700" color={Colors.blue}>
+              {zonesText}
             </Text>
-            <XStack
-              px="$2"
-              py="$1"
-              style={{ backgroundColor: Colors.blueBg, borderRadius: Radii.xs }}
-            >
-              <Text fontSize={12} fontWeight="700" color={Colors.blue}>
-                {zonesText}
-              </Text>
-            </XStack>
-          </YStack>
+          </XStack>
         )}
       </XStack>
+      <LineChips lines={lines} />
     </YStack>
   )
 }

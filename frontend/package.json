@@ -17,7 +17,6 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@expo/ngrok": "^4.0.0",
     "@gorhom/bottom-sheet": "^5.2.14",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-community/datetimepicker": "8.4.4",
@@ -52,9 +51,10 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
+    "@expo/ngrok": "^4.0.0",
     "@types/react": "~19.1.0",
     "eslint": "^9.39.4",
-    "eslint-config-expo": "^56.0.4",
+    "eslint-config-expo": "~10.0.0",
     "eslint-config-prettier": "^10.1.8",
     "openapi-typescript": "^7.13.0",
     "patch-package": "^8.0.1",

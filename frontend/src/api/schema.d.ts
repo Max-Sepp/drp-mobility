@@ -685,6 +685,16 @@ export interface components {
             detail?: components["schemas"]["ValidationError"][];
         };
         /**
+         * InterchangeToSchema
+         * @description A step-free walking link from one platform to another at the same station.
+         */
+        InterchangeToSchema: {
+            /** To */
+            to: string;
+            /** Distance M */
+            distance_m: number;
+        };
+        /**
          * OutageReportCreate
          * @description Request body for POST /outage-reports — the image is uploaded separately.
          */
@@ -750,6 +760,12 @@ export interface components {
             step_free: components["schemas"]["PlatformStepFree"];
             /** Lines */
             lines: string[];
+            /** Direction */
+            direction?: string | null;
+            /** Interchange To */
+            interchange_to?: components["schemas"]["InterchangeToSchema"][] | null;
+            /** Same Level Platforms */
+            same_level_platforms?: string[] | null;
         };
         /**
          * PlatformStepFree

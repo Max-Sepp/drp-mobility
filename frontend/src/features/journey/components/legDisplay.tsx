@@ -25,8 +25,8 @@ export function RouteTags({ tags }: { tags?: RouteTag[] }) {
       {tags.map((tag) => (
         <XStack
           key={tag}
-          px="$3"
-          py="$1.5"
+          px="$2"
+          py="$1"
           style={{
             backgroundColor: Colors.blueBg,
             borderColor: Colors.border,
@@ -34,7 +34,7 @@ export function RouteTags({ tags }: { tags?: RouteTag[] }) {
             borderRadius: Radii.pill,
           }}
         >
-          <Text fontSize={14} fontWeight="700" color={Colors.blue}>
+          <Text fontSize={13} fontWeight="700" color={Colors.blue}>
             {TAG_LABELS[tag]}
           </Text>
         </XStack>
