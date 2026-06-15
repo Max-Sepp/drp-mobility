@@ -1,6 +1,6 @@
 // Bottom sheet that lives inside MapHomeScreen.
 // Three snap points:
-//   index 0 – PILL   (~72 px)  : only the search pill visible; map in focus
+//   index 0 – PILL   (~100 px) : only the search pill visible; map in focus
 //   index 1 – HOME   (~320 px) : Places row + Saved Journeys (default / launch state)
 //   index 2 – OPEN   (82 % of screen) : search active; results fill the sheet
 //
@@ -66,7 +66,7 @@ import BottomSheet, {
 const SCREEN_H = Dimensions.get('window').height
 
 // Heights of the visible sheet at each snap point (gorhom convention: height from bottom).
-const SNAP_POINTS = [72, 320, SCREEN_H * 0.82]
+const SNAP_POINTS = [100, 320, SCREEN_H * 0.82]
 
 const SNAP_IDX_HOME = 1
 const SNAP_IDX_OPEN = 2
