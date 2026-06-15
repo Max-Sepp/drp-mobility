@@ -394,6 +394,13 @@ export function ActiveJourneySheet({
     [insets.top, insets.bottom, showRerouteAlert],
   )
 
+  // Keep the host's notion of our height in sync even when the snap index doesn't change — e.g. a
+  // reroute that clears the block shrinks snap 0 by the banner height while staying at index 0.
+  // Without this the host's map padding stays stale and re-frames the route against a too-tall inset.
+  useEffect(() => {
+    if (snapIndex >= 0) onHeightChange?.(snapPoints[snapIndex])
+  }, [snapPoints, snapIndex, onHeightChange])
+
   // Issues sheet is fixed height — just RouteAlerts + option buttons footer.
   const rerouteSnapPoints = useMemo(() => [SCREEN_H * 0.78], [])
 
