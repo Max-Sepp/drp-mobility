@@ -283,6 +283,8 @@ export type StationLookup = {
     lines: string[]
     direction?: string | null
     interchange_to?: PlatformInterchange[] | null
+    // Names of other platforms reachable from this one at the same level (no lift/ramp).
+    same_level_platforms?: string[] | null
   }[]
 }
 
@@ -616,9 +618,10 @@ export async function planAlternativesAlongLine(
 // need to exit or interchange is out), the help they need is a route that STARTS from that
 // platform: typically stay on / re-board and ride to the nearest step-free station, then continue
 // by another mode. `planRouteFromPlatform` reasons about which platforms the rider can actually
-// reach step-free (their own, plus the opposite direction / other lines reachable via a step-free
-// platform interchange), rides each line to the nearest step-free station, and plans onward from
-// there to the real destination.
+// reach (their own, plus the opposite direction / other lines reachable from it *at the same
+// level* — a lift-independent walk, since a step-free interchange could itself rely on the broken
+// lift), rides each line to the nearest step-free station, and plans onward from there to the real
+// destination.
 
 /** Loose station-name match (same containment rule as `findStationByName`). */
 function sameStationName(a: string, b: string): boolean {
@@ -801,6 +804,11 @@ async function planFromEscapes(
   destination: string,
   accessibility: AccessibilityPreference | null,
   blockedOtherNorm: Set<string>,
+  // When set (stuck-on-platform flow), the reach's first ridden leg must board one of these
+  // (normalised) line names — i.e. the stuck line or a line reachable at the same level. Without
+  // this, TfL's free rail routing can start the reach on a line whose platforms the stranded rider
+  // can't actually get to (e.g. boarding the Bakerloo at Paddington from the Circle platform).
+  allowedFirstLineNorm: Set<string> | null = null,
 ): Promise<JourneyOptionsResult> {
   // Prefer a StopPoint id for the origin (e.g. the stuck station) so the route starts cleanly *at*
   // that station; fall back to coordinates (e.g. the rider's GPS position, which is no station).
@@ -830,6 +838,13 @@ async function planFromEscapes(
       // route starts cleanly at the station rather than a nearby street address.
       const reachJourney = from.station ? stripLeadingWalk(reach.journeys[0]) : reach.journeys[0]
       if (maxWalkLegMinutes(reachJourney) > MAX_WALK_LEG_MIN) return []
+      // Drop reaches that board a line the stranded rider can't reach at the same level — TfL plans
+      // the reach with no step-free/line constraint, so it may otherwise start on an unreachable line.
+      if (allowedFirstLineNorm) {
+        const firstRidden = reachJourney.legs.find((l) => l.mode.name !== 'walking')
+        const firstLine = firstRidden?.routeOptions?.[0]?.name
+        if (!firstLine || !allowedFirstLineNorm.has(normaliseStationName(firstLine))) return []
+      }
       const out: Journey[] = []
       for (const onwardJourney of onward.journeys) {
         const lead = onwardJourney.legs[0]
@@ -894,14 +909,15 @@ export async function planRouteFromPlatform(
     escapes.push({ station, coords: c })
   }
 
-  // Step-free platforms the rider can reach from the platform(s) serving their line.
+  // Platforms the rider can reach at the same level from the platform(s) serving their line — a
+  // lift-independent walk, so it holds even with the lift out (a step-free interchange might not).
   const stuckPlatforms = stuckStation.platforms.filter((p) =>
     p.lines.some((l) => sameLineName(l, lineName)),
   )
   const stuckDir = stuckPlatforms.find((p) => p.direction)?.direction ?? null
   const reachableNorm = new Set(
     stuckPlatforms.flatMap((p) =>
-      (p.interchange_to ?? []).map((ic) => normaliseStationName(ic.to)),
+      (p.same_level_platforms ?? []).map((name) => normaliseStationName(name)),
     ),
   )
   const reachablePlatforms = stuckStation.platforms.filter(
@@ -987,11 +1003,17 @@ export async function planRouteFromPlatform(
   const blockedOtherNorm = new Set(
     blockedStationNames.map(normaliseStationName).filter((n) => !sameStationName(n, stuckName)),
   )
+  // The reach must board the stuck line itself or a line served by a same-level-reachable platform
+  // (the cross-platform / opposite-direction options) — never a line whose platforms need the lift.
+  const allowedFirstLineNorm = new Set(
+    [lineName, ...reachablePlatforms.flatMap((p) => p.lines)].map((l) => normaliseStationName(l)),
+  )
   return planFromEscapes(
     escapes,
     { coords: stuckCoords, station: stuckStation },
     destination,
     accessibility,
     blockedOtherNorm,
+    allowedFirstLineNorm,
   )
 }

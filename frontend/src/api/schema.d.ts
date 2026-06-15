@@ -764,6 +764,8 @@ export interface components {
             direction?: string | null;
             /** Interchange To */
             interchange_to?: components["schemas"]["InterchangeToSchema"][] | null;
+            /** Same Level Platforms */
+            same_level_platforms?: string[] | null;
         };
         /**
          * PlatformStepFree

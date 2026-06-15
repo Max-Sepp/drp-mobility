@@ -108,6 +108,7 @@ def seed_defaults(db: Session) -> None:
                     lines=lines_for(plat.get("lines", [])),
                     direction=plat.get("direction"),
                     interchange_to=plat.get("interchangeTo"),
+                    same_level_platforms=plat.get("sameLevelPlatforms"),
                 )
                 db.add(platforms[key])
     db.flush()

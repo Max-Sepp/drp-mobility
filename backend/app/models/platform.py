@@ -43,6 +43,11 @@ class Platform(Base):
     # stations.json: a list of { "to": "<platform name>", "distanceM": <int> }. Lets the client
     # reason about which platforms a stranded rider can reach step-free (other direction / line).
     interchange_to: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    # Names of other platforms at this station reachable from this one *at the same level*
+    # (no lift or ramp involved), as stored in stations.json: a list of platform name
+    # strings. Unlike `interchange_to`, this set is lift-independent, so it is what a
+    # rider stranded by a broken lift can actually still reach.
+    same_level_platforms: Mapped[list | None] = mapped_column(JSON, nullable=True)
 
     # A station has at most one platform of a given name.
     __table_args__ = (UniqueConstraint("station_id", "name"),)
