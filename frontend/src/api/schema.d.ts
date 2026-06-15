@@ -894,6 +894,8 @@ export interface components {
             id: number;
             /** Name */
             name: string;
+            /** Tfl Id */
+            tfl_id?: string | null;
             step_free: components["schemas"]["StepFree"];
             /** Latitude */
             latitude?: number | null;
@@ -957,6 +959,8 @@ export interface components {
             id: number;
             /** Name */
             name: string;
+            /** Tfl Id */
+            tfl_id?: string | null;
             step_free: components["schemas"]["StepFree"];
         };
         /**

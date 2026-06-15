@@ -5,6 +5,7 @@ import { Input, Spinner, Text, YStack } from 'tamagui'
 import {
   type LocationSuggestion,
   postcodeForSuggestion,
+  resolveToPostcode,
   searchLocations,
 } from '@/features/journey/api/geocode'
 import {
@@ -12,6 +13,9 @@ import {
   getRecentLocations,
   type RecentLocation,
 } from '@/features/journey/api/recentLocations'
+import { type StationDetail } from '@/features/stations'
+import { fuzzyScore } from '@/lib/fuzzy'
+import { alertOffline, isOfflineError } from '@/lib/offline'
 import { useTheme, Borders, Opacity } from '@/theme'
 
 export type PlaceShortcut = {
@@ -25,14 +29,16 @@ type LocationInputProps = {
   value: string
   onChangeText: (text: string) => void
   onResolved: (postcode: string | null) => void
-  /** Called when a suggestion or saved place is selected; use this instead of onChangeText to avoid clearing the postcode on programmatic text updates. */
-  onSelect?: (label: string, postcode: string) => void
+  /** Called when a suggestion, station, or saved place is selected; use this instead of onChangeText to avoid clearing the postcode on programmatic text updates. `tflId` is set only for station selections (preferred over the postcode as the TfL query). */
+  onSelect?: (label: string, postcode: string, tflId?: string) => void
   isResolved?: boolean
   textColor?: string
   textBold?: boolean
   onCurrentLocation?: () => void
   currentLocationLoading?: boolean
   savedPlaceShortcuts?: PlaceShortcut[]
+  /** Station list to fuzzy-match against, so the dropdown can offer stations alongside addresses. */
+  stations?: StationDetail[]
 }
 
 export const LocationInput = ({
@@ -47,9 +53,11 @@ export const LocationInput = ({
   onCurrentLocation,
   currentLocationLoading,
   savedPlaceShortcuts,
+  stations,
 }: LocationInputProps) => {
   const { Colors, Radii } = useTheme()
   const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([])
+  const [stationSuggestions, setStationSuggestions] = useState<StationDetail[]>([])
   const [searching, setSearching] = useState(false)
   const [resolved, setResolved] = useState(isResolvedProp ?? false)
   const [focused, setFocused] = useState(false)
@@ -59,10 +67,16 @@ export const LocationInput = ({
 
   const skipNextSearch = useRef(isResolvedProp ?? false)
   const isResolvedRef = useRef(isResolvedProp ?? false)
+  // Read stations through a ref so the search debounce depends only on `value` — `stations` is a
+  // fresh `[]` on every render until the list loads, which would otherwise restart the debounce
+  // endlessly and leave the spinner stuck on "searching".
+  const stationsRef = useRef(stations)
+  useEffect(() => {
+    stationsRef.current = stations
+  }, [stations])
 
   useEffect(() => {
     isResolvedRef.current = isResolvedProp ?? false
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (isResolvedProp !== undefined) setResolved(isResolvedProp)
   }, [isResolvedProp])
 
@@ -79,9 +93,18 @@ export const LocationInput = ({
       async () => {
         if (tooShort) {
           setSuggestions([])
+          setStationSuggestions([])
           setSearching(false)
           return
         }
+        // Fuzzy-match stations locally (instant) and show the top 2 above the address results.
+        const matchedStations = (stationsRef.current ?? [])
+          .map((s) => ({ s, score: fuzzyScore(value, s.name) }))
+          .filter((x) => x.score > 0)
+          .sort((a, b) => b.score - a.score)
+          .slice(0, 2)
+          .map((x) => x.s)
+        setStationSuggestions(matchedStations)
         setSearching(true)
         let results: LocationSuggestion[] = []
         try {
@@ -106,6 +129,7 @@ export const LocationInput = ({
     const sub = Keyboard.addListener(event, () => {
       setFocused(false)
       setSuggestions([])
+      setStationSuggestions([])
     })
     return () => sub.remove()
   }, [])
@@ -120,18 +144,21 @@ export const LocationInput = ({
   function clear() {
     setResolved(false)
     setSuggestions([])
+    setStationSuggestions([])
     onResolved(null)
     onChangeText('')
   }
 
   async function choose(suggestion: LocationSuggestion) {
     setSuggestions([])
+    setStationSuggestions([])
     setSearching(true)
     let postcode: string | null = null
     try {
       postcode = await postcodeForSuggestion(suggestion)
-    } catch {
-      // Network error — leave postcode null
+    } catch (err) {
+      // Tapping a suggestion with no connection would otherwise do nothing — tell the user why.
+      if (isOfflineError(err)) alertOffline('find that place')
     }
     setSearching(false)
     if (!postcode) return
@@ -143,6 +170,34 @@ export const LocationInput = ({
     } else {
       onResolved(postcode)
       onChangeText(suggestion.label)
+    }
+  }
+
+  async function chooseStation(station: StationDetail) {
+    setSuggestions([])
+    setStationSuggestions([])
+    setSearching(true)
+    // Resolve the station's coordinates to a postcode as a TfL-query fallback; the tfl_id is
+    // preferred (see `tflQuery`) so the journey ends at the station rather than a nearby postcode.
+    let postcode: string | null = null
+    try {
+      if (station.latitude != null && station.longitude != null) {
+        const result = await resolveToPostcode(`${station.latitude},${station.longitude}`)
+        if (!('error' in result)) postcode = result.postcode
+      }
+    } catch (err) {
+      if (isOfflineError(err)) alertOffline('find that station')
+    }
+    setSearching(false)
+    if (!postcode) return
+    addRecentLocation(station.name, postcode)
+    skipNextSearch.current = true
+    setResolved(true)
+    if (onSelect) {
+      onSelect(station.name, postcode, station.tfl_id ?? undefined)
+    } else {
+      onResolved(postcode)
+      onChangeText(station.name)
     }
   }
 
@@ -183,6 +238,7 @@ export const LocationInput = ({
     showSavedShortcuts ||
     showRecents ||
     matchedSavedPlaces.length > 0 ||
+    stationSuggestions.length > 0 ||
     suggestions.length > 0
 
   // Right-side overlay inside the input: spinner → resolved tick → clear button → nothing.
@@ -213,6 +269,7 @@ export const LocationInput = ({
             onBlur={() => setTimeout(() => setFocused(false), 150)}
             onSubmitEditing={() => {
               if (matchedSavedPlaces.length > 0) chooseSavedPlace(matchedSavedPlaces[0])
+              else if (stationSuggestions.length > 0) chooseStation(stationSuggestions[0])
               else if (suggestions.length > 0) choose(suggestions[0])
             }}
             selection={focused ? undefined : { start: 0, end: 0 }}
@@ -380,6 +437,35 @@ export const LocationInput = ({
               </YStack>
             ))}
 
+            {/* Stations come first. Same row shape as addresses, but a train icon (lightly
+                tinted, not the bold blue of the home search) so the two types blend. */}
+            {stationSuggestions.map((station, i) => (
+              <YStack
+                key={`station-${station.id}`}
+                px="$4"
+                justify="center"
+                pressStyle={{ background: Colors.searchBg }}
+                onPress={() => chooseStation(station)}
+                style={{
+                  minHeight: 56,
+                  borderTopWidth: i === 0 && matchedSavedPlaces.length === 0 ? 0 : Borders.thin,
+                  borderTopColor: Colors.border,
+                }}
+              >
+                <YStack gap="$2" style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <MaterialIcons name="train" size={16} color={Colors.blue} />
+                  <YStack flex={1}>
+                    <Text fontSize={15} fontWeight="600" color={Colors.text} numberOfLines={1}>
+                      {station.name}
+                    </Text>
+                    <Text fontSize={13} color={Colors.secondaryText}>
+                      Station
+                    </Text>
+                  </YStack>
+                </YStack>
+              </YStack>
+            ))}
+
             {suggestions.map((suggestion, i) => (
               <YStack
                 key={`${suggestion.lat},${suggestion.lon}-${i}`}
@@ -389,18 +475,26 @@ export const LocationInput = ({
                 onPress={() => choose(suggestion)}
                 style={{
                   minHeight: 56,
-                  borderTopWidth: i === 0 && matchedSavedPlaces.length === 0 ? 0 : Borders.thin,
+                  borderTopWidth:
+                    i === 0 && matchedSavedPlaces.length === 0 && stationSuggestions.length === 0
+                      ? 0
+                      : Borders.thin,
                   borderTopColor: Colors.border,
                 }}
               >
-                <Text fontSize={15} fontWeight="600" color={Colors.text} numberOfLines={1}>
-                  {suggestion.label}
-                </Text>
-                {suggestion.subtitle ? (
-                  <Text fontSize={13} color={Colors.secondaryText} numberOfLines={1}>
-                    {suggestion.subtitle}
-                  </Text>
-                ) : null}
+                <YStack gap="$2" style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <MaterialIcons name="place" size={16} color={Colors.secondaryText} />
+                  <YStack flex={1}>
+                    <Text fontSize={15} fontWeight="600" color={Colors.text} numberOfLines={1}>
+                      {suggestion.label}
+                    </Text>
+                    {suggestion.subtitle ? (
+                      <Text fontSize={13} color={Colors.secondaryText} numberOfLines={1}>
+                        {suggestion.subtitle}
+                      </Text>
+                    ) : null}
+                  </YStack>
+                </YStack>
               </YStack>
             ))}
           </View>

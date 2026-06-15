@@ -50,6 +50,7 @@ import {
 } from '@/features/journey/api/activeJourney'
 import {
   clockTime,
+  humanizePlace,
   humanizeSummary,
   legLineColor,
   modeIcon,
@@ -199,7 +200,6 @@ export function ActiveJourneySheet({
       return
     }
     sheetRef.current?.snapToIndex(0)
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSnapIndex(0)
     setLegIndex(0)
     setGpsActive(false)
@@ -250,6 +250,9 @@ export function ActiveJourneySheet({
 
   const legIndexRef = useRef(legIndex)
   const goToRef = useRef(goTo)
+  // onArrived is defined further down; the watcher reads it through a ref so the final-leg
+  // arrival can fire the "Journey complete" popup without re-subscribing the GPS watcher.
+  const onArrivedRef = useRef<() => void>(() => {})
   useEffect(() => {
     legIndexRef.current = legIndex
     goToRef.current = goTo
@@ -338,7 +341,6 @@ export function ActiveJourneySheet({
   // Three snaps: compact (handle + summary row + optional banner + footer), half-screen, near-full.
   // Banner height is only added when an accessibility alert is active, so snap 0 grows dynamically.
   // Footer = paddingTop 8 + button 48 + border 1 + paddingBottom 8 + insets.bottom = 65 + insets.bottom.
-  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const snapPoints = useMemo(
     () => [
       24 + 58 + (showRerouteAlert ? REROUTE_BANNER_H : 0) + 65 + insets.bottom,
@@ -377,7 +379,6 @@ export function ActiveJourneySheet({
     if (!showRerouteAlert) {
       dismissAll()
       alternativesCacheRef.current = null
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setRerouteState({ phase: 'idle' })
     }
   }, [showRerouteAlert, dismissAll])
@@ -394,7 +395,6 @@ export function ActiveJourneySheet({
         (loc) => {
           setGpsActive(true)
           const idx = legIndexRef.current
-          if (idx >= legs.length - 1) return
           if (autoAdvancedFromRef.current === idx) return
           const arr = legs[idx]?.arrivalPoint
           if (typeof arr?.lat !== 'number' || typeof arr?.lon !== 'number') return
@@ -404,7 +404,13 @@ export function ActiveJourneySheet({
           )
           if (metres <= ARRIVAL_RADIUS_M) {
             autoAdvancedFromRef.current = idx
-            goToRef.current(idx + 1)
+            // Final leg: arriving at the destination ends the journey and shows the
+            // "Journey complete" popup. Intermediate legs just advance to the next leg.
+            if (idx >= legs.length - 1) {
+              onArrivedRef.current()
+            } else {
+              goToRef.current(idx + 1)
+            }
           }
         },
       )
@@ -509,6 +515,10 @@ export function ActiveJourneySheet({
       goTo(legIndex + 1)
     }
   }, [isFinalLeg, goTo, legIndex, onComplete])
+
+  useEffect(() => {
+    onArrivedRef.current = onArrived
+  }, [onArrived])
 
   // Tapping above collapses to snap 0; sheet cannot be dragged below snap 0.
   const collapseBackdrop = useCallback(
@@ -689,8 +699,10 @@ export function ActiveJourneySheet({
 
   const depCommon = currentLeg.departurePoint?.commonName
   const arrCommon = currentLeg.arrivalPoint?.commonName
-  const depName = depCommon ? stripStationSuffix(depCommon) : null
-  const arrName = arrCommon ? stripStationSuffix(arrCommon) : null
+  // Use the user's chosen label when an endpoint is the postcode we queried TfL with (e.g. a final
+  // walking leg arriving at "E3 4TN" → the address the user entered), else strip the station suffix.
+  const depName = humanizePlace(depCommon, [from, to])
+  const arrName = humanizePlace(arrCommon, [from, to])
   const depResolved = depCommon ? resolveStation(depCommon) : null
   const arrResolved = arrCommon ? resolveStation(arrCommon) : null
   const depTime = currentLeg.departureTime ? clockTime(currentLeg.departureTime) : null
@@ -1136,7 +1148,7 @@ export function ActiveJourneySheet({
                   const legFg = legIsWalking ? Colors.secondaryText : 'white'
                   const legRouteName = leg.routeOptions?.[0]?.name || null
                   const legArrCommon = leg.arrivalPoint?.commonName
-                  const legArrName = legArrCommon ? stripStationSuffix(legArrCommon) : null
+                  const legArrName = humanizePlace(legArrCommon, [from, to])
                   const legArrTime = leg.arrivalTime ? clockTime(leg.arrivalTime) : null
                   return (
                     <XStack
