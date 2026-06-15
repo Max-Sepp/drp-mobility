@@ -455,12 +455,16 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
                         name={icon}
                         size={40}
                         color={disabled ? Colors.secondaryText : Colors.text}
+                        // Android adds font padding above/below the glyph's line box, which pushes the
+                        // visible icon down within the centred content and reads as "too far down".
+                        // Disabling it lets justifyContent:center truly centre the visible content.
+                        style={{ includeFontPadding: false }}
                       />
                       <Text
                         fontSize={13}
                         fontWeight="600"
                         color={disabled ? Colors.secondaryText : Colors.text}
-                        style={{ textAlign: 'center' }}
+                        style={{ textAlign: 'center', includeFontPadding: false }}
                       >
                         {disabled && disabledLabel ? disabledLabel : label}
                       </Text>

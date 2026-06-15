@@ -2,6 +2,7 @@
 // Single snap at full height minus top buttons. Dark backdrop, swipe/tap to close.
 
 import { MaterialIcons } from '@expo/vector-icons'
+import Svg, { Circle, Path, Rect } from 'react-native-svg'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { Text, XStack } from 'tamagui'
@@ -90,6 +91,21 @@ function DashedVerticalLine({ color }: { color: string }) {
 }
 
 type WaypointKind = 'origin' | 'transit' | 'destination'
+type WaypointType = 'tube' | 'bus' | 'default'
+
+function TflRoundel() {
+  return (
+    <Svg width={28} height={23} viewBox="0 0 615.3 500">
+      <Circle cx={308.15} cy={250} r={161.3} fill="white" />
+      <Path
+        d="m469.5 250c0 89.1-72.3 161.3-161.3 161.3-89.1 0-161.3-72.2-161.3-161.3s72.1-161.3 161.2-161.3 161.4 72.2 161.4 161.3m-161.4-250c-138.1 0-250 111.9-250 250s111.9 250 250 250 250-111.9 250-250-111.9-250-250-250"
+        fill="#e1251f"
+        fillRule="nonzero"
+      />
+      <Rect y={199.5} width={615.3} height={101.1} fill="#000f9f" />
+    </Svg>
+  )
+}
 
 function TimelineWaypoint({
   kind,
@@ -97,12 +113,14 @@ function TimelineWaypoint({
   time,
   dotColor,
   stopNumber,
+  waypointType = 'default',
 }: {
   kind: WaypointKind
   name: string
   time?: string
   dotColor: string
   stopNumber?: string
+  waypointType?: WaypointType
 }) {
   const { Colors } = useTheme()
   return (
@@ -110,7 +128,7 @@ function TimelineWaypoint({
       <View style={{ width: GUTTER_W, alignItems: 'center', justifyContent: 'center' }}>
         {kind === 'destination' ? (
           <MaterialIcons name="place" size={22} color={Colors.text} />
-        ) : kind === 'origin' ? (
+        ) : kind === 'origin' && waypointType === 'default' ? (
           <View
             style={{
               width: 13,
@@ -121,6 +139,10 @@ function TimelineWaypoint({
               backgroundColor: Colors.card,
             }}
           />
+        ) : waypointType === 'tube' ? (
+          <TflRoundel />
+        ) : waypointType === 'bus' ? (
+          <MaterialIcons name="directions-bus" size={20} color={dotColor} />
         ) : (
           <View
             style={{
@@ -332,8 +354,6 @@ export function JourneyDetailSheet({
           paddingHorizontal: Spacing.lg,
           paddingTop: Spacing.xl,
           paddingBottom: Spacing.lg,
-          borderBottomWidth: StyleSheet.hairlineWidth,
-          borderBottomColor: Colors.separator,
         },
         closeBtn: {
           width: 34,
@@ -351,7 +371,10 @@ export function JourneyDetailSheet({
         actionRow: {
           flexDirection: 'row',
           gap: Spacing.sm,
-          marginTop: Spacing.sm,
+          paddingHorizontal: Spacing.lg,
+          paddingVertical: Spacing.sm,
+          borderBottomWidth: StyleSheet.hairlineWidth,
+          borderBottomColor: Colors.separator,
         },
         actionBtn: {
           flex: 1,
@@ -552,6 +575,11 @@ export function JourneyDetailSheet({
     firstLeg && isBusLeg(firstLeg) ? firstLeg.departurePoint?.stopLetter : undefined
 
   // Origin waypoint
+  const originWaypointType: WaypointType = isBusLeg(firstLeg)
+    ? 'bus'
+    : firstLeg && firstLeg.mode.name !== 'walking'
+      ? 'tube'
+      : 'default'
   timelineItems.push(
     <TimelineWaypoint
       key="origin"
@@ -560,6 +588,7 @@ export function JourneyDetailSheet({
       time={clockTime(journey.startDateTime)}
       dotColor={Colors.text}
       stopNumber={originStopNumber}
+      waypointType={originWaypointType}
     />,
   )
 
@@ -568,7 +597,10 @@ export function JourneyDetailSheet({
     const connectorColor = isWalking ? Colors.separator : legLineColor(leg, Colors.blue)
     const routeName = leg.routeOptions?.[0]?.name ?? null
     const direction = leg.routeOptions?.[0]?.directions?.find(Boolean) ?? null
-    const stopCount = leg.path?.stopPoints?.length ?? 0
+    const allStopPoints = leg.path?.stopPoints ?? []
+    // Drop the arrival station from the list (already shown as the arrival node) but keep it in the count
+    const stopPoints = allStopPoints.length > 0 ? allStopPoints.slice(0, -1) : allStopPoints
+    const stopCount = allStopPoints.length
     const isLast = i === journey.legs.length - 1
     const nextLeg = journey.legs[i + 1]
     const nextIsTransit = nextLeg && nextLeg.mode.name !== 'walking'
@@ -583,7 +615,7 @@ export function JourneyDetailSheet({
         direction={direction}
         walkDuration={isWalking ? leg.duration : undefined}
         stopCount={isWalking ? 0 : stopCount}
-        stopPoints={isWalking ? [] : (leg.path?.stopPoints ?? [])}
+        stopPoints={isWalking ? [] : stopPoints}
         legDuration={isWalking ? 0 : leg.duration}
         departureTime={leg.departureTime}
         arrivalTime={leg.arrivalTime}
@@ -600,6 +632,12 @@ export function JourneyDetailSheet({
       : nextLeg && isBusLeg(nextLeg)
         ? nextLeg.departurePoint?.stopLetter
         : undefined
+    const arrivalWaypointType: WaypointType =
+      isLast || !nextLeg || nextLeg.mode.name === 'walking'
+        ? 'default'
+        : isBusLeg(nextLeg)
+          ? 'bus'
+          : 'tube'
 
     timelineItems.push(
       <TimelineWaypoint
@@ -609,6 +647,7 @@ export function JourneyDetailSheet({
         time={leg.arrivalTime ? clockTime(leg.arrivalTime) : undefined}
         dotColor={dotColor}
         stopNumber={arrivalStopNumber}
+        waypointType={arrivalWaypointType}
       />,
     )
   })
@@ -637,11 +676,23 @@ export function JourneyDetailSheet({
     >
       {/* Header: prominent duration + arrive/fare + tags + close */}
       <View style={styles.header}>
-        <MaterialIcons name={modeIcon(primaryMode)} size={24} color={Colors.secondaryText} />
         <View style={{ flex: 1, gap: 6 }}>
-          <Text fontSize={26} fontWeight="800" color={Colors.text} style={{ lineHeight: 30 }}>
-            {journey.duration} min
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <MaterialIcons name={modeIcon(primaryMode)} size={20} color={Colors.secondaryText} />
+            <Text fontSize={26} fontWeight="800" color={Colors.text} style={{ lineHeight: 30 }}>
+              {journey.duration} min
+            </Text>
+            <View style={{ flex: 1 }} />
+            <TouchableOpacity
+              onPress={() => sheetRef.current?.close()}
+              style={styles.closeBtn}
+              activeOpacity={0.75}
+              accessibilityRole="button"
+              accessibilityLabel="Close"
+            >
+              <MaterialIcons name="close" size={18} color={Colors.secondaryText} />
+            </TouchableOpacity>
+          </View>
           <Text fontSize={16} color={Colors.secondaryText}>
             Arrive {clockTime(journey.arrivalDateTime)}
             {fare ? ` · ${fare}` : ''}
@@ -652,70 +703,61 @@ export function JourneyDetailSheet({
             </View>
           ) : null}
         </View>
+      </View>
+
+      {/* Start + Save action buttons — pinned above the scroll view */}
+      <View style={styles.actionRow}>
         <TouchableOpacity
-          onPress={() => sheetRef.current?.close()}
-          style={styles.closeBtn}
-          activeOpacity={0.75}
+          style={[
+            styles.actionBtn,
+            {
+              backgroundColor: Colors.blue,
+              borderColor: Colors.blue,
+            },
+            anyBusy && { opacity: Opacity.disabledMid },
+          ]}
+          onPress={anyBusy ? undefined : startJourney}
+          activeOpacity={0.8}
           accessibilityRole="button"
-          accessibilityLabel="Close"
+          accessibilityLabel="Start journey"
         >
-          <MaterialIcons name="close" size={18} color={Colors.secondaryText} />
+          <MaterialIcons name="navigation" size={18} color="white" />
+          <Text fontSize={16} fontWeight="700" color="white">
+            {startBusy ? 'Starting…' : 'Start'}
+          </Text>
         </TouchableOpacity>
+
+        {!hideSave && (
+          <TouchableOpacity
+            style={[
+              styles.actionBtn,
+              {
+                backgroundColor: saved ? Colors.searchBg : Colors.card,
+                borderColor: Colors.border,
+              },
+              anyBusy && { opacity: Opacity.disabledMid },
+            ]}
+            onPress={anyBusy ? undefined : toggleSave}
+            activeOpacity={0.8}
+            accessibilityRole="button"
+            accessibilityLabel={saved ? 'Remove from saved journeys' : 'Save this journey'}
+          >
+            <MaterialIcons
+              name={saved ? 'bookmark' : 'bookmark-border'}
+              size={18}
+              color={Colors.text}
+            />
+            <Text fontSize={16} fontWeight="600" color={Colors.text}>
+              {saveBusy ? 'Saving…' : saved ? 'Saved' : 'Save'}
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       <BottomSheetScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
       >
-        {/* Start + Save action buttons */}
-        <View style={styles.actionRow}>
-          <TouchableOpacity
-            style={[
-              styles.actionBtn,
-              {
-                backgroundColor: Colors.blue,
-                borderColor: Colors.blue,
-              },
-              anyBusy && { opacity: Opacity.disabledMid },
-            ]}
-            onPress={anyBusy ? undefined : startJourney}
-            activeOpacity={0.8}
-            accessibilityRole="button"
-            accessibilityLabel="Start journey"
-          >
-            <MaterialIcons name="navigation" size={18} color="white" />
-            <Text fontSize={16} fontWeight="700" color="white">
-              {startBusy ? 'Starting…' : 'Start'}
-            </Text>
-          </TouchableOpacity>
-
-          {!hideSave && (
-            <TouchableOpacity
-              style={[
-                styles.actionBtn,
-                {
-                  backgroundColor: saved ? Colors.searchBg : Colors.card,
-                  borderColor: Colors.border,
-                },
-                anyBusy && { opacity: Opacity.disabledMid },
-              ]}
-              onPress={anyBusy ? undefined : toggleSave}
-              activeOpacity={0.8}
-              accessibilityRole="button"
-              accessibilityLabel={saved ? 'Remove from saved journeys' : 'Save this journey'}
-            >
-              <MaterialIcons
-                name={saved ? 'bookmark' : 'bookmark-border'}
-                size={18}
-                color={Colors.text}
-              />
-              <Text fontSize={16} fontWeight="600" color={Colors.text}>
-                {saveBusy ? 'Saving…' : saved ? 'Saved' : 'Save'}
-              </Text>
-            </TouchableOpacity>
-          )}
-        </View>
-
         {/* Combined disruptions: TfL service disruptions + accessibility outages, tiered */}
         <RouteAlerts assessments={outageAssessments} disruptions={disruptions} />
 
