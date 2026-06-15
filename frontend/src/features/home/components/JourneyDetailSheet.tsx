@@ -676,11 +676,23 @@ export function JourneyDetailSheet({
     >
       {/* Header: prominent duration + arrive/fare + tags + close */}
       <View style={styles.header}>
-        <MaterialIcons name={modeIcon(primaryMode)} size={24} color={Colors.secondaryText} />
         <View style={{ flex: 1, gap: 6 }}>
-          <Text fontSize={26} fontWeight="800" color={Colors.text} style={{ lineHeight: 30 }}>
-            {journey.duration} min
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <MaterialIcons name={modeIcon(primaryMode)} size={20} color={Colors.secondaryText} />
+            <Text fontSize={26} fontWeight="800" color={Colors.text} style={{ lineHeight: 30 }}>
+              {journey.duration} min
+            </Text>
+            <View style={{ flex: 1 }} />
+            <TouchableOpacity
+              onPress={() => sheetRef.current?.close()}
+              style={styles.closeBtn}
+              activeOpacity={0.75}
+              accessibilityRole="button"
+              accessibilityLabel="Close"
+            >
+              <MaterialIcons name="close" size={18} color={Colors.secondaryText} />
+            </TouchableOpacity>
+          </View>
           <Text fontSize={16} color={Colors.secondaryText}>
             Arrive {clockTime(journey.arrivalDateTime)}
             {fare ? ` · ${fare}` : ''}
@@ -691,15 +703,6 @@ export function JourneyDetailSheet({
             </View>
           ) : null}
         </View>
-        <TouchableOpacity
-          onPress={() => sheetRef.current?.close()}
-          style={styles.closeBtn}
-          activeOpacity={0.75}
-          accessibilityRole="button"
-          accessibilityLabel="Close"
-        >
-          <MaterialIcons name="close" size={18} color={Colors.secondaryText} />
-        </TouchableOpacity>
       </View>
 
       {/* Start + Save action buttons — pinned above the scroll view */}
