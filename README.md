@@ -1,8 +1,15 @@
 # DRP Mobility
 
-A mobile app to help mobility-impaired users travel with independence and confidence. Provides trustworthy accessibility information about TfL transit stations and live updates on step-free access outages (lift/escalator failures), with a fast, low-friction flow for submitting and viewing outage reports.
+A mobile app to help mobility-impaired users travel with independence and confidence. It provides trustworthy accessibility information about TfL transit stations and keeps riders ahead of step-free access outages.
 
-Imperial College Year 2 DRP (Design & Realisation Project) coursework.
+Features:
+
+- **Outage reports** — fast, low-friction submission and viewing of lift/escalator failures, grouped into incidents.
+- **Live status** — the backend ingests TfL's disruption feed and streams changes to the app over Server-Sent Events, so status updates appear without a refresh.
+- **Journey planning** — powered by TfL's Journey Planner and cross-referenced against live outage data, with a step-free preference filter.
+- **Push notifications** — riders are alerted when an outage hits a station on a journey they've saved.
+
+Imperial College Year 2 DRP (Designing for Real People) coursework. For an end-to-end picture of how the pieces fit together, see [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
 ## Layout
 

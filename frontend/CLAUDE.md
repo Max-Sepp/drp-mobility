@@ -14,9 +14,11 @@ npm run lint             # ESLint (eslint-config-expo, flat config in eslint.con
 npm run lint:fix         # ESLint with autofix
 npm run format           # Prettier write across the repo
 npm run format:check     # Prettier check only (CI-friendly)
+npm run test             # Vitest (single run)
+npm run test:watch       # Vitest in watch mode
 ```
 
-There is no test runner configured.
+Tests run on **Vitest** (`vitest.config.ts`). Coverage is currently focused on the journey feature's pure logic — `src/features/journey/**/__tests__/` (railcards, route geometry, geocoding, fare labels). There are no component/render tests; prefer extracting testable logic into `lib`/helper modules and unit-testing that rather than rendering RN components.
 
 Linting is ESLint 9 + `eslint-config-expo` (pinned to ESLint 9 — `eslint-plugin-react` isn't ESLint-10-ready). Formatting is Prettier (`.prettierrc.json`: single quotes, no semicolons, 100 cols), with `eslint-config-prettier` disabling stylistic ESLint rules so the two don't conflict. The generated `src/api/schema.d.ts` is excluded from both. `react-hooks/set-state-in-effect` is set to `warn`, not error.
 
@@ -25,13 +27,23 @@ Linting is ESLint 9 + `eslint-config-expo` (pinned to ESLint 9 — `eslint-plugi
 The provider stack, outside-in, is:
 
 ```
-TamaguiProvider (light theme)
-  └─ SafeAreaProvider
-       └─ NavigationContainer
-            └─ RootNavigator
+GestureHandlerRootView
+  └─ ThemeProvider                       (app theme — light/dark/high-contrast, see src/theme)
+       └─ MobilityStyleProvider
+            └─ AccessibilityPreferenceProvider   (step-free preference, filters journeys)
+                 └─ WorkShiftProvider
+                      └─ TamaguiProvider (defaultTheme="light")
+                           └─ AuthProvider
+                                └─ AppContent
+                                     └─ OutageProvider          (live outage state + SSE)
+                                          └─ SafeAreaProvider
+                                               └─ SheetStackProvider
+                                                    └─ LocationProvider
+                                                         └─ NavigationContainer
+                                                              └─ RootNavigator
 ```
 
-When adding global context (auth, theming, query client, etc.), insert it inside `TamaguiProvider` so Tamagui themes are available everywhere, but outside `NavigationContainer` unless the context legitimately depends on navigation state.
+`AppContent` is split out so `usePushNotifications()` can call `useAuth()` (it needs to register the push token against the logged-in user). When adding global context, place it where its dependencies are satisfied: theming/preferences near the top, anything needing auth inside `AuthProvider`, anything needing navigation inside `NavigationContainer`.
 
 ## Navigation (`src/navigation/`)
 
@@ -53,22 +65,37 @@ is really toggling that state. New flows should be added as sheets, not stack sc
 
 ## UI components (`src/components/`)
 
-These are app-level building blocks (`FormScreenLayout`, `ScreenHeader`, `SubmitBar`, `PhotoPicker`, etc.), composed from Tamagui primitives. Prefer composing one of these over reaching for raw `View`/`Text`. `FormScreenLayout`/`ScreenHeader`/`SubmitBar` back the auth screens (`AuthForm`, `AccountScreen`); `FormScreenLayout` handles `KeyboardAvoidingView` internally — don't add another `KeyboardAvoidingView` outside. Reporting is composed inside `ReportSheet` from `EquipmentPicker`, `FormSection`, and `PhotoPicker`.
+App-level building blocks shared across features: `BottomSheet` and `SheetHeader` (the `@gorhom/bottom-sheet` wrappers every sheet is built on), `SheetStack` (the `SheetStackProvider` + ordering for stacked sheets), `ScreenHeader` and `Heading` (text/header primitives), and `TflBadge` (line/mode badge). Prefer composing one of these over reaching for raw `View`/`Text`.
+
+Feature-specific layout components live under their feature, not here — e.g. the form scaffolding (`FormScreenLayout`, `FormSection`, `SubmitBar`, `PhotoPicker`, `EquipmentPicker`) lives in `src/features/reporting/components/` and is reused by the auth screens and `ReportSheet`. `FormScreenLayout` handles `KeyboardAvoidingView` internally — don't add another one outside it.
 
 ## API client (`src/api/`)
 
 - `client.ts` wraps `openapi-fetch` with the types from `schema.d.ts`. Use it via the typed paths — don't construct fetches by hand.
 - **`schema.d.ts` is generated.** Don't edit it by hand. After any backend route/schema change, run `npm run generate:api` against a locally running backend (`DEV=true uvicorn app.main:app --reload`).
 - Base URL comes from `EXPO_PUBLIC_API_URL` and defaults to `http://localhost:8000`. For physical-device testing you'll need to set this to your laptop's LAN IP, since `localhost` on the phone refers to the phone itself.
+- `authToken.ts` holds the current session token; `client.ts` attaches it as a Bearer header on every request. `cachedResource.ts` is a small local-cache helper for infrequently-changing data.
+- Journey geocoding uses Mapbox — set `EXPO_PUBLIC_MAPBOX_TOKEN` (see `src/features/journey/api/geocode.ts`).
+
+## Feature modules (`src/features/`)
+
+Each product area is a self-contained feature folder (own `components/`, `api/`, `lib/`, hooks, context):
+
+- `home` — `MapHomeScreen` and every bottom sheet/card/modal it mounts (`SearchActionSheet`, `JourneyPlannerSheet`, `JourneyDetailSheet`, `ActiveJourneySheet`, `StationSheet`, `ReportSheet`, station cards, `StationAlertBanner`).
+- `map` — `StationMap`, markers, the static `stationMarkers.json` bundle (see Map section below).
+- `stations` — `useStations()` (the `/stations` fetch), step-free helpers (`stepFree.ts`), line colours (`lineColours.ts`), station constants.
+- `journey` — TfL Journey Planner client (`api/`), route/geometry/fare/railcard logic (`lib/`, the unit-tested code), journey UI.
+- `reporting` — outage report submission (`useEquipment`, `useEquipmentTypes`, the form components reused elsewhere).
+- `outages` — `OutageProvider`/`OutageContext` (live outage state, subscribes to the SSE stream), timeline, severity, station-alert helpers, local outage storage.
+- `auth` — login/signup/account screens, `AuthContext`/`useAuth`, the API calls.
+- `crowding` — placeholder for station crowding info (not yet built out).
 
 ## Helpers (`src/lib/`)
 
-- `datetime.ts` centralises the timezone handling: the backend always sends UTC ISO strings, but some don't include a trailing `Z`. `parseUtc` appends `Z` if no timezone designator is present so dates are never reinterpreted as local time. Use these helpers rather than `new Date(iso)` directly when displaying backend timestamps.
-- `LocationContext.tsx` provides a `LocationProvider` (wrap at app root) plus two hooks: `useAppLocation()` → `{ latitude, longitude, ... } | null` and `useAppHeading()` → `number | null` (degrees clockwise from true north). Both return `null` until permission is granted. The provider runs `watchPositionAsync` and `watchHeadingAsync` in a single effect; heading prefers `trueHeading` and falls back to `magHeading`.
-
-## Constants (`src/constants/`)
-
-`stations.ts` contains client-side station data. The backend also exposes `/stations`; check whether the data you need is server-driven (fetched at runtime) or hard-coded here before duplicating.
+- `datetime.ts` centralises timezone handling: the backend always sends UTC ISO strings, but some omit the trailing `Z`. `parseUtc` appends `Z` if no timezone designator is present so dates are never reinterpreted as local time. Use these rather than `new Date(iso)` for backend timestamps.
+- `LocationContext.tsx` provides `LocationProvider` plus `useAppLocation()` → `{ latitude, longitude, ... } | null` and `useAppHeading()` → `number | null` (degrees clockwise from true north). Both return `null` until permission is granted; the provider runs `watchPositionAsync` and `watchHeadingAsync` in one effect (heading prefers `trueHeading`, falls back to `magHeading`).
+- `AccessibilityPreferenceContext.tsx` — the rider's step-free preference (used to filter journey results). `MobilityStyleContext.tsx` and `WorkShiftContext.tsx` carry other rider-mode preferences.
+- `geo.ts` (distance/coordinate maths), `fuzzy.ts` (name matching, used by map POI lookup), `connection.ts` / `offline.ts` (connectivity detection). The app-theme context lives in `src/theme/` (see Theme section), not here.
 
 ## Backend station/equipment data
 
@@ -93,22 +120,21 @@ There is no web build. The app ships through EAS — slug `drp-mobility`, projec
 - `UserLocationMarker.tsx` renders a custom `Marker` with a blue dot and a semi-transparent directional cone that rotates with the device heading. The cone is only shown when `useAppHeading()` returns a non-null value.
 - `StationMap.web.tsx` is a stub that renders `MapPlaceholder` — `react-native-maps` is native-only and the web bundler would otherwise fail.
 
-## Theme (`src/theme.ts`)
+## Theme (`src/theme.ts` + `src/theme/`)
 
-All design tokens live here — import from `@/theme`, never hardcode values in components. Exports:
+Import design tokens from `@/theme` — never hardcode values in components. Theming is **runtime-switchable** between multiple themes (`lightBrutalist`, `darkBrutalist`, `light`, `dark`, defined in `src/theme/themes.ts`), so tokens split into two kinds:
 
-| Export         | Contents                                                                                                                     |
-| -------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `Colors`       | Palette + semantic colours                                                                                                   |
-| `Radii`        | Border radii (`card`, `button`, `input`, `pill`, `small`, `xs`, `handle`, `icon`)                                            |
-| `Shadows`      | `card`, `heavy`, `top`, `marker` — hard-offset for neo-brutalist, soft blur for default                                      |
-| `Borders`      | `thin`, `medium`, `thick`                                                                                                    |
-| `Opacity`      | `disabled`, `disabledMid`, `subtle`, `pressed`, `pressedLight` — use for all interactive state opacity instead of hardcoding |
-| `Overlays`     | `backdrop` — modal/sheet backdrop colour                                                                                     |
-| `Typography`   | Font size + weight presets                                                                                                   |
-| `Spacing`      | 4 pt grid (`xs` → `section`)                                                                                                 |
-| `Heights`      | `button`, `touchTarget`                                                                                                      |
-| `SharedStyles` | Common `StyleSheet` fragments (`card`, `row`, `screenBackground`)                                                            |
+**Theme-dependent — read with the `useTheme()` hook** (changes when the user switches theme; *not* static imports):
+
+| `useTheme()` field | Contents                                                                            |
+| ------------------ | ----------------------------------------------------------------------------------- |
+| `Colors`           | Palette + semantic colours (incl. `mapGrid`)                                         |
+| `Radii`            | Border radii (`card`, `button`, `input`, `pill`, …)                                  |
+| `Shadows`          | `card`, `heavy`, `top`, `marker` — hard-offset for neo-brutalist, soft blur otherwise |
+
+`ThemeProvider` (mounted near the root of `App.tsx`) supplies these; `useThemeControls()` returns `{ themeId, setTheme }` for switching. Because colours are now per-theme, **do not** import a static `Colors`; read them via `useTheme()` inside the component so they react to theme changes.
+
+**Theme-independent — static `const` exports from `src/theme.ts`** (same in every theme): `Typography`, `Spacing` (4 pt grid), `Borders` (`thin`/`medium`/`thick`), `Opacity` (`disabled`/`pressed`/… — use these for all interactive-state opacity), `Overlays` (`backdrop`), `Heights` (`button`/`touchTarget`), `hairlineWidth`. `theme.ts` also re-exports the theme hooks/types so everything theme-related imports from one place.
 
 ## When working on UI
 
