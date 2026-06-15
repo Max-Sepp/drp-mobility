@@ -73,8 +73,7 @@ const BottomSheet = forwardRef<GorhomBottomSheet, BottomSheetProps>(
       <GorhomBottomSheet
         enablePanDownToClose={enablePanDownToClose}
         enableDynamicSizing={false}
-        animationConfigs={{ damping: 24, stiffness: 200 }}
-        handleIndicatorStyle={styles.handle}
+handleIndicatorStyle={styles.handle}
         backgroundStyle={styles.background}
         keyboardBehavior="extend"
         keyboardBlurBehavior="restore"
