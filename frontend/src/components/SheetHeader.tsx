@@ -22,7 +22,15 @@ type SheetHeaderProps = {
  * Consistent header row for all bottom sheets: optional left action, title (+ optional
  * subtitle), optional right extras, and always a close button on the far right.
  */
-export function SheetHeader({ title, subtitle, onClose, left, right, modal, titleFontSize = 18 }: SheetHeaderProps) {
+export function SheetHeader({
+  title,
+  subtitle,
+  onClose,
+  left,
+  right,
+  modal,
+  titleFontSize = 18,
+}: SheetHeaderProps) {
   const { Colors } = useTheme()
 
   return (

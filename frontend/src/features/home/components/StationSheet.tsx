@@ -265,7 +265,13 @@ export function StationSheet({
         contentContainerStyle={{ paddingBottom: insets.bottom + Spacing.xl }}
       >
         {stationDetail && <StationInfoCard station={stationDetail} />}
-        {stationDetail && <PlatformAccessCard key={station} platforms={stationDetail.platforms} reports={stationReports} />}
+        {stationDetail && (
+          <PlatformAccessCard
+            key={station}
+            platforms={stationDetail.platforms}
+            reports={stationReports}
+          />
+        )}
         <StationAlertBanner alerts={alerts} />
         <ReportsStatus loading={loading} reports={reports} />
         {stationDetail && <StationAdditionalInfoCard station={stationDetail} />}

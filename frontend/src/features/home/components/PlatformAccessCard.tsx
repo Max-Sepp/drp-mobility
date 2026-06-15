@@ -131,7 +131,9 @@ function isPlatformAffected(platform: PlatformDetail, endpoints: string[]): bool
 }
 
 function buildSummary(platforms: PlatformDetail[], disruptedCount: number): string {
-  const toTrain = platforms.filter((p) => p.step_free === 'full' || p.step_free === 'to_train').length
+  const toTrain = platforms.filter(
+    (p) => p.step_free === 'full' || p.step_free === 'to_train',
+  ).length
   const toPlatform = platforms.filter((p) => p.step_free === 'to_platform').length
   const noneAll = platforms.filter((p) => p.step_free === 'none').length
   const permanentNone = noneAll - disruptedCount
