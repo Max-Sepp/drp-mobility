@@ -1,7 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import { useFocusEffect } from '@react-navigation/native'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Alert, Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Animated, Alert, Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { StationMap, type StationMapHandle } from '@/features/map/components/StationMap'
 import { useAppLocation } from '@/lib/LocationContext'
@@ -396,7 +396,16 @@ export function MapHomeScreen({ navigation, route }: Props) {
   // enough room for the top buttons. When a sheet reaches that height it covers the map entirely
   // (e.g. the route overview), so the re-centre/account buttons are hidden to avoid floating over it.
   const insets = useSafeAreaInsets()
-  const sheetIsFullscreen = mapBottomInset >= Dimensions.get('window').height - insets.top - 66
+  const sheetIsFullscreen = mapBottomInset >= Dimensions.get('window').height - insets.top - 10
+
+  const topButtonsOpacity = useRef(new Animated.Value(1)).current
+  useEffect(() => {
+    Animated.timing(topButtonsOpacity, {
+      toValue: sheetIsFullscreen ? 0 : 1,
+      duration: 180,
+      useNativeDriver: true,
+    }).start()
+  }, [sheetIsFullscreen, topButtonsOpacity])
 
   // The search sheet is the resting state of the map. Any other flow (a station, a plan, a journey
   // detail/active journey, or a report) takes over the screen, so the search sheet is dismissed
@@ -687,29 +696,30 @@ export function MapHomeScreen({ navigation, route }: Props) {
 
       {/* Top overlay: rendered after sheets so it sits above all backdrops */}
       <SafeAreaView edges={['top']} style={[styles.topSafe, { pointerEvents: 'box-none' }]}>
-        {!sheetIsFullscreen && (
-          <View style={[styles.topButtons, { pointerEvents: 'box-none' }]}>
-            <TopIconButton
-              icon="my-location"
-              size={50}
-              color={coords ? Colors.blue : Colors.secondaryText}
-              accessibilityLabel="Re-centre map on my location"
-              onPress={() => mapRef.current?.recentre()}
-            />
-            {shiftStation && !activeStation && !activeReport && (
-              <ShiftBanner station={shiftStation} onJump={jumpToShiftStation} />
-            )}
-            <TopIconButton
-              icon={status === 'authed' ? 'account-circle' : 'person'}
-              color={status === 'authed' ? Colors.blue : Colors.text}
-              size={50}
-              accessibilityLabel={
-                status === 'authed' && user ? `Logged in as ${user.username}` : 'Log in'
-              }
-              onPress={handleAccountPress}
-            />
-          </View>
-        )}
+        <Animated.View
+          style={[styles.topButtons, { opacity: topButtonsOpacity }]}
+          pointerEvents={sheetIsFullscreen ? 'none' : 'box-none'}
+        >
+          <TopIconButton
+            icon="my-location"
+            size={50}
+            color={coords ? Colors.blue : Colors.secondaryText}
+            accessibilityLabel="Re-centre map on my location"
+            onPress={() => mapRef.current?.recentre()}
+          />
+          {shiftStation && !activeStation && !activeReport && (
+            <ShiftBanner station={shiftStation} onJump={jumpToShiftStation} />
+          )}
+          <TopIconButton
+            icon={status === 'authed' ? 'account-circle' : 'person'}
+            color={status === 'authed' ? Colors.blue : Colors.text}
+            size={50}
+            accessibilityLabel={
+              status === 'authed' && user ? `Logged in as ${user.username}` : 'Log in'
+            }
+            onPress={handleAccountPress}
+          />
+        </Animated.View>
         {active && !activeJourneyParams && (
           <ActiveJourneyBanner
             active={active}
