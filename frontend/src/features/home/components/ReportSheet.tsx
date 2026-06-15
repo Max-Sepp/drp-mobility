@@ -6,10 +6,14 @@
 import * as ImagePicker from 'expo-image-picker'
 import { MaterialIcons } from '@expo/vector-icons'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Alert, Dimensions, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
+import { Alert, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { Text } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import BottomSheet, { BottomSheetScrollView, type BottomSheetRef } from '@/components/BottomSheet'
+import BottomSheet, {
+  BottomSheetScrollView,
+  BottomSheetTextInput,
+  type BottomSheetRef,
+} from '@/components/BottomSheet'
 import { SheetHeader } from '@/components/SheetHeader'
 import { apiClient } from '@/api/client'
 import type { components } from '@/api/schema.d'
@@ -452,7 +456,7 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
                   platforms={stationDetail?.platforms}
                 />
                 <FormSection label="Comments (optional)">
-                  <TextInput
+                  <BottomSheetTextInput
                     style={styles.textArea}
                     placeholder="e.g. doors won't open…"
                     placeholderTextColor={Colors.placeholderText}
@@ -467,7 +471,7 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
             ) : (
               <>
                 <FormSection label="Describe the issue">
-                  <TextInput
+                  <BottomSheetTextInput
                     style={styles.textArea}
                     placeholder={
                       issueType === 'overcrowding'
@@ -483,7 +487,7 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
                   />
                 </FormSection>
                 <FormSection label="Area within station (optional)">
-                  <TextInput
+                  <BottomSheetTextInput
                     style={styles.textInput}
                     placeholder="e.g. northbound platform, main entrance…"
                     placeholderTextColor={Colors.placeholderText}
