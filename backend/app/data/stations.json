@@ -5627,17 +5627,17 @@
         "id": "HUBCAW-Lift-DLR 1",
         "name": "Lift DLR 1",
         "from": "Northern line",
-        "to": "DLR M",
+        "to": "DLR concourse",
         "limitedCapacity": false,
-        "description": "Northern line ↔ DLR M"
+        "description": "Northern line ↔ DLR concourse"
       },
       {
         "id": "HUBCAW-Lift-DLR 2",
         "name": "Lift DLR 2",
         "from": "Northern line",
-        "to": "DLR M",
+        "to": "DLR concourse",
         "limitedCapacity": false,
-        "description": "Northern line ↔ DLR M"
+        "description": "Northern line ↔ DLR concourse"
       },
       {
         "id": "HUBCAW-Lift-DLR S2",
@@ -5646,7 +5646,7 @@
         "to": "DLR northbound",
         "limitedCapacity": false,
         "description": "Shopping centre (west entrance) ↔ DLR northbound",
-        "via": "DLR M"
+        "via": "DLR concourse"
       },
       {
         "id": "HUBCAW-Lift-DLR S3",
@@ -5655,7 +5655,7 @@
         "to": "DLR southbound",
         "limitedCapacity": false,
         "description": "Shopping centre (east entrance) ↔ DLR southbound",
-        "via": "DLR M"
+        "via": "DLR concourse"
       },
       {
         "id": "HUBCAW-Lift-LU 1",
@@ -8428,9 +8428,9 @@
         "id": "940GZZDLCLA-Lift-1",
         "name": "Lift 1",
         "from": "Station concourse",
-        "to": "DLR_S",
+        "to": "DLR southbound",
         "limitedCapacity": true,
-        "description": "Station concourse ↔ DLR_S"
+        "description": "Station concourse ↔ DLR southbound"
       },
       {
         "id": "940GZZDLCLA-Lift-2",
@@ -9479,18 +9479,18 @@
       {
         "id": "940GZZDLDEP-Lift-1",
         "name": "Lift 1",
-        "from": "C",
+        "from": "Concourse",
         "to": "DLR southbound",
         "limitedCapacity": false,
-        "description": "C ↔ DLR southbound"
+        "description": "Concourse ↔ DLR southbound"
       },
       {
         "id": "940GZZDLDEP-Lift-2",
         "name": "Lift 2",
-        "from": "C",
+        "from": "Concourse",
         "to": "DLR northbound",
         "limitedCapacity": false,
-        "description": "C ↔ DLR northbound"
+        "description": "Concourse ↔ DLR northbound"
       }
     ],
     "id": "940GZZDLDEP",
@@ -26118,9 +26118,9 @@
         "id": "HUBPAD-Lift-2",
         "name": "Lift 2",
         "from": "The Lawn (concourse)",
-        "to": "D - L",
+        "to": "District line platforms",
         "limitedCapacity": false,
-        "description": "The Lawn (concourse) ↔ D - L"
+        "description": "The Lawn (concourse) ↔ District line platforms"
       },
       {
         "id": "HUBPAD-Lift-3",
@@ -34059,10 +34059,10 @@
       {
         "id": "HUBTCR-Lift-3",
         "name": "Lift A",
-        "from": "F-O/C",
+        "from": "Station forecourt",
         "to": "Booking Hall",
         "limitedCapacity": false,
-        "description": "F-O/C ↔ Booking Hall"
+        "description": "Station forecourt ↔ Booking Hall"
       },
       {
         "id": "HUBTCR-Lift-4",
@@ -34445,17 +34445,17 @@
         "id": "HUBTOG-Lift-1",
         "name": "Lift 1",
         "from": "Minories entrance",
-        "to": "DLR 2",
+        "to": "DLR platform 2",
         "limitedCapacity": true,
-        "description": "Minories entrance ↔ DLR 2"
+        "description": "Minories entrance ↔ DLR platform 2"
       },
       {
         "id": "HUBTOG-Lift-2",
         "name": "Lift 2",
         "from": "Minories entrance",
-        "to": "DLR 2",
+        "to": "DLR platform 2",
         "limitedCapacity": true,
-        "description": "Minories entrance ↔ DLR 2"
+        "description": "Minories entrance ↔ DLR platform 2"
       }
     ],
     "id": "HUBTOG",
@@ -38328,26 +38328,26 @@
       {
         "id": "910GWHMPSTM-Lift-1",
         "name": "Lift 1",
-        "from": "FB I",
+        "from": "Footbridge",
         "to": "Railway platform 1",
         "limitedCapacity": false,
-        "description": "FB I ↔ Railway platform 1"
+        "description": "Footbridge ↔ Railway platform 1"
       },
       {
         "id": "910GWHMPSTM-Lift-2",
         "name": "Lift 2",
-        "from": "FB I",
+        "from": "Footbridge",
         "to": "Railway platform 2",
         "limitedCapacity": false,
-        "description": "FB I ↔ Railway platform 2"
+        "description": "Footbridge ↔ Railway platform 2"
       },
       {
         "id": "910GWHMPSTM-Lift-3",
         "name": "Lift 3",
-        "from": "FB I",
+        "from": "Footbridge",
         "to": "Railway platform 3",
         "limitedCapacity": false,
-        "description": "FB I ↔ Railway platform 3"
+        "description": "Footbridge ↔ Railway platform 3"
       }
     ],
     "id": "910GWHMPSTM",
@@ -40582,17 +40582,17 @@
         "id": "HUBWWA-Lift-2",
         "name": "Lift C",
         "from": "Beresford Square entrance",
-        "to": "DLR",
+        "to": "DLR platforms",
         "limitedCapacity": false,
-        "description": "Beresford Square entrance ↔ DLR"
+        "description": "Beresford Square entrance ↔ DLR platforms"
       },
       {
         "id": "HUBWWA-Lift-3",
         "name": "Lift A",
         "from": "Station concourse",
-        "to": "DLR",
+        "to": "DLR platforms",
         "limitedCapacity": false,
-        "description": "Station concourse ↔ DLR",
+        "description": "Station concourse ↔ DLR platforms",
         "via": "DLR interchange concourse"
       }
     ],

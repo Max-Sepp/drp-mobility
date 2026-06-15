@@ -380,6 +380,16 @@ _AREA_EXACT: dict[str, str] = {
     "WIDR": "Westferry Road side entrance",  # Westferry DLR — secondary street entrance
     "WILTO": "Wilton Road entrance",  # Abbey Wood — Wilton Road (station's street)
     "WOO": "Station concourse",  # Woolwich Arsenal
+    # ----- Previously-untranslated shortcodes ---------------------------------------
+    "C": "Concourse",  # Deptford Bridge DLR — concourse/ticket level
+    "D - L": "District line platforms",  # Paddington — lift from the Lawn to District/Circle line
+    "DLR": "DLR platforms",  # Woolwich Arsenal
+    "DLR 1": "DLR platform 1",  # Tower Gateway
+    "DLR 2": "DLR platform 2",  # Tower Gateway
+    "DLR M": "DLR concourse",  # Canary Wharf — shared mid-level DLR concourse
+    "DLR_S": "DLR southbound",  # Crossharbour — underscore variant of DLR-S
+    "F-O/C": "Station forecourt",  # Tottenham Court Road — street-level forecourt node
+    "FB I": "Footbridge",  # West Hampstead Thameslink — platform footbridge
 }
 
 # Line prefix codes used in area names like "DisWB", "PicNB"
