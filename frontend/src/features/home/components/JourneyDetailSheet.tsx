@@ -128,7 +128,7 @@ function TimelineWaypoint({
       <View style={{ width: GUTTER_W, alignItems: 'center', justifyContent: 'center' }}>
         {kind === 'destination' ? (
           <MaterialIcons name="place" size={22} color={Colors.text} />
-        ) : kind === 'origin' ? (
+        ) : kind === 'origin' && waypointType === 'default' ? (
           <View
             style={{
               width: 13,
@@ -574,6 +574,11 @@ export function JourneyDetailSheet({
     firstLeg && isBusLeg(firstLeg) ? firstLeg.departurePoint?.stopLetter : undefined
 
   // Origin waypoint
+  const originWaypointType: WaypointType = isBusLeg(firstLeg)
+    ? 'bus'
+    : firstLeg && firstLeg.mode.name !== 'walking'
+      ? 'tube'
+      : 'default'
   timelineItems.push(
     <TimelineWaypoint
       key="origin"
@@ -582,6 +587,7 @@ export function JourneyDetailSheet({
       time={clockTime(journey.startDateTime)}
       dotColor={Colors.text}
       stopNumber={originStopNumber}
+      waypointType={originWaypointType}
     />,
   )
 
