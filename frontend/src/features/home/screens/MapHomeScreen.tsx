@@ -28,6 +28,7 @@ import { useAuth } from '@/features/auth'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import type { RootStackParamList } from '@/navigation/types'
 import type { ResolvedLocation } from '@/features/journey/api/geocode'
+import type { Journey } from '@/features/journey/api/tfl'
 import { useTheme, Spacing, Typography } from '@/theme'
 import {
   SearchActionSheet,
@@ -306,18 +307,26 @@ export function MapHomeScreen({ navigation, route }: Props) {
   // strip of map left above it and zoom right out to all of London. Reacting only to the journey
   // becoming active (not every GPS tick) also means manual panning mid-journey isn't fought.
   const wasActiveRef = useRef(false)
+  // The journey object last framed by the camera, so a mid-journey reroute (which swaps the journey
+  // while it's already active) re-frames to the new route rather than being treated as a GPS tick.
+  const fittedJourneyRef = useRef<Journey | null>(null)
   useEffect(() => {
     if (!mapRoute) {
       wasActiveRef.current = false
+      fittedJourneyRef.current = null
       return
     }
+    const journey = activeJourneyParams?.journey ?? null
     const justStarted = Boolean(activeJourneyParams) && !wasActiveRef.current
+    const rerouted =
+      Boolean(activeJourneyParams) && !justStarted && journey !== fittedJourneyRef.current
     wasActiveRef.current = Boolean(activeJourneyParams)
     // Defer one beat on start: the detail sheet we're leaving is still closing, so its tall
     // reported height lingers in mapBottomInset for a frame. Fitting immediately would frame the
     // route into the thin strip left above that stale inset and zoom right out. Waiting lets the
     // inset settle to the compact active-journey sheet so the whole trip is framed and centred.
-    if (justStarted) {
+    if (justStarted || rerouted) {
+      fittedJourneyRef.current = journey
       const id = setTimeout(() => mapRef.current?.fitToRoute(mapRoute.bounds), 400)
       return () => clearTimeout(id)
     }
@@ -603,6 +612,9 @@ export function MapHomeScreen({ navigation, route }: Props) {
           setActiveJourneyParams(null)
           setActive(null)
         }}
+        onRerouteSelected={(journey) =>
+          setActiveJourneyParams((prev) => (prev ? { ...prev, journey } : prev))
+        }
         onHeightChange={setActiveJourneyHeight}
       />
 

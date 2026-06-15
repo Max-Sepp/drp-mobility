@@ -202,6 +202,24 @@ export function routeSignature(journey: Journey): string {
 }
 
 /**
+ * Derive display tags from a set of routes: the best on each metric (plus anything tied within
+ * `TAG_TOLERANCE` for the time-based ones) earns the tag. Order matches the RouteTags display
+ * order (fastest, fewest-changes, least-walking).
+ */
+function tagJourneys(journeys: Journey[]): TaggedJourney[] {
+  const minDuration = Math.min(...journeys.map((j) => j.duration))
+  const minWalking = Math.min(...journeys.map(walkingMinutes))
+  const minChanges = Math.min(...journeys.map(changeCount))
+  return journeys.map((journey) => {
+    const tags: RouteTag[] = []
+    if (journey.duration <= minDuration * (1 + TAG_TOLERANCE)) tags.push('fastest')
+    if (changeCount(journey) === minChanges) tags.push('fewest-changes')
+    if (walkingMinutes(journey) <= minWalking * (1 + TAG_TOLERANCE)) tags.push('least-walking')
+    return { journey, tags }
+  })
+}
+
+/**
  * Plan a set of genuinely different routes by asking TfL for each of its optimisation criteria in
  * parallel (fastest / fewest changes / least walking), then collapsing the time-shifted repeats
  * each criterion returns. Tags are then derived from the actual route data — each metric's
@@ -245,21 +263,7 @@ export async function planJourneyOptions(
   const journeys = [...bySignature.values()]
   if (journeys.length === 0) return { kind: 'error', message: lastError }
 
-  // Derive tags from the actual routes: the best on each metric (plus anything tied within
-  // TAG_TOLERANCE for the time-based ones) earns the tag.
-  const minDuration = Math.min(...journeys.map((j) => j.duration))
-  const minWalking = Math.min(...journeys.map(walkingMinutes))
-  const minChanges = Math.min(...journeys.map(changeCount))
-
-  const tagged: TaggedJourney[] = journeys.map((journey) => {
-    const tags: RouteTag[] = []
-    // Order matters: matches RouteTags display order (fastest, fewest-changes, least-walking).
-    if (journey.duration <= minDuration * (1 + TAG_TOLERANCE)) tags.push('fastest')
-    if (changeCount(journey) === minChanges) tags.push('fewest-changes')
-    if (walkingMinutes(journey) <= minWalking * (1 + TAG_TOLERANCE)) tags.push('least-walking')
-    return { journey, tags }
-  })
-  return { kind: 'journeys', journeys: tagged }
+  return { kind: 'journeys', journeys: tagJourneys(journeys) }
 }
 
 /** A step-free walking link from one platform to another at the same station. */
@@ -268,6 +272,9 @@ type PlatformInterchange = { to: string; distance_m: number }
 /** Minimal shape of a station used by the rerouting helpers. Satisfied by `StationDetail`. */
 export type StationLookup = {
   name: string
+  // NaPTAN StopPoint / Hub id (e.g. "940GZZLUACT", "HUBKPA"). Used to plan to/from the exact
+  // station so a reroute's stitched segments meet at one real stop.
+  tfl_id?: string | null
   latitude?: number | null
   longitude?: number | null
   platforms: {
@@ -347,44 +354,6 @@ function nearbyStepFreeStations(
   return out
 }
 
-/**
- * Walking forward from the user's current leg, find the last interchange station they will pass
- * through before reaching any blocked station. Returns the station name as TfL knows it, suitable
- * to pass back to the journey planner, or null when there's no interchange before the block.
- *
- * Replanning from a real interchange surfaces genuine line-switching alternatives — something
- * that querying from a non-interchange intermediate stop cannot produce.
- */
-function lastInterchangeBefore(
-  legs: Leg[],
-  fromLegIndex: number,
-  blockedStationNames: string[],
-  stations: StationLookup[],
-): string | null {
-  const blockedNorm = blockedStationNames.map(normaliseStationName)
-  const matchesBlocked = (name: string) => {
-    const n = normaliseStationName(name)
-    return blockedNorm.some((b) => n.includes(b) || b.includes(n))
-  }
-
-  let last: string | null = null
-  for (let i = fromLegIndex; i < legs.length; i++) {
-    const leg = legs[i]
-    if (leg.mode.name === 'walking') continue
-    const points: string[] = []
-    if (leg.departurePoint?.commonName) points.push(leg.departurePoint.commonName)
-    for (const sp of leg.path?.stopPoints ?? []) {
-      if (sp.name) points.push(sp.name)
-    }
-    for (const name of points) {
-      if (matchesBlocked(name)) return last
-      const s = findStationByName(stations, name)
-      if (s && isInterchange(s)) last = name
-    }
-  }
-  return last
-}
-
 /** TfL local-wallclock time format ("YYYY-MM-DDTHH:MM:SS", no timezone). */
 function toLondonLocal(d: Date): string {
   const pad = (n: number) => String(n).padStart(2, '0')
@@ -459,25 +428,26 @@ function appendWalkingLeg(
 }
 
 /**
- * Find alternative routes when a station on the user's current journey has reported accessibility
- * outages. Runs three strategies in parallel and merges:
+ * Find alternative routes when a station ahead on the rider's current line has a reported
+ * accessibility outage. Unlike a plain replan (which TfL would route straight back through the
+ * block), this walks the line's stop sequence to build genuine escapes, in fallback order:
  *
- * - **Substitute destination (A)**: pick step-free stations near the blocked one (from our own
- *   `stations.json`), plan to each, then synthesise a final walking leg to the original destination.
- *   Lets the rider end at a different (working) station and walk the last stretch.
- * - **Earlier interchange (B)**: identify the last interchange the rider will pass through before
- *   the block, then replan from there to the original destination with all modes enabled and
- *   `includeAlternativeRoutes=true`. Gives TfL the room to surface a real line-switch.
- * - **Walk fallback (C)**: a single walking-only journey from origin to destination, always
- *   included as a safety net so the alternatives sheet is never empty.
+ * 1. **Line-graph escapes** — using `approachLeg` (its line + the direction fixed by its
+ *    departure/arrival points), locate the block on the line and ride either *forward* past it to
+ *    the next step-free station, or *backward* to the last step-free interchange before it (where
+ *    the rider can switch lines). Each escape is planned onward to the destination and stitched to
+ *    a synthetic ride leg from the rider's current position.
+ * 2. **Nearest step-free stations** — the guaranteed fallback: ride to the closest step-free
+ *    stations and continue from there. There is essentially always one nearby.
+ * 3. **Substitute + walk** — end at a working step-free station near the block and walk the last
+ *    stretch.
+ * 4. **Pure walk** — a single walking-only journey, only as a true last resort.
  *
- * `originCoords` is the rider's current position (GPS); `destCoords` are the coordinates of the
- * journey's true destination. Either can be null — strategies needing them will silently skip.
- * Results are deduplicated by route signature and tagged (fastest / fewest-changes / least-walking).
+ * `originCoords` is the rider's current position (GPS); `destCoords` are the journey's true
+ * destination coordinates. Results are deduplicated by route signature and tagged.
  */
 export async function planAlternativesAlongLine(
-  legs: Leg[],
-  fromLegIndex: number,
+  approachLeg: Leg,
   destination: string,
   accessibility: AccessibilityPreference | null,
   blockedStationNames: string[],
@@ -485,82 +455,159 @@ export async function planAlternativesAlongLine(
   originCoords: LatLon | null,
   destCoords: LatLon | null,
 ): Promise<JourneyOptionsResult> {
-  // Strategy A — substitute destination
-  const strategyA: Promise<Journey[]> = (async () => {
-    if (!originCoords || !destCoords || blockedStationNames.length === 0) return []
-    // Anchor on the blocked station's known coordinates so substitutes cluster near it. Fall back
-    // to the rider's destination if we don't recognise the blocked station name.
-    const blockedCoords = blockedStationNames
-      .map((n) => {
-        const s = findStationByName(stations, n)
-        return s ? stationCoords(s) : null
-      })
-      .filter((c): c is LatLon => c !== null)
-    const anchor = blockedCoords[0] ?? destCoords
+  if (blockedStationNames.length === 0) {
+    return { kind: 'error', message: 'No alternative routes found.' }
+  }
+  const blockedNorm = blockedStationNames.map(normaliseStationName)
+  const isBlocked = (name: string) => blockedNorm.some((b) => sameStationName(name, b))
+
+  const lineName = approachLeg.routeOptions?.[0]?.name ?? ''
+  const lineId = tflLineId(lineName)
+  const depName = approachLeg.departurePoint?.commonName ?? null
+
+  const excludeNorm = new Set(blockedNorm)
+  const escapes: Escape[] = []
+  const pushEscape = (station: StationLookup) => {
+    const c = stationCoords(station)
+    const norm = normaliseStationName(station.name)
+    if (!c || excludeNorm.has(norm)) return
+    excludeNorm.add(norm)
+    escapes.push({ station, coords: c })
+  }
+
+  let blockName: string | null = null
+  let blockCoords: LatLon | null = null
+
+  // 1. Walk the line sequence. The travel direction is fixed by the boarding point → block, so we
+  // ride forward (past the block to the next step-free station) and backward (alight before it at
+  // the last step-free interchange). Anchoring on the block (not the leg's arrival, which may be a
+  // verbose/unmatched name or a later change) makes this fire reliably.
+  if (lineId) {
+    for (const branch of await fetchLineBranches(lineId)) {
+      const names = branch.names
+      const depIdx = depName == null ? -1 : names.findIndex((x) => sameStationName(x, depName))
+      const blockIdx = names.findIndex((n) => isBlocked(n))
+      if (depIdx < 0 || blockIdx < 0 || depIdx === blockIdx) continue
+      if (!blockName) {
+        blockName = names[blockIdx]
+        const bs = findStationByName(stations, blockName)
+        blockCoords = bs ? stationCoords(bs) : null
+      }
+      const ascending = blockIdx > depIdx
+      // Forward: beyond the block, continuing in the travel direction.
+      const forward = ascending ? names.slice(blockIdx + 1) : names.slice(0, blockIdx).reverse()
+      // Before the block, ordered nearest-block-first, between the boarding point and the block.
+      const before = ascending
+        ? names.slice(depIdx + 1, blockIdx).reverse()
+        : names.slice(blockIdx + 1, depIdx)
+      const f = firstStepFreeAlong(forward, stations, excludeNorm)
+      if (f) pushEscape(f)
+      const b =
+        firstStepFreeInterchangeAlong(before, stations, excludeNorm) ??
+        firstStepFreeAlong(before, stations, excludeNorm)
+      if (b) pushEscape(b)
+    }
+  }
+
+  // Anchor the reach segment at the rider's live position, falling back to where they boarded this
+  // leg, then to the block. Both forward and backward escapes lie ahead of this point.
+  const fromCoords =
+    originCoords ??
+    (approachLeg.departurePoint?.lat != null && approachLeg.departurePoint?.lon != null
+      ? { lat: approachLeg.departurePoint.lat, lon: approachLeg.departurePoint.lon }
+      : null) ??
+    blockCoords ??
+    destCoords
+  const from = { name: depName ?? 'your current position', coords: fromCoords }
+
+  // Routes may pass *through* the block (fine for a step-free outage — the rider stays on the
+  // train), so the block itself is not in the avoid set; other blocked stations still are.
+  const blockedOtherNorm = new Set(
+    blockedNorm.filter((n) => !blockName || !sameStationName(n, blockName)),
+  )
+
+  if (escapes.length > 0 && from.coords) {
+    const transit = await planFromEscapes(
+      escapes,
+      { coords: from.coords },
+      destination,
+      accessibility,
+      blockedOtherNorm,
+    )
+    if (transit.kind === 'journeys') return transit
+  }
+
+  // 2. Nearest step-free stations — the guaranteed fallback (ride to the closest one, continue).
+  if (from.coords) {
+    const nearEscapes: Escape[] = nearbyStepFreeStations(
+      from.coords,
+      stations,
+      blockedStationNames,
+      3,
+    )
+      .slice(0, 3)
+      .map((n) => ({ station: n.station, coords: n.coords }))
+    if (nearEscapes.length > 0) {
+      const near = await planFromEscapes(
+        nearEscapes,
+        { coords: from.coords },
+        destination,
+        accessibility,
+        blockedOtherNorm,
+      )
+      if (near.kind === 'journeys') return near
+    }
+  }
+
+  // 3. Substitute step-free station near the block + walk the last stretch to the destination.
+  if (originCoords && destCoords) {
+    const anchor = blockCoords ?? destCoords
     const substitutes = nearbyStepFreeStations(anchor, stations, blockedStationNames, 1.5).slice(
       0,
       3,
     )
-    if (substitutes.length === 0) return []
     const originStr = `${originCoords.lat},${originCoords.lon}`
     const results = await Promise.all(
+      // Query the substitute by coordinates — TfL can't resolve our terse internal names.
       substitutes.map((sub) =>
-        planJourney(originStr, sub.station.name, accessibility, null, null, true),
+        planJourney(
+          originStr,
+          `${sub.coords.lat},${sub.coords.lon}`,
+          accessibility,
+          null,
+          null,
+          true,
+        ),
       ),
     )
-    const out: Journey[] = []
+    const bySig = new Map<string, Journey>()
     for (let i = 0; i < results.length; i++) {
       const result = results[i]
       const sub = substitutes[i]
       if (result.kind !== 'journeys') continue
       for (const journey of result.journeys) {
-        out.push(
-          appendWalkingLeg(journey, { name: sub.station.name, coords: sub.coords }, destCoords),
+        const walked = appendWalkingLeg(
+          journey,
+          { name: sub.station.name, coords: sub.coords },
+          destCoords,
         )
+        // Only viable when the final walk to the destination is short (destination near the block).
+        if (maxWalkLegMinutes(walked) > MAX_WALK_LEG_MIN) continue
+        const key = routeSignature(walked)
+        if (!bySig.has(key)) bySig.set(key, walked)
       }
     }
-    return out
-  })()
-
-  // Strategy B — earlier interchange
-  const strategyB: Promise<Journey[]> = (async () => {
-    if (blockedStationNames.length === 0) return []
-    const interchange = lastInterchangeBefore(legs, fromLegIndex, blockedStationNames, stations)
-    if (!interchange) return []
-    const result = await planJourney(interchange, destination, accessibility, null, null, true)
-    return result.kind === 'journeys' ? result.journeys : []
-  })()
-
-  // Strategy C — walking fallback (always included when we have both endpoints)
-  const strategyC: Journey[] =
-    originCoords && destCoords ? [synthesizeWalkJourney(originCoords, destCoords)] : []
-
-  const [resultsA, resultsB] = await Promise.all([strategyA, strategyB])
-
-  const bySignature = new Map<string, Journey>()
-  for (const journey of [...resultsA, ...resultsB, ...strategyC]) {
-    const key = routeSignature(journey)
-    if (!bySignature.has(key)) bySignature.set(key, journey)
+    if (bySig.size > 0) return { kind: 'journeys', journeys: tagJourneys([...bySig.values()]) }
   }
 
-  const journeys = [...bySignature.values()]
-  if (journeys.length === 0) {
-    return { kind: 'error', message: 'No alternative routes found.' }
+  // 4. Pure walk — true last resort, and only when the destination is genuinely walkable.
+  if (originCoords && destCoords) {
+    const walk = synthesizeWalkJourney(originCoords, destCoords)
+    if (maxWalkLegMinutes(walk) <= MAX_WALK_LEG_MIN) {
+      return { kind: 'journeys', journeys: tagJourneys([walk]) }
+    }
   }
-
-  const minDuration = Math.min(...journeys.map((j) => j.duration))
-  const minWalking = Math.min(...journeys.map(walkingMinutes))
-  const minChanges = Math.min(...journeys.map(changeCount))
-
-  const tagged: TaggedJourney[] = journeys.map((journey) => {
-    const tags: RouteTag[] = []
-    if (journey.duration <= minDuration * (1 + TAG_TOLERANCE)) tags.push('fastest')
-    if (changeCount(journey) === minChanges) tags.push('fewest-changes')
-    if (walkingMinutes(journey) <= minWalking * (1 + TAG_TOLERANCE)) tags.push('least-walking')
-    return { journey, tags }
-  })
-
-  return { kind: 'journeys', journeys: tagged }
+  return { kind: 'error', message: 'No alternative routes found.' }
 }
 
 // ── "Stuck on the platform" rerouting ──────────────────────────────────────────────────────────
@@ -598,17 +645,6 @@ function tflLineId(name: string | undefined): string | null {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '')
   return id || null
-}
-
-/** The leg mode used to render a ride on a given line (for colour/icon in the result card). */
-function legModeForLine(lineName: string): string {
-  const n = normaliseStationName(lineName)
-  if (n.includes('elizabeth')) return 'elizabeth-line'
-  if (n.includes('overground') || n.includes('liberty') || n.includes('lioness') ||
-    n.includes('mildmay') || n.includes('suffragette') || n.includes('weaver') ||
-    n.includes('windrush')) return 'overground'
-  if (n === 'dlr') return 'dlr'
-  return 'tube'
 }
 
 /** Ordered station names of one branch of a line's route sequence. */
@@ -658,48 +694,62 @@ function firstStepFreeAlong(
   return null
 }
 
-/** Rough on-train minutes between two points: straight-line km at ~40 km/h (stops included). */
-function trainMinutes(a: LatLon, b: LatLon): number {
-  return Math.max(2, Math.round((haversineKm(a, b) / 40) * 60))
+/**
+ * The first station in `names` (in order) that is both step-free to board AND an interchange — i.e.
+ * a place the rider can change to another line. `names` should be ordered nearest-first from the
+ * point of interest. Used to find where to alight before a block and switch lines.
+ */
+function firstStepFreeInterchangeAlong(
+  names: string[],
+  stations: StationLookup[],
+  excludeNorm: Set<string>,
+): StationLookup | null {
+  for (const name of names) {
+    const s = findStationByName(stations, name)
+    if (!s || excludeNorm.has(normaliseStationName(s.name))) continue
+    if (hasStepFreeBoarding(s) && isInterchange(s)) return s
+  }
+  return null
 }
 
-/** A step-free station the stranded rider can ride to, and how they reach the platform for it. */
+/** A step-free station the stranded rider can reroute via. */
 type Escape = {
   station: StationLookup
   coords: LatLon
-  lineName: string
-  // The platform they must cross to (step-free) first, or null when they stay where they are.
-  viaPlatform: string | null
 }
 
-/** Prepend a synthetic ride leg (stuck station → escape station) onto an onward journey. */
-function prependRideLeg(
-  journey: Journey,
-  from: { name: string; coords: LatLon },
-  escape: Escape,
-): Journey {
-  const minutes = trainMinutes(from.coords, escape.coords)
-  const firstLeg = journey.legs[0]
-  const arriveStr = firstLeg?.departureTime ?? journey.startDateTime
-  const departStr = toLondonLocal(new Date(parseLondonLocal(arriveStr).getTime() - minutes * 60_000))
-  const summary = escape.viaPlatform
-    ? `Change to ${escape.viaPlatform} (step-free), then ride to ${escape.station.name}`
-    : `Stay on the ${escape.lineName} to ${escape.station.name}`
-  const rideLeg: Leg = {
-    duration: minutes,
-    mode: { name: legModeForLine(escape.lineName) },
-    instruction: { summary },
-    departureTime: departStr,
-    arrivalTime: arriveStr,
-    departurePoint: { lat: from.coords.lat, lon: from.coords.lon, commonName: from.name },
-    arrivalPoint: { lat: escape.coords.lat, lon: escape.coords.lon, commonName: escape.station.name },
-    routeOptions: [{ name: escape.lineName }],
-  }
+/** A TfL JourneyResults query token for a station: its StopPoint id when usable, else coordinates.
+ * StopPoint ids (`940…`) plan to/from the exact stop; Hub ids (`HUB…`) aren't accepted by
+ * JourneyResults (HTTP 300), so those fall back to coordinates. */
+function stationQueryRef(station: StationLookup, coords: LatLon): string {
+  const id = station.tfl_id
+  return id && id.startsWith('940') ? id : `${coords.lat},${coords.lon}`
+}
+
+/** Drop a leading walking leg (TfL pads coordinate-origin journeys with a walk to the first stop).
+ * Used when the rider is already at the origin station, so the route should start there. */
+function stripLeadingWalk(journey: Journey): Journey {
+  const [first, ...rest] = journey.legs
+  if (first?.mode.name !== 'walking' || rest.length === 0) return journey
   return {
     ...journey,
-    startDateTime: departStr,
-    duration: journey.duration + minutes,
-    legs: [rideLeg, ...journey.legs],
+    startDateTime: rest[0].departureTime ?? journey.startDateTime,
+    duration: Math.max(0, journey.duration - first.duration),
+    legs: rest,
+  }
+}
+
+/** Combine a reach segment and an onward segment that meet at the same station into one journey. */
+function concatJourneys(reach: Journey, onward: Journey): Journey {
+  return {
+    startDateTime: reach.startDateTime,
+    arrivalDateTime: onward.arrivalDateTime,
+    duration: reach.duration + onward.duration,
+    legs: [...reach.legs, ...onward.legs],
+    fare:
+      reach.fare && onward.fare
+        ? { totalCost: reach.fare.totalCost + onward.fare.totalCost }
+        : (reach.fare ?? onward.fare),
   }
 }
 
@@ -713,6 +763,97 @@ function journeyTouchesBlocked(journey: Journey, blockedNorm: Set<string>): bool
     }
   }
   return false
+}
+
+/** A leading walk longer than this (minutes) means the onward journey doesn't really start at the
+ * escape — TfL walked the rider off to a different station, so the escape is a useless detour. */
+const MAX_ONWARD_LEAD_WALK_MIN = 3
+
+/** Drop any reroute with a single walking leg longer than this — a long walk is a poor route for
+ * everyone and especially the mobility-impaired persona, and usually signals TfL fell back to
+ * walking because the escape has no real transit link to the destination. */
+const MAX_WALK_LEG_MIN = 18
+
+/** Rail-only mode filter for the "reach" segment when the rider is stuck on a platform: the move
+ * off the platform must be a train ride along the line, never a walk-out-to-bus. */
+const RAIL_MODES = 'tube,dlr,overground,elizabeth-line,national-rail'
+
+/** The longest single walking leg in a journey, in minutes. */
+function maxWalkLegMinutes(journey: Journey): number {
+  return journey.legs
+    .filter((l) => l.mode.name === 'walking')
+    .reduce((max, l) => Math.max(max, l.duration), 0)
+}
+
+/**
+ * For each escape station, build a route as two *real* TfL journeys stitched together: a "reach"
+ * segment (`from` → escape) and an "onward" segment (escape → `destination`). Both are planned
+ * against the escape's exact stop, so the segments meet at one real station and every leg is a
+ * genuine TfL leg — no fabricated "ride" leg that could teleport the rider or imply a service the
+ * line doesn't run. Onward routes that begin by walking away from the escape (a sign the escape is
+ * a useless detour) and routes touching any *other* blocked station are dropped. Results are
+ * deduplicated by route signature and tagged. Shared by the "stuck on platform" and "along the
+ * line" reroute flows.
+ */
+async function planFromEscapes(
+  escapes: Escape[],
+  from: { coords: LatLon; station?: StationLookup },
+  destination: string,
+  accessibility: AccessibilityPreference | null,
+  blockedOtherNorm: Set<string>,
+): Promise<JourneyOptionsResult> {
+  // Prefer a StopPoint id for the origin (e.g. the stuck station) so the route starts cleanly *at*
+  // that station; fall back to coordinates (e.g. the rider's GPS position, which is no station).
+  const fromRef = from.station
+    ? stationQueryRef(from.station, from.coords)
+    : `${from.coords.lat},${from.coords.lon}`
+  // When the rider is already at a station (stuck on the platform), the reach is a *ride away* from
+  // that platform: restrict it to rail modes and drop the step-free filter. TfL would otherwise
+  // refuse a rail ride (the stuck station isn't step-free *to board*) and fall back to walking out
+  // to a bus — useless to a rider stranded on the platform. Step-free *alighting* is still
+  // guaranteed because escapes are chosen to be step-free stations. From a GPS coordinate (no
+  // station) the reach stays multimodal and step-free as before.
+  const reachAccessibility = from.station ? null : accessibility
+  const reachModes = from.station ? RAIL_MODES : undefined
+  const planned = await Promise.all(
+    escapes.slice(0, 4).map(async (escape) => {
+      // Nothing to reroute via if the escape is essentially where the rider already is.
+      if (haversineKm(from.coords, escape.coords) < 0.25) return []
+      const escapeRef = stationQueryRef(escape.station, escape.coords)
+      const [reach, onward] = await Promise.all([
+        planJourney(fromRef, escapeRef, reachAccessibility, null, null, true, reachModes),
+        planJourney(escapeRef, destination, accessibility, null, null, true),
+      ])
+      if (reach.kind !== 'journeys' || onward.kind !== 'journeys') return []
+      // When the rider is already at the origin station, drop a leading walk TfL inserts from the
+      // geocoded coordinate to the platform (Hub-coded stations can't be queried by id) so the
+      // route starts cleanly at the station rather than a nearby street address.
+      const reachJourney = from.station ? stripLeadingWalk(reach.journeys[0]) : reach.journeys[0]
+      if (maxWalkLegMinutes(reachJourney) > MAX_WALK_LEG_MIN) return []
+      const out: Journey[] = []
+      for (const onwardJourney of onward.journeys) {
+        const lead = onwardJourney.legs[0]
+        if (lead?.mode.name === 'walking' && lead.duration > MAX_ONWARD_LEAD_WALK_MIN) continue
+        // Reject onward journeys that fall back to a long walk (no real transit to the destination).
+        if (maxWalkLegMinutes(onwardJourney) > MAX_WALK_LEG_MIN) continue
+        const combined = concatJourneys(reachJourney, onwardJourney)
+        if (journeyTouchesBlocked(combined, blockedOtherNorm)) continue
+        out.push(combined)
+      }
+      return out
+    }),
+  )
+
+  const bySignature = new Map<string, Journey>()
+  for (const journey of planned.flat()) {
+    const key = routeSignature(journey)
+    if (!bySignature.has(key)) bySignature.set(key, journey)
+  }
+  const journeys = [...bySignature.values()]
+  if (journeys.length === 0) {
+    return { kind: 'error', message: 'No step-free reroute was found.' }
+  }
+  return { kind: 'journeys', journeys: tagJourneys(journeys) }
 }
 
 /**
@@ -745,12 +886,12 @@ export async function planRouteFromPlatform(
   const prevName = currentLeg.departurePoint?.commonName ?? null
   const excludeNorm = new Set([normaliseStationName(stuckStation.name)])
   const escapes: Escape[] = []
-  const pushEscape = (station: StationLookup, ln: string, viaPlatform: string | null) => {
+  const pushEscape = (station: StationLookup) => {
     const c = stationCoords(station)
     const norm = normaliseStationName(station.name)
     if (!c || excludeNorm.has(norm)) return
     excludeNorm.add(norm)
-    escapes.push({ station, coords: c, lineName: ln || lineName, viaPlatform })
+    escapes.push({ station, coords: c })
   }
 
   // Step-free platforms the rider can reach from the platform(s) serving their line.
@@ -759,17 +900,17 @@ export async function planRouteFromPlatform(
   )
   const stuckDir = stuckPlatforms.find((p) => p.direction)?.direction ?? null
   const reachableNorm = new Set(
-    stuckPlatforms.flatMap((p) => (p.interchange_to ?? []).map((ic) => normaliseStationName(ic.to))),
+    stuckPlatforms.flatMap((p) =>
+      (p.interchange_to ?? []).map((ic) => normaliseStationName(ic.to)),
+    ),
   )
   const reachablePlatforms = stuckStation.platforms.filter(
     (p) => p.name && reachableNorm.has(normaliseStationName(p.name)),
   )
   const canCrossToOppositeSameLine = reachablePlatforms.some(
-    (p) => p.lines.some((l) => sameLineName(l, lineName)) && p.direction && p.direction !== stuckDir,
+    (p) =>
+      p.lines.some((l) => sameLineName(l, lineName)) && p.direction && p.direction !== stuckDir,
   )
-  const oppositePlatformName = reachablePlatforms.find(
-    (p) => p.lines.some((l) => sameLineName(l, lineName)) && p.direction && p.direction !== stuckDir,
-  )?.name
 
   // Strategy 1 — ride this line. Forward (stay on the platform) and, when a step-free crossing to
   // the opposite platform exists, backward (the way they came) too.
@@ -779,7 +920,8 @@ export async function planRouteFromPlatform(
       .map((branch) => ({
         branch,
         stuckIdx: branch.names.findIndex((n) => sameStationName(n, stuckName)),
-        prevIdx: prevName != null ? branch.names.findIndex((n) => sameStationName(n, prevName)) : -1,
+        prevIdx:
+          prevName != null ? branch.names.findIndex((n) => sameStationName(n, prevName)) : -1,
       }))
       .filter((x) => x.stuckIdx >= 0)
     // When the previous stop pins the direction on some branch, trust only those branches — the
@@ -793,26 +935,26 @@ export async function planRouteFromPlatform(
       const forward = prevIdx > stuckIdx ? before : after
       const backward = prevIdx > stuckIdx ? after : before
       const f = firstStepFreeAlong(forward, stations, excludeNorm)
-      if (f) pushEscape(f, lineName, null)
+      if (f) pushEscape(f)
       if (canCrossToOppositeSameLine) {
         const b = firstStepFreeAlong(backward, stations, excludeNorm)
-        if (b) pushEscape(b, lineName, oppositePlatformName ?? null)
+        if (b) pushEscape(b)
       }
     }
   }
 
   // Strategy 2 — change to another line via a step-free platform interchange, then ride it to the
   // nearest step-free station (either direction, since we can't fix direction on a new line).
-  const otherLines = new Map<string, string>() // normalised line → { platform name, raw line }
-  const otherLineInfo: { line: string; viaPlatform: string }[] = []
+  const otherLines = new Set<string>() // normalised line names already considered
+  const otherLineNames: string[] = []
   for (const p of reachablePlatforms) {
     for (const l of p.lines) {
       if (sameLineName(l, lineName) || otherLines.has(normaliseStationName(l))) continue
-      otherLines.set(normaliseStationName(l), l)
-      if (p.name) otherLineInfo.push({ line: l, viaPlatform: p.name })
+      otherLines.add(normaliseStationName(l))
+      otherLineNames.push(l)
     }
   }
-  for (const { line, viaPlatform } of otherLineInfo) {
+  for (const line of otherLineNames) {
     const id = tflLineId(line)
     if (!id) continue
     const branches = await fetchLineBranches(id)
@@ -821,16 +963,19 @@ export async function planRouteFromPlatform(
       if (idx < 0) continue
       for (const side of [branch.names.slice(idx + 1), branch.names.slice(0, idx).reverse()]) {
         const s = firstStepFreeAlong(side, stations, excludeNorm)
-        if (s) pushEscape(s, line, viaPlatform)
+        if (s) pushEscape(s)
       }
     }
   }
 
   // Fallback — couldn't read any line sequence (network/unknown line): offer the nearest step-free
-  // stations geographically, with a best-effort ride leg.
+  // stations geographically.
   if (escapes.length === 0) {
-    for (const near of nearbyStepFreeStations(stuckCoords, stations, [stuckStation.name], 3).slice(0, 3)) {
-      pushEscape(near.station, lineName, null)
+    for (const near of nearbyStepFreeStations(stuckCoords, stations, [stuckStation.name], 3).slice(
+      0,
+      3,
+    )) {
+      pushEscape(near.station)
     }
   }
 
@@ -838,39 +983,15 @@ export async function planRouteFromPlatform(
     return { kind: 'error', message: 'No step-free way off this platform was found.' }
   }
 
-  // Plan onward from each escape station to the real destination and stitch the ride leg on front.
+  // Build a reach + onward route via each escape (the stuck station itself is allowed mid-route).
   const blockedOtherNorm = new Set(
     blockedStationNames.map(normaliseStationName).filter((n) => !sameStationName(n, stuckName)),
   )
-  const planned = await Promise.all(
-    escapes.slice(0, 4).map(async (escape) => {
-      const result = await planJourney(escape.station.name, destination, accessibility, null, null, true)
-      if (result.kind !== 'journeys') return []
-      return result.journeys
-        .filter((j) => !journeyTouchesBlocked(j, blockedOtherNorm))
-        .map((j) => prependRideLeg(j, { name: stuckStation.name, coords: stuckCoords }, escape))
-    }),
+  return planFromEscapes(
+    escapes,
+    { coords: stuckCoords, station: stuckStation },
+    destination,
+    accessibility,
+    blockedOtherNorm,
   )
-
-  const bySignature = new Map<string, Journey>()
-  for (const journey of planned.flat()) {
-    const key = routeSignature(journey)
-    if (!bySignature.has(key)) bySignature.set(key, journey)
-  }
-  const journeys = [...bySignature.values()]
-  if (journeys.length === 0) {
-    return { kind: 'error', message: 'No step-free way off this platform was found.' }
-  }
-
-  const minDuration = Math.min(...journeys.map((j) => j.duration))
-  const minWalking = Math.min(...journeys.map(walkingMinutes))
-  const minChanges = Math.min(...journeys.map(changeCount))
-  const tagged: TaggedJourney[] = journeys.map((journey) => {
-    const tags: RouteTag[] = []
-    if (journey.duration <= minDuration * (1 + TAG_TOLERANCE)) tags.push('fastest')
-    if (changeCount(journey) === minChanges) tags.push('fewest-changes')
-    if (walkingMinutes(journey) <= minWalking * (1 + TAG_TOLERANCE)) tags.push('least-walking')
-    return { journey, tags }
-  })
-  return { kind: 'journeys', journeys: tagged }
 }

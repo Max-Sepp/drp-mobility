@@ -40,6 +40,7 @@ import {
   planRouteFromPlatform,
   routeSignature,
   type Journey,
+  type Leg,
   type RouteTag,
   type TaggedJourney,
 } from '@/features/journey/api/tfl'
@@ -49,6 +50,7 @@ import { JourneyResultCard } from '@/features/journey/components/JourneyResultCa
 import {
   clearActiveJourney,
   loadActiveJourney,
+  replaceActiveJourney,
   setActiveLegIndex,
 } from '@/features/journey/api/activeJourney'
 import {
@@ -79,6 +81,8 @@ type Props = {
   onEnd: () => void
   onStationPress?: (station: string) => void
   onHeightChange?: (height: number) => void
+  // Fired when the rider switches to a rerouted journey, so the host can redraw the map route.
+  onRerouteSelected?: (journey: Journey) => void
 }
 
 export function ActiveJourneySheet({
@@ -87,6 +91,7 @@ export function ActiveJourneySheet({
   onEnd,
   onStationPress,
   onHeightChange,
+  onRerouteSelected,
 }: Props) {
   const { Colors, Radii } = useTheme()
   const styles = useMemo(
@@ -164,11 +169,19 @@ export function ActiveJourneySheet({
   const [currentJourney, setCurrentJourney] = useState<Journey | null>(null)
   const [rerouteState, setRerouteState] = useState<RerouteState>({ phase: 'idle' })
   const [loadingSource, setLoadingSource] = useState<'from-location' | 'along-line' | null>(null)
+  // Which flow produced the currently shown alternatives. For 'along-line' (stuck on the platform)
+  // the journeys start at the stuck station, so the preview labels its origin from the journey
+  // itself rather than the original "from" (e.g. "Current location").
+  const [rerouteSource, setRerouteSource] = useState<'from-location' | 'along-line' | null>(null)
   const [alongLineHint, setAlongLineHint] = useState(false)
   const [previewJourney, setPreviewJourney] = useState<JourneyDetailParams | null>(null)
   const [rerouteHeaderH, setRerouteHeaderH] = useState(0)
   const [rerouteResultsH, setRerouteResultsH] = useState<number | null>(null)
   const autoAdvancedFromRef = useRef<number | null>(null)
+  // Latest fix from this sheet's own high-accuracy watcher (below). Kept in a ref so the reroute
+  // handlers read a fresh position at call time; `useAppLocation()` (LocationProvider) updates too
+  // slowly to rely on here.
+  const liveCoordsRef = useRef<{ lat: number; lon: number } | null>(null)
   const alternativesCacheRef = useRef<{ alternatives: TaggedJourney[]; fetchedAt: number } | null>(
     null,
   )
@@ -213,6 +226,7 @@ export function ActiveJourneySheet({
     setCurrentJourney(null)
     setRerouteState({ phase: 'idle' })
     autoAdvancedFromRef.current = null
+    liveCoordsRef.current = null
     alternativesCacheRef.current = null
 
     let active = true
@@ -424,6 +438,7 @@ export function ActiveJourneySheet({
         { accuracy: Location.Accuracy.High, timeInterval: 5000, distanceInterval: 10 },
         (loc) => {
           setGpsActive(true)
+          liveCoordsRef.current = { lat: loc.coords.latitude, lon: loc.coords.longitude }
           const idx = legIndexRef.current
           if (autoAdvancedFromRef.current === idx) return
           const arr = legs[idx]?.arrivalPoint
@@ -461,6 +476,7 @@ export function ActiveJourneySheet({
     // Return cached results immediately if they're still fresh.
     const cached = alternativesCacheRef.current
     if (cached && Date.now() - cached.fetchedAt < JOURNEY_CACHE_TTL_MS) {
+      setRerouteSource('from-location')
       setRerouteState({ phase: 'found', alternatives: cached.alternatives })
       return
     }
@@ -469,15 +485,17 @@ export function ActiveJourneySheet({
     setRerouteState({ phase: 'loading' })
 
     const activeLegs = (currentJourney ?? params.journey).legs
-    // Reroute from the rider's real GPS position; fall back to the current leg's departure point
-    // (where they boarded this leg) when location is unavailable — never the original start.
+    // Reroute from the rider's real GPS position. Prefer this sheet's own high-accuracy watcher
+    // (refreshed every 5s), then the slower LocationProvider context, and only as a last resort
+    // the current leg's departure point — never silently the original journey start.
     const currentDep = activeLegs[legIndex]?.departurePoint
     const originCoords =
-      userCoords != null
+      liveCoordsRef.current ??
+      (userCoords != null
         ? { lat: userCoords.latitude, lon: userCoords.longitude }
         : currentDep?.lat != null && currentDep?.lon != null
           ? { lat: currentDep.lat, lon: currentDep.lon }
-          : null
+          : null)
     const fromLocation = originCoords ? `${originCoords.lat},${originCoords.lon}` : null
     const toLocation = await resolveRerouteDestination()
 
@@ -506,26 +524,46 @@ export function ActiveJourneySheet({
 
     // A plain point-to-point replan often returns only near-identical routes (TfL doesn't know to
     // avoid the blocked station), leaving nothing after filtering. Fall back to the richer
-    // along-line strategies (substitute step-free stations + walking) before giving up.
+    // along-line strategies (ride past / before the block, then continue) before giving up.
     if (alternatives.length === 0) {
       const blockedNames = upcomingBlockedAssessments.map((a) => a.stationName)
-      const fallback = await planAlternativesAlongLine(
-        activeLegs,
-        legIndex,
-        toLocation,
-        params.level ?? null,
-        blockedNames,
-        stations,
-        originCoords,
-        rerouteDestCoords,
-      )
-      if (fallback.kind === 'journeys') alternatives = keepAvoiding(fallback.journeys)
+      // Anchor on the leg approaching a blocked station — its line and departure/arrival points let
+      // the planner walk the line sequence (see `handleStuckOnPlatform`'s `stuckLeg`).
+      const approachLeg =
+        activeLegs
+          .slice(legIndex)
+          .find(
+            (leg) =>
+              leg.mode.name !== 'walking' &&
+              leg.arrivalPoint?.commonName != null &&
+              blockedNames.includes(resolveStation(leg.arrivalPoint.commonName) ?? ''),
+          ) ?? (currentLeg?.mode.name !== 'walking' ? currentLeg : undefined)
+      const fallback = approachLeg
+        ? await planAlternativesAlongLine(
+            approachLeg,
+            toLocation,
+            params.level ?? null,
+            blockedNames,
+            stations,
+            originCoords,
+            rerouteDestCoords,
+          )
+        : null
+      // The along-line escapes legitimately ride through the blocked station, so don't apply the
+      // `matchOutages` filter here (it would delete them); the planner already drops routes that
+      // touch *other* blocked stations. Just exclude the current route, as the platform flow does.
+      if (fallback?.kind === 'journeys') {
+        alternatives = fallback.journeys.filter(
+          ({ journey }) => routeSignature(journey) !== baseSig,
+        )
+      }
     }
 
     setLoadingSource(null)
 
     if (alternatives.length > 0) {
       alternativesCacheRef.current = { alternatives, fetchedAt: Date.now() }
+      setRerouteSource('from-location')
       setRerouteState({ phase: 'found', alternatives })
     } else {
       setRerouteState({ phase: 'none-found' })
@@ -541,22 +579,68 @@ export function ActiveJourneySheet({
 
     const activeLegs = (currentJourney ?? params.journey).legs
     const blockedNames = upcomingBlockedAssessments.map((a) => a.stationName)
-    // The rider is stranded on the platform they rode *into* the blocked station on. Anchor on the
-    // transit leg (from here onward) that arrives at the nearest blocked station — its arrival
-    // point is that platform, its departure point fixes the direction, its routeOptions give the
-    // line. This is more robust than the current leg, whose arrival drifts past the block once GPS
-    // auto-advance fires on arrival.
-    const stuckLeg = activeLegs
-      .slice(legIndex)
-      .find(
-        (leg) =>
-          leg.mode.name !== 'walking' &&
-          leg.arrivalPoint?.commonName != null &&
-          blockedNames.includes(resolveStation(leg.arrivalPoint.commonName) ?? ''),
-      )
-    // Fall back to the current leg when we can't pin a blocked arrival; if that's a walk, there's
-    // no platform to be stuck on.
-    const anchorLeg = stuckLeg ?? (currentLeg?.mode.name !== 'walking' ? currentLeg : undefined)
+
+    // Decide *which* blocked station the rider is stranded at. With a live fix, pick the nearest
+    // blocked station to the rider's real position; otherwise consider all blocked stations and let
+    // the leg scan below pick the first one encountered along the route.
+    const live = liveCoordsRef.current
+    let candidates = blockedNames
+    if (live && blockedNames.length > 1) {
+      let nearest: string | null = null
+      let best = Infinity
+      for (const name of blockedNames) {
+        const st = stations.find((s) => s.name === name)
+        if (st?.latitude == null || st?.longitude == null) continue
+        const d = haversineMeters(
+          { latitude: live.lat, longitude: live.lon },
+          { latitude: st.latitude, longitude: st.longitude },
+        )
+        if (d < best) {
+          best = d
+          nearest = name
+        }
+      }
+      if (nearest) candidates = [nearest]
+    }
+
+    // Find the transit leg that puts the rider on the chosen blocked station's platform, preferring
+    // it as the leg's *arrival* (the line they rode in on — "the line they were coming from"), then
+    // a pass-through mid-leg, then a departure. Scanning *all* legs (not just from `legIndex`) keeps
+    // this robust whether or not GPS has advanced the leg index. We then re-point that leg's arrival
+    // at the blocked station so `planRouteFromPlatform` anchors on *that* platform. There is no
+    // fall-back to the current/first leg — that previously routed the rider from the journey start.
+    const transitLegs = activeLegs.filter((l) => l.mode.name !== 'walking')
+    const matchLeg = (
+      pick: (leg: Leg) => string | null | undefined,
+    ): { leg: Leg; blocked: string } | undefined => {
+      for (const leg of transitLegs) {
+        const name = pick(leg)
+        if (name == null) continue
+        const resolved = resolveStation(name)
+        if (resolved && candidates.includes(resolved)) return { leg, blocked: resolved }
+      }
+      return undefined
+    }
+    const match =
+      matchLeg((leg) => leg.arrivalPoint?.commonName) ??
+      matchLeg((leg) =>
+        (leg.path?.stopPoints ?? [])
+          .map((sp) => sp.name)
+          .find((nm) => nm != null && candidates.includes(resolveStation(nm) ?? '')),
+      ) ??
+      matchLeg((leg) => leg.departurePoint?.commonName)
+
+    let anchorLeg: Leg | undefined
+    if (match) {
+      const st = stations.find((s) => s.name === match.blocked)
+      anchorLeg =
+        st?.latitude != null && st?.longitude != null
+          ? {
+              ...match.leg,
+              arrivalPoint: { commonName: match.blocked, lat: st.latitude, lon: st.longitude },
+            }
+          : match.leg
+    }
     if (!anchorLeg) {
       setAlongLineHint(true)
       return
@@ -593,6 +677,7 @@ export function ActiveJourneySheet({
         : []
 
     if (alternatives.length > 0) {
+      setRerouteSource('along-line')
       setRerouteState({ phase: 'found', alternatives })
     } else {
       setRerouteState({ phase: 'none-found' })
@@ -604,6 +689,10 @@ export function ActiveJourneySheet({
     setLegIndex(0)
     setRerouteState({ phase: 'idle' })
     autoAdvancedFromRef.current = null
+    // Persist the swap so a refresh/resume follows the rerouted trip, and tell the host so it can
+    // redraw and re-frame the route on the map.
+    void replaceActiveJourney(journey)
+    onRerouteSelected?.(journey)
     dismissAll()
   }
 
@@ -1444,7 +1533,7 @@ export function ActiveJourneySheet({
                   {busyAlongLine ? (
                     <Spinner size="small" color={Colors.text} />
                   ) : (
-                      <MaterialIcons name="train" size={16} color={Colors.secondaryText} />
+                    <MaterialIcons name="train" size={16} color={Colors.secondaryText} />
                   )}
                   <YStack flex={1}>
                     <Text fontSize={14} fontWeight="700" color={Colors.text}>
@@ -1459,16 +1548,12 @@ export function ActiveJourneySheet({
                 </TouchableOpacity>
 
                 {alongLineHint && (
-                  <XStack
-                    gap="$2"
-                    px="$1"
-                    pt="$1"
-                    pb="$1"
-                    items="center"
-                  >
+                  <XStack gap="$2" px="$1" pt="$1" pb="$1" items="center">
                     <MaterialIcons name="info-outline" size={14} color={Colors.secondaryText} />
                     <Text fontSize={12} color={Colors.secondaryText} flex={1}>
-                      {"You're on a walking leg — this option works once you're on a train or bus and stuck on a platform."}
+                      {
+                        "You're on a walking leg — this option works once you're on a train or bus and stuck on a platform."
+                      }
                     </Text>
                   </XStack>
                 )}
@@ -1539,7 +1624,10 @@ export function ActiveJourneySheet({
                       setPreviewJourney({
                         journey,
                         tags,
-                        from: params?.from,
+                        // Stuck-on-platform routes start at the stuck station, not the original
+                        // origin — drop `from` so the preview labels the origin from the journey's
+                        // first station instead of e.g. "Current location".
+                        from: rerouteSource === 'along-line' ? undefined : params?.from,
                         to: params?.to,
                         outages: params?.outages,
                         level: params?.level,
