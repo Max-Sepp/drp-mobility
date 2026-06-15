@@ -590,7 +590,10 @@ export function JourneyDetailSheet({
     const connectorColor = isWalking ? Colors.separator : legLineColor(leg, Colors.blue)
     const routeName = leg.routeOptions?.[0]?.name ?? null
     const direction = leg.routeOptions?.[0]?.directions?.find(Boolean) ?? null
-    const stopCount = leg.path?.stopPoints?.length ?? 0
+    const allStopPoints = leg.path?.stopPoints ?? []
+    // Drop the arrival station from the list (already shown as the arrival node) but keep it in the count
+    const stopPoints = allStopPoints.length > 0 ? allStopPoints.slice(0, -1) : allStopPoints
+    const stopCount = allStopPoints.length
     const isLast = i === journey.legs.length - 1
     const nextLeg = journey.legs[i + 1]
     const nextIsTransit = nextLeg && nextLeg.mode.name !== 'walking'
@@ -605,7 +608,7 @@ export function JourneyDetailSheet({
         direction={direction}
         walkDuration={isWalking ? leg.duration : undefined}
         stopCount={isWalking ? 0 : stopCount}
-        stopPoints={isWalking ? [] : (leg.path?.stopPoints ?? [])}
+        stopPoints={isWalking ? [] : stopPoints}
         legDuration={isWalking ? 0 : leg.duration}
         departureTime={leg.departureTime}
         arrivalTime={leg.arrivalTime}
