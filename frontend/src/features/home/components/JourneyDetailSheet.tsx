@@ -354,8 +354,6 @@ export function JourneyDetailSheet({
           paddingHorizontal: Spacing.lg,
           paddingTop: Spacing.xl,
           paddingBottom: Spacing.lg,
-          borderBottomWidth: StyleSheet.hairlineWidth,
-          borderBottomColor: Colors.separator,
         },
         closeBtn: {
           width: 34,
@@ -373,7 +371,10 @@ export function JourneyDetailSheet({
         actionRow: {
           flexDirection: 'row',
           gap: Spacing.sm,
-          marginTop: Spacing.sm,
+          paddingHorizontal: Spacing.lg,
+          paddingVertical: Spacing.sm,
+          borderBottomWidth: StyleSheet.hairlineWidth,
+          borderBottomColor: Colors.separator,
         },
         actionBtn: {
           flex: 1,
@@ -701,59 +702,59 @@ export function JourneyDetailSheet({
         </TouchableOpacity>
       </View>
 
-      <BottomSheetScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.content}
-      >
-        {/* Start + Save action buttons */}
-        <View style={styles.actionRow}>
+      {/* Start + Save action buttons — pinned above the scroll view */}
+      <View style={styles.actionRow}>
+        <TouchableOpacity
+          style={[
+            styles.actionBtn,
+            {
+              backgroundColor: Colors.blue,
+              borderColor: Colors.blue,
+            },
+            anyBusy && { opacity: Opacity.disabledMid },
+          ]}
+          onPress={anyBusy ? undefined : startJourney}
+          activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel="Start journey"
+        >
+          <MaterialIcons name="navigation" size={18} color="white" />
+          <Text fontSize={16} fontWeight="700" color="white">
+            {startBusy ? 'Starting…' : 'Start'}
+          </Text>
+        </TouchableOpacity>
+
+        {!hideSave && (
           <TouchableOpacity
             style={[
               styles.actionBtn,
               {
-                backgroundColor: Colors.blue,
-                borderColor: Colors.blue,
+                backgroundColor: saved ? Colors.searchBg : Colors.card,
+                borderColor: Colors.border,
               },
               anyBusy && { opacity: Opacity.disabledMid },
             ]}
-            onPress={anyBusy ? undefined : startJourney}
+            onPress={anyBusy ? undefined : toggleSave}
             activeOpacity={0.8}
             accessibilityRole="button"
-            accessibilityLabel="Start journey"
+            accessibilityLabel={saved ? 'Remove from saved journeys' : 'Save this journey'}
           >
-            <MaterialIcons name="navigation" size={18} color="white" />
-            <Text fontSize={16} fontWeight="700" color="white">
-              {startBusy ? 'Starting…' : 'Start'}
+            <MaterialIcons
+              name={saved ? 'bookmark' : 'bookmark-border'}
+              size={18}
+              color={Colors.text}
+            />
+            <Text fontSize={16} fontWeight="600" color={Colors.text}>
+              {saveBusy ? 'Saving…' : saved ? 'Saved' : 'Save'}
             </Text>
           </TouchableOpacity>
+        )}
+      </View>
 
-          {!hideSave && (
-            <TouchableOpacity
-              style={[
-                styles.actionBtn,
-                {
-                  backgroundColor: saved ? Colors.searchBg : Colors.card,
-                  borderColor: Colors.border,
-                },
-                anyBusy && { opacity: Opacity.disabledMid },
-              ]}
-              onPress={anyBusy ? undefined : toggleSave}
-              activeOpacity={0.8}
-              accessibilityRole="button"
-              accessibilityLabel={saved ? 'Remove from saved journeys' : 'Save this journey'}
-            >
-              <MaterialIcons
-                name={saved ? 'bookmark' : 'bookmark-border'}
-                size={18}
-                color={Colors.text}
-              />
-              <Text fontSize={16} fontWeight="600" color={Colors.text}>
-                {saveBusy ? 'Saving…' : saved ? 'Saved' : 'Save'}
-              </Text>
-            </TouchableOpacity>
-          )}
-        </View>
-
+      <BottomSheetScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.content}
+      >
         {/* Combined disruptions: TfL service disruptions + accessibility outages, tiered */}
         <RouteAlerts assessments={outageAssessments} disruptions={disruptions} />
 
