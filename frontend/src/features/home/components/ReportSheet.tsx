@@ -1,12 +1,12 @@
 // Multi-step reporting sheet that slides up over the station sheet.
 // Step 1 ('type'): issue type grid — 55% snap
 // Step 2 ('form'): equipment picker + comments + photo — 88% snap
-// Step 3 ('success'): confirmation card, then closes
+// On success: sheet closes, a Modal overlay appears above everything.
 
 import * as ImagePicker from 'expo-image-picker'
 import { MaterialIcons } from '@expo/vector-icons'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Alert, Dimensions, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
+import { Alert, Dimensions, Modal, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
 import { Text } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { BottomSheetBackdrop, type BottomSheetBackdropProps } from '@gorhom/bottom-sheet'
@@ -28,11 +28,11 @@ import { useEquipment } from '@/features/reporting/useEquipment'
 import { EquipmentPicker } from '@/features/reporting/components/EquipmentPicker'
 import { FormSection } from '@/features/reporting/components/FormSection'
 import { PhotoPicker } from '@/features/reporting/components/PhotoPicker'
-import { useTheme, Borders, Heights, Opacity, Spacing } from '@/theme'
+import { useTheme, Borders, Heights, Opacity, Overlays, Spacing } from '@/theme'
 import { useSheetStack } from '@/components/SheetStack'
 
 type Equipment = components['schemas']['EquipmentSummary']
-type Step = 'type' | 'form' | 'success'
+type Step = 'type' | 'form'
 type IssueType = 'lift' | 'escalator' | 'overcrowding' | 'custom'
 
 const SCREEN_H = Dimensions.get('window').height
@@ -142,29 +142,54 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
           justifyContent: 'center',
           ...Shadows.card,
         },
-        successContainer: {
+        modalBackdrop: {
+          flex: 1,
+          backgroundColor: Overlays.backdrop,
           alignItems: 'center',
+          justifyContent: 'center',
           paddingHorizontal: Spacing.xl,
-          paddingTop: Spacing.xxl,
+        },
+        successOuter: {
+          alignItems: 'center',
+          width: '100%',
+          // Reserve space above card for the overlapping circle (half its diameter)
+          paddingTop: 36,
         },
         successCircle: {
-          width: 110,
-          height: 110,
+          width: 72,
+          height: 72,
           borderRadius: Radii.circle,
           borderWidth: 3,
           borderColor: Colors.successDark,
           backgroundColor: Colors.successBg,
           alignItems: 'center',
           justifyContent: 'center',
+          zIndex: 1,
+          // Pull the circle down into the card by half its height
+          marginBottom: -36,
+        },
+        successCard: {
+          width: '100%',
+          alignItems: 'center',
+          borderWidth: Borders.thin,
+          borderColor: Colors.border,
+          borderRadius: Radii.card,
+          backgroundColor: Colors.card,
+          // Enough top padding so the circle doesn't overlap the title
+          paddingTop: 36 + Spacing.lg,
+          paddingBottom: Spacing.xl,
+          paddingHorizontal: Spacing.xl,
+          ...Shadows.card,
         },
         okBtn: {
           marginTop: Spacing.xl,
           paddingVertical: Spacing.md,
-          paddingHorizontal: Spacing.xxl,
-          borderRadius: Radii.pill,
+          width: '100%',
+          borderRadius: Radii.button,
           borderWidth: Borders.thin,
           borderColor: Colors.border,
-          backgroundColor: Colors.searchBg,
+          backgroundColor: Colors.card,
+          alignItems: 'center',
         },
       }),
     [Colors, Radii, Shadows],
@@ -201,6 +226,7 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
   const [area, setArea] = useState('')
   const [photo, setPhoto] = useState<ImagePicker.ImagePickerAsset | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
   // The in-progress journey (if any), used to surface the equipment on the rider's current route
   // first. Null when no journey is underway — the list keeps its plain alphabetical order.
   const [activeJourney, setActiveJourney] = useState<ActiveJourney | null>(null)
@@ -244,6 +270,7 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
     setArea('')
     setPhoto(null)
     setSubmitting(false)
+    setShowSuccessModal(false)
   }
 
   useEffect(() => {
@@ -399,7 +426,9 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
           body: formData as unknown as never,
         })
       }
-      setStep('success')
+      setSubmitting(false)
+      sheetRef.current?.close()
+      setShowSuccessModal(true)
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Something went wrong. Please try again.'
       Alert.alert('Error', msg)
@@ -417,11 +446,12 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
           : 'Describe the issue'
 
   return (
+    <>
     <BottomSheet
       ref={sheetRef}
       index={-1}
       enableDynamicSizing={true}
-      enablePanDownToClose
+      enablePanDownToClose={false}
       backdropComponent={dimmedBackdrop}
       onAnimate={handleAnimate}
       onChange={handleChange}
@@ -576,43 +606,51 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
         </BottomSheetView>
       )}
 
-      {step === 'success' && (
-        <BottomSheetView
-          style={[styles.successContainer, { paddingBottom: insets.bottom + Spacing.xl }]}
-        >
-          <View style={styles.successCircle}>
-            <MaterialIcons name="check" size={52} color={Colors.successDark} />
-          </View>
-          <Text
-            fontSize={22}
-            fontWeight="700"
-            color={Colors.text}
-            mt="$5"
-            style={{ textAlign: 'center' }}
-          >
-            Report submitted
-          </Text>
-          <Text
-            fontSize={14}
-            color={Colors.secondaryText}
-            mt="$2"
-            style={{ textAlign: 'center', lineHeight: 20 }}
-          >
-            A TfL worker will verify the issue soon.
-          </Text>
-          <TouchableOpacity
-            style={styles.okBtn}
-            onPress={() => sheetRef.current?.close()}
-            activeOpacity={0.8}
-            accessibilityRole="button"
-            accessibilityLabel="OK"
-          >
-            <Text fontSize={16} fontWeight="600" color={Colors.blue}>
-              OK
-            </Text>
-          </TouchableOpacity>
-        </BottomSheetView>
-      )}
     </BottomSheet>
+
+      <Modal
+        visible={showSuccessModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowSuccessModal(false)}
+      >
+        <View style={styles.modalBackdrop}>
+          <View style={styles.successOuter}>
+            <View style={styles.successCircle}>
+              <MaterialIcons name="check" size={36} color={Colors.successDark} />
+            </View>
+            <View style={styles.successCard}>
+              <Text
+                fontSize={22}
+                fontWeight="700"
+                color={Colors.text}
+                style={{ textAlign: 'center' }}
+              >
+                Report submitted
+              </Text>
+              <Text
+                fontSize={14}
+                color={Colors.secondaryText}
+                mt="$2"
+                style={{ textAlign: 'center', lineHeight: 20 }}
+              >
+                A TfL worker will verify the issue soon.
+              </Text>
+              <TouchableOpacity
+                style={styles.okBtn}
+                onPress={() => setShowSuccessModal(false)}
+                activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel="OK"
+              >
+                <Text fontSize={16} fontWeight="600" color={Colors.text}>
+                  OK
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </>
   )
 }
