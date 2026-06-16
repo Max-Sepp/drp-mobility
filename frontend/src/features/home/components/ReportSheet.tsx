@@ -85,6 +85,7 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
           alignItems: 'center',
           justifyContent: 'center',
           marginTop: 2,
+          marginRight: Spacing.sm,
         },
         gridContainer: {
           paddingHorizontal: Spacing.xl,
@@ -170,7 +171,7 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
   )
   const insets = useSafeAreaInsets()
   const sheetRef = useRef<BottomSheetRef>(null)
-  const { register, onClosed } = useSheetStack()
+  const { register, onClosed, push } = useSheetStack()
 
   useEffect(() => {
     return register(
@@ -249,13 +250,14 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
     if (station) {
       resetForm()
       setStep('type')
-      // Equipment availability comes from the cached list (see hasLifts/hasEscalators), so the
-      // sheet opens immediately instead of waiting on a network round-trip.
-      sheetRef.current?.snapToIndex(0)
+      // push() hides the station sheet, adds 'report' to the stack, and calls the registered
+      // open callback (snapToIndex(0)). Without push, onClosed('report') always returns false
+      // so setActiveReport(null) is never called and the sheet can't be reopened after closing.
+      push('report')
     } else {
       sheetRef.current?.close()
     }
-  }, [station])
+  }, [station, push])
 
   // For overcrowding/custom there's a single station-level equipment row; auto-select it once the
   // (possibly still-loading) cached equipment list is available.
@@ -338,7 +340,7 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
     setDescription('')
     setPhoto(null)
     setStep('form')
-    sheetRef.current?.snapToIndex(1)
+    sheetRef.current?.snapToIndex(0)
     // The lift/escalator list (`equipment`) and the overcrowding/custom auto-select are both
     // derived from the cached equipment list — no network call needed here.
   }
