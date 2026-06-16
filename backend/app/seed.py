@@ -167,7 +167,10 @@ def seed_defaults(db: Session) -> None:
         if lift_units:
             for unit in lift_units:
                 add_equipment(
-                    station.id, lift_type_id, lift_connection(unit), None,
+                    station.id,
+                    lift_type_id,
+                    lift_connection(unit),
+                    None,
                     display_name=lift_display_name(unit),
                 )
         else:

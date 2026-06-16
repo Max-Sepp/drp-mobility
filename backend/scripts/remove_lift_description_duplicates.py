@@ -30,7 +30,7 @@ from app.models.equipment import Equipment
 
 def main() -> None:
     with SessionLocal() as db:
-        duplicates = db.query(Equipment).filter(Equipment.connection.contains('↔')).all()
+        duplicates = db.query(Equipment).filter(Equipment.connection.contains("↔")).all()
 
         if not duplicates:
             print("Nothing to remove — no ↔ format rows found.")
@@ -40,11 +40,13 @@ def main() -> None:
         for e in duplicates:
             print(f"  id={e.id}  {e.connection}")
 
-        db.query(Equipment).filter(Equipment.connection.contains('↔')).delete(
+        db.query(Equipment).filter(Equipment.connection.contains("↔")).delete(
             synchronize_session=False
         )
         db.commit()
-        print(f"\nDeleted {len(duplicates)} rows. Restart the backend to clear the in-memory cache.")
+        print(
+            f"\nDeleted {len(duplicates)} rows. Restart the backend to clear the in-memory cache."
+        )
 
 
 if __name__ == "__main__":
