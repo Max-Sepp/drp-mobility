@@ -195,6 +195,10 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
     [Colors, Radii, Shadows],
   )
   const insets = useSafeAreaInsets()
+  const snapPoints = useMemo(
+    () => [SCREEN_H * 0.55, SCREEN_H - insets.top - TOP_BUTTON_RESERVE],
+    [insets.top],
+  )
   const sheetRef = useRef<BottomSheetRef>(null)
   const { register, onClosed, push } = useSheetStack()
 
@@ -344,13 +348,7 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
   }
 
   function handleChange(index: number) {
-    onHeightChange?.(
-      index >= 0
-        ? step === 'form'
-          ? SCREEN_H - insets.top - TOP_BUTTON_RESERVE
-          : SCREEN_H * 0.55
-        : 0,
-    )
+    onHeightChange?.(index >= 0 ? snapPoints[index] : 0)
     if (index === -1 && !firedEarlyClose.current && onClosed('report')) onClose()
     if (index >= 0) firedEarlyClose.current = false
   }
@@ -367,7 +365,7 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
     setDescription('')
     setPhoto(null)
     setStep('form')
-    sheetRef.current?.snapToIndex(0)
+    sheetRef.current?.snapToIndex(1)
     // The lift/escalator list (`equipment`) and the overcrowding/custom auto-select are both
     // derived from the cached equipment list — no network call needed here.
   }
@@ -450,7 +448,7 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
     <BottomSheet
       ref={sheetRef}
       index={-1}
-      enableDynamicSizing={true}
+      snapPoints={snapPoints}
       enablePanDownToClose={false}
       backdropComponent={dimmedBackdrop}
       onAnimate={handleAnimate}
@@ -510,7 +508,7 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
       )}
 
       {step === 'form' && (
-        <BottomSheetView style={{ maxHeight: SCREEN_H - insets.top - TOP_BUTTON_RESERVE }}>
+        <>
           <SheetHeader
             title={formTitle}
             subtitle={station ?? undefined}
@@ -603,7 +601,7 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
               </TouchableOpacity>
             </View>
           </BottomSheetScrollView>
-        </BottomSheetView>
+        </>
       )}
 
     </BottomSheet>
