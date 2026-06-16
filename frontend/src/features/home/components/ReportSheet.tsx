@@ -515,7 +515,7 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
                   platforms={stationDetail?.platforms}
                 />
                 <FormSection label="Comments (optional)">
-                  <BottomSheetTextInput
+                  <TextInput
                     style={styles.textArea}
                     placeholder="e.g. doors won't open…"
                     placeholderTextColor={Colors.placeholderText}
@@ -530,7 +530,7 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
             ) : (
               <>
                 <FormSection label="Describe the issue">
-                  <BottomSheetTextInput
+                  <TextInput
                     style={styles.textArea}
                     placeholder={
                       issueType === 'overcrowding'
@@ -546,7 +546,7 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
                   />
                 </FormSection>
                 <FormSection label="Area within station (optional)">
-                  <BottomSheetTextInput
+                  <TextInput
                     style={styles.textInput}
                     placeholder="e.g. northbound platform, main entrance…"
                     placeholderTextColor={Colors.placeholderText}

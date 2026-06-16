@@ -189,8 +189,8 @@ export const EquipmentPicker = ({
                         fontSize={11}
                         fontWeight="700"
                         color={Colors.card}
-                        alignSelf="flex-start"
                         style={{
+                          alignSelf: 'flex-start',
                           backgroundColor: Colors.blue,
                           paddingVertical: 2,
                           paddingHorizontal: 7,
