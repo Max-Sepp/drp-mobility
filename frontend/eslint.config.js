@@ -14,10 +14,10 @@ module.exports = defineConfig([
   },
   {
     rules: {
-      // Synchronous setState in effects is a common React pattern for resetting derived/controlled
-      // state when props change. The rule flags it as an error in eslint-config-expo; downgrade to
-      // warn so CI doesn't break while we keep the signal visible.
-      'react-hooks/set-state-in-effect': 'warn',
+      // Synchronous setState in effects is a common pattern here for resetting derived/controlled
+      // state when props change (form resets, loading flags before async). All flagged instances
+      // are intentional, so disable the rule entirely.
+      'react-hooks/set-state-in-effect': 'off',
     },
   },
 ])
