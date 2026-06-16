@@ -343,6 +343,17 @@ export function MapHomeScreen({ navigation, route }: Props) {
       return () => clearTimeout(id)
     }
   }, [mapRoute, activeJourneyParams])
+
+  // Fit the route when the detail sheet opens. Uses a dedicated timeout rather than pendingFitRef
+  // because mapBottomInset drops to 0 the moment the search sheet dismisses (before the detail
+  // sheet has opened), which would cause pendingFitRef to fire against a zero inset and frame the
+  // route into the full screen — then the sheet opens and covers the bottom of it. Waiting ~450ms
+  // lets the sheet settle at its minimum snap so mapPadding is correct when the fit runs.
+  useEffect(() => {
+    if (!activeDetail || !mapRoute) return
+    const id = setTimeout(() => mapRef.current?.fitToRoute(mapRoute.bounds), 450)
+    return () => clearTimeout(id)
+  }, [activeDetail]) // eslint-disable-line react-hooks/exhaustive-deps
   const { workStation } = useWorkShift()
   const { stations } = useStations()
   const isTrusted = user?.role === 'trusted'
@@ -653,6 +664,7 @@ export function MapHomeScreen({ navigation, route }: Props) {
 
       <JourneyPlannerSheet
         plan={activePlan}
+        hidden={Boolean(activeDetail)}
         onClose={closePlan}
         onJourneySelect={(params) => setActiveDetail(params)}
         savedPlaces={savedPlaces}

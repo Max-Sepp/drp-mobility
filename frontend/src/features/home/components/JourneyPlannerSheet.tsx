@@ -48,6 +48,7 @@ export type JourneyPlan = {
 
 type Props = {
   plan: JourneyPlan | null
+  hidden?: boolean
   onClose: () => void
   onJourneySelect: (params: JourneyDetailParams) => void
   savedPlaces?: SavedPlaces
@@ -94,6 +95,7 @@ const FROM_TO_GAP = 10 // vertical gap between From and To inputs
 
 export function JourneyPlannerSheet({
   plan,
+  hidden,
   onClose,
   onJourneySelect,
   savedPlaces,
@@ -168,6 +170,8 @@ export function JourneyPlannerSheet({
   const [resolved, setResolved] = useState<Resolved | null>(null)
   // True after the close button is tapped so handleChange(-1) doesn't fire onClose() again.
   const closedByButton = useRef(false)
+  // True while the sheet is hidden behind another sheet — suppresses onClose so state is preserved.
+  const hiddenRef = useRef(false)
   // True once a successful search has been performed; resets when the planner re-opens.
   const hasSearched = useRef(false)
   // Guards the prevHadBoth auto-search: reset on every plan open so re-opening with the same
@@ -291,6 +295,18 @@ export function JourneyPlannerSheet({
     if (results.length > 0) sheetRef.current?.snapToIndex(2)
   }, [results])
 
+  // When the parent hides this sheet (e.g. detail sheet opens on top), close without calling
+  // onClose so results and form state survive. Reopen to the right snap when unhidden.
+  useEffect(() => {
+    if (hidden) {
+      hiddenRef.current = true
+      sheetRef.current?.close()
+    } else {
+      hiddenRef.current = false
+      if (plan) sheetRef.current?.snapToIndex(results.length > 0 ? 2 : 1)
+    }
+  }, [hidden]) // eslint-disable-line react-hooks/exhaustive-deps
+
   // Auto-search the moment both postcodes become resolved — covers opening from a saved place
   // (where current location fills in async) and the general case of resolving the second field.
   useEffect(() => {
@@ -309,8 +325,8 @@ export function JourneyPlannerSheet({
   function handleChange(index: number) {
     onHeightChange?.(index >= 0 ? snapPoints[index] : 0)
     if (index === -1) {
-      journeyOptionsCache.clear()
-      if (!closedByButton.current) onClose()
+      if (!hiddenRef.current) journeyOptionsCache.clear()
+      if (!closedByButton.current && !hiddenRef.current) onClose()
       closedByButton.current = false
     }
   }
