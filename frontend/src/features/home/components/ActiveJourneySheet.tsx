@@ -385,7 +385,6 @@ export function ActiveJourneySheet({
   // Three snaps: compact (handle + summary row + optional banner + footer), half-screen, near-full.
   // Banner height is only added when an accessibility alert is active, so snap 0 grows dynamically.
   // Footer = paddingTop 8 + button 48 + border 1 + paddingBottom 8 + insets.bottom = 65 + insets.bottom.
-  // eslint-disable-next-line react-hooks/preserve-manual-memoization -- BottomSheet requires a stable array ref; manual memo is load-bearing here.
   const snapPoints = useMemo(
     () => [
       24 + 58 + (showRerouteAlert ? REROUTE_BANNER_H : 0) + 65 + insets.bottom,
