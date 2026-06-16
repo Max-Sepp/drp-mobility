@@ -331,6 +331,7 @@ type Props = {
   onClose: () => void
   onStartJourney: (params: ActiveJourneyParams) => void
   onSaveChanged?: () => void
+  onRequireAuth?: () => void
   onHeightChange?: (height: number) => void
   hideSave?: boolean
 }
@@ -340,6 +341,7 @@ export function JourneyDetailSheet({
   onClose,
   onStartJourney,
   onSaveChanged,
+  onRequireAuth,
   onHeightChange,
   hideSave = false,
 }: Props) {
@@ -414,7 +416,7 @@ export function JourneyDetailSheet({
 
   const { stations } = useStations()
 
-  const { user } = useAuth()
+  const { user, status } = useAuth()
 
   // Re-fetch live outages each time a journey is opened so the alerts reflect the current state
   // rather than the stale snapshot stored with the saved journey.
@@ -475,6 +477,15 @@ export function JourneyDetailSheet({
 
   async function toggleSave() {
     if (!params || saveBusy || startBusy) return
+    // Saved journeys live on the backend, so saving needs an account. Prompt to sign in rather
+    // than silently no-op (which would falsely flip the button to "Saved" and never persist).
+    if (status !== 'authed') {
+      Alert.alert('Sign in to save', 'Sign in to keep this journey in your saved list.', [
+        { text: 'Not now', style: 'cancel' },
+        { text: 'Sign in', onPress: onRequireAuth },
+      ])
+      return
+    }
     setSaveBusy(true)
     try {
       if (currentSavedId) {

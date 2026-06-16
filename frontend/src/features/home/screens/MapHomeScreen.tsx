@@ -663,6 +663,7 @@ export function MapHomeScreen({ navigation, route }: Props) {
         params={activeDetail}
         onClose={() => setActiveDetail(null)}
         onSaveChanged={() => loadSavedJourneys().then(setSaved)}
+        onRequireAuth={() => navigation.navigate('Login')}
         onStartJourney={(params) => {
           setActiveDetail(null)
           setActivePlan(null)
