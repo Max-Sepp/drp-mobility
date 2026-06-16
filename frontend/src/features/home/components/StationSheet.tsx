@@ -26,7 +26,8 @@ import { useTheme, Heights, Spacing } from '@/theme'
 import { useSheetStack } from '@/components/SheetStack'
 
 const SCREEN_H = Dimensions.get('window').height
-const COLLAPSED_H = 84
+// handle (~24) + SheetHeader title+subtitle+paddingBottom (~50) + actionsRow button+paddingBottom (~68) = ~142, +38 buffer
+const COLLAPSED_H = 180
 // 8 (paddingTop) + 50 (button height) + 8 (gap) = 66 reserved for top buttons
 const TOP_BUTTON_RESERVE = 66
 
