@@ -109,8 +109,9 @@ export function StationSheet({
     [allReports, station],
   )
   const { alerts } = useStationAlerts(stationDetail?.id)
-  const badgeSeverity = useMemo(() => overallSeverity(reports), [reports])
-  const hasIssues = reports.length > 0 || alerts.length > 0
+  const liveReports = useMemo(() => reports.filter((r) => !r.failure.resolved), [reports])
+  const badgeSeverity = useMemo(() => overallSeverity(liveReports), [liveReports])
+  const hasIssues = liveReports.length > 0 || alerts.length > 0
   const issueSeverity =
     badgeSeverity === 'danger' || worstAlertSeverity(alerts) === 'danger' ? 'danger' : 'warning'
 
