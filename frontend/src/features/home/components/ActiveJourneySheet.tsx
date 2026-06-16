@@ -357,7 +357,7 @@ export function ActiveJourneySheet({
   const resolveRerouteDestination = useCallback(async (): Promise<string | null> => {
     if (params?.to) return tflQuery(params.to)
     return rerouteToLocation
-  }, [params?.to, rerouteToLocation])
+  }, [params, rerouteToLocation])
 
   const showRerouteAlert = useMemo(
     () => upcomingBlockedAssessments.length > 0 && rerouteToLocation != null,

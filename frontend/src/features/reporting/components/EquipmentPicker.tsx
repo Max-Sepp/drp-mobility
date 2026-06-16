@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { View } from 'react-native'
 import { Spinner, Text, XStack, YStack } from 'tamagui'
 import type { components } from '@/api/schema.d'
 import { connectionBody, connectionDirections, type Direction } from '@/lib/connection'
@@ -141,16 +142,30 @@ export const EquipmentPicker = ({
             filtered.map((e) => {
               const selected = selectedId === e.id
               const highlighted = highlightedIds?.has(e.id) ?? false
-              const isLift = e.equipment_type.name === 'lift'
-              const ends = connectionBody(e.connection, e.equipment_type.name)
+              // display_name holds the human description ("Lift 1: Booking Hall ↔ Eastbound
+              // platforms 3 and 4"). Fall back to the structured connection body if absent.
+              const displaySource =
+                e.display_name ?? connectionBody(e.connection, e.equipment_type.name)
+              const displayParts = displaySource
                 .split(/↔|→/)
                 .map((s) => s.trim())
                 .filter(Boolean)
+              // Strip the leading "Lift A: " name prefix from the display parts if present.
+              const namePrefix = displayParts[0]?.includes(':')
+                ? displayParts[0].split(':')[0].trim()
+                : null
+              const equipName = namePrefix
+              const displayBody = namePrefix
+                ? displayParts[0].slice(displayParts[0].indexOf(':') + 1).trim()
+                : (displayParts[0] ?? '')
+              const from = displayBody
+              const to =
+                displayParts.length > 1 ? (namePrefix ? displayParts[1] : displayParts[1]) : null
               const lines = platforms ? linesForEquipment(e.connection, platforms) : []
               return (
                 <XStack
                   key={e.id}
-                  items="center"
+                  items="flex-start"
                   gap="$3"
                   pressStyle={{ opacity: Opacity.pressed }}
                   onPress={() => onSelect(e.id)}
@@ -164,61 +179,106 @@ export const EquipmentPicker = ({
                     backgroundColor: selected ? Colors.blueBg : Colors.card,
                   }}
                 >
-                  <YStack
+                  {/* Content */}
+                  <YStack flex={1} gap="$1.5">
+                    <Text fontSize={15} fontWeight="600" color={Colors.text}>
+                      {equipName ?? from}
+                    </Text>
+                    {highlighted && (
+                      <Text
+                        fontSize={11}
+                        fontWeight="700"
+                        color={Colors.card}
+                        style={{
+                          alignSelf: 'flex-start',
+                          backgroundColor: Colors.blue,
+                          paddingVertical: 2,
+                          paddingHorizontal: 7,
+                          borderRadius: Radii.pill,
+                          overflow: 'hidden',
+                        }}
+                      >
+                        On your route
+                      </Text>
+                    )}
+
+                    {to ? (
+                      <XStack items="flex-start" gap="$2">
+                        {/* Dot-line-dot interchange indicator */}
+                        <YStack items="center" style={{ marginTop: 4 }}>
+                          <View
+                            style={{
+                              width: 8,
+                              height: 8,
+                              borderRadius: 4,
+                              borderWidth: 2,
+                              borderColor: Colors.secondaryText,
+                              backgroundColor: selected ? Colors.blueBg : Colors.card,
+                            }}
+                          />
+                          <View
+                            style={{ width: 2, height: 16, backgroundColor: Colors.secondaryText }}
+                          />
+                          <View
+                            style={{
+                              width: 8,
+                              height: 8,
+                              borderRadius: 4,
+                              borderWidth: 2,
+                              borderColor: Colors.secondaryText,
+                              backgroundColor: selected ? Colors.blueBg : Colors.card,
+                            }}
+                          />
+                        </YStack>
+                        <YStack gap="$2" flex={1}>
+                          <Text fontSize={14} color={Colors.text} style={{ lineHeight: 18 }}>
+                            {from}
+                          </Text>
+                          <Text fontSize={14} color={Colors.text} style={{ lineHeight: 18 }}>
+                            {to}
+                          </Text>
+                        </YStack>
+                      </XStack>
+                    ) : (
+                      equipName && (
+                        <Text fontSize={14} color={Colors.text}>
+                          {from}
+                        </Text>
+                      )
+                    )}
+
+                    {lines.length > 0 && (
+                      <YStack mt="$1">
+                        <LineChips lines={lines} />
+                      </YStack>
+                    )}
+                  </YStack>
+
+                  {/* Radio button — filled blue = selected, gray ring = unselected */}
+                  <View
                     style={{
                       width: 22,
                       height: 22,
-                      borderRadius: Radii.circle,
+                      borderRadius: 11,
                       borderWidth: Borders.thick,
-                      borderColor: selected ? Colors.blue : Colors.placeholderText,
+                      borderColor: selected ? Colors.blue : Colors.secondaryText,
                       backgroundColor: selected ? Colors.blue : 'transparent',
                       alignItems: 'center',
                       justifyContent: 'center',
+                      marginTop: 1,
                     }}
                   >
                     {selected && (
-                      <Text color={Colors.card} fontSize={12} fontWeight="700">
-                        ✓
-                      </Text>
+                      <View
+                        style={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: 4,
+                          backgroundColor: Colors.card,
+                        }}
+                      />
                     )}
-                  </YStack>
-
-                  <YStack flex={1} gap="$1">
-                    {/* The connector is part of the text flow (joined to the last word by a
-                        non-breaking space) so it stays at the end of the line when end A wraps,
-                        rather than dropping onto a line of its own. */}
-                    <Text fontSize={15} color={Colors.text}>
-                      {ends[0] ?? ''}
-                      {ends.length > 1 && (
-                        <Text
-                          color={Colors.secondaryText}
-                        >{`\u00A0\u00A0${isLift ? '↔' : '→'}`}</Text>
-                      )}
-                    </Text>
-                    {ends.length > 1 && (
-                      <Text fontSize={15} color={Colors.text}>
-                        {ends[1]}
-                      </Text>
-                    )}
-                    {lines.length > 0 && <LineChips lines={lines} />}
-                  </YStack>
-
-                  {highlighted && (
-                    <Text
-                      fontSize={12}
-                      fontWeight="700"
-                      color={Colors.card}
-                      style={{
-                        backgroundColor: Colors.blue,
-                        paddingVertical: 3,
-                        paddingHorizontal: 8,
-                        borderRadius: Radii.pill,
-                        overflow: 'hidden',
-                      }}
-                    >
-                      On your route
-                    </Text>
-                  )}
+                  </View>
                 </XStack>
               )
             })

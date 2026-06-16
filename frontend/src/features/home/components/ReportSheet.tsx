@@ -5,13 +5,14 @@
 
 import * as ImagePicker from 'expo-image-picker'
 import { MaterialIcons } from '@expo/vector-icons'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { Alert, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Alert, Dimensions, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
 import { Text } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { BottomSheetBackdrop, type BottomSheetBackdropProps } from '@gorhom/bottom-sheet'
 import BottomSheet, {
+  BottomSheetView,
   BottomSheetScrollView,
-  BottomSheetTextInput,
   type BottomSheetRef,
 } from '@/components/BottomSheet'
 import { SheetHeader } from '@/components/SheetHeader'
@@ -27,24 +28,43 @@ import { useEquipment } from '@/features/reporting/useEquipment'
 import { EquipmentPicker } from '@/features/reporting/components/EquipmentPicker'
 import { FormSection } from '@/features/reporting/components/FormSection'
 import { PhotoPicker } from '@/features/reporting/components/PhotoPicker'
-import { useTheme, Borders, Heights, Spacing } from '@/theme'
+import { useTheme, Borders, Heights, Opacity, Spacing } from '@/theme'
+import { useSheetStack } from '@/components/SheetStack'
 
 type Equipment = components['schemas']['EquipmentSummary']
 type Step = 'type' | 'form' | 'success'
 type IssueType = 'lift' | 'escalator' | 'overcrowding' | 'custom'
 
 const SCREEN_H = Dimensions.get('window').height
+const SCREEN_W = Dimensions.get('window').width
 const TOP_BUTTON_RESERVE = 66
+// Two equal columns — Spacing.xl padding each side, Spacing.lg gap between
+const GRID_ITEM_W = (SCREEN_W - 2 * Spacing.xl - Spacing.lg) / 2
+const GRID_ITEM_H = Math.round(GRID_ITEM_W * 0.68)
 
 const ALLOWED_MIME = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
 
-const ISSUE_TYPES: { type: IssueType; icon: keyof typeof MaterialIcons.glyphMap; label: string }[] =
-  [
-    { type: 'lift', icon: 'elevator', label: 'Lift\nBroken' },
-    { type: 'escalator', icon: 'escalator', label: 'Escalator\nBroken' },
-    { type: 'overcrowding', icon: 'groups', label: 'Overcrowding' },
-    { type: 'custom', icon: 'edit-note', label: 'Custom\nIssue' },
-  ]
+const ISSUE_TYPES: {
+  type: IssueType
+  icon: keyof typeof MaterialIcons.glyphMap
+  label: string
+  disabledLabel?: string
+}[] = [
+  {
+    type: 'lift',
+    icon: 'elevator',
+    label: 'Lift\nBroken',
+    disabledLabel: 'No lifts at\nthis station',
+  },
+  {
+    type: 'escalator',
+    icon: 'escalator',
+    label: 'Escalator\nBroken',
+    disabledLabel: 'No escalators\nat this station',
+  },
+  { type: 'overcrowding', icon: 'groups', label: 'Overcrowding' },
+  { type: 'custom', icon: 'edit-note', label: 'Custom\nIssue' },
+]
 
 type Props = {
   station: string | null
@@ -65,20 +85,20 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
           alignItems: 'center',
           justifyContent: 'center',
           marginTop: 2,
+          marginRight: Spacing.sm,
         },
         gridContainer: {
-          paddingHorizontal: Spacing.lg,
-          paddingTop: Spacing.sm,
+          paddingHorizontal: Spacing.xl,
+          paddingTop: Spacing.md,
         },
         grid: {
           flexDirection: 'row',
           flexWrap: 'wrap',
-          gap: Spacing.md,
-          justifyContent: 'space-between',
+          gap: Spacing.lg,
         },
         gridItem: {
-          width: '47%',
-          aspectRatio: 1.3,
+          width: GRID_ITEM_W,
+          height: GRID_ITEM_H,
           borderWidth: Borders.thin,
           borderColor: Colors.border,
           borderRadius: Radii.button,
@@ -150,11 +170,29 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
     [Colors, Radii, Shadows],
   )
   const insets = useSafeAreaInsets()
-  const snapPoints = useMemo(
-    () => [SCREEN_H * 0.55, SCREEN_H - insets.top - TOP_BUTTON_RESERVE],
-    [insets.top],
-  )
   const sheetRef = useRef<BottomSheetRef>(null)
+  const { register, onClosed, push } = useSheetStack()
+
+  useEffect(() => {
+    return register(
+      'report',
+      () => sheetRef.current?.snapToIndex(0),
+      () => sheetRef.current?.close(),
+    )
+  }, [register])
+
+  const dimmedBackdrop = useCallback(
+    (props: BottomSheetBackdropProps) => (
+      <BottomSheetBackdrop
+        {...props}
+        opacity={0.4}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        pressBehavior="close"
+      />
+    ),
+    [],
+  )
 
   const [step, setStep] = useState<Step>('type')
   const [issueType, setIssueType] = useState<IssueType | null>(null)
@@ -166,6 +204,8 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
   // The in-progress journey (if any), used to surface the equipment on the rider's current route
   // first. Null when no journey is underway — the list keeps its plain alphabetical order.
   const [activeJourney, setActiveJourney] = useState<ActiveJourney | null>(null)
+  // Tracks whether we already fired onClosed early (via onAnimate) so handleChange doesn't double-fire.
+  const firedEarlyClose = useRef(false)
   const { stations } = useStations()
   // The full equipment list is cached/revalidated reference data; filter it client-side rather
   // than refetching it over the network each time the sheet opens.
@@ -210,13 +250,14 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
     if (station) {
       resetForm()
       setStep('type')
-      // Equipment availability comes from the cached list (see hasLifts/hasEscalators), so the
-      // sheet opens immediately instead of waiting on a network round-trip.
-      sheetRef.current?.snapToIndex(0)
+      // push() hides the station sheet, adds 'report' to the stack, and calls the registered
+      // open callback (snapToIndex(0)). Without push, onClosed('report') always returns false
+      // so setActiveReport(null) is never called and the sheet can't be reopened after closing.
+      push('report')
     } else {
       sheetRef.current?.close()
     }
-  }, [station])
+  }, [station, push])
 
   // For overcrowding/custom there's a single station-level equipment row; auto-select it once the
   // (possibly still-loading) cached equipment list is available.
@@ -267,9 +308,24 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
     )
   }, [equipment, highlightedIds])
 
+  function handleAnimate(fromIndex: number, toIndex: number) {
+    // Fire early — station sheet starts opening while report is still sliding away.
+    if (toIndex === -1 && !firedEarlyClose.current) {
+      firedEarlyClose.current = true
+      if (onClosed('report')) onClose()
+    }
+  }
+
   function handleChange(index: number) {
-    onHeightChange?.(index >= 0 ? snapPoints[index] : 0)
-    if (index === -1) onClose()
+    onHeightChange?.(
+      index >= 0
+        ? step === 'form'
+          ? SCREEN_H - insets.top - TOP_BUTTON_RESERVE
+          : SCREEN_H * 0.55
+        : 0,
+    )
+    if (index === -1 && !firedEarlyClose.current && onClosed('report')) onClose()
+    if (index >= 0) firedEarlyClose.current = false
   }
 
   function isTypeDisabled(type: IssueType): boolean {
@@ -284,7 +340,7 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
     setDescription('')
     setPhoto(null)
     setStep('form')
-    sheetRef.current?.snapToIndex(1)
+    sheetRef.current?.snapToIndex(0)
     // The lift/escalator list (`equipment`) and the overcrowding/custom auto-select are both
     // derived from the cached equipment list — no network call needed here.
   }
@@ -364,64 +420,67 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
     <BottomSheet
       ref={sheetRef}
       index={-1}
-      snapPoints={snapPoints}
+      enableDynamicSizing={true}
       enablePanDownToClose
+      backdropComponent={dimmedBackdrop}
+      onAnimate={handleAnimate}
       onChange={handleChange}
     >
       {step === 'type' && (
-        <>
+        <BottomSheetView>
           <SheetHeader
-            title="Report issue"
-            subtitle={station ? `@ ${station}` : undefined}
+            title={station ?? 'Report an issue'}
+            subtitle={station ? 'Report an issue' : undefined}
             onClose={() => sheetRef.current?.close()}
           />
 
-          <BottomSheetScrollView
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={[
-              styles.gridContainer,
-              { paddingBottom: insets.bottom + Spacing.xl },
-            ]}
-          >
+          <View style={[styles.gridContainer, { paddingBottom: insets.bottom + Spacing.xl }]}>
             <View style={styles.grid}>
-              {ISSUE_TYPES.filter(({ type }) => !isTypeDisabled(type)).map(
-                ({ type, icon, label }) => (
+              {ISSUE_TYPES.map(({ type, icon, label, disabledLabel }) => {
+                const disabled = isTypeDisabled(type)
+                return (
                   <TouchableOpacity
                     key={type}
-                    style={styles.gridItem}
-                    onPress={() => selectType(type)}
-                    activeOpacity={0.75}
+                    style={[styles.gridItem, disabled && { opacity: Opacity.disabled }]}
+                    onPress={disabled ? undefined : () => selectType(type)}
+                    activeOpacity={disabled ? 1 : 0.75}
                     accessibilityRole="button"
-                    accessibilityLabel={label.replace('\n', ' ')}
+                    accessibilityLabel={
+                      disabled && disabledLabel
+                        ? disabledLabel.replace('\n', ' ')
+                        : label.replace('\n', ' ')
+                    }
+                    disabled={disabled}
                   >
-                    <MaterialIcons
-                      name={icon}
-                      size={36}
-                      color={Colors.text}
-                      // Android adds font padding above/below the glyph's line box, which pushes the
-                      // visible icon down within the centred content and reads as "too far down".
-                      // Disabling it lets justifyContent:center truly centre the visible content.
-                      style={{ includeFontPadding: false }}
-                    />
-                    <Text
-                      fontSize={14}
-                      fontWeight="600"
-                      color={Colors.text}
-                      mt="$1.5"
-                      style={{ textAlign: 'center', includeFontPadding: false }}
-                    >
-                      {label}
-                    </Text>
+                    <View style={{ alignItems: 'center', gap: 8, paddingHorizontal: 8 }}>
+                      <MaterialIcons
+                        name={icon}
+                        size={40}
+                        color={disabled ? Colors.secondaryText : Colors.text}
+                        // Android adds font padding above/below the glyph's line box, which pushes the
+                        // visible icon down within the centred content and reads as "too far down".
+                        // Disabling it lets justifyContent:center truly centre the visible content.
+                        style={{ includeFontPadding: false }}
+                      />
+                      <Text
+                        fontSize={13}
+                        fontWeight="600"
+                        color={disabled ? Colors.secondaryText : Colors.text}
+                        style={{ textAlign: 'center', includeFontPadding: false }}
+                      >
+                        {disabled && disabledLabel ? disabledLabel : label}
+                      </Text>
+                    </View>
                   </TouchableOpacity>
-                ),
-              )}
+                )
+              })}
             </View>
-          </BottomSheetScrollView>
-        </>
+          </View>
+        </BottomSheetView>
       )}
 
       {step === 'form' && (
-        <>
+        <BottomSheetView style={{ maxHeight: SCREEN_H - insets.top - TOP_BUTTON_RESERVE }}>
           <SheetHeader
             title={formTitle}
             subtitle={station ?? undefined}
@@ -456,7 +515,7 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
                   platforms={stationDetail?.platforms}
                 />
                 <FormSection label="Comments (optional)">
-                  <BottomSheetTextInput
+                  <TextInput
                     style={styles.textArea}
                     placeholder="e.g. doors won't open…"
                     placeholderTextColor={Colors.placeholderText}
@@ -471,7 +530,7 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
             ) : (
               <>
                 <FormSection label="Describe the issue">
-                  <BottomSheetTextInput
+                  <TextInput
                     style={styles.textArea}
                     placeholder={
                       issueType === 'overcrowding'
@@ -487,7 +546,7 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
                   />
                 </FormSection>
                 <FormSection label="Area within station (optional)">
-                  <BottomSheetTextInput
+                  <TextInput
                     style={styles.textInput}
                     placeholder="e.g. northbound platform, main entrance…"
                     placeholderTextColor={Colors.placeholderText}
@@ -514,16 +573,12 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
               </TouchableOpacity>
             </View>
           </BottomSheetScrollView>
-        </>
+        </BottomSheetView>
       )}
 
       {step === 'success' && (
-        <BottomSheetScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={[
-            styles.successContainer,
-            { paddingBottom: insets.bottom + Spacing.xl },
-          ]}
+        <BottomSheetView
+          style={[styles.successContainer, { paddingBottom: insets.bottom + Spacing.xl }]}
         >
           <View style={styles.successCircle}>
             <MaterialIcons name="check" size={52} color={Colors.successDark} />
@@ -556,7 +611,7 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
               OK
             </Text>
           </TouchableOpacity>
-        </BottomSheetScrollView>
+        </BottomSheetView>
       )}
     </BottomSheet>
   )
