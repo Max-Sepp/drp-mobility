@@ -152,6 +152,7 @@ export const LocationInput = ({
   }
 
   async function choose(suggestion: LocationSuggestion) {
+    Keyboard.dismiss()
     setSuggestions([])
     setStationSuggestions([])
     setSearching(true)
@@ -176,6 +177,7 @@ export const LocationInput = ({
   }
 
   async function chooseStation(station: StationDetail) {
+    Keyboard.dismiss()
     setSuggestions([])
     setStationSuggestions([])
     setSearching(true)
@@ -204,6 +206,7 @@ export const LocationInput = ({
   }
 
   function chooseRecent(recent: RecentLocation) {
+    Keyboard.dismiss()
     setSuggestions([])
     skipNextSearch.current = true
     setResolved(true)
@@ -217,6 +220,7 @@ export const LocationInput = ({
   }
 
   function chooseSavedPlace(place: PlaceShortcut) {
+    Keyboard.dismiss()
     setSuggestions([])
     skipNextSearch.current = true
     setResolved(true)

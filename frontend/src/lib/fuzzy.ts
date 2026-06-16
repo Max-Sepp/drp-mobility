@@ -3,7 +3,7 @@
  * Substring matches rank highest; subsequence matches rank by character density.
  */
 export function fuzzyScore(query: string, target: string): number {
-  const q = query.toLowerCase()
+  const q = query.trim().toLowerCase()
   const t = target.toLowerCase()
   if (!q) return 0
 
