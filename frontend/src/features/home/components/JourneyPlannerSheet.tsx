@@ -432,7 +432,7 @@ export function JourneyPlannerSheet({
   const [formH, setFormH] = useState(300)
   const snapPoints = useMemo(() => {
     const h = Dimensions.get('window').height
-    return [formH + insets.bottom, h * 0.75, h - insets.top]
+    return [formH + insets.bottom, h * 0.75, h - insets.top - 66]
   }, [formH, insets.bottom, insets.top])
 
   return (

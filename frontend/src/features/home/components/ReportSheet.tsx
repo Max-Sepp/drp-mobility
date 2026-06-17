@@ -195,10 +195,6 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
     [Colors, Radii, Shadows],
   )
   const insets = useSafeAreaInsets()
-  const snapPoints = useMemo(
-    () => [SCREEN_H * 0.55, SCREEN_H - insets.top - TOP_BUTTON_RESERVE],
-    [insets.top],
-  )
   const sheetRef = useRef<BottomSheetRef>(null)
   const { register, onClosed, push } = useSheetStack()
 
