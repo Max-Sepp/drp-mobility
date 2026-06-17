@@ -40,8 +40,12 @@ export function LocationProvider({ children }: { children: ReactNode }) {
     Location.requestForegroundPermissionsAsync().then(({ status }) => {
       if (cancelled || status !== 'granted') return
 
+      // Keep the dot following the user: update every few seconds / few metres. A coordinate
+      // change repositions the marker natively (no bitmap re-capture, so no flicker — see
+      // UserLocationMarker), so a responsive interval is cheap. The old 50 m / 30 s filter left
+      // the dot frozen for normal walking-scale movement.
       Location.watchPositionAsync(
-        { accuracy: Location.Accuracy.Balanced, timeInterval: 30_000, distanceInterval: 50 },
+        { accuracy: Location.Accuracy.High, timeInterval: 3_000, distanceInterval: 5 },
         (loc) => setCoords(loc.coords),
       ).then((sub) => {
         if (cancelled) {
@@ -51,10 +55,13 @@ export function LocationProvider({ children }: { children: ReactNode }) {
         posSubRef.current = sub
       })
 
-      if (Platform.OS !== 'web') {
+      // Heading only drives the directional cone, which is Android-only (UserLocationMarker): on
+      // iOS (Apple Maps) the cone can't rotate without flicker, so the marker shows the dot alone.
+      // Skip the heading watch elsewhere to avoid needless compass battery drain.
+      if (Platform.OS === 'android') {
         // Throttle: process at most one heading reading per 300ms.
-        // This keeps tracksViewChanges cycling in UserLocationMarker stable —
-        // the 250ms turn-off timer can fire between consecutive state updates.
+        // The compass fires far more often than that; throttling limits how often the
+        // map marker re-renders to rotate its cone.
         let lastHeadingMs = 0
         Location.watchHeadingAsync((h) => {
           const now = Date.now()
