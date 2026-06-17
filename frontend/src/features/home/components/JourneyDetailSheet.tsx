@@ -3,11 +3,10 @@
 
 import { MaterialIcons } from '@expo/vector-icons'
 import Svg, { Circle, Path, Rect } from 'react-native-svg'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { Text, XStack } from 'tamagui'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { BottomSheetBackdrop, type BottomSheetBackdropProps } from '@gorhom/bottom-sheet'
 import BottomSheet, { BottomSheetScrollView, type BottomSheetRef } from '@/components/BottomSheet'
 import { useStations } from '@/features/stations'
 import { useAuth } from '@/features/auth'
@@ -390,21 +389,14 @@ export function JourneyDetailSheet({
     [Colors, Radii],
   )
 
-  const darkBackdrop = useCallback(
-    (props: BottomSheetBackdropProps) => (
-      <BottomSheetBackdrop
-        {...props}
-        opacity={0.55}
-        disappearsOnIndex={-1}
-        appearsOnIndex={0}
-        pressBehavior="close"
-      />
-    ),
-    [],
-  )
-
   const insets = useSafeAreaInsets()
-  const snapPoints = useMemo(() => [SCREEN_H - insets.top - 66], [insets.top])
+  // Measured height of the header + action buttons — becomes the minimum snap so the sheet can
+  // never be dragged below the Start/Save row (but no backdrop blocks the map above it).
+  const [fixedH, setFixedH] = useState(180)
+  const snapPoints = useMemo(
+    () => [fixedH + insets.bottom, SCREEN_H - insets.top - 66],
+    [fixedH, insets.bottom, insets.top],
+  )
   const sheetRef = useRef<BottomSheetRef>(null)
 
   const [currentSavedId, setCurrentSavedId] = useState<string | null>(null)
@@ -544,9 +536,7 @@ export function JourneyDetailSheet({
         ref={sheetRef}
         index={-1}
         snapPoints={snapPoints}
-        enablePanDownToClose
-        handleComponent={null}
-        backdropComponent={darkBackdrop}
+        enablePanDownToClose={false}
         onChange={handleChange}
       >
         {null}
@@ -669,11 +659,11 @@ export function JourneyDetailSheet({
       ref={sheetRef}
       index={-1}
       snapPoints={snapPoints}
-      enablePanDownToClose
-      handleComponent={null}
-      backdropComponent={darkBackdrop}
+      enablePanDownToClose={false}
       onChange={handleChange}
     >
+      {/* Measuring wrapper: drives the minimum snap to the bottom of the action buttons */}
+      <View onLayout={(e) => setFixedH(e.nativeEvent.layout.height)}>
       {/* Header: prominent duration + arrive/fare + tags + close */}
       <View style={styles.header}>
         <View style={{ flex: 1, gap: 6 }}>
@@ -753,6 +743,7 @@ export function JourneyDetailSheet({
           </TouchableOpacity>
         )}
       </View>
+      </View>{/* end measuring wrapper */}
 
       <BottomSheetScrollView
         showsVerticalScrollIndicator={false}

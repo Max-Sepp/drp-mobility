@@ -26,7 +26,8 @@ import { useTheme, Heights, Spacing } from '@/theme'
 import { useSheetStack } from '@/components/SheetStack'
 
 const SCREEN_H = Dimensions.get('window').height
-const COLLAPSED_H = 84
+// handle (~24) + SheetHeader title+subtitle+paddingBottom (~50) + actionsRow button+paddingBottom (~68) = ~142, +38 buffer
+const COLLAPSED_H = 180
 // 8 (paddingTop) + 50 (button height) + 8 (gap) = 66 reserved for top buttons
 const TOP_BUTTON_RESERVE = 66
 
@@ -109,8 +110,9 @@ export function StationSheet({
     [allReports, station],
   )
   const { alerts } = useStationAlerts(stationDetail?.id)
-  const badgeSeverity = useMemo(() => overallSeverity(reports), [reports])
-  const hasIssues = reports.length > 0 || alerts.length > 0
+  const liveReports = useMemo(() => reports.filter((r) => !r.failure.resolved), [reports])
+  const badgeSeverity = useMemo(() => overallSeverity(liveReports), [liveReports])
+  const hasIssues = liveReports.length > 0 || alerts.length > 0
   const issueSeverity =
     badgeSeverity === 'danger' || worstAlertSeverity(alerts) === 'danger' ? 'danger' : 'warning'
 

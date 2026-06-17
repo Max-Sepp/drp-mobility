@@ -191,35 +191,16 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
   // so this is a no-op. (Camera recentring on close is handled by the caller.)
   const clearFocus = useCallback(() => {}, [])
 
-  // Frame the whole route, centred in the band left visible above the bottom sheet. The map's own
-  // mapPadding already reserves the sheet's height, so animateToRegion fits the region into the
-  // visible band and centres it there — we must NOT also scale the span by the visible fraction, as
-  // an earlier version did: that double-counts the inset and zooms the trip out to a tiny dot. We
-  // ask for a span 1.2x the route's bounding box on each axis, so the route fills the frame with a
-  // little breathing room; the map fits whichever axis is tighter and centres the other. A small
-  // floor keeps a one-stop hop from zooming in absurdly far.
+  // fitToCoordinates is the native API for framing a set of coords — it computes the correct zoom
+  // level for the visible area (respecting mapPadding) without manual bounding-box maths.
+  // edgePadding gives breathing room on each side so the route isn't flush with the sheet edge.
   const fitToRoute = useCallback((coords: LatLng[]) => {
     if (coords.length === 0) return
-    let minLat = Infinity
-    let maxLat = -Infinity
-    let minLng = Infinity
-    let maxLng = -Infinity
-    for (const c of coords) {
-      if (c.latitude < minLat) minLat = c.latitude
-      if (c.latitude > maxLat) maxLat = c.latitude
-      if (c.longitude < minLng) minLng = c.longitude
-      if (c.longitude > maxLng) maxLng = c.longitude
-    }
-    const MARGIN = 1.2
-    mapRef.current?.animateToRegion(
-      {
-        latitude: (minLat + maxLat) / 2,
-        longitude: (minLng + maxLng) / 2,
-        latitudeDelta: Math.max((maxLat - minLat) * MARGIN, 0.005),
-        longitudeDelta: Math.max((maxLng - minLng) * MARGIN, 0.005),
-      },
-      600,
-    )
+    const EDGE = 60
+    mapRef.current?.fitToCoordinates(coords, {
+      edgePadding: { top: EDGE, right: EDGE, bottom: EDGE, left: EDGE },
+      animated: true,
+    })
   }, [])
 
   useImperativeHandle(
