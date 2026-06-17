@@ -652,17 +652,6 @@ export function JourneyDetailSheet({
     )
   })
 
-  // Waiting time row
-  if (waiting >= 1) {
-    timelineItems.push(
-      <XStack key="waiting" gap="$3" items="center" mt="$1" ml={GUTTER_W}>
-        <MaterialIcons name="schedule" size={16} color={Colors.secondaryText} />
-        <Text fontSize={15} color={Colors.secondaryText}>
-          Waiting & connections · {waiting} min
-        </Text>
-      </XStack>,
-    )
-  }
 
   return (
     <BottomSheet
@@ -763,6 +752,25 @@ export function JourneyDetailSheet({
 
         {/* Gutter timeline */}
         <View style={{ gap: 0, marginTop: Spacing.lg }}>{timelineItems}</View>
+
+        {waiting >= 1 && (
+          <XStack
+            items="center"
+            justify="center"
+            gap="$2"
+            mt="$4"
+            style={{
+              borderTopWidth: StyleSheet.hairlineWidth,
+              borderTopColor: Colors.separator,
+              paddingTop: Spacing.sm,
+            }}
+          >
+            <MaterialIcons name="schedule" size={13} color={Colors.tertiaryText} />
+            <Text fontSize={13} color={Colors.tertiaryText}>
+              Includes {waiting} min waiting & connections
+            </Text>
+          </XStack>
+        )}
       </BottomSheetScrollView>
     </BottomSheet>
   )
