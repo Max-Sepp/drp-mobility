@@ -1,11 +1,11 @@
 import { Ionicons } from '@expo/vector-icons'
 import type { ReactNode } from 'react'
 import { useMemo } from 'react'
-import { StyleSheet } from 'react-native'
+import { StyleSheet, TouchableOpacity } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Text, XStack, YStack } from 'tamagui'
 import { Heading } from '@/components/Heading'
-import { useTheme, Opacity, Spacing } from '@/theme'
+import { useTheme, Spacing } from '@/theme'
 
 type ScreenHeaderProps = {
   title: string
@@ -20,7 +20,7 @@ export const ScreenHeader = ({
   title,
   subtitle,
   onBack,
-  height = 96,
+  height = 72,
   right,
 }: ScreenHeaderProps) => {
   const { Colors } = useTheme()
@@ -34,7 +34,14 @@ export const ScreenHeader = ({
         },
         inner: {
           justifyContent: 'center',
-          paddingBottom: Spacing.sm,
+        },
+        backButton: {
+          width: 32,
+          height: 32,
+          borderRadius: 16,
+          backgroundColor: Colors.searchBg,
+          alignItems: 'center',
+          justifyContent: 'center',
         },
       }),
     [Colors],
@@ -42,30 +49,28 @@ export const ScreenHeader = ({
   return (
     <SafeAreaView edges={['top']} style={styles.container}>
       <YStack style={[styles.inner, { height }]} px="$5" gap="$1">
-        {onBack && (
-          <XStack
-            items="center"
-            gap="$1"
-            mb="$2"
-            style={{ alignSelf: 'flex-start' }}
-            pressStyle={{ opacity: Opacity.disabledMid }}
-            onPress={onBack}
-          >
-            <Ionicons name="chevron-back" size={18} color={Colors.blue} />
-            <Text fontSize={14} fontWeight="500" color={Colors.blue}>
-              Back
-            </Text>
-          </XStack>
-        )}
-        <XStack items="center" justify="space-between" gap="$3">
-          <Heading>{title}</Heading>
+        <XStack items="center" gap="$3">
+          {onBack && (
+            <TouchableOpacity
+              onPress={onBack}
+              activeOpacity={0.75}
+              style={styles.backButton}
+              accessibilityRole="button"
+              accessibilityLabel="Back"
+            >
+              <Ionicons name="chevron-back" size={20} color={Colors.secondaryText} />
+            </TouchableOpacity>
+          )}
+          <YStack flex={1} gap="$1">
+            <Heading>{title}</Heading>
+            {subtitle && (
+              <Text fontSize={15} color={Colors.secondaryText}>
+                {subtitle}
+              </Text>
+            )}
+          </YStack>
           {right}
         </XStack>
-        {subtitle && (
-          <Text fontSize={15} color={Colors.secondaryText} mt="$1">
-            {subtitle}
-          </Text>
-        )}
       </YStack>
     </SafeAreaView>
   )

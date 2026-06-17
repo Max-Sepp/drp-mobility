@@ -481,59 +481,75 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
       footer={null}
     >
       <YStack px="$5" mt="$5" gap="$6">
-        {/* Username */}
+        {/* Account identity + log out */}
         <YStack gap="$2">
           <Text fontSize={12} fontWeight="600" color={Colors.secondaryText} letterSpacing={0.8}>
             SIGNED IN AS
           </Text>
-          <XStack items="center" gap="$3" style={styles.card}>
-            <Ionicons name="person-circle" size={36} color={Colors.blue} />
-            <YStack gap={4}>
-              <Text fontSize={15} fontWeight="600" color={Colors.text}>
-                {user.username}
-              </Text>
-              {user.role === 'trusted' ? (
-                <XStack items="center" gap="$1">
-                  <Ionicons name="shield-checkmark" size={13} color="#15803d" />
-                  <Text fontSize={12} fontWeight="600" color="#15803d">
-                    TfL worker
+          <YStack style={styles.card}>
+            <XStack items="center" gap="$3">
+              <Ionicons name="person-circle" size={52} color={Colors.blue} />
+              <YStack flex={1} gap={5}>
+                <Text fontSize={18} fontWeight="700" color={Colors.text}>
+                  {user.username}
+                </Text>
+                {user.role === 'trusted' ? (
+                  <XStack items="center" gap="$1">
+                    <Ionicons name="shield-checkmark" size={14} color="#15803d" />
+                    <Text fontSize={13} fontWeight="600" color="#15803d">
+                      Trusted reporter
+                    </Text>
+                  </XStack>
+                ) : (
+                  <Text fontSize={13} color={Colors.secondaryText}>
+                    Standard account
                   </Text>
-                </XStack>
-              ) : (
-                <Text fontSize={12} color={Colors.secondaryText}>
-                  Standard account
-                </Text>
-              )}
-            </YStack>
-          </XStack>
-        </YStack>
-
-        {/* On-shift station (trusted staff only) */}
-        {isTrusted && (
-          <YStack gap="$2">
-            <Text fontSize={12} fontWeight="600" color={Colors.secondaryText} letterSpacing={0.8}>
-              ON-SHIFT STATION
-            </Text>
-            <TouchableOpacity
-              style={[styles.card, styles.triggerRow]}
-              activeOpacity={Opacity.pressed}
-              onPress={openShiftPicker}
-            >
-              <Ionicons name="briefcase-outline" size={20} color={Colors.blue} />
-              <YStack flex={1} gap={2}>
-                <Text fontSize={15} fontWeight="500" color={Colors.text}>
-                  {workStation ?? 'Not set'}
-                </Text>
-                <Text fontSize={13} color={Colors.secondaryText} numberOfLines={2}>
-                  {workStation
-                    ? 'Reporting and journeys start here today. Resets tomorrow.'
-                    : 'Set the station you are working at for one-tap reporting.'}
-                </Text>
+                )}
               </YStack>
-              <Ionicons name="chevron-down" size={16} color={Colors.secondaryText} />
+            </XStack>
+            <View
+              style={{
+                height: StyleSheet.hairlineWidth,
+                backgroundColor: Colors.separator,
+                marginHorizontal: -Spacing.md,
+                marginTop: Spacing.md,
+                marginBottom: Spacing.md,
+              }}
+            />
+            <TouchableOpacity
+              style={styles.triggerRow}
+              activeOpacity={Opacity.pressed}
+              onPress={handleSignOut}
+            >
+              <Ionicons name="log-out-outline" size={18} color={Colors.danger} />
+              <Text fontSize={15} fontWeight="600" color={Colors.danger}>
+                Log out
+              </Text>
             </TouchableOpacity>
           </YStack>
-        )}
+        </YStack>
+
+        {/* Journey accessibility default */}
+        <YStack gap="$2">
+          <Text fontSize={12} fontWeight="600" color={Colors.secondaryText} letterSpacing={0.8}>
+            DEFAULT ACCESSIBILITY
+          </Text>
+          <TouchableOpacity
+            style={[styles.card, styles.triggerRow]}
+            activeOpacity={Opacity.pressed}
+            onPress={openAccessibilityPicker}
+          >
+            <YStack flex={1} gap={2}>
+              <Text fontSize={15} fontWeight="500" color={Colors.text}>
+                {currentAccessibilityOption.name}
+              </Text>
+              <Text fontSize={13} color={Colors.secondaryText} numberOfLines={2}>
+                {currentAccessibilityOption.description}
+              </Text>
+            </YStack>
+            <Ionicons name="chevron-down" size={16} color={Colors.secondaryText} />
+          </TouchableOpacity>
+        </YStack>
 
         {/* Traveller type */}
         <YStack gap="$2">
@@ -551,34 +567,6 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
               </Text>
               <Text fontSize={13} color={Colors.secondaryText} numberOfLines={1}>
                 {currentTT.description}
-              </Text>
-            </YStack>
-            <Ionicons name="chevron-down" size={16} color={Colors.secondaryText} />
-          </TouchableOpacity>
-        </YStack>
-
-        {/* Appearance / theme */}
-        <YStack gap="$2">
-          <Text fontSize={12} fontWeight="600" color={Colors.secondaryText} letterSpacing={0.8}>
-            APPEARANCE
-          </Text>
-          <TouchableOpacity
-            style={[styles.card, styles.triggerRow]}
-            activeOpacity={Opacity.pressed}
-            onPress={openThemePicker}
-          >
-            <View
-              style={[
-                styles.themeSwatch,
-                {
-                  backgroundColor: currentTheme.Colors.card,
-                  borderColor: currentTheme.Colors.border,
-                },
-              ]}
-            />
-            <YStack flex={1} gap={2}>
-              <Text fontSize={15} fontWeight="500" color={Colors.text}>
-                {currentTheme.label}
               </Text>
             </YStack>
             <Ionicons name="chevron-down" size={16} color={Colors.secondaryText} />
@@ -612,41 +600,60 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
           </TouchableOpacity>
         </YStack>
 
-        {/* Journey accessibility default */}
+        {/* On-shift station (trusted staff only) */}
+        {isTrusted && (
+          <YStack gap="$2">
+            <Text fontSize={12} fontWeight="600" color={Colors.secondaryText} letterSpacing={0.8}>
+              ON-SHIFT STATION
+            </Text>
+            <TouchableOpacity
+              style={[styles.card, styles.triggerRow]}
+              activeOpacity={Opacity.pressed}
+              onPress={openShiftPicker}
+            >
+              <Ionicons name="briefcase-outline" size={20} color={Colors.blue} />
+              <YStack flex={1} gap={2}>
+                <Text fontSize={15} fontWeight="500" color={Colors.text}>
+                  {workStation ?? 'Not set'}
+                </Text>
+                <Text fontSize={13} color={Colors.secondaryText} numberOfLines={2}>
+                  {workStation
+                    ? 'Reporting and journeys start here today. Resets tomorrow.'
+                    : 'Set the station you are working at for one-tap reporting.'}
+                </Text>
+              </YStack>
+              <Ionicons name="chevron-down" size={16} color={Colors.secondaryText} />
+            </TouchableOpacity>
+          </YStack>
+        )}
+
+        {/* Appearance / theme */}
         <YStack gap="$2">
           <Text fontSize={12} fontWeight="600" color={Colors.secondaryText} letterSpacing={0.8}>
-            DEFAULT ACCESSIBILITY
+            APPEARANCE
           </Text>
           <TouchableOpacity
             style={[styles.card, styles.triggerRow]}
             activeOpacity={Opacity.pressed}
-            onPress={openAccessibilityPicker}
+            onPress={openThemePicker}
           >
+            <View
+              style={[
+                styles.themeSwatch,
+                {
+                  backgroundColor: currentTheme.Colors.card,
+                  borderColor: currentTheme.Colors.border,
+                },
+              ]}
+            />
             <YStack flex={1} gap={2}>
               <Text fontSize={15} fontWeight="500" color={Colors.text}>
-                {currentAccessibilityOption.name}
-              </Text>
-              <Text fontSize={13} color={Colors.secondaryText} numberOfLines={2}>
-                {currentAccessibilityOption.description}
+                {currentTheme.label}
               </Text>
             </YStack>
             <Ionicons name="chevron-down" size={16} color={Colors.secondaryText} />
           </TouchableOpacity>
         </YStack>
-
-        {/* Sign out */}
-        <XStack
-          items="center"
-          gap="$2"
-          style={{ alignSelf: 'flex-start', paddingVertical: Spacing.sm }}
-          pressStyle={{ opacity: Opacity.pressed }}
-          onPress={handleSignOut}
-        >
-          <Ionicons name="log-out-outline" size={20} color={Colors.danger} />
-          <Text fontSize={15} fontWeight="600" color={Colors.danger}>
-            Log out
-          </Text>
-        </XStack>
       </YStack>
 
       {/* Traveller type modal */}

@@ -342,7 +342,7 @@ export const RouteAlerts = ({
           color={Colors.text}
           mt="$3"
           pt="$3"
-          style={{ borderTopWidth: Borders.thin, borderTopColor: Colors.border }}
+          style={{ borderTopWidth: 0 }}
         >
           Disruptions on this route
         </Text>
