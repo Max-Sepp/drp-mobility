@@ -339,6 +339,16 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
     )
   }, [equipment, highlightedIds])
 
+  // Explicit per-step snap points (no dynamic sizing). The form needs a fixed, bounded height so
+  // its inner BottomSheetScrollView has a real scroll region — dynamic sizing measured the full
+  // scroll content and both broke scrolling and pushed the sheet above the profile button. The form
+  // is capped just below that button (insets.top + TOP_BUTTON_RESERVE from the top, ~90% tall).
+  const snapPoints = useMemo(() => {
+    if (step === 'form') return [SCREEN_H - insets.top - TOP_BUTTON_RESERVE]
+    if (step === 'success') return [Math.round(SCREEN_H * 0.5)]
+    return [Math.round(SCREEN_H * 0.55)]
+  }, [step, insets.top])
+
   function handleAnimate(fromIndex: number, toIndex: number) {
     // Fire early — station sheet starts opening while report is still sliding away.
     if (toIndex === -1 && !firedEarlyClose.current) {
@@ -507,6 +517,9 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
         </BottomSheetView>
       )}
 
+      {/* Header and scroll view are direct children (no BottomSheetView wrapper): a BottomSheetView
+          registers itself as a non-scrollable VIEW and clobbers the BottomSheetScrollView's scroll
+          registration, which disables scrolling for long lift/escalator lists. */}
       {step === 'form' && (
         <>
           <SheetHeader
@@ -527,6 +540,7 @@ export function ReportSheet({ station, onClose, onHeightChange }: Props) {
           />
 
           <BottomSheetScrollView
+            style={{ flex: 1 }}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: insets.bottom + Spacing.xl }}
           >
