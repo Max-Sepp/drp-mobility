@@ -37,6 +37,7 @@ type LocationInputProps = {
   onCurrentLocation?: () => void
   currentLocationLoading?: boolean
   savedPlaceShortcuts?: PlaceShortcut[]
+  readOnly?: boolean
   /** Station list to fuzzy-match against, so the dropdown can offer stations alongside addresses. */
   stations?: StationDetail[]
 }
@@ -53,6 +54,7 @@ export const LocationInput = ({
   onCurrentLocation,
   currentLocationLoading,
   savedPlaceShortcuts,
+  readOnly,
   stations,
 }: LocationInputProps) => {
   const { Colors, Radii } = useTheme()
@@ -150,6 +152,7 @@ export const LocationInput = ({
   }
 
   async function choose(suggestion: LocationSuggestion) {
+    Keyboard.dismiss()
     setSuggestions([])
     setStationSuggestions([])
     setSearching(true)
@@ -174,6 +177,7 @@ export const LocationInput = ({
   }
 
   async function chooseStation(station: StationDetail) {
+    Keyboard.dismiss()
     setSuggestions([])
     setStationSuggestions([])
     setSearching(true)
@@ -202,6 +206,7 @@ export const LocationInput = ({
   }
 
   function chooseRecent(recent: RecentLocation) {
+    Keyboard.dismiss()
     setSuggestions([])
     skipNextSearch.current = true
     setResolved(true)
@@ -215,6 +220,7 @@ export const LocationInput = ({
   }
 
   function chooseSavedPlace(place: PlaceShortcut) {
+    Keyboard.dismiss()
     setSuggestions([])
     skipNextSearch.current = true
     setResolved(true)
@@ -272,7 +278,13 @@ export const LocationInput = ({
               else if (stationSuggestions.length > 0) chooseStation(stationSuggestions[0])
               else if (suggestions.length > 0) choose(suggestions[0])
             }}
-            selection={focused ? undefined : { start: 0, end: 0 }}
+            selection={
+              readOnly && focused
+                ? { start: 0, end: value.length }
+                : focused
+                  ? undefined
+                  : { start: 0, end: 0 }
+            }
             placeholder="Address, postcode, or lat,long"
             placeholderTextColor="$gray9"
             autoCapitalize="none"

@@ -1,6 +1,6 @@
 // Bottom sheet that lives inside MapHomeScreen.
 // Three snap points:
-//   index 0 – PILL   (~72 px)  : only the search pill visible; map in focus
+//   index 0 – PILL   (~100 px) : only the search pill visible; map in focus
 //   index 1 – HOME   (~320 px) : Places row + Saved Journeys (default / launch state)
 //   index 2 – OPEN   (82 % of screen) : search active; results fill the sheet
 //
@@ -66,7 +66,7 @@ import BottomSheet, {
 const SCREEN_H = Dimensions.get('window').height
 
 // Heights of the visible sheet at each snap point (gorhom convention: height from bottom).
-const SNAP_POINTS = [72, 320, SCREEN_H * 0.82]
+const SNAP_POINTS = [100, 320, SCREEN_H * 0.82]
 
 const SNAP_IDX_HOME = 1
 const SNAP_IDX_OPEN = 2
@@ -109,19 +109,20 @@ function PlacesRow({
   const placesStyles = useMemo(
     () =>
       StyleSheet.create({
-        placesSection: { marginBottom: Spacing.lg, paddingHorizontal: Spacing.lg },
+        placesSection: { marginBottom: Spacing.lg },
         sectionLabel: {
           ...Typography.label,
+          fontSize: 13,
           color: Colors.secondaryText,
           marginBottom: Spacing.sm,
           letterSpacing: 0.5,
-          paddingHorizontal: Spacing.lg,
+          paddingLeft: Spacing.lg,
         },
-        placesRow: { flexDirection: 'row', gap: Spacing.md },
-        placesTile: { alignItems: 'center', width: 64 },
+        placesRow: { flexDirection: 'row', gap: Spacing.sm, paddingLeft: Spacing.lg },
+        placesTile: { alignItems: 'center', width: 68 },
         placesTileIcon: {
-          width: 50,
-          height: 50,
+          width: 54,
+          height: 54,
           borderRadius: Radii.button,
           backgroundColor: Colors.searchBg,
           alignItems: 'center',
@@ -142,7 +143,7 @@ function PlacesRow({
   const [containerWidth, setContainerWidth] = useState(0)
 
   const tileCount = NAMED_PLACES.length + savedPlaces.custom.length + 1
-  const contentWidth = tileCount * 64 + (tileCount - 1) * Spacing.md
+  const contentWidth = tileCount * 68 + (tileCount - 1) * Spacing.sm
   const scrollable = containerWidth > 0 && contentWidth > containerWidth
   const thumbWidth = scrollable
     ? Math.max(24, Math.min(containerWidth * 0.4, (containerWidth / contentWidth) * containerWidth))
@@ -185,13 +186,19 @@ function PlacesRow({
                 <View
                   style={[placesStyles.placesTileIcon, saved && placesStyles.placesTileIconSaved]}
                 >
-                  <MaterialIcons name={icon} size={22} color={saved ? Colors.card : Colors.blue} />
+                  <MaterialIcons name={icon} size={24} color={saved ? Colors.card : Colors.blue} />
                 </View>
-                <Text style={[Typography.label, { color: Colors.text, marginTop: 4 }]}>
+                <Text
+                  style={[Typography.label, { color: Colors.text, marginTop: 4, fontSize: 13 }]}
+                >
                   {label}
                 </Text>
                 {!saved && (
-                  <Text style={[Typography.label, { color: Colors.blue, marginTop: 1 }]}>Add</Text>
+                  <Text
+                    style={[Typography.label, { color: Colors.blue, marginTop: 1, fontSize: 13 }]}
+                  >
+                    Add
+                  </Text>
                 )}
               </TouchableOpacity>
             )
@@ -210,12 +217,12 @@ function PlacesRow({
               <View style={[placesStyles.placesTileIcon, placesStyles.placesTileIconSaved]}>
                 <MaterialIcons
                   name={place.icon as keyof typeof MaterialIcons.glyphMap}
-                  size={22}
+                  size={24}
                   color={Colors.card}
                 />
               </View>
               <Text
-                style={[Typography.label, { color: Colors.text, marginTop: 4 }]}
+                style={[Typography.label, { color: Colors.text, marginTop: 4, fontSize: 13 }]}
                 numberOfLines={1}
               >
                 {place.name}
@@ -228,9 +235,11 @@ function PlacesRow({
             onPress={onAddPress}
           >
             <View style={placesStyles.placesTileIcon}>
-              <MaterialIcons name="add" size={22} color={Colors.blue} />
+              <MaterialIcons name="add" size={24} color={Colors.blue} />
             </View>
-            <Text style={[Typography.label, { color: Colors.text, marginTop: 4 }]}>Add</Text>
+            <Text style={[Typography.label, { color: Colors.text, marginTop: 4, fontSize: 13 }]}>
+              Add
+            </Text>
           </TouchableOpacity>
         </ScrollView>
       </NativeViewGestureHandler>
@@ -258,8 +267,8 @@ function SavedRow({ item, onPress }: { item: SavedJourney; onPress: () => void }
           paddingHorizontal: Spacing.lg,
         },
         savedRowIcon: {
-          width: 34,
-          height: 34,
+          width: 40,
+          height: 40,
           borderRadius: Radii.icon,
           backgroundColor: Colors.searchBg,
           alignItems: 'center',
@@ -274,17 +283,20 @@ function SavedRow({ item, onPress }: { item: SavedJourney; onPress: () => void }
   return (
     <TouchableOpacity onPress={onPress} style={savedRowStyles.savedRow} activeOpacity={0.7}>
       <View style={savedRowStyles.savedRowIcon}>
-        <MaterialIcons name="schedule" size={16} color={Colors.blue} />
+        <MaterialIcons name="schedule" size={20} color={Colors.blue} />
       </View>
       <View style={{ flex: 1 }}>
-        <Text style={[Typography.bodyBold, { color: Colors.text }]} numberOfLines={1}>
+        <Text style={[Typography.bodyBold, { color: Colors.text, fontSize: 17 }]} numberOfLines={1}>
           {from}
         </Text>
-        <Text style={[Typography.caption, { color: Colors.secondaryText }]} numberOfLines={1}>
+        <Text
+          style={[Typography.caption, { color: Colors.secondaryText, fontSize: 14 }]}
+          numberOfLines={1}
+        >
           → {to} · {item.journey.duration} min · {time}
         </Text>
       </View>
-      <MaterialIcons name="chevron-right" size={16} color={Colors.tertiaryText} />
+      <MaterialIcons name="chevron-right" size={20} color={Colors.tertiaryText} />
     </TouchableOpacity>
   )
 }
@@ -301,8 +313,8 @@ function StationResultRow({ station, onPress }: { station: StationDetail; onPres
           paddingVertical: Spacing.sm,
         },
         resultRowIcon: {
-          width: 34,
-          height: 34,
+          width: 40,
+          height: 40,
           borderRadius: Radii.icon,
           backgroundColor: Colors.searchBg,
           alignItems: 'center',
@@ -314,15 +326,17 @@ function StationResultRow({ station, onPress }: { station: StationDetail; onPres
   return (
     <TouchableOpacity onPress={onPress} style={resultRowStyles.resultRow} activeOpacity={0.7}>
       <View style={resultRowStyles.resultRowIcon}>
-        <MaterialIcons name="train" size={16} color={Colors.blue} />
+        <MaterialIcons name="train" size={20} color={Colors.blue} />
       </View>
       <View style={{ flex: 1 }}>
-        <Text style={[Typography.bodyBold, { color: Colors.text }]} numberOfLines={1}>
+        <Text style={[Typography.bodyBold, { color: Colors.text, fontSize: 17 }]} numberOfLines={1}>
           {station.name}
         </Text>
-        <Text style={[Typography.caption, { color: Colors.secondaryText }]}>Station</Text>
+        <Text style={[Typography.caption, { color: Colors.secondaryText, fontSize: 14 }]}>
+          Station
+        </Text>
       </View>
-      <MaterialIcons name="chevron-right" size={16} color={Colors.tertiaryText} />
+      <MaterialIcons name="chevron-right" size={20} color={Colors.tertiaryText} />
     </TouchableOpacity>
   )
 }
@@ -345,8 +359,8 @@ function LocationResultRow({
           paddingVertical: Spacing.sm,
         },
         resultRowIcon: {
-          width: 34,
-          height: 34,
+          width: 40,
+          height: 40,
           borderRadius: Radii.icon,
           backgroundColor: Colors.searchBg,
           alignItems: 'center',
@@ -358,22 +372,25 @@ function LocationResultRow({
   return (
     <TouchableOpacity onPress={onPress} style={locResultStyles.resultRow} activeOpacity={0.7}>
       <View style={locResultStyles.resultRowIcon}>
-        <MaterialIcons name="place" size={16} color={Colors.secondaryText} />
+        <MaterialIcons name="place" size={20} color={Colors.secondaryText} />
       </View>
       <View style={{ flex: 1 }}>
         <Text
-          style={[Typography.body, { color: Colors.text, fontWeight: '600' }]}
+          style={[Typography.body, { color: Colors.text, fontWeight: '600', fontSize: 17 }]}
           numberOfLines={1}
         >
           {suggestion.label}
         </Text>
         {suggestion.subtitle ? (
-          <Text style={[Typography.caption, { color: Colors.secondaryText }]} numberOfLines={1}>
+          <Text
+            style={[Typography.caption, { color: Colors.secondaryText, fontSize: 14 }]}
+            numberOfLines={1}
+          >
             {suggestion.subtitle}
           </Text>
         ) : null}
       </View>
-      <MaterialIcons name="chevron-right" size={16} color={Colors.tertiaryText} />
+      <MaterialIcons name="chevron-right" size={20} color={Colors.tertiaryText} />
     </TouchableOpacity>
   )
 }
@@ -440,7 +457,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
           },
           searchInput: {
             flex: 1,
-            fontSize: 15,
+            fontSize: 18,
             color: Colors.text,
             padding: 0,
           },
@@ -465,6 +482,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
           },
           sectionLabel: {
             ...Typography.label,
+            fontSize: 13,
             color: Colors.secondaryText,
             marginBottom: Spacing.sm,
             letterSpacing: 0.5,
@@ -750,7 +768,7 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
             >
               <MaterialIcons
                 name="search"
-                size={18}
+                size={22}
                 color={Colors.secondaryText}
                 style={{ marginRight: 6 }}
               />
@@ -828,19 +846,19 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
                     alignItems: 'center',
                     gap: Spacing.md,
                     paddingHorizontal: Spacing.lg,
-                    minHeight: 52,
+                    minHeight: 60,
                     borderTopWidth: i === 0 ? 0 : StyleSheet.hairlineWidth,
                     borderTopColor: Colors.separator,
                   }}
                 >
-                  <MaterialIcons name="history" size={16} color={Colors.secondaryText} />
+                  <MaterialIcons name="history" size={20} color={Colors.secondaryText} />
                   <Text
-                    style={[Typography.body, { color: Colors.text, flex: 1 }]}
+                    style={[Typography.body, { color: Colors.text, flex: 1, fontSize: 17 }]}
                     numberOfLines={1}
                   >
                     {item.label}
                   </Text>
-                  <MaterialIcons name="chevron-right" size={16} color={Colors.tertiaryText} />
+                  <MaterialIcons name="chevron-right" size={20} color={Colors.tertiaryText} />
                 </TouchableOpacity>
               ))}
             </View>
@@ -930,7 +948,11 @@ export const SearchActionSheet = forwardRef<SearchActionSheetHandle, Props>(
                   <Text
                     style={[
                       Typography.caption,
-                      { color: Colors.secondaryText, paddingVertical: 6, paddingLeft: Spacing.md },
+                      {
+                        color: Colors.secondaryText,
+                        paddingVertical: 6,
+                        paddingHorizontal: Spacing.lg,
+                      },
                     ]}
                   >
                     No saved journeys yet — plan one to save it here.

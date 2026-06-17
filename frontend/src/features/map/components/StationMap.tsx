@@ -1,7 +1,6 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
-import { StyleSheet } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import MapView, { MapMarkerProps, Marker, Polyline, PoiClickEvent, Region } from 'react-native-maps'
-import Svg, { Circle } from 'react-native-svg'
 import { fuzzyScore } from '@/lib/fuzzy'
 import { useAppHeading, useAppLocation } from '@/lib/LocationContext'
 import stationMarkers from '@/features/map/data/stationMarkers.json'
@@ -19,19 +18,38 @@ export type StationMapHandle = {
 // ring so the start, the destination, and every on/off point read as the same kind of marker (the
 // destination also carries a TfL roundel above it). Both ends of a walking transfer between two
 // sections are emitted as interchanges, so each end of that gap gets its own circle.
+//
+// The dot is a small View centred inside a larger transparent box rather than being the marker
+// view itself. On Android, react-native-maps computes the anchor offset from the marker view's
+// measured native bounds, and a very small custom view gets measured/padded such that anchor:0.5
+// lands off-centre — the dot ends up displaced up-and-left of its coordinate (iOS is unaffected
+// because it centres the snapshot bitmap instead). Centring the dot in a roomier box keeps it on
+// the true anchor point, mirroring the working UserLocationMarker. `flat` likewise matches that
+// marker: it draws on the map surface rather than as an upright billboard, which Android anchors
+// reliably (a symmetric dot looks identical flat or not).
+const WAYPOINT_DOT = 16
+const WAYPOINT_BOX = 36
 function RouteWaypoint() {
-  const size = 16
   return (
-    <Svg width={size} height={size}>
-      <Circle
-        cx={size / 2}
-        cy={size / 2}
-        r={size / 2 - 2}
-        fill="white"
-        stroke="#1f1f1f"
-        strokeWidth={2}
+    <View
+      style={{
+        width: WAYPOINT_BOX,
+        height: WAYPOINT_BOX,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <View
+        style={{
+          width: WAYPOINT_DOT,
+          height: WAYPOINT_DOT,
+          borderRadius: WAYPOINT_DOT / 2,
+          backgroundColor: 'white',
+          borderWidth: 2,
+          borderColor: '#1f1f1f',
+        }}
       />
-    </Svg>
+    </View>
   )
 }
 
@@ -277,6 +295,7 @@ export const StationMap = forwardRef<StationMapHandle, Props>(function StationMa
             key={`waypoint-${i}`}
             coordinate={marker?.coord ?? { latitude: LONDON.latitude, longitude: LONDON.longitude }}
             anchor={{ x: 0.5, y: 0.5 }}
+            flat
             opacity={marker ? 1 : 0}
             trackKey={marker ? `${marker.coord.latitude},${marker.coord.longitude}` : 'hidden'}
           >

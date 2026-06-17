@@ -19,6 +19,9 @@ class Equipment(Base):
     )
     # Human-readable description of what this unit connects (e.g. "Platform 2 → Street").
     connection: Mapped[str] = mapped_column()
+    # Natural-language display label (e.g. "Booking Hall ↔ Eastbound platforms 3 and 4").
+    # Populated for named lift/escalator units; null for synthesised or overcrowding rows.
+    display_name: Mapped[str | None] = mapped_column(default=None)
 
     # A station has at most one piece of equipment of a given type serving a given connection.
     __table_args__ = (UniqueConstraint("station_id", "equipment_type_id", "connection"),)

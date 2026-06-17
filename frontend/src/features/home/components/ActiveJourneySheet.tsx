@@ -35,17 +35,22 @@ import { assessOutages, DIRECT_VERDICTS } from '@/features/journey/api/outageRel
 import type { StationOutage } from '@/features/journey/api/accessibility'
 import { useOutages } from '@/features/outages'
 import {
+  planAlternativesAlongLine,
   planJourneyOptions,
+  planRouteFromPlatform,
   routeSignature,
   type Journey,
+  type Leg,
   type RouteTag,
   type TaggedJourney,
 } from '@/features/journey/api/tfl'
+import { tflQuery } from '@/features/journey/api/geocode'
 import type { RerouteState } from '@/features/journey/components/RerouteAlert'
 import { JourneyResultCard } from '@/features/journey/components/JourneyResultCard'
 import {
   clearActiveJourney,
   loadActiveJourney,
+  replaceActiveJourney,
   setActiveLegIndex,
 } from '@/features/journey/api/activeJourney'
 import {
@@ -59,11 +64,12 @@ import {
 } from '@/features/journey/components/legDisplay'
 import { RouteAlerts } from '@/features/journey/components/RouteAlerts'
 import { haversineMeters } from '@/lib/geo'
+import { useAppLocation } from '@/lib/LocationContext'
 import { useTheme, Borders, Heights, Opacity, Spacing } from '@/theme'
 import { JOURNEY_CACHE_TTL_MS } from '@/config'
 import { useSheetStack } from '@/components/SheetStack'
 
-const ARRIVAL_RADIUS_M = 120
+const ARRIVAL_RADIUS_M = 40
 const SCREEN_H = Dimensions.get('window').height
 const SNAP_HALF = SCREEN_H * 0.52
 // Extra height added to snap 0 when the reroute banner is visible in the footer.
@@ -75,6 +81,8 @@ type Props = {
   onEnd: () => void
   onStationPress?: (station: string) => void
   onHeightChange?: (height: number) => void
+  // Fired when the rider switches to a rerouted journey, so the host can redraw the map route.
+  onRerouteSelected?: (journey: Journey) => void
 }
 
 export function ActiveJourneySheet({
@@ -83,6 +91,7 @@ export function ActiveJourneySheet({
   onEnd,
   onStationPress,
   onHeightChange,
+  onRerouteSelected,
 }: Props) {
   const { Colors, Radii } = useTheme()
   const styles = useMemo(
@@ -159,10 +168,20 @@ export function ActiveJourneySheet({
   const [gpsActive, setGpsActive] = useState(false)
   const [currentJourney, setCurrentJourney] = useState<Journey | null>(null)
   const [rerouteState, setRerouteState] = useState<RerouteState>({ phase: 'idle' })
+  const [loadingSource, setLoadingSource] = useState<'from-location' | 'along-line' | null>(null)
+  // Which flow produced the currently shown alternatives. For 'along-line' (stuck on the platform)
+  // the journeys start at the stuck station, so the preview labels its origin from the journey
+  // itself rather than the original "from" (e.g. "Current location").
+  const [rerouteSource, setRerouteSource] = useState<'from-location' | 'along-line' | null>(null)
+  const [alongLineHint, setAlongLineHint] = useState(false)
   const [previewJourney, setPreviewJourney] = useState<JourneyDetailParams | null>(null)
   const [rerouteHeaderH, setRerouteHeaderH] = useState(0)
   const [rerouteResultsH, setRerouteResultsH] = useState<number | null>(null)
   const autoAdvancedFromRef = useRef<number | null>(null)
+  // Latest fix from this sheet's own high-accuracy watcher (below). Kept in a ref so the reroute
+  // handlers read a fresh position at call time; `useAppLocation()` (LocationProvider) updates too
+  // slowly to rely on here.
+  const liveCoordsRef = useRef<{ lat: number; lon: number } | null>(null)
   const alternativesCacheRef = useRef<{ alternatives: TaggedJourney[]; fetchedAt: number } | null>(
     null,
   )
@@ -171,6 +190,7 @@ export function ActiveJourneySheet({
 
   const { stations } = useStations()
   const stationNames = useMemo(() => stations.map((s) => s.name), [stations])
+  const userCoords = useAppLocation()
   const resolveStation = useCallback(
     (name: string) => resolveStationName(name, stationNames),
     [stationNames],
@@ -206,6 +226,7 @@ export function ActiveJourneySheet({
     setCurrentJourney(null)
     setRerouteState({ phase: 'idle' })
     autoAdvancedFromRef.current = null
+    liveCoordsRef.current = null
     alternativesCacheRef.current = null
 
     let active = true
@@ -306,14 +327,37 @@ export function ActiveJourneySheet({
     [outageAssessments, futureStationNames],
   )
 
-  // Destination for the reroute planner: prefer the stored postcode, fall back to the
-  // last leg's arrival coordinates (TfL accepts both formats).
+  // The reroute destination must always be the *original* journey's endpoint — derived from
+  // `params.journey`, never `currentJourney` — so it doesn't drift to an intermediate stop after
+  // the rider selects an alternative route.
+  const originalLegs = useMemo(() => params?.journey?.legs ?? [], [params?.journey])
+
+  // Sync "is a destination known?" gate for the reroute alert. Prefer the stored postcode, fall
+  // back to the original journey's final arrival coordinates (TfL accepts both formats). The exact
+  // query string sent to TfL is resolved in `resolveRerouteDestination`, which prefers the
+  // station id.
   const rerouteToLocation = useMemo(() => {
     if (params?.to?.postcode) return params.to.postcode
-    const lastLeg = legs[legs.length - 1]
-    const arr = lastLeg?.arrivalPoint
+    const arr = originalLegs[originalLegs.length - 1]?.arrivalPoint
     return arr?.lat != null && arr?.lon != null ? `${arr.lat},${arr.lon}` : null
-  }, [params, legs])
+  }, [params?.to, originalLegs])
+
+  // Destination coordinates as a lat/lon pair — needed to synthesise walking legs in
+  // `planAlternativesAlongLine`. Taken from the original journey's final arrival point, which
+  // TfL always populates for transit legs.
+  const rerouteDestCoords = useMemo(() => {
+    const arr = originalLegs[originalLegs.length - 1]?.arrivalPoint
+    return arr?.lat != null && arr?.lon != null ? { lat: arr.lat, lon: arr.lon } : null
+  }, [originalLegs])
+
+  // Resolve the reroute destination exactly the way the original journey did: prefer the station
+  // id (`tflQuery` resolves NaPTAN hub codes such as Heathrow's `HUBH13` to a real StopPoint) so
+  // the route ends *at* the station rather than a nearby postcode. Falls back to the postcode, then
+  // to the original journey's final arrival coordinates.
+  const resolveRerouteDestination = useCallback(async (): Promise<string | null> => {
+    if (params?.to) return tflQuery(params.to)
+    return rerouteToLocation
+  }, [params, rerouteToLocation])
 
   const showRerouteAlert = useMemo(
     () => upcomingBlockedAssessments.length > 0 && rerouteToLocation != null,
@@ -349,6 +393,13 @@ export function ActiveJourneySheet({
     ],
     [insets.top, insets.bottom, showRerouteAlert],
   )
+
+  // Keep the host's notion of our height in sync even when the snap index doesn't change — e.g. a
+  // reroute that clears the block shrinks snap 0 by the banner height while staying at index 0.
+  // Without this the host's map padding stays stale and re-frames the route against a too-tall inset.
+  useEffect(() => {
+    if (snapIndex >= 0) onHeightChange?.(snapPoints[snapIndex])
+  }, [snapPoints, snapIndex, onHeightChange])
 
   // Issues sheet is fixed height — just RouteAlerts + option buttons footer.
   const rerouteSnapPoints = useMemo(() => [SCREEN_H * 0.78], [])
@@ -394,6 +445,7 @@ export function ActiveJourneySheet({
         { accuracy: Location.Accuracy.High, timeInterval: 5000, distanceInterval: 10 },
         (loc) => {
           setGpsActive(true)
+          liveCoordsRef.current = { lat: loc.coords.latitude, lon: loc.coords.longitude }
           const idx = legIndexRef.current
           if (autoAdvancedFromRef.current === idx) return
           const arr = legs[idx]?.arrivalPoint
@@ -431,27 +483,31 @@ export function ActiveJourneySheet({
     // Return cached results immediately if they're still fresh.
     const cached = alternativesCacheRef.current
     if (cached && Date.now() - cached.fetchedAt < JOURNEY_CACHE_TTL_MS) {
+      setRerouteSource('from-location')
       setRerouteState({ phase: 'found', alternatives: cached.alternatives })
       return
     }
 
+    setLoadingSource('from-location')
     setRerouteState({ phase: 'loading' })
 
     const activeLegs = (currentJourney ?? params.journey).legs
-    const dep = activeLegs[legIndex]?.departurePoint
-    // Always reroute from the current leg's departure point (where the user is now),
-    // never from the original starting point.
-    const fromLocation = dep?.lat != null && dep?.lon != null ? `${dep.lat},${dep.lon}` : null
-    const toLocation = rerouteToLocation
+    // Reroute from the rider's real GPS position. Prefer this sheet's own high-accuracy watcher
+    // (refreshed every 5s), then the slower LocationProvider context, and only as a last resort
+    // the current leg's departure point — never silently the original journey start.
+    const currentDep = activeLegs[legIndex]?.departurePoint
+    const originCoords =
+      liveCoordsRef.current ??
+      (userCoords != null
+        ? { lat: userCoords.latitude, lon: userCoords.longitude }
+        : currentDep?.lat != null && currentDep?.lon != null
+          ? { lat: currentDep.lat, lon: currentDep.lon }
+          : null)
+    const fromLocation = originCoords ? `${originCoords.lat},${originCoords.lon}` : null
+    const toLocation = await resolveRerouteDestination()
 
     if (!fromLocation || !toLocation) {
-      setRerouteState({ phase: 'none-found' })
-      return
-    }
-
-    const result = await planJourneyOptions(fromLocation, toLocation, params.level, null, true)
-
-    if (result.kind !== 'journeys') {
+      setLoadingSource(null)
       setRerouteState({ phase: 'none-found' })
       return
     }
@@ -462,15 +518,173 @@ export function ActiveJourneySheet({
       units: [],
       totalByType: {},
     }))
-
     const baseSig = routeSignature(currentJourney ?? params.journey)
-    const alternatives = result.journeys.filter(
-      ({ journey }) =>
-        routeSignature(journey) !== baseSig && matchOutages(journey, blockedAsOutages).length === 0,
-    )
+    const keepAvoiding = (journeys: TaggedJourney[]) =>
+      journeys.filter(
+        ({ journey }) =>
+          routeSignature(journey) !== baseSig &&
+          matchOutages(journey, blockedAsOutages).length === 0,
+      )
+
+    const result = await planJourneyOptions(fromLocation, toLocation, params.level, null, true)
+    let alternatives = result.kind === 'journeys' ? keepAvoiding(result.journeys) : []
+
+    // A plain point-to-point replan often returns only near-identical routes (TfL doesn't know to
+    // avoid the blocked station), leaving nothing after filtering. Fall back to the richer
+    // along-line strategies (ride past / before the block, then continue) before giving up.
+    if (alternatives.length === 0) {
+      const blockedNames = upcomingBlockedAssessments.map((a) => a.stationName)
+      // Anchor on the leg approaching a blocked station — its line and departure/arrival points let
+      // the planner walk the line sequence (see `handleStuckOnPlatform`'s `stuckLeg`).
+      const approachLeg =
+        activeLegs
+          .slice(legIndex)
+          .find(
+            (leg) =>
+              leg.mode.name !== 'walking' &&
+              leg.arrivalPoint?.commonName != null &&
+              blockedNames.includes(resolveStation(leg.arrivalPoint.commonName) ?? ''),
+          ) ?? (currentLeg?.mode.name !== 'walking' ? currentLeg : undefined)
+      const fallback = approachLeg
+        ? await planAlternativesAlongLine(
+            approachLeg,
+            toLocation,
+            params.level ?? null,
+            blockedNames,
+            stations,
+            originCoords,
+            rerouteDestCoords,
+          )
+        : null
+      // The along-line escapes legitimately ride through the blocked station, so don't apply the
+      // `matchOutages` filter here (it would delete them); the planner already drops routes that
+      // touch *other* blocked stations. Just exclude the current route, as the platform flow does.
+      if (fallback?.kind === 'journeys') {
+        alternatives = fallback.journeys.filter(
+          ({ journey }) => routeSignature(journey) !== baseSig,
+        )
+      }
+    }
+
+    setLoadingSource(null)
 
     if (alternatives.length > 0) {
       alternativesCacheRef.current = { alternatives, fetchedAt: Date.now() }
+      setRerouteSource('from-location')
+      setRerouteState({ phase: 'found', alternatives })
+    } else {
+      setRerouteState({ phase: 'none-found' })
+    }
+  }
+
+  // "Stuck on the platform?" — the rider has ridden into the blocked station and can't get off
+  // step-free. Plan routes that start by riding from this platform to the nearest step-free
+  // station (see `planRouteFromPlatform`). Anchors on the current leg (its arrival point is where
+  // they're stuck) rather than the departure point used by the other button.
+  async function handleStuckOnPlatform() {
+    if (!params) return
+
+    const activeLegs = (currentJourney ?? params.journey).legs
+    const blockedNames = upcomingBlockedAssessments.map((a) => a.stationName)
+
+    // Decide *which* blocked station the rider is stranded at. With a live fix, pick the nearest
+    // blocked station to the rider's real position; otherwise consider all blocked stations and let
+    // the leg scan below pick the first one encountered along the route.
+    const live = liveCoordsRef.current
+    let candidates = blockedNames
+    if (live && blockedNames.length > 1) {
+      let nearest: string | null = null
+      let best = Infinity
+      for (const name of blockedNames) {
+        const st = stations.find((s) => s.name === name)
+        if (st?.latitude == null || st?.longitude == null) continue
+        const d = haversineMeters(
+          { latitude: live.lat, longitude: live.lon },
+          { latitude: st.latitude, longitude: st.longitude },
+        )
+        if (d < best) {
+          best = d
+          nearest = name
+        }
+      }
+      if (nearest) candidates = [nearest]
+    }
+
+    // Find the transit leg that puts the rider on the chosen blocked station's platform, preferring
+    // it as the leg's *arrival* (the line they rode in on — "the line they were coming from"), then
+    // a pass-through mid-leg, then a departure. Scanning *all* legs (not just from `legIndex`) keeps
+    // this robust whether or not GPS has advanced the leg index. We then re-point that leg's arrival
+    // at the blocked station so `planRouteFromPlatform` anchors on *that* platform. There is no
+    // fall-back to the current/first leg — that previously routed the rider from the journey start.
+    const transitLegs = activeLegs.filter((l) => l.mode.name !== 'walking')
+    const matchLeg = (
+      pick: (leg: Leg) => string | null | undefined,
+    ): { leg: Leg; blocked: string } | undefined => {
+      for (const leg of transitLegs) {
+        const name = pick(leg)
+        if (name == null) continue
+        const resolved = resolveStation(name)
+        if (resolved && candidates.includes(resolved)) return { leg, blocked: resolved }
+      }
+      return undefined
+    }
+    const match =
+      matchLeg((leg) => leg.arrivalPoint?.commonName) ??
+      matchLeg((leg) =>
+        (leg.path?.stopPoints ?? [])
+          .map((sp) => sp.name)
+          .find((nm) => nm != null && candidates.includes(resolveStation(nm) ?? '')),
+      ) ??
+      matchLeg((leg) => leg.departurePoint?.commonName)
+
+    let anchorLeg: Leg | undefined
+    if (match) {
+      const st = stations.find((s) => s.name === match.blocked)
+      anchorLeg =
+        st?.latitude != null && st?.longitude != null
+          ? {
+              ...match.leg,
+              arrivalPoint: { commonName: match.blocked, lat: st.latitude, lon: st.longitude },
+            }
+          : match.leg
+    }
+    if (!anchorLeg) {
+      setAlongLineHint(true)
+      return
+    }
+
+    setAlongLineHint(false)
+    setLoadingSource('along-line')
+    setRerouteState({ phase: 'loading' })
+
+    const toLocation = await resolveRerouteDestination()
+    if (!toLocation) {
+      setLoadingSource(null)
+      setRerouteState({ phase: 'none-found' })
+      return
+    }
+
+    const result = await planRouteFromPlatform(
+      anchorLeg,
+      toLocation,
+      params.level ?? null,
+      blockedNames,
+      stations,
+    )
+
+    setLoadingSource(null)
+
+    // Don't filter on `matchOutages` here: every result legitimately starts at the blocked station
+    // (that's where the rider is stuck). `planRouteFromPlatform` already drops routes that touch
+    // *other* blocked stations. Just exclude the current route.
+    const baseSig = routeSignature(currentJourney ?? params.journey)
+    const alternatives =
+      result.kind === 'journeys'
+        ? result.journeys.filter(({ journey }) => routeSignature(journey) !== baseSig)
+        : []
+
+    if (alternatives.length > 0) {
+      setRerouteSource('along-line')
       setRerouteState({ phase: 'found', alternatives })
     } else {
       setRerouteState({ phase: 'none-found' })
@@ -482,6 +696,10 @@ export function ActiveJourneySheet({
     setLegIndex(0)
     setRerouteState({ phase: 'idle' })
     autoAdvancedFromRef.current = null
+    // Persist the swap so a refresh/resume follows the rerouted trip, and tell the host so it can
+    // redraw and re-frame the route on the map.
+    void replaceActiveJourney(journey)
+    onRerouteSelected?.(journey)
     dismissAll()
   }
 
@@ -521,13 +739,14 @@ export function ActiveJourneySheet({
   }, [onArrived])
 
   // Tapping above collapses to snap 0; sheet cannot be dragged below snap 0.
+  // Backdrop only appears at snap 1+ so the map remains swipeable at snap 0.
   const collapseBackdrop = useCallback(
     (props: BottomSheetBackdropProps) => (
       <BottomSheetBackdrop
         {...props}
         opacity={0}
-        disappearsOnIndex={-1}
-        appearsOnIndex={0}
+        disappearsOnIndex={0}
+        appearsOnIndex={1}
         pressBehavior="collapse"
       />
     ),
@@ -1240,79 +1459,63 @@ export function ActiveJourneySheet({
         onChange={(index) => {
           if (index === -1 && onClosed('reroute-issues')) {
             setRerouteState({ phase: 'idle' })
+            setAlongLineHint(false)
             alternativesCacheRef.current = null
           }
         }}
       >
+        {/* Non-scrollable header: title + reroute action buttons */}
         <SheetHeader
-          title="Accessibility issues"
+          title="Alternative routes"
           onClose={() => rerouteSheetRef.current?.close()}
           modal
+          titleFontSize={22}
         />
-        <BottomSheetScrollView
-          showsVerticalScrollIndicator={false}
-          style={{ flex: 1 }}
-          contentContainerStyle={{
-            paddingHorizontal: Spacing.lg,
-            paddingTop: Spacing.xs,
-            paddingBottom: Spacing.xl,
-          }}
-        >
-          <RouteAlerts
-            assessments={upcomingBlockedAssessments}
-            disruptions={[]}
-            hideHeader
-            defaultExpanded
-          />
-        </BottomSheetScrollView>
-
-        {/* Option buttons pinned to bottom of issues sheet */}
         <YStack
           gap="$2"
           px="$4"
-          pt="$3"
+          pt="$2"
           style={{
-            paddingBottom: insets.bottom + Spacing.md,
-            backgroundColor: Colors.card,
-            borderTopWidth: StyleSheet.hairlineWidth,
-            borderTopColor: Colors.border,
+            paddingBottom: Spacing.md,
+            zIndex: 1,
+            borderBottomWidth: StyleSheet.hairlineWidth,
+            borderBottomColor: Colors.secondaryText,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 3 },
+            shadowOpacity: 0.08,
+            shadowRadius: 6,
+            elevation: 4,
           }}
         >
-          <Text
-            fontSize={11}
-            fontWeight="700"
-            color={Colors.tertiaryText}
-            style={{ letterSpacing: 0.5 }}
-          >
-            FIND ALTERNATIVE ROUTES
-          </Text>
           {(() => {
-            const busy = rerouteState.phase === 'loading'
+            const anyBusy = rerouteState.phase === 'loading'
+            const busyFromLocation = anyBusy && loadingSource === 'from-location'
+            const busyAlongLine = anyBusy && loadingSource === 'along-line'
             return (
               <>
                 <TouchableOpacity
                   style={[
                     styles.rerouteSheetBtn,
                     {
-                      backgroundColor: busy ? Colors.dangerBorder : Colors.dangerDark,
-                      opacity: busy ? Opacity.disabledMid : 1,
+                      backgroundColor: busyFromLocation ? Colors.dangerBorder : Colors.dangerDark,
+                      opacity: anyBusy ? Opacity.disabledMid : 1,
                     },
                   ]}
-                  onPress={busy ? undefined : handleFindAlternative}
+                  onPress={anyBusy ? undefined : handleFindAlternative}
                   activeOpacity={0.8}
                   accessibilityRole="button"
                   accessibilityLabel="Find alternative route from your location"
                 >
-                  {busy ? (
+                  {busyFromLocation ? (
                     <Spinner size="small" color="white" />
                   ) : (
                     <MaterialIcons name="my-location" size={16} color="white" />
                   )}
                   <YStack flex={1}>
                     <Text fontSize={14} fontWeight="700" color="white">
-                      {busy ? 'Searching…' : 'From your location'}
+                      {busyFromLocation ? 'Searching…' : 'From your location'}
                     </Text>
-                    {!busy && (
+                    {!busyFromLocation && (
                       <Text fontSize={12} color="white" style={{ opacity: 0.8 }}>
                         Plan a new route avoiding the issue
                       </Text>
@@ -1327,31 +1530,63 @@ export function ActiveJourneySheet({
                       backgroundColor: Colors.searchBg,
                       borderWidth: Borders.medium,
                       borderColor: Colors.border,
-                      opacity: Opacity.disabled,
+                      opacity: anyBusy ? Opacity.disabledMid : 1,
                     },
                   ]}
-                  disabled
-                  activeOpacity={1}
+                  onPress={anyBusy ? undefined : handleStuckOnPlatform}
+                  activeOpacity={0.8}
                   accessibilityRole="button"
-                  accessibilityLabel="Find step-free stops along this line — coming soon"
+                  accessibilityLabel="Stuck on the platform — get a route from the platform"
                 >
-                  <MaterialIcons name="train" size={16} color={Colors.secondaryText} />
+                  {busyAlongLine ? (
+                    <Spinner size="small" color={Colors.text} />
+                  ) : (
+                    <MaterialIcons name="train" size={16} color={Colors.secondaryText} />
+                  )}
                   <YStack flex={1}>
                     <Text fontSize={14} fontWeight="700" color={Colors.text}>
-                      Along this line
+                      {busyAlongLine ? 'Searching…' : 'Stuck on the platform?'}
                     </Text>
-                    <Text fontSize={12} color={Colors.secondaryText}>
-                      Find step-free stops you can reach from here
-                    </Text>
+                    {!busyAlongLine && (
+                      <Text fontSize={12} color={Colors.secondaryText}>
+                        Get a route from the platform
+                      </Text>
+                    )}
                   </YStack>
-                  <Text fontSize={11} fontWeight="600" color={Colors.tertiaryText}>
-                    Coming soon
-                  </Text>
                 </TouchableOpacity>
+
+                {alongLineHint && (
+                  <XStack gap="$2" px="$1" pt="$1" pb="$1" items="center">
+                    <MaterialIcons name="info-outline" size={14} color={Colors.secondaryText} />
+                    <Text fontSize={12} color={Colors.secondaryText} flex={1}>
+                      {
+                        "You're on a walking leg — this option works once you're on a train or bus and stuck on a platform."
+                      }
+                    </Text>
+                  </XStack>
+                )}
               </>
             )
           })()}
         </YStack>
+
+        {/* Scrollable issues list */}
+        <BottomSheetScrollView
+          showsVerticalScrollIndicator={false}
+          style={{ flex: 1, backgroundColor: Colors.background }}
+          contentContainerStyle={{
+            paddingHorizontal: Spacing.lg,
+            paddingTop: Spacing.sm,
+            paddingBottom: insets.bottom + Spacing.xl,
+          }}
+        >
+          <RouteAlerts
+            assessments={upcomingBlockedAssessments}
+            disruptions={[]}
+            hideHeader
+            defaultExpanded
+          />
+        </BottomSheetScrollView>
       </BottomSheet>
 
       {/* Alternatives sheet — modal-style popup, no handlebar, opens over the issues sheet. */}
@@ -1397,7 +1632,10 @@ export function ActiveJourneySheet({
                       setPreviewJourney({
                         journey,
                         tags,
-                        from: params?.from,
+                        // Stuck-on-platform routes start at the stuck station, not the original
+                        // origin — drop `from` so the preview labels the origin from the journey's
+                        // first station instead of e.g. "Current location".
+                        from: rerouteSource === 'along-line' ? undefined : params?.from,
                         to: params?.to,
                         outages: params?.outages,
                         level: params?.level,

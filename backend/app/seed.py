@@ -106,6 +106,9 @@ def seed_defaults(db: Session) -> None:
                     name=plat["name"],
                     step_free=platform_step_free(plat),
                     lines=lines_for(plat.get("lines", [])),
+                    direction=plat.get("direction"),
+                    interchange_to=plat.get("interchangeTo"),
+                    same_level_platforms=plat.get("sameLevelPlatforms"),
                 )
                 db.add(platforms[key])
     db.flush()
@@ -116,7 +119,11 @@ def seed_defaults(db: Session) -> None:
     }
 
     def add_equipment(
-        station_id: int, type_id: int, connection: str, platform_id: int | None
+        station_id: int,
+        type_id: int,
+        connection: str,
+        platform_id: int | None,
+        display_name: str | None = None,
     ) -> None:
         key = (station_id, type_id, connection)
         if key in existing:
@@ -128,18 +135,21 @@ def seed_defaults(db: Session) -> None:
                 equipment_type_id=type_id,
                 platform_id=platform_id,
                 connection=connection,
+                display_name=display_name,
             )
         )
 
     def lift_connection(unit: dict) -> str:
-        """Build a connection string. Prefer the curated, rider-readable
-        `description` (e.g. "Booking Hall ↔ Eastbound platforms"); otherwise fall
-        back to a raw "from → to" route or the legacy {connection} format."""
+        """Build a connection string from the structured from/to fields.
+        Falls back to the legacy {connection} string for hand-curated overrides."""
         if "connection" in unit:
             return f"{unit['name']}: {unit['connection']}"
-        if unit.get("description"):
-            return f"{unit['name']}: {unit['description']}"
         return f"{unit['name']}: {unit.get('from', '')} → {unit.get('to', '')}"
+
+    def lift_display_name(unit: dict) -> str | None:
+        """Human-readable label from the description field, used for display only."""
+        desc = unit.get("description", "").strip()
+        return f"{unit['name']}: {desc}" if desc else None
 
     def escalator_connection(unit: dict) -> str:
         return f"{unit['name']}: {unit.get('from', 'Street')} → {unit.get('to', 'platform')}"
@@ -156,7 +166,13 @@ def seed_defaults(db: Session) -> None:
         lift_units = data.get("lift_units")
         if lift_units:
             for unit in lift_units:
-                add_equipment(station.id, lift_type_id, lift_connection(unit), None)
+                add_equipment(
+                    station.id,
+                    lift_type_id,
+                    lift_connection(unit),
+                    None,
+                    display_name=lift_display_name(unit),
+                )
         else:
             for i in range(data.get("lifts", 0)):
                 platform = (

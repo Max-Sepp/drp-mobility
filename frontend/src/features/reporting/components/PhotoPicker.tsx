@@ -1,4 +1,5 @@
 import * as ImagePicker from 'expo-image-picker'
+import { MaterialIcons } from '@expo/vector-icons'
 import { Alert, Image } from 'react-native'
 import { Text, YStack } from 'tamagui'
 import { FormSection } from '@/features/reporting/components/FormSection'
@@ -52,11 +53,12 @@ export const PhotoPicker = ({
       <YStack
         items="center"
         justify="center"
+        gap="$1.5"
         pressStyle={{ opacity: Opacity.pressed }}
         onPress={pick}
         style={{
-          borderWidth: Borders.thick,
-          borderColor: Colors.placeholderText,
+          borderWidth: Borders.thin,
+          borderColor: Colors.border,
           borderStyle: 'dashed',
           borderRadius: Radii.small,
           height: 100,
@@ -69,9 +71,12 @@ export const PhotoPicker = ({
             style={{ width: '100%', height: '100%', resizeMode: 'cover' }}
           />
         ) : (
-          <Text fontSize={14} color={Colors.placeholderText}>
-            [ + ] tap to upload image
-          </Text>
+          <>
+            <MaterialIcons name="camera-alt" size={26} color={Colors.secondaryText} />
+            <Text fontSize={13} color={Colors.secondaryText}>
+              Tap to add a photo
+            </Text>
+          </>
         )}
       </YStack>
     </FormSection>

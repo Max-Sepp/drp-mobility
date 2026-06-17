@@ -23,6 +23,7 @@ import { useAppLocation } from '@/lib/LocationContext'
 import { alertOffline, isOfflineError } from '@/lib/offline'
 import type { JourneyPlan } from '@/features/home/components/JourneyPlannerSheet'
 import { useTheme, Heights, Spacing } from '@/theme'
+import { useSheetStack } from '@/components/SheetStack'
 
 const SCREEN_H = Dimensions.get('window').height
 const COLLAPSED_H = 84
@@ -91,6 +92,7 @@ export function StationSheet({
   const sheetRef = useRef<BottomSheetRef>(null)
   // Suppresses onClose when the sheet is hidden programmatically (not by the user).
   const programmaticClose = useRef(false)
+  const { register, push, onClosed } = useSheetStack()
 
   const { stations } = useStations()
   const stationDetail = useMemo(() => stations.find((s) => s.name === station), [stations, station])
@@ -99,6 +101,11 @@ export function StationSheet({
   const reports = useMemo(
     () =>
       allReports.filter((r) => r.failure.equipment.station.name === station && r.source !== 'tfl'),
+    [allReports, station],
+  )
+  // All reports for this station (including TfL-sourced) used for platform disruption overlay.
+  const stationReports = useMemo(
+    () => allReports.filter((r) => r.failure.equipment.station.name === station),
     [allReports, station],
   )
   const { alerts } = useStationAlerts(stationDetail?.id)
@@ -111,14 +118,29 @@ export function StationSheet({
   // The index prop alone is unreliable for re-triggering gorhom after mount.
   useEffect(() => {
     if (station) {
-      programmaticClose.current = false
-      sheetRef.current?.snapToIndex(1)
+      push('station') // puts it on the stack; registered open() handles snapToIndex + flag
     } else {
       programmaticClose.current = true
       sheetRef.current?.close()
     }
     setGoingHere(false)
-  }, [station])
+  }, [station]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Register with the global sheet stack so push('report') can hide this sheet and
+  // automatically restore it when the report sheet closes.
+  useEffect(() => {
+    return register(
+      'station',
+      () => {
+        programmaticClose.current = false
+        sheetRef.current?.snapToIndex(1)
+      },
+      () => {
+        programmaticClose.current = true
+        sheetRef.current?.close()
+      },
+    )
+  }, [register])
 
   function handleAnimate(fromIndex: number, toIndex: number) {
     // Fire onClose as soon as the close animation begins (not when it ends) so the
@@ -132,8 +154,11 @@ export function StationSheet({
   function handleChange(index: number) {
     setSnapIndex(index)
     onHeightChange?.(index >= 0 ? snapPoints[index] : 0)
-    // onClose is now called from handleAnimate; guard against any edge-case double-fire.
-    if (index === -1 && !programmaticClose.current) onClose()
+    if (index === -1) {
+      onClosed('station')
+      // Fallback: if handleAnimate didn't fire (gorhom edge case), call onClose directly.
+      if (!programmaticClose.current) onClose()
+    }
   }
 
   async function handleGoHere() {
@@ -260,7 +285,13 @@ export function StationSheet({
         contentContainerStyle={{ paddingBottom: insets.bottom + Spacing.xl }}
       >
         {stationDetail && <StationInfoCard station={stationDetail} />}
-        {stationDetail && <PlatformAccessCard key={station} platforms={stationDetail.platforms} />}
+        {stationDetail && (
+          <PlatformAccessCard
+            key={station}
+            platforms={stationDetail.platforms}
+            reports={stationReports}
+          />
+        )}
         <StationAlertBanner alerts={alerts} />
         <ReportsStatus loading={loading} reports={reports} />
         {stationDetail && <StationAdditionalInfoCard station={stationDetail} />}

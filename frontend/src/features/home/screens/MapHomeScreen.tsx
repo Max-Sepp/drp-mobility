@@ -1,7 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import { useFocusEffect } from '@react-navigation/native'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Alert, Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Animated, Alert, Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { StationMap, type StationMapHandle } from '@/features/map/components/StationMap'
 import { useAppLocation } from '@/lib/LocationContext'
@@ -28,6 +28,8 @@ import { useAuth } from '@/features/auth'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import type { RootStackParamList } from '@/navigation/types'
 import type { ResolvedLocation } from '@/features/journey/api/geocode'
+import type { Journey } from '@/features/journey/api/tfl'
+import type { LatLng } from '@/features/journey/lib/routeGeometry'
 import { useTheme, Spacing, Typography } from '@/theme'
 import {
   SearchActionSheet,
@@ -306,19 +308,38 @@ export function MapHomeScreen({ navigation, route }: Props) {
   // strip of map left above it and zoom right out to all of London. Reacting only to the journey
   // becoming active (not every GPS tick) also means manual panning mid-journey isn't fought.
   const wasActiveRef = useRef(false)
+  // The journey object last framed by the camera, so a mid-journey reroute (which swaps the journey
+  // while it's already active) re-frames to the new route rather than being treated as a GPS tick.
+  const fittedJourneyRef = useRef<Journey | null>(null)
+  // Bounds awaiting a camera fit. The actual fit runs once the sheet height (and thus the map's
+  // bottom padding) settles — see the mapBottomInset effect below — so the route is framed into the
+  // band the sheet really leaves visible, not a stale, taller inset.
+  const pendingFitRef = useRef<LatLng[] | null>(null)
   useEffect(() => {
     if (!mapRoute) {
       wasActiveRef.current = false
+      fittedJourneyRef.current = null
+      pendingFitRef.current = null
       return
     }
+    const journey = activeJourneyParams?.journey ?? null
     const justStarted = Boolean(activeJourneyParams) && !wasActiveRef.current
+    const rerouted =
+      Boolean(activeJourneyParams) && !justStarted && journey !== fittedJourneyRef.current
     wasActiveRef.current = Boolean(activeJourneyParams)
-    // Defer one beat on start: the detail sheet we're leaving is still closing, so its tall
-    // reported height lingers in mapBottomInset for a frame. Fitting immediately would frame the
-    // route into the thin strip left above that stale inset and zoom right out. Waiting lets the
-    // inset settle to the compact active-journey sheet so the whole trip is framed and centred.
-    if (justStarted) {
-      const id = setTimeout(() => mapRef.current?.fitToRoute(mapRoute.bounds), 400)
+    // On start the detail sheet we're leaving is still closing, and on a reroute the active sheet is
+    // collapsing from a taller snap (or shedding the alert banner); either way its reported height —
+    // which drives the map's bottom padding — is mid-flight. Fitting now would frame the route into
+    // the thin strip above that stale inset and zoom out too far. Queue the bounds and let the
+    // inset-settle effect fit once the height lands; the timer is a fallback for when it never moves.
+    if (justStarted || rerouted) {
+      fittedJourneyRef.current = journey
+      pendingFitRef.current = mapRoute.bounds
+      const id = setTimeout(() => {
+        if (!pendingFitRef.current) return
+        mapRef.current?.fitToRoute(pendingFitRef.current)
+        pendingFitRef.current = null
+      }, 500)
       return () => clearTimeout(id)
     }
   }, [mapRoute, activeJourneyParams])
@@ -359,11 +380,32 @@ export function MapHomeScreen({ navigation, route }: Props) {
     : overlayActive
       ? Math.max(stationHeight, reportHeight, plannerHeight, detailHeight)
       : searchHeight
+
+  // Run a queued route fit (from start / reroute) once the bottom inset settles, so the camera
+  // frames the route against the sheet's final height rather than a transient taller one. The fit
+  // uses `mapPadding` (driven by mapBottomInset), so reacting to its change guarantees correct
+  // framing; the fallback timer in the queueing effect covers the case where the inset never moves.
+  useEffect(() => {
+    if (!pendingFitRef.current) return
+    const bounds = pendingFitRef.current
+    pendingFitRef.current = null
+    const id = requestAnimationFrame(() => mapRef.current?.fitToRoute(bounds))
+    return () => cancelAnimationFrame(id)
+  }, [mapBottomInset])
   // The sheets that expand to full height all snap to `SCREEN_H - insets.top - 66`, leaving just
   // enough room for the top buttons. When a sheet reaches that height it covers the map entirely
   // (e.g. the route overview), so the re-centre/account buttons are hidden to avoid floating over it.
   const insets = useSafeAreaInsets()
-  const sheetIsFullscreen = mapBottomInset >= Dimensions.get('window').height - insets.top - 66
+  const sheetIsFullscreen = mapBottomInset >= Dimensions.get('window').height - insets.top - 10
+
+  const topButtonsOpacity = useRef(new Animated.Value(1)).current
+  useEffect(() => {
+    Animated.timing(topButtonsOpacity, {
+      toValue: sheetIsFullscreen ? 0 : 1,
+      duration: 180,
+      useNativeDriver: true,
+    }).start()
+  }, [sheetIsFullscreen, topButtonsOpacity])
 
   // The search sheet is the resting state of the map. Any other flow (a station, a plan, a journey
   // detail/active journey, or a report) takes over the screen, so the search sheet is dismissed
@@ -603,6 +645,9 @@ export function MapHomeScreen({ navigation, route }: Props) {
           setActiveJourneyParams(null)
           setActive(null)
         }}
+        onRerouteSelected={(journey) =>
+          setActiveJourneyParams((prev) => (prev ? { ...prev, journey } : prev))
+        }
         onHeightChange={setActiveJourneyHeight}
       />
 
@@ -651,29 +696,30 @@ export function MapHomeScreen({ navigation, route }: Props) {
 
       {/* Top overlay: rendered after sheets so it sits above all backdrops */}
       <SafeAreaView edges={['top']} style={[styles.topSafe, { pointerEvents: 'box-none' }]}>
-        {!sheetIsFullscreen && (
-          <View style={[styles.topButtons, { pointerEvents: 'box-none' }]}>
-            <TopIconButton
-              icon="my-location"
-              size={50}
-              color={coords ? Colors.blue : Colors.secondaryText}
-              accessibilityLabel="Re-centre map on my location"
-              onPress={() => mapRef.current?.recentre()}
-            />
-            {shiftStation && !activeStation && !activeReport && (
-              <ShiftBanner station={shiftStation} onJump={jumpToShiftStation} />
-            )}
-            <TopIconButton
-              icon={status === 'authed' ? 'account-circle' : 'person'}
-              color={status === 'authed' ? Colors.blue : Colors.text}
-              size={50}
-              accessibilityLabel={
-                status === 'authed' && user ? `Logged in as ${user.username}` : 'Log in'
-              }
-              onPress={handleAccountPress}
-            />
-          </View>
-        )}
+        <Animated.View
+          style={[styles.topButtons, { opacity: topButtonsOpacity }]}
+          pointerEvents={sheetIsFullscreen ? 'none' : 'box-none'}
+        >
+          <TopIconButton
+            icon="my-location"
+            size={50}
+            color={coords ? Colors.blue : Colors.secondaryText}
+            accessibilityLabel="Re-centre map on my location"
+            onPress={() => mapRef.current?.recentre()}
+          />
+          {shiftStation && !activeStation && !activeReport && (
+            <ShiftBanner station={shiftStation} onJump={jumpToShiftStation} />
+          )}
+          <TopIconButton
+            icon={status === 'authed' ? 'account-circle' : 'person'}
+            color={status === 'authed' ? Colors.blue : Colors.text}
+            size={50}
+            accessibilityLabel={
+              status === 'authed' && user ? `Logged in as ${user.username}` : 'Log in'
+            }
+            onPress={handleAccountPress}
+          />
+        </Animated.View>
         {active && !activeJourneyParams && (
           <ActiveJourneyBanner
             active={active}

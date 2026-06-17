@@ -77,6 +77,20 @@ export async function setActiveLegIndex(index: number): Promise<void> {
   await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify({ ...active, currentLegIndex: clamped }))
 }
 
+/**
+ * Swap the followed journey for a rerouted one, restarting progress at the first leg. Keeps the
+ * rest of the record (savedId, from/to, outages, level, startedAt) intact. No-op if there is no
+ * active journey.
+ */
+export async function replaceActiveJourney(journey: Journey): Promise<void> {
+  const active = await loadActiveJourney()
+  if (!active) return
+  await AsyncStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify({ ...active, journey, currentLegIndex: 0 }),
+  )
+}
+
 /** Clear the active journey — used both when it completes and when the rider ends it early. */
 export async function clearActiveJourney(): Promise<void> {
   await AsyncStorage.removeItem(STORAGE_KEY)
