@@ -88,7 +88,7 @@ export const OutageTimeline = ({
                       <XStack items="center" gap="$1">
                         <Ionicons name="shield-checkmark" size={10} color="#15803d" />
                         <Text fontSize={11} fontWeight="600" color="#15803d">
-                          Trusted
+                            TfL worker
                         </Text>
                       </XStack>
                     )

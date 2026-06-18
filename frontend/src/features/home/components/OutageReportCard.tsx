@@ -184,7 +184,7 @@ export const OutageReportCard = ({
             <XStack items="center" gap="$1" mt="$0.5">
               <Ionicons name="shield-checkmark" size={11} color="#15803d" />
               <Text fontSize={11} fontWeight="600" color="#15803d">
-                Trusted reporter
+                TfL worker
               </Text>
             </XStack>
           )}

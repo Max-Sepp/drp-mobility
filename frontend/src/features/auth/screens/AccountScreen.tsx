@@ -496,7 +496,7 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
                 <XStack items="center" gap="$1">
                   <Ionicons name="shield-checkmark" size={13} color="#15803d" />
                   <Text fontSize={12} fontWeight="600" color="#15803d">
-                    Trusted reporter
+                    TfL worker
                   </Text>
                 </XStack>
               ) : (

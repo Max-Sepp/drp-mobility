@@ -69,6 +69,8 @@ export const LocationInput = ({
 
   const skipNextSearch = useRef(isResolvedProp ?? false)
   const isResolvedRef = useRef(isResolvedProp ?? false)
+  // Incremented whenever a selection is made; in-flight searches check this to discard stale results.
+  const searchGenRef = useRef(0)
   // Read stations through a ref so the search debounce depends only on `value` — `stations` is a
   // fresh `[]` on every render until the list loads, which would otherwise restart the debounce
   // endlessly and leave the spinner stuck on "searching".
@@ -99,6 +101,7 @@ export const LocationInput = ({
           setSearching(false)
           return
         }
+        const gen = searchGenRef.current
         // Fuzzy-match stations locally (instant) and show the top 2 above the address results.
         const matchedStations = (stationsRef.current ?? [])
           .map((s) => ({ s, score: fuzzyScore(value, s.name) }))
@@ -114,7 +117,8 @@ export const LocationInput = ({
         } catch {
           // Network error — show no suggestions rather than crashing
         }
-        if (!active) return
+        // Discard results if the component cleaned up or a selection was made while we were waiting.
+        if (!active || searchGenRef.current !== gen) return
         setSuggestions(results)
         setSearching(false)
       },
@@ -152,6 +156,7 @@ export const LocationInput = ({
   }
 
   async function choose(suggestion: LocationSuggestion) {
+    searchGenRef.current++
     Keyboard.dismiss()
     setSuggestions([])
     setStationSuggestions([])
@@ -177,6 +182,7 @@ export const LocationInput = ({
   }
 
   async function chooseStation(station: StationDetail) {
+    searchGenRef.current++
     Keyboard.dismiss()
     setSuggestions([])
     setStationSuggestions([])
@@ -206,6 +212,7 @@ export const LocationInput = ({
   }
 
   function chooseRecent(recent: RecentLocation) {
+    searchGenRef.current++
     Keyboard.dismiss()
     setSuggestions([])
     skipNextSearch.current = true
@@ -220,6 +227,7 @@ export const LocationInput = ({
   }
 
   function chooseSavedPlace(place: PlaceShortcut) {
+    searchGenRef.current++
     Keyboard.dismiss()
     setSuggestions([])
     skipNextSearch.current = true
@@ -274,6 +282,9 @@ export const LocationInput = ({
             }}
             onBlur={() => setTimeout(() => setFocused(false), 150)}
             onSubmitEditing={() => {
+              setSuggestions([])
+              setStationSuggestions([])
+              setFocused(false)
               if (matchedSavedPlaces.length > 0) chooseSavedPlace(matchedSavedPlaces[0])
               else if (stationSuggestions.length > 0) chooseStation(stationSuggestions[0])
               else if (suggestions.length > 0) choose(suggestions[0])

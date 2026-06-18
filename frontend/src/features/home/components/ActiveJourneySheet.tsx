@@ -293,14 +293,6 @@ export function ActiveJourneySheet({
     return assessOutages(journey, matched, stations)
   }, [currentJourney, params?.journey, allOutages, params?.outages, stations])
 
-  const arrivalStation = currentLeg?.arrivalPoint?.commonName
-    ? resolveStation(currentLeg.arrivalPoint.commonName)
-    : null
-  const upcomingAssessments = useMemo(
-    () => (arrivalStation ? outageAssessments.filter((a) => a.stationName === arrivalStation) : []),
-    [arrivalStation, outageAssessments],
-  )
-
   // All station names the rider still needs to pass through (arrival of current leg onwards).
   const futureStationNames = useMemo(() => {
     const names = new Set<string>()
@@ -1349,8 +1341,6 @@ export function ActiveJourneySheet({
                   : 'Tap Arrived when you reach each stop.'}
               </Text>
             </XStack>
-
-            <RouteAlerts assessments={upcomingAssessments} disruptions={[]} />
 
             {remaining.length > 0 && (
               <YStack gap="$1.5">
